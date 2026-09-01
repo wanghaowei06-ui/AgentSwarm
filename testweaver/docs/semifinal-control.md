@@ -2,9 +2,9 @@
 
 更新时间：2026-09-02（Asia/Shanghai）
 
-状态：`M1_NATIVE_DUAL_TEAM_PASS / M1_SKILL_INVOKE_PARTIAL`
+状态：`M2-C_PARTIAL / M2-D_NOT_STARTED`
 
-唯一当前里程碑：把 `84bd152` 的通用 Skill 选择/溯源纪律通过原生 `AgentSpec/package` 热更新到四个 QwenPaw Agent，然后进入最小真实 M2：继续由原生 Manager→Leader→Worker 驱动，在自然任务中验证适用 Skill 的真实 load/invoke、一次 Human PAUSE→人工决定→resume、一次真实可恢复故障，以及不同身份/进程的 Outcome/Boundary Oracle。异构 DSH/阿里云百炼与 `codex-cc` 随后接入同一权威链，不恢复第二编排器。
+唯一当前里程碑：M2-C run `m2c-20260901T211748Z` 已冻结并诚实标记为 `PARTIAL`；完成跨房间 assignment 通知根因修复镜像 `be10aaf` 的部署后，立即进入唯一下一步 M2-D，不扩 Gate。
 
 ## 1. 已冻结决策
 
@@ -72,6 +72,9 @@ TestWeaver 只做产品差异：
 - M1+ 真实 Run `m1plus-20260901T193737Z` 已冻结：单次 Human 输入触发 Manager 动态选择两个 Team/Leader，两条新原生 Project/Task、两个真实 Worker provider 调用、两次 submit/check/accept/handoff 和 Manager 最终报告；36 分钟内无第三 Task 或重复 intake。核心原生双 Team 链 PASS，整体仍 PARTIAL。receipt/manifest/hash 为 `82332fc`，独立 review 为 `e09309b`。
 - M1+ 独立复核确认五个领域 Skill 的 source/runtime hash 与 enabled 状态，但本 Run exact-name load/invoke 全部 `NOT_OBSERVED`；不得用安装状态冒充调用。`84bd152` 已在原生 AgentSpec `config/AGENTS.md` 增加通用、非案例化纪律：按 `assign_when` 选择零个或多个适用 Skill，经原生路径读取，并在正常 result/handoff 记录 exact name、source commit/version 与 evidence ref；尚未热更新或真实复跑。
 - M1+ 仍记录三个非阻断原生缺口：新 Human room 共享 `agent:main:main` session、global task/project 状态投影滞后、global `replyRoute` 指向旧 admin room。它们不推翻已观察的 Team-scoped accepted artifacts，但在后续严格收口前保持 `PARTIAL/WARN`。
+- M2-C run `m2c-20260901T211748Z`（commit `503f1d7`）已冻结，状态诚实为 `PARTIAL`：Manager 动态选择 Team、Leader 原生创建 Project/Task 并完成 `delegate_task` 均已成立；但 Task room 中 Worker 虽为 `join`，仍有 0 条 assignment 消息，Leader 未消费跨房间的 `notificationNeeded`，并进入长时间 `sleep` 轮询。因此本 Run 的 Skill invoke、HITL、恢复和双 Oracle 均为 `NOT_OBSERVED`，不能以静态收据补齐。
+- 跨房间 assignment 通用根因修复已由 `be10aaf` 完成，相关 focused tests、插件校验和官方 QwenPaw 镜像构建均通过，当前仍待部署；在真实运行前不得写成 LIVE。
+- 异构 Worker 最薄适配已由 `2e1ef40` source-only 完成：DSH 显式支持 DeepSeek 与阿里云百炼，Codex 使用 `codex-cc`、`gpt-5.6-luna`、`max`；尚未 LIVE，不得替代原生 Leader 分配或回收结果。
 - 配置线已建立 names-only preflight，并确认 `/etc/agentteams/agentteams.env`、`providers.env`、LoongSuite、OTel 和 Nacos 只通过外部受保护引用复用；当前 Nacos 探测、OTel Collector 和 LoongSuite 服务状态如实标为延后，不冒充 LIVE。
 - AgentLoop 旧资产目前只可称合同/replay/历史受限证据；必须等待同一真实 M0/Hero 后完成真实查询回读。
 
@@ -79,9 +82,10 @@ TestWeaver 只做产品差异：
 
 1. `M0 原生闭环`：同一真实请求完成 Manager→Leader→Worker→Leader→Manager 二次决策；无旧 Runner 参与。
 2. `M1 协作与 Skill`：双 Team、至少三个不同职能 Agent、真实 Skill discovery/load/invoke、结构化 Handoff；证据改变至少一次后续路径。
-3. `M2 工程与安全`：真实 HITL、一次可恢复异常、迟到结果拒绝、双 Oracle、PG/事件/Trace/AgentLoop 同 Run 关联、密钥和 Gold 隔离。
-4. `M3 效果`：冻结同输入、预算和 Oracle，单 Agent、同质多 Agent、异质多 Agent至少三次配对复跑；报告质量、重复率、幻觉阻断、协调开销、Token/成本和净价值。
-5. `M4 交付`：clean-room 一键运行/复跑、离线包、产品接入、PPT/PDF、8 分钟内视频、许可证/SBOM/贡献指南。第二场景随后用于证明复制性。
+3. `M2-C`：run `m2c-20260901T211748Z` 保持冻结 `PARTIAL`，不回填未观察的 Skill invoke、HITL、恢复或 Oracle。
+4. `M2-D`（唯一下一步，不扩 Gate）：部署 `be10aaf` 后立即重跑到真实 `PAUSE`；由 Human 批准后执行一次可恢复故障、原生 cancel+replacement、拒绝旧 Task 迟到提交，再运行双 Oracle。
+5. `M3 效果`：冻结同输入、预算和 Oracle，单 Agent、同质多 Agent、异质多 Agent至少三次配对复跑；报告质量、重复率、幻觉阻断、协调开销、Token/成本和净价值。
+6. `M4 交付`：clean-room 一键运行/复跑、离线包、产品接入、PPT/PDF、8 分钟内视频、许可证/SBOM/贡献指南。第二场景随后用于证明复制性。
 
 HA、PITR、RAG、高并发、容量和灾备在核心闭环前只保留设计，不阻塞 M0–M3。
 
