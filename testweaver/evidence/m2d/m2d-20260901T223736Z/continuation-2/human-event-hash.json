@@ -1,0 +1,12 @@
+{
+  "schema": "testweaver.m2d.human-event-hash/v1",
+  "run_id": "continuation-2",
+  "room_id": "!hXmoHY3MdNwdH16r3J:matrix-native-m0-20260901.agentteams.local:28080",
+  "event_id": "$N7jz49ARX7kpkyDAo1UrYoJohvBdLPag_AZO2XFBABY",
+  "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+  "origin_server_ts": 1788305368781,
+  "body_sha256": "c46be7486fef069344a668a3e1a2d35dd2c9373d2ce1fdfc72948925349eeb67",
+  "event_file_sha256": "07c387c12c6cbfa104ecb77f54c14426d1c88b2b28fc604cba0d00a5ff20286d",
+  "event_path": "/root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/continuation-2/human-event.json",
+  "values_redacted": true
+}

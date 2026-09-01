@@ -2,9 +2,9 @@
 
 更新时间：2026-09-02（Asia/Shanghai）
 
-状态：`M2-C_PARTIAL / M2-D_HITL_ROUTING_BLOCKED`
+状态：`M2-C_PARTIAL / M2-D_HITL_AND_CONTAINER_RECOVERY_PASS / M2-D_REPLACEMENT_NOT_OBSERVED`
 
-唯一当前里程碑：跨房间 assignment 通知修复镜像 `be10aaf` 已部署并由 M2-D 的真实 Worker assignment/submit 验证；M2-D 已到真实 `PAUSE`，当前只解决 Human 决定必须经 Manager 认证并转交 Leader 的原生路由，不扩 Gate、不绕过权限。
+唯一当前里程碑：跨房间 assignment 通知修复镜像 `be10aaf` 已部署并由 M2-D 的真实 Worker assignment/submit 验证；M2-D continuation-2 已证明真实 HITL 与单容器恢复 PASS。故障发生时 Task 已终态，原生 replacement/迟到拒绝为 `NOT_OBSERVED`；根因是本次实验时序，不归因于 AgentTeams 故障。
 
 ## 1. 已冻结决策
 
@@ -74,7 +74,7 @@ TestWeaver 只做产品差异：
 - M1+ 仍记录三个非阻断原生缺口：新 Human room 共享 `agent:main:main` session、global task/project 状态投影滞后、global `replyRoute` 指向旧 admin room。它们不推翻已观察的 Team-scoped accepted artifacts，但在后续严格收口前保持 `PARTIAL/WARN`。
 - M2-C run `m2c-20260901T211748Z`（commit `503f1d7`）已冻结，状态诚实为 `PARTIAL`：Manager 动态选择 Team、Leader 原生创建 Project/Task 并完成 `delegate_task` 均已成立；但 Task room 中 Worker 虽为 `join`，仍有 0 条 assignment 消息，Leader 未消费跨房间的 `notificationNeeded`，并进入长时间 `sleep` 轮询。因此本 Run 的 Skill invoke、HITL、恢复和双 Oracle 均为 `NOT_OBSERVED`，不能以静态收据补齐。
 - 跨房间 assignment 通用根因修复 `be10aaf` 已顺序部署到四个 QwenPaw Agent；健康、身份、Team Ready 和 M2-D 中 Worker 的真实 ack/submit 已证明修复生效。
-- M2-D run `m2d-20260901T223736Z` 已真实完成 Manager 选 Team、Leader 委派、Worker 模型/Skill 执行、submit/check/accept 与 `PAUSE`；但 Human 批准被发往 Task room，Leader 正确执行权限拒绝。未出现 `resume_project`、replacement Task 或 `FAULT_READY`，因此未执行容器故障，当前诚实为 `PARTIAL`。唯一下一步是核实并使用 AgentTeams 原生 Human→Manager→Leader 决策链，而不是让 Human 直连 Leader或由脚本改状态。
+- M2-D run `m2d-20260901T223736Z` 的 continuation-2 已真实完成 Human→Manager→Leader HITL 决策、同一 Project `resume_project`、恢复 Task、Worker ack/in_progress/submit、Leader accept、`FAULT_READY`、授权范围内唯一 `docker rm -f` 与 Controller 自动重建；真实 HITL 与容器恢复 PASS。故障发生时 recovery Task 已进入终态，重建后未观察到原生 `cancel old with replacementTaskId`、replacement delegate/execute/submit/check/accept 或旧 Task 迟到 ack/submit 拒绝（`NOT_OBSERVED`）。这是本次实验时序边界，不归因于 AgentTeams 故障；整体收据仍为 `PARTIAL`。
 - 异构 Worker 最薄适配已由 `2e1ef40` source-only 完成：DSH 显式支持 DeepSeek 与阿里云百炼，Codex 使用 `codex-cc`、`gpt-5.6-luna`、`max`；尚未 LIVE，不得替代原生 Leader 分配或回收结果。
 - 配置线已建立 names-only preflight，并确认 `/etc/agentteams/agentteams.env`、`providers.env`、LoongSuite、OTel 和 Nacos 只通过外部受保护引用复用；当前 Nacos 探测、OTel Collector 和 LoongSuite 服务状态如实标为延后，不冒充 LIVE。
 - AgentLoop 旧资产目前只可称合同/replay/历史受限证据；必须等待同一真实 M0/Hero 后完成真实查询回读。
@@ -84,7 +84,7 @@ TestWeaver 只做产品差异：
 1. `M0 原生闭环`：同一真实请求完成 Manager→Leader→Worker→Leader→Manager 二次决策；无旧 Runner 参与。
 2. `M1 协作与 Skill`：双 Team、至少三个不同职能 Agent、真实 Skill discovery/load/invoke、结构化 Handoff；证据改变至少一次后续路径。
 3. `M2-C`：run `m2c-20260901T211748Z` 保持冻结 `PARTIAL`，不回填未观察的 Skill invoke、HITL、恢复或 Oracle。
-4. `M2-D`（唯一下一步，不扩 Gate）：沿 AgentTeams 原生 Human→Manager→Leader 路由完成真实批准与 `resume`；随后执行一次已批准的可恢复故障、原生 cancel+replacement、拒绝旧 Task 迟到提交，再运行双 Oracle。当前 run 若原生状态无法安全续接，则冻结为 `PARTIAL`，只用已验证路径发起一个新 run，不伪改旧状态。
+4. `M2-D`：continuation-2 已证明真实 HITL 与 Controller 容器恢复；由于故障发生时 Task 已终态，原生 replacement/迟到拒绝为 `NOT_OBSERVED`。若后续需要复制该边界，必须先确保故障发生时 Task 仍处于可取消执行态；本次结论是实验时序边界，不归因于 AgentTeams 故障。
 5. `M3 效果`：冻结同输入、预算和 Oracle，单 Agent、同质多 Agent、异质多 Agent至少三次配对复跑；报告质量、重复率、幻觉阻断、协调开销、Token/成本和净价值。
 6. `M4 交付`：clean-room 一键运行/复跑、离线包、产品接入、PPT/PDF、8 分钟内视频、许可证/SBOM/贡献指南。第二场景随后用于证明复制性。
 

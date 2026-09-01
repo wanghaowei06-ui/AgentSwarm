@@ -1,0 +1,71 @@
+{
+  "schema": "testweaver.m2d.continuation-2.preflight/v1",
+  "collected_at": "2026-09-01T23:33:36Z",
+  "authorization": {
+    "human_room": "!hXmoHY3MdNwdH16r3J:matrix-native-m0-20260901.agentteams.local:28080",
+    "human_event": "$N7jz49ARX7kpkyDAo1UrYoJohvBdLPag_AZO2XFBABY",
+    "manager_leader_room": "!IrR5zoeSGDaTVw4Ple:matrix-native-m0-20260901.agentteams.local:28080",
+    "manager_forward_event": "$JZ6Y0xLj5e21WTdvvr4ne461sMor52xwj6GooGh0wGw",
+    "manager_fault_ready_event": "$KkNwnAImjy4shO2kmXPp27BHHSkxzviXlJDUFPvKeLM",
+    "project": "m2d-recovery-prep-20260901-224400",
+    "task": "task-20260901-224400-recovery-verify"
+  },
+  "target": {
+    "cr": "native-m1-verify-worker",
+    "container_name": "agentteams-native-m0-20260901-worker-native-m1-verify-worker"
+  },
+  "docker": {
+    "Id": "344c1bb4218e786f435e975bef1a5de950271674f18454ef3e4c3d221d3d3a5e",
+    "Name": "/agentteams-native-m0-20260901-worker-native-m1-verify-worker",
+    "Config": {
+      "Hostname": "344c1bb4218e",
+      "Image": "agentteams/qwenpaw-worker:be10aaf"
+    },
+    "State": {
+      "Status": "running",
+      "Running": true,
+      "Restarting": false,
+      "OOMKilled": false,
+      "ExitCode": 0,
+      "StartedAt": "2026-09-01T22:26:52.76157996Z",
+      "FinishedAt": "0001-01-01T00:00:00Z",
+      "Health": null
+    },
+    "HostConfig": {
+      "NetworkMode": "agentteams-native-m0-20260901-net"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "agentteams-native-m0-20260901-net": {
+          "NetworkID": "b52bc4d90fa17a25aa5a743f3694548715f6a6b9651e7a58e8cdcc44ad503371",
+          "EndpointID": "42d45184ef04239cda339b15e29d161abdd01a5c69fdbc25d7bbdfe4dc04f469",
+          "IPAddress": "172.29.0.6",
+          "Gateway": "172.29.0.1",
+          "Aliases": null
+        }
+      }
+    }
+  },
+  "controller_worker": [
+    {
+      "name": "native-m1-verify-worker",
+      "team": "native-m1-verify-team",
+      "role": "worker",
+      "runtime": "qwenpaw",
+      "image": "agentteams/qwenpaw-worker:be10aaf",
+      "phase": "Running",
+      "containerState": "running",
+      "model": "deepseek-v4-flash",
+      "config_keys": []
+    }
+  ],
+  "controller_team": [
+    {
+      "name": "native-m1-verify-team",
+      "phase": "Active",
+      "status": null,
+      "ready": null
+    }
+  ],
+  "mutation_executed": false
+}

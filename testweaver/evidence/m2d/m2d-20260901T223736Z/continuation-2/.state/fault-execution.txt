@@ -1,0 +1,11 @@
+schema=testweaver.m2d.continuation-2.fault-execution/v1
+operator_command=docker rm -f 344c1bb4218e786f435e975bef1a5de950271674f18454ef3e4c3d221d3d3a5e
+target_container_name=agentteams-native-m0-20260901-worker-native-m1-verify-worker
+target_container_id=344c1bb4218e786f435e975bef1a5de950271674f18454ef3e4c3d221d3d3a5e
+started_at=2026-09-01T23:33:56Z
+--- docker rm output ---
+344c1bb4218e786f435e975bef1a5de950271674f18454ef3e4c3d221d3d3a5e
+--- end docker rm output ---
+exit_code=0
+finished_at=2026-09-01T23:33:56Z
+post_rm_same_id_visible=

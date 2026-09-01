@@ -1,0 +1,24 @@
+{
+  "schema": "testweaver.m2d.matrix-readback/v1",
+  "run_id": "continuation-2",
+  "checked_at": "2026-09-01T23:42:53Z",
+  "human_boundary": {
+    "room_id": "!hXmoHY3MdNwdH16r3J:matrix-native-m0-20260901.agentteams.local:28080",
+    "event_id": "$N7jz49ARX7kpkyDAo1UrYoJohvBdLPag_AZO2XFBABY"
+  },
+  "rooms_observed": 34,
+  "events_recorded": 195,
+  "paths": {
+    "events": "/root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/continuation-2/matrix-events.jsonl",
+    "index": "/root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/continuation-2/matrix-event-index.jsonl",
+    "stages": "/root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/continuation-2/matrix-stage-observations.jsonl",
+    "rooms_state": "/root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/continuation-2/.state/rooms.tsv"
+  },
+  "credentials": {
+    "base_url_variable": "AGENTTEAMS_MATRIX_URL",
+    "manager_access_token_variable": "AGENTTEAMS_MANAGER_MATRIX_TOKEN",
+    "worker_access_token_variable": "AGENTTEAMS_WORKER_MATRIX_TOKEN",
+    "values_persisted": false
+  },
+  "writes": false
+}

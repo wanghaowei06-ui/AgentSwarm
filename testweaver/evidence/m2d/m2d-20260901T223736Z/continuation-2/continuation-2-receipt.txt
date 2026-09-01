@@ -1,0 +1,109 @@
+schema: testweaver.m2d.continuation-2.receipt/v1
+status: PARTIAL
+run: m2d-20260901T223736Z
+continuation: continuation-2
+frozen_parent_commit: c4573b3f470d9d0752dfb2a74e0edf235046159f
+started_at_utc: 2026-09-01T23:28:50Z
+stopped_at_utc: 2026-09-01T23:47:19Z
+
+Scope and safety
+----------------
+This is a new continuation-2 evidence segment under the frozen M2-D run. The
+parent and post-approval evidence were not modified. Exactly one Human input
+was sent, only to the authoritative Human -> Manager room. No approval was
+sent to the old Task room or the drift room. No Manager, Controller, Matrix,
+CR, volume, model, provider, account, or configuration change was made.
+
+Human -> Manager -> Leader
+-------------------------
+Human room: !hXmoHY3MdNwdH16r3J:matrix-native-m0-20260901.agentteams.local:28080
+Human event: $N7jz49ARX7kpkyDAo1UrYoJohvBdLPag_AZO2XFBABY
+Human sender: @nativeadmin:matrix-native-m0-20260901.agentteams.local:28080
+Human event origin_server_ts: 1788305368781
+Human input SHA256 recorded by send receipt: c46be7486fef069344a668a3e1a2d35dd2c9373d2ce1fdfc72948925349eeb67
+Manager -> Leader room: !IrR5zoeSGDaTVw4Ple:matrix-native-m0-20260901.agentteams.local:28080
+Manager forward event: $JZ6Y0xLj5e21WTdvvr4ne461sMor52xwj6GooGh0wGw
+Manager forward mention: @native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080
+The forward event records the narrow docker rm -f scope and explicitly leaves
+resume, task creation, assignment, and state changes to the Leader.
+
+Native pre-fault chain
+----------------------
+Project: m2d-recovery-prep-20260901-224400
+Leader: native-m1-verify-leader
+Worker: native-m1-verify-worker
+Leader resume_project event: $1aQfjC1ZG4nEpDDVb3pOQOOTjigSYJK-CxqSfOXmxpk
+Recovery Task: task-20260901-224400-recovery-verify
+Leader plan_dag event: $TcwQeu1k_jo8A-QR6HpVpUVBfsHnh6d_uruHcnP1JGU
+Leader delegate_task event with target room: $BW_7E8oi9AxyMTAfsKWNijf86YMgA3Ms4MLINTdn9EQ
+Native assignment event: $ujFCFbdfUSkq5Z1SBVU-TTpm4qnCxHpFF0rDlfH2E6Y
+Assignment target: !LS2u4mrrNQIvM1B79I:matrix-native-m0-20260901.agentteams.local:28080
+Assignment mention: @native-m1-verify-worker:matrix-native-m0-20260901.agentteams.local:28080
+Worker ack_task event: $GJTp098GqTWQohB6kB2UYPBKVXvzNTl1rMdL5StfOp8
+Worker submit_task event: $jLurwmfl3h12DIU2gs7_m-fV7n_D75ThSpMjgeyaK1U
+Leader accept_task_result event: $NxVMGdeF1pEG7C7U3ODechsKt0zK8JIbnYz7OS2MPN8
+Manager FAULT_READY event: $KkNwnAImjy4shO2kmXPp27BHHSkxzviXlJDUFPvKeLM
+FAULT_READY room: !IrR5zoeSGDaTVw4Ple:matrix-native-m0-20260901.agentteams.local:28080
+FAULT_READY was emitted only after the Worker had ack/in_progress, completed
+the strictly read-only baseline, submitted SUCCESS, and the Leader accepted it.
+
+Authorized fault and native rebuild
+------------------------------------
+Fresh preflight: .state/preflight-target.json
+Old container name: agentteams-native-m0-20260901-worker-native-m1-verify-worker
+Old container ID: 344c1bb4218e786f435e975bef1a5de950271674f18454ef3e4c3d221d3d3a5e
+Old image: agentteams/qwenpaw-worker:be10aaf
+Operator command: docker rm -f 344c1bb4218e786f435e975bef1a5de950271674f18454ef3e4c3d221d3d3a5e
+Operator result: exit_code=0; no -v; no volume, CR, config, or other-container action
+Operator record: .state/fault-execution.txt
+Controller recreated the same named Worker container without a manual trigger.
+New container ID: 09301cc4771ebc6ab43a32b35ccca69ce3307fd8c8310e410948744c64c22ba5
+New image ID: sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb
+New image tag: agentteams/qwenpaw-worker:be10aaf
+New container started_at: 2026-09-01T23:35:50.820387014Z
+Post-rebuild readback: .state/post-rebuild-readback.json
+Post-rebuild state: same CR, role worker, runtime qwenpaw, model deepseek-v4-flash,
+Matrix user @native-m1-verify-worker:matrix-native-m0-20260901.agentteams.local:28080,
+personal room !YJn4m2FIISa0gNTx9y:matrix-native-m0-20260901.agentteams.local:28080,
+8088 HTTP 200, Team Active, leaderReady=true, readyWorkers=1/totalWorkers=1.
+
+Post-rebuild native continuation result
+----------------------------------------
+Read-only Matrix collection stopped at 2026-09-01T23:42:55Z; all owned log
+stream descendants were confirmed stopped at 2026-09-01T23:47:19Z. Using the exact
+new-container start millisecond boundary 1788305750820, the raw Matrix stream
+contains 12 room.meta records and zero m.room.message records. It contains
+zero post-rebuild cancel_task, replacementTaskId, replacement delegate,
+replacement execution, late-ack/submit rejection, or replacement accept events.
+Therefore the native Leader replacement chain did not occur during this
+continuation. No replacement Task was created by the operator, and no Leader
+or Worker state was manually changed. No Oracle action occurred.
+Corrected observation: .state/replacement-observation-corrected.tsv
+The retained process-only files .state/replacement-observation.tsv and
+.state/replacement-observation-summary.tsv used an earlier seconds-vs-
+milliseconds filter and are non-authoritative trace only; all conclusions
+above use the corrected millisecond-boundary record.
+Native event references: .state/native-event-refs.json
+Raw Matrix stream: matrix-events.jsonl
+Raw Matrix index: matrix-event-index.jsonl
+
+Evidence integrity
+------------------
+Collectors were armed before the Human input and stopped explicitly; stop
+record: .state/collector-stop.txt
+All Docker log files in logs/rebuild/ were passed through the existing
+redactor before persistence. Secret scan was run over this continuation and
+found no unredacted Bearer/key/password/secret value. Only protected variable
+names and non-secret identity/state fields were retained.
+Secret scan record: secret-scan.txt
+Path containment record: path-check.txt
+All continuation paths resolve below this directory. The SHA256 manifest is
+continuation-2-manifest.sha256 and excludes itself to avoid a hash cycle.
+
+Conclusion
+----------
+PARTIAL: the authoritative Human -> Manager -> Leader flow, same-Project
+resume, native recovery Task, real Worker ack/in_progress/submit, Leader
+accept, FAULT_READY, one authorized container fault, and Controller rebuild
+all passed. The post-rebuild native replacement/cancel/late-rejection chain
+was not observed, so this receipt does not claim full M2-D recovery success.

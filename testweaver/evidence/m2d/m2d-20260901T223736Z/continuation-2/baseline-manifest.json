@@ -1,0 +1,583 @@
+{
+  "schema": "testweaver.m2d.evidence-boundary/v1",
+  "status": "EVIDENCE_ARMED",
+  "started_at": "2026-09-01T23:28:47Z",
+  "head": "c4573b3f470d9d0752dfb2a74e0edf235046159f",
+  "frozen_human_input": {
+    "hash": "39181d205e8f101080221e2edad03dcf7d5fa2ccea72b26a4b8a83b2c2fd479c",
+    "room_id": null,
+    "event_id": null,
+    "policy": "Room and event identifiers were not supplied; no Human query was performed. Later use is filter/readback only."
+  },
+  "scope": {
+    "containers": [
+      "manager",
+      "controller",
+      "worker-native-m0-clean-leader",
+      "worker-native-m0-clean-worker",
+      "worker-native-m1-verify-leader",
+      "worker-native-m1-verify-worker"
+    ],
+    "manager": "default",
+    "teams": [
+      "native-m0-clean-team",
+      "native-m1-verify-team"
+    ],
+    "workers": [
+      "native-m0-clean-leader",
+      "native-m0-clean-worker",
+      "native-m1-verify-leader",
+      "native-m1-verify-worker"
+    ],
+    "skills": [
+      "approval-intent-boundary-check",
+      "avoid-redundant-exploration",
+      "diagnose-by-competing-hypotheses",
+      "preserve-critical-constraints",
+      "reconcile-before-retry"
+    ],
+    "exclude_other_containers": true
+  },
+  "manager": {
+    "identity": {
+      "resource_name": "default",
+      "container_name": "agentteams-native-m0-20260901-manager"
+    },
+    "image": {
+      "resource": "agentteams/manager:m1plus-15b7b14",
+      "container": "agentteams/manager:m1plus-15b7b14",
+      "image_id": "sha256:798d52808f58324dcb489517fd87092eaed7ae1aa69e80a19b55464b51092b54"
+    },
+    "resource": {
+      "name": "default",
+      "phase": "Running",
+      "runtime": "openclaw",
+      "image": "agentteams/manager:m1plus-15b7b14",
+      "version": "agentteams/manager:m1plus-15b7b14",
+      "matrixUserID": "@manager:matrix-native-m0-20260901.agentteams.local:28080"
+    },
+    "container": {
+      "container_name": "agentteams-native-m0-20260901-manager",
+      "container_id": "cbc6432f0e51df3c491514c146d31704afe64a5d61bc3acf81fe42698b85e50e",
+      "image": "agentteams/manager:m1plus-15b7b14",
+      "image_id": "sha256:798d52808f58324dcb489517fd87092eaed7ae1aa69e80a19b55464b51092b54",
+      "status": "running",
+      "running": true,
+      "restart_count": 0,
+      "started_at": "2026-09-01T18:48:11.586295224Z"
+    }
+  },
+  "controller": {
+    "identity": {
+      "container_name": "agentteams-native-m0-20260901-controller"
+    },
+    "image": {
+      "container": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-embedded@sha256:3966dc000f20f98033b15fba897f257186653ef8600e760c1cc55aa620b42bd6",
+      "image_id": "sha256:3966dc000f20f98033b15fba897f257186653ef8600e760c1cc55aa620b42bd6"
+    },
+    "container": {
+      "container_name": "agentteams-native-m0-20260901-controller",
+      "container_id": "cc5c2f91197b544c721f1c303fcdf5a3091b0dc7d6aafa5e8f9cb15d51ee7fdc",
+      "image": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-embedded@sha256:3966dc000f20f98033b15fba897f257186653ef8600e760c1cc55aa620b42bd6",
+      "image_id": "sha256:3966dc000f20f98033b15fba897f257186653ef8600e760c1cc55aa620b42bd6",
+      "status": "running",
+      "running": true,
+      "restart_count": 0,
+      "started_at": "2026-09-01T13:30:58.943859072Z"
+    }
+  },
+  "teams": [
+    {
+      "identity": {
+        "resource_name": "native-m0-clean-team"
+      },
+      "image": null,
+      "image_note": "Team resource has no image field; member image references are recorded below.",
+      "member_images": {
+        "native-m0-clean-leader": {
+          "resource": "agentteams/qwenpaw-worker:be10aaf",
+          "container": "agentteams/qwenpaw-worker:be10aaf",
+          "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb"
+        },
+        "native-m0-clean-worker": {
+          "resource": "agentteams/qwenpaw-worker:be10aaf",
+          "container": "agentteams/qwenpaw-worker:be10aaf",
+          "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb"
+        }
+      },
+      "resource": {
+        "name": "native-m0-clean-team",
+        "teamName": "native-m0-clean-team",
+        "leader": "native-m0-clean-leader",
+        "workerNames": [
+          "native-m0-clean-worker"
+        ],
+        "workerMembers": [
+          {
+            "name": "native-m0-clean-leader",
+            "role": "team_leader"
+          },
+          {
+            "name": "native-m0-clean-worker",
+            "role": "worker"
+          }
+        ],
+        "phase": "Active",
+        "leaderReady": true,
+        "readyWorkers": 1,
+        "totalWorkers": 1
+      }
+    },
+    {
+      "identity": {
+        "resource_name": "native-m1-verify-team"
+      },
+      "image": null,
+      "image_note": "Team resource has no image field; member image references are recorded below.",
+      "member_images": {
+        "native-m1-verify-leader": {
+          "resource": "agentteams/qwenpaw-worker:be10aaf",
+          "container": "agentteams/qwenpaw-worker:be10aaf",
+          "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb"
+        },
+        "native-m1-verify-worker": {
+          "resource": "agentteams/qwenpaw-worker:be10aaf",
+          "container": "agentteams/qwenpaw-worker:be10aaf",
+          "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb"
+        }
+      },
+      "resource": {
+        "name": "native-m1-verify-team",
+        "teamName": "native-m1-verify-team",
+        "leader": "native-m1-verify-leader",
+        "workerNames": [
+          "native-m1-verify-worker"
+        ],
+        "workerMembers": [
+          {
+            "name": "native-m1-verify-leader",
+            "role": "team_leader"
+          },
+          {
+            "name": "native-m1-verify-worker",
+            "role": "worker"
+          }
+        ],
+        "phase": "Active",
+        "leaderReady": true,
+        "readyWorkers": 1,
+        "totalWorkers": 1
+      }
+    }
+  ],
+  "workers": [
+    {
+      "identity": {
+        "resource_name": "native-m0-clean-leader",
+        "container_name": "agentteams-native-m0-20260901-worker-native-m0-clean-leader",
+        "role": "team_leader",
+        "team": "native-m0-clean-team"
+      },
+      "runtime": "qwenpaw",
+      "image": {
+        "resource": "agentteams/qwenpaw-worker:be10aaf",
+        "container": "agentteams/qwenpaw-worker:be10aaf",
+        "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb"
+      },
+      "resource": {
+        "name": "native-m0-clean-leader",
+        "workerName": null,
+        "team": "native-m0-clean-team",
+        "role": "team_leader",
+        "runtime": "qwenpaw",
+        "image": "agentteams/qwenpaw-worker:be10aaf",
+        "phase": "Running",
+        "containerState": "running"
+      },
+      "container": {
+        "container_name": "agentteams-native-m0-20260901-worker-native-m0-clean-leader",
+        "container_id": "6c986616c22eb2155d1fe62aefac1c632e042fb1f1f7eedf607b1a05b3680736",
+        "image": "agentteams/qwenpaw-worker:be10aaf",
+        "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+        "status": "running",
+        "running": true,
+        "restart_count": 0,
+        "started_at": "2026-09-01T22:24:40.351731239Z"
+      }
+    },
+    {
+      "identity": {
+        "resource_name": "native-m0-clean-worker",
+        "container_name": "agentteams-native-m0-20260901-worker-native-m0-clean-worker",
+        "role": "worker",
+        "team": "native-m0-clean-team"
+      },
+      "runtime": "qwenpaw",
+      "image": {
+        "resource": "agentteams/qwenpaw-worker:be10aaf",
+        "container": "agentteams/qwenpaw-worker:be10aaf",
+        "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb"
+      },
+      "resource": {
+        "name": "native-m0-clean-worker",
+        "workerName": null,
+        "team": "native-m0-clean-team",
+        "role": "worker",
+        "runtime": "qwenpaw",
+        "image": "agentteams/qwenpaw-worker:be10aaf",
+        "phase": "Running",
+        "containerState": "running"
+      },
+      "container": {
+        "container_name": "agentteams-native-m0-20260901-worker-native-m0-clean-worker",
+        "container_id": "20736420e86f27a080b73b8425aca0730c45fc1c805324b99cd8e693ec25ebd8",
+        "image": "agentteams/qwenpaw-worker:be10aaf",
+        "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+        "status": "running",
+        "running": true,
+        "restart_count": 0,
+        "started_at": "2026-09-01T22:25:42.438030687Z"
+      }
+    },
+    {
+      "identity": {
+        "resource_name": "native-m1-verify-leader",
+        "container_name": "agentteams-native-m0-20260901-worker-native-m1-verify-leader",
+        "role": "team_leader",
+        "team": "native-m1-verify-team"
+      },
+      "runtime": "qwenpaw",
+      "image": {
+        "resource": "agentteams/qwenpaw-worker:be10aaf",
+        "container": "agentteams/qwenpaw-worker:be10aaf",
+        "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb"
+      },
+      "resource": {
+        "name": "native-m1-verify-leader",
+        "workerName": null,
+        "team": "native-m1-verify-team",
+        "role": "team_leader",
+        "runtime": "qwenpaw",
+        "image": "agentteams/qwenpaw-worker:be10aaf",
+        "phase": "Running",
+        "containerState": "running"
+      },
+      "container": {
+        "container_name": "agentteams-native-m0-20260901-worker-native-m1-verify-leader",
+        "container_id": "048528582d172668353509bb66e0dfdb891ea9eaba10765824a9b2bda09dcf6a",
+        "image": "agentteams/qwenpaw-worker:be10aaf",
+        "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+        "status": "running",
+        "running": true,
+        "restart_count": 0,
+        "started_at": "2026-09-01T22:26:18.938278615Z"
+      }
+    },
+    {
+      "identity": {
+        "resource_name": "native-m1-verify-worker",
+        "container_name": "agentteams-native-m0-20260901-worker-native-m1-verify-worker",
+        "role": "worker",
+        "team": "native-m1-verify-team"
+      },
+      "runtime": "qwenpaw",
+      "image": {
+        "resource": "agentteams/qwenpaw-worker:be10aaf",
+        "container": "agentteams/qwenpaw-worker:be10aaf",
+        "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb"
+      },
+      "resource": {
+        "name": "native-m1-verify-worker",
+        "workerName": null,
+        "team": "native-m1-verify-team",
+        "role": "worker",
+        "runtime": "qwenpaw",
+        "image": "agentteams/qwenpaw-worker:be10aaf",
+        "phase": "Running",
+        "containerState": "running"
+      },
+      "container": {
+        "container_name": "agentteams-native-m0-20260901-worker-native-m1-verify-worker",
+        "container_id": "344c1bb4218e786f435e975bef1a5de950271674f18454ef3e4c3d221d3d3a5e",
+        "image": "agentteams/qwenpaw-worker:be10aaf",
+        "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+        "status": "running",
+        "running": true,
+        "restart_count": 0,
+        "started_at": "2026-09-01T22:26:52.76157996Z"
+      }
+    }
+  ],
+  "skills": [
+    {
+      "worker": "native-m0-clean-leader",
+      "skill": "approval-intent-boundary-check",
+      "api_port": 10065,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66",
+      "runtime_sha256": "9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66",
+      "enabled": true
+    },
+    {
+      "worker": "native-m0-clean-leader",
+      "skill": "avoid-redundant-exploration",
+      "api_port": 10065,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd",
+      "runtime_sha256": "eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd",
+      "enabled": true
+    },
+    {
+      "worker": "native-m0-clean-leader",
+      "skill": "diagnose-by-competing-hypotheses",
+      "api_port": 10065,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954",
+      "runtime_sha256": "3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954",
+      "enabled": true
+    },
+    {
+      "worker": "native-m0-clean-leader",
+      "skill": "preserve-critical-constraints",
+      "api_port": 10065,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f",
+      "runtime_sha256": "fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f",
+      "enabled": true
+    },
+    {
+      "worker": "native-m0-clean-leader",
+      "skill": "reconcile-before-retry",
+      "api_port": 10065,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e",
+      "runtime_sha256": "cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e",
+      "enabled": true
+    },
+    {
+      "worker": "native-m0-clean-worker",
+      "skill": "approval-intent-boundary-check",
+      "api_port": 14153,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66",
+      "runtime_sha256": "9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66",
+      "enabled": true
+    },
+    {
+      "worker": "native-m0-clean-worker",
+      "skill": "avoid-redundant-exploration",
+      "api_port": 14153,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd",
+      "runtime_sha256": "eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd",
+      "enabled": true
+    },
+    {
+      "worker": "native-m0-clean-worker",
+      "skill": "diagnose-by-competing-hypotheses",
+      "api_port": 14153,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954",
+      "runtime_sha256": "3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954",
+      "enabled": true
+    },
+    {
+      "worker": "native-m0-clean-worker",
+      "skill": "preserve-critical-constraints",
+      "api_port": 14153,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f",
+      "runtime_sha256": "fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f",
+      "enabled": true
+    },
+    {
+      "worker": "native-m0-clean-worker",
+      "skill": "reconcile-before-retry",
+      "api_port": 14153,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e",
+      "runtime_sha256": "cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-leader",
+      "skill": "approval-intent-boundary-check",
+      "api_port": 16994,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66",
+      "runtime_sha256": "9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-leader",
+      "skill": "avoid-redundant-exploration",
+      "api_port": 16994,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd",
+      "runtime_sha256": "eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-leader",
+      "skill": "diagnose-by-competing-hypotheses",
+      "api_port": 16994,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954",
+      "runtime_sha256": "3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-leader",
+      "skill": "preserve-critical-constraints",
+      "api_port": 16994,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f",
+      "runtime_sha256": "fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-leader",
+      "skill": "reconcile-before-retry",
+      "api_port": 16994,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e",
+      "runtime_sha256": "cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-worker",
+      "skill": "approval-intent-boundary-check",
+      "api_port": 14315,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66",
+      "runtime_sha256": "9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-worker",
+      "skill": "avoid-redundant-exploration",
+      "api_port": 14315,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd",
+      "runtime_sha256": "eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-worker",
+      "skill": "diagnose-by-competing-hypotheses",
+      "api_port": 14315,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954",
+      "runtime_sha256": "3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-worker",
+      "skill": "preserve-critical-constraints",
+      "api_port": 14315,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f",
+      "runtime_sha256": "fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-worker",
+      "skill": "reconcile-before-retry",
+      "api_port": 14315,
+      "source_commit": "56c05557f40a517b300b032228f83aeab1fe28a4",
+      "source_sha256": "cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e",
+      "runtime_sha256": "cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e",
+      "enabled": true
+    }
+  ],
+  "skill_api_observation": [
+    {
+      "worker": "native-m0-clean-leader",
+      "api_port": 10065,
+      "state": "reachable"
+    },
+    {
+      "worker": "native-m0-clean-worker",
+      "api_port": 14153,
+      "state": "reachable"
+    },
+    {
+      "worker": "native-m1-verify-leader",
+      "api_port": 16994,
+      "state": "reachable"
+    },
+    {
+      "worker": "native-m1-verify-worker",
+      "api_port": 14315,
+      "state": "reachable"
+    }
+  ],
+  "docker_log_collection": {
+    "mode": "incremental_from_boundary",
+    "since": "2026-09-01T23:28:47Z",
+    "timestamps": true,
+    "stdout_stderr_combined": true,
+    "sources": [
+      {
+        "label": "manager",
+        "container": "agentteams-native-m0-20260901-manager",
+        "log": "/root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/continuation-2/logs/arm-continuation-2/manager.docker.log",
+        "pid": 5794,
+        "alive_at_manifest": true
+      },
+      {
+        "label": "controller",
+        "container": "agentteams-native-m0-20260901-controller",
+        "log": "/root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/continuation-2/logs/arm-continuation-2/controller.docker.log",
+        "pid": 5795,
+        "alive_at_manifest": true
+      },
+      {
+        "label": "worker-native-m0-clean-leader",
+        "container": "agentteams-native-m0-20260901-worker-native-m0-clean-leader",
+        "log": "/root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/continuation-2/logs/arm-continuation-2/worker-native-m0-clean-leader.docker.log",
+        "pid": 5796,
+        "alive_at_manifest": true
+      },
+      {
+        "label": "worker-native-m0-clean-worker",
+        "container": "agentteams-native-m0-20260901-worker-native-m0-clean-worker",
+        "log": "/root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/continuation-2/logs/arm-continuation-2/worker-native-m0-clean-worker.docker.log",
+        "pid": 5797,
+        "alive_at_manifest": true
+      },
+      {
+        "label": "worker-native-m1-verify-leader",
+        "container": "agentteams-native-m0-20260901-worker-native-m1-verify-leader",
+        "log": "/root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/continuation-2/logs/arm-continuation-2/worker-native-m1-verify-leader.docker.log",
+        "pid": 5798,
+        "alive_at_manifest": true
+      },
+      {
+        "label": "worker-native-m1-verify-worker",
+        "container": "agentteams-native-m0-20260901-worker-native-m1-verify-worker",
+        "log": "/root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/continuation-2/logs/arm-continuation-2/worker-native-m1-verify-worker.docker.log",
+        "pid": 5799,
+        "alive_at_manifest": true
+      }
+    ],
+    "redaction": {
+      "values": "credential-like values are replaced with [REDACTED] before persistence",
+      "variable_names": "retained where present",
+      "input_lines": "streamed line-by-line; no event parsing or rewriting"
+    },
+    "raw_event_parsing": false,
+    "event_injection": false
+  },
+  "forbidden_actions_for_this_boundary": [
+    "send Matrix messages",
+    "create Project or Task",
+    "invoke a model",
+    "restart, replace, or modify runtime resources",
+    "parse logs and inject derived events"
+  ],
+  "notes": [
+    "This is a baseline collection boundary only; no run outcome is recorded.",
+    "Evidence files remain uncommitted until the Run is frozen."
+  ]
+}

@@ -1,0 +1,280 @@
+{
+  "schema": "testweaver.m2d.continuation-2.native-event-refs/v1",
+  "generated_at": "2026-09-01T23:43:08Z",
+  "raw_path": "/root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/continuation-2/matrix-events.jsonl",
+  "event_count": 13,
+  "events": [
+    {
+      "content": {
+        "body": "这是 M2-D 同一 Run 的 continuation-2 唯一 Human 决定。请只通过官方 AgentTeams 原生 Human→Manager→Leader 路径继续，不要向旧 Task room、旧漂移 room 或任何其他房间发送批准，不要修改模型、provider、账号、推理设置、凭据、Manager、Controller、Matrix、CR、卷或配置。\n\nManager 请重新认证并记录本决定，并只在既有 Manager→Leader room !IrR5zoeSGDaTVw4Ple:matrix-native-m0-20260901.agentteams.local:28080 转交给本 Run 的 Leader，消息中完整 mention @native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080。Manager 不要代 Leader 建 Project/Task，不要代发 Task assignment，不要直接改变任务状态。\n\n本 Human 仅批准 native-m1-verify-worker 的一个当前 Worker 容器执行一次 docker rm -f 故障演练；严禁 -v、删除卷、修改 CR/config、触碰其他容器。只有在 Leader 对同一 Project m2d-recovery-prep-20260901-224400 原生 resume_project 后，使用官方 TeamHarness 创建一个新的短小、实际只读恢复验证执行 Task，并由真实 Worker 出现 ack/in_progress 后，Leader/Manager 发出真实 FAULT_READY 事件，才允许外部 operator 按已审计流程 fresh-read 当前旧 container ID 并执行唯一一次 docker rm -f。不得提前执行、不得自行制造故障。\n\nLeader 必须原生创建并委派该恢复验证 Task；delegate 成功后按 notificationNeeded.targetRoom 向目标 Task room 发送一次带完整 Worker Matrix ID 的 assignment 并结束 turn，不 sleep、不轮询。Worker 必须真实执行只读验证并报告 ack/in_progress；Leader/Manager 发出 FAULT_READY 后等待外部 operator 处理。容器重建后只观察同一 Worker CR/Matrix identity 的新 container、health 和 Team Ready 恢复，再只观察 Leader 原生 cancel old with replacementTaskId、replacement delegate/execute/submit/check/accept，以及旧 Task 迟到 ack/submit 的终态拒绝。脚本不得代建 Task、改状态或代替 Leader。只发本条 Human 输入，不自行批准后续动作，不执行 Oracle。",
+        "m.mentions": {
+          "user_ids": [
+            "@manager:matrix-native-m0-20260901.agentteams.local:28080"
+          ]
+        },
+        "msgtype": "m.text"
+      },
+      "event_id": "$N7jz49ARX7kpkyDAo1UrYoJohvBdLPag_AZO2XFBABY",
+      "origin_server_ts": 1788305368781,
+      "room_id": "!hXmoHY3MdNwdH16r3J:matrix-native-m0-20260901.agentteams.local:28080",
+      "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+      "type": "m.room.message",
+      "unsigned": {
+        "age": 28467
+      }
+    },
+    {
+      "content": {
+        "body": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080 Human 已就 M2-D（Project `m2d-recovery-prep-20260901-224400`）下达 continuation-2 唯一决定。请按以下**严格顺序**执行，每一步都以官方 TeamHarness 原生完成：\n\n**Human 批准范围（严格）**：仅批准对 Worker `native-m1-verify-worker` 的**当前一个 Worker 容器**执行**一次 `docker rm -f` 故障演练**。严禁 `-v`、删除卷、修改 CR/config、触碰任何其他容器。不得提前执行、不得自行制造故障。\n\n**请执行（顺序强制）**：\n1. **projectflow `resume_project`**：projectId=`m2d-recovery-prep-20260901-224400`（从 paused 恢复）。\n2. 用官方 TeamHarness（roomflow/projectflow/taskflow）**原生创建并委派一个新的短小、实际只读恢复验证执行 Task**（同一 Project 下，replacementTaskId 语义；内容为：只读验证 Worker 容器/进程/状态可达性）。\n3. **taskflow `delegate_task`** 委派给真实 Worker `@native-m1-verify-worker:matrix-native-m0-20260901.agentteams.local:28080`。delegate 成功后，按 **notificationNeeded.targetRoom** 向目标 Task room 发送**一次**带 Worker 完整 Matrix ID 的 assignment，然后**结束 turn**——不 sleep、不轮询。\n4. 等真实 Worker 出现 **ack/in_progress** 后，向 Manager 报告 FAULT_READY 触发点。\n\n**Manager 侧**：收到你的 resume + 新 Task delegate + Worker ack/in_progress 确认后，Manager 将发出真实 **FAULT_READY** 事件，之后才允许外部 operator 按已审计流程 fresh-read 当前旧 container ID 并执行唯一一次 `docker rm -f`。\n\n**容器重建后（只观察，不主动执行）**：观察同一 Worker CR/Matrix identity 的新 container、health、Team Ready 恢复；随后观察你原生 `cancel old with replacementTaskId`、replacement delegate/execute/submit/check/accept，以及旧 Task 迟到 ack/submit 的终态拒绝。\n\n请先执行 resume_project，然后创建并委派新的恢复验证 Task，delegate 后发 assignment 并结束 turn。不要 sleep/空转。",
+        "format": "org.matrix.custom.html",
+        "formatted_body": "<p><a href=\"https://matrix.to/#/%40native-m1-verify-leader%3Amatrix-native-m0-20260901.agentteams.local%3A28080\">@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080</a> Human 已就 M2-D（Project <code>m2d-recovery-prep-20260901-224400</code>）下达 continuation-2 唯一决定。请按以下<strong>严格顺序</strong>执行，每一步都以官方 TeamHarness 原生完成：</p>\n<p><strong>Human 批准范围（严格）</strong>：仅批准对 Worker <code>native-m1-verify-worker</code> 的<strong>当前一个 Worker 容器</strong>执行<strong>一次 <code>docker rm -f</code> 故障演练</strong>。严禁 <code>-v</code>、删除卷、修改 CR/config、触碰任何其他容器。不得提前执行、不得自行制造故障。</p>\n<p><strong>请执行（顺序强制）</strong>：</p>\n<ol>\n<li><strong>projectflow <code>resume_project</code></strong>：projectId=<code>m2d-recovery-prep-20260901-224400</code>（从 paused 恢复）。</li>\n<li>用官方 TeamHarness（roomflow/projectflow/taskflow）<strong>原生创建并委派一个新的短小、实际只读恢复验证执行 Task</strong>（同一 Project 下，replacementTaskId 语义；内容为：只读验证 Worker 容器/进程/状态可达性）。</li>\n<li><strong>taskflow <code>delegate_task</code></strong> 委派给真实 Worker <code>@native-m1-verify-worker:matrix-native-m0-20260901.agentteams.local:28080</code>。delegate 成功后，按 <strong>notificationNeeded.targetRoom</strong> 向目标 Task room 发送<strong>一次</strong>带 Worker 完整 Matrix ID 的 assignment，然后<strong>结束 turn</strong>——不 sleep、不轮询。</li>\n<li>等真实 Worker 出现 <strong>ack/in_progress</strong> 后，向 Manager 报告 FAULT_READY 触发点。</li>\n</ol>\n<p><strong>Manager 侧</strong>：收到你的 resume + 新 Task delegate + Worker ack/in_progress 确认后，Manager 将发出真实 <strong>FAULT_READY</strong> 事件，之后才允许外部 operator 按已审计流程 fresh-read 当前旧 container ID 并执行唯一一次 <code>docker rm -f</code>。</p>\n<p><strong>容器重建后（只观察，不主动执行）</strong>：观察同一 Worker CR/Matrix identity 的新 container、health、Team Ready 恢复；随后观察你原生 <code>cancel old with replacementTaskId</code>、replacement delegate/execute/submit/check/accept，以及旧 Task 迟到 ack/submit 的终态拒绝。</p>\n<p>请先执行 resume_project，然后创建并委派新的恢复验证 Task，delegate 后发 assignment 并结束 turn。不要 sleep/空转。</p>",
+        "m.mentions": {
+          "user_ids": [
+            "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080"
+          ]
+        },
+        "msgtype": "m.text"
+      },
+      "event_id": "$JZ6Y0xLj5e21WTdvvr4ne461sMor52xwj6GooGh0wGw",
+      "origin_server_ts": 1788305387125,
+      "room_id": "!IrR5zoeSGDaTVw4Ple:matrix-native-m0-20260901.agentteams.local:28080",
+      "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+      "type": "m.room.message",
+      "unsigned": {
+        "age": 9023,
+        "transaction_id": "m1788305387104.656"
+      }
+    },
+    {
+      "content": {
+        "body": "🔧 **teamharness__projectflow**\n```\n{\"action\": \"resume_project\", \"projectId\": \"m2d-recovery-prep-20260901-224400\"}\n```",
+        "format": "org.matrix.custom.html",
+        "formatted_body": "<p>🔧 <strong>teamharness__projectflow</strong></p>\n<pre><code>{&quot;action&quot;: &quot;resume_project&quot;, &quot;projectId&quot;: &quot;m2d-recovery-prep-20260901-224400&quot;}\n</code></pre>",
+        "m.relates_to": {
+          "event_id": "$-mliYWJIBjJPXBnpjweE7wO0M6YkRYcG5eLqqN4jzHM",
+          "is_falling_back": false,
+          "rel_type": "m.thread"
+        },
+        "msgtype": "m.text"
+      },
+      "event_id": "$1aQfjC1ZG4nEpDDVb3pOQOOTjigSYJK-CxqSfOXmxpk",
+      "origin_server_ts": 1788305392755,
+      "room_id": "!IrR5zoeSGDaTVw4Ple:matrix-native-m0-20260901.agentteams.local:28080",
+      "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "type": "m.room.message",
+      "unsigned": {
+        "age": 3393
+      }
+    },
+    {
+      "content": {
+        "body": "🔧 **teamharness__projectflow**\n```\n{\"action\": \"plan_dag\", \"payload\": {\"projectId\": \"m2d-recovery-prep-20260901-224400\", \"tasks\": [{\"assignedTo\": \"native-m1-verify-worker\", \"dependsOn\": [], \"status\": \"completed\", \"taskId\": \"task-2026090...\n```",
+        "format": "org.matrix.custom.html",
+        "formatted_body": "<p>🔧 <strong>teamharness__projectflow</strong></p>\n<pre><code>{&quot;action&quot;: &quot;plan_dag&quot;, &quot;payload&quot;: {&quot;projectId&quot;: &quot;m2d-recovery-prep-20260901-224400&quot;, &quot;tasks&quot;: [{&quot;assignedTo&quot;: &quot;native-m1-verify-worker&quot;, &quot;dependsOn&quot;: [], &quot;status&quot;: &quot;completed&quot;, &quot;taskId&quot;: &quot;task-2026090...\n</code></pre>",
+        "m.relates_to": {
+          "event_id": "$-mliYWJIBjJPXBnpjweE7wO0M6YkRYcG5eLqqN4jzHM",
+          "is_falling_back": false,
+          "rel_type": "m.thread"
+        },
+        "msgtype": "m.text"
+      },
+      "event_id": "$TcwQeu1k_jo8A-QR6HpVpUVBfsHnh6d_uruHcnP1JGU",
+      "origin_server_ts": 1788305397453,
+      "room_id": "!IrR5zoeSGDaTVw4Ple:matrix-native-m0-20260901.agentteams.local:28080",
+      "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "type": "m.room.message",
+      "unsigned": {
+        "age": 4439,
+        "transaction_id": "3eba0e04-9b65-49bd-9ce5-50440a0937c6"
+      }
+    },
+    {
+      "content": {
+        "body": "🔧 **teamharness__taskflow**\n```\n{\"action\": \"delegate_task\", \"assignedTo\": \"native-m1-verify-worker\", \"payload\": {\"projectId\": \"m2d-recovery-prep-20260901-224400\", \"roomId\": \"room:!LS2u4mrrNQIvM1B79I:matrix-native-m0-20260901.agentte...\n```",
+        "format": "org.matrix.custom.html",
+        "formatted_body": "<p>🔧 <strong>teamharness__taskflow</strong></p>\n<pre><code>{&quot;action&quot;: &quot;delegate_task&quot;, &quot;assignedTo&quot;: &quot;native-m1-verify-worker&quot;, &quot;payload&quot;: {&quot;projectId&quot;: &quot;m2d-recovery-prep-20260901-224400&quot;, &quot;roomId&quot;: &quot;room:!LS2u4mrrNQIvM1B79I:matrix-native-m0-20260901.agentte...\n</code></pre>",
+        "m.relates_to": {
+          "event_id": "$-mliYWJIBjJPXBnpjweE7wO0M6YkRYcG5eLqqN4jzHM",
+          "is_falling_back": false,
+          "rel_type": "m.thread"
+        },
+        "msgtype": "m.text"
+      },
+      "event_id": "$BW_7E8oi9AxyMTAfsKWNijf86YMgA3Ms4MLINTdn9EQ",
+      "origin_server_ts": 1788305413950,
+      "room_id": "!IrR5zoeSGDaTVw4Ple:matrix-native-m0-20260901.agentteams.local:28080",
+      "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "type": "m.room.message",
+      "unsigned": {
+        "age": 418
+      }
+    },
+    {
+      "content": {
+        "body": "@native-m1-verify-worker:matrix-native-m0-20260901.agentteams.local:28080 TASK_ASSIGNED: task-20260901-224400-recovery-verify - Please start this task. Spec: shared/tasks/task-20260901-224400-recovery-verify/spec.md",
+        "format": "org.matrix.custom.html",
+        "formatted_body": "<p><a href=\"https://matrix.to/#/%40native-m1-verify-worker%3Amatrix-native-m0-20260901.agentteams.local%3A28080\">native-m1-verify-worker</a> TASK_ASSIGNED: task-20260901-224400-recovery-verify - Please start this task. Spec: shared/tasks/task-20260901-224400-recovery-verify/spec.md</p>",
+        "m.mentions": {
+          "user_ids": [
+            "@native-m1-verify-worker:matrix-native-m0-20260901.agentteams.local:28080"
+          ]
+        },
+        "msgtype": "m.text"
+      },
+      "event_id": "$ujFCFbdfUSkq5Z1SBVU-TTpm4qnCxHpFF0rDlfH2E6Y",
+      "origin_server_ts": 1788305419140,
+      "room_id": "!LS2u4mrrNQIvM1B79I:matrix-native-m0-20260901.agentteams.local:28080",
+      "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "type": "m.room.message",
+      "unsigned": {
+        "age": 827,
+        "transaction_id": "teamharness-472-1788305419138"
+      }
+    },
+    {
+      "content": {
+        "body": "🔧 **teamharness__taskflow**\n```\n{\"action\": \"ack_task\", \"payload\": {\"taskId\": \"task-20260901-224400-recovery-verify\"}, \"role\": \"worker\", \"taskId\": \"task-20260901-224400-recovery-verify\"}\n```",
+        "format": "org.matrix.custom.html",
+        "formatted_body": "<p>🔧 <strong>teamharness__taskflow</strong></p>\n<pre><code>{&quot;action&quot;: &quot;ack_task&quot;, &quot;payload&quot;: {&quot;taskId&quot;: &quot;task-20260901-224400-recovery-verify&quot;}, &quot;role&quot;: &quot;worker&quot;, &quot;taskId&quot;: &quot;task-20260901-224400-recovery-verify&quot;}\n</code></pre>",
+        "m.relates_to": {
+          "event_id": "$7X-q0u43HgQttubAayMaJeuaYQGN3XkE6QSvU2gP2z8",
+          "is_falling_back": false,
+          "rel_type": "m.thread"
+        },
+        "msgtype": "m.text"
+      },
+      "event_id": "$GJTp098GqTWQohB6kB2UYPBKVXvzNTl1rMdL5StfOp8",
+      "origin_server_ts": 1788305439627,
+      "room_id": "!LS2u4mrrNQIvM1B79I:matrix-native-m0-20260901.agentteams.local:28080",
+      "sender": "@native-m1-verify-worker:matrix-native-m0-20260901.agentteams.local:28080",
+      "type": "m.room.message",
+      "unsigned": {
+        "age": 14436
+      }
+    },
+    {
+      "content": {
+        "body": "🔧 **teamharness__taskflow**\n```\n{\"action\": \"submit_task\", \"payload\": {\"taskId\": \"task-20260901-224400-recovery-verify\", \"status\": \"SUCCESS\", \"summary\": \"Read-only pre-fault baseline verified: container 344c1bb4218e alive (PID1 qwenp...\n```",
+        "format": "org.matrix.custom.html",
+        "formatted_body": "<p>🔧 <strong>teamharness__taskflow</strong></p>\n<pre><code>{&quot;action&quot;: &quot;submit_task&quot;, &quot;payload&quot;: {&quot;taskId&quot;: &quot;task-20260901-224400-recovery-verify&quot;, &quot;status&quot;: &quot;SUCCESS&quot;, &quot;summary&quot;: &quot;Read-only pre-fault baseline verified: container 344c1bb4218e alive (PID1 qwenp...\n</code></pre>",
+        "m.relates_to": {
+          "event_id": "$7X-q0u43HgQttubAayMaJeuaYQGN3XkE6QSvU2gP2z8",
+          "is_falling_back": false,
+          "rel_type": "m.thread"
+        },
+        "msgtype": "m.text"
+      },
+      "event_id": "$jLurwmfl3h12DIU2gs7_m-fV7n_D75ThSpMjgeyaK1U",
+      "origin_server_ts": 1788305462852,
+      "room_id": "!LS2u4mrrNQIvM1B79I:matrix-native-m0-20260901.agentteams.local:28080",
+      "sender": "@native-m1-verify-worker:matrix-native-m0-20260901.agentteams.local:28080",
+      "type": "m.room.message",
+      "unsigned": {
+        "age": 9232
+      }
+    },
+    {
+      "content": {
+        "body": "🔧 **teamharness__projectflow**\n```\n{\"action\": \"accept_task_result\", \"payload\": {\"projectId\": \"m2d-recovery-prep-20260901-224400\", \"taskId\": \"task-20260901-224400-recovery-verify\", \"resultStatus\": \"SUCCESS\", \"summary\": \"Accepted M2-D pr...\n```",
+        "format": "org.matrix.custom.html",
+        "formatted_body": "<p>🔧 <strong>teamharness__projectflow</strong></p>\n<pre><code>{&quot;action&quot;: &quot;accept_task_result&quot;, &quot;payload&quot;: {&quot;projectId&quot;: &quot;m2d-recovery-prep-20260901-224400&quot;, &quot;taskId&quot;: &quot;task-20260901-224400-recovery-verify&quot;, &quot;resultStatus&quot;: &quot;SUCCESS&quot;, &quot;summary&quot;: &quot;Accepted M2-D pr...\n</code></pre>",
+        "m.relates_to": {
+          "event_id": "$DRYRRjP5jmTk6NAjiKEn5zrvEQ2uWI9L7BUmleAWeV8",
+          "is_falling_back": false,
+          "rel_type": "m.thread"
+        },
+        "msgtype": "m.text"
+      },
+      "event_id": "$NxVMGdeF1pEG7C7U3ODechsKt0zK8JIbnYz7OS2MPN8",
+      "origin_server_ts": 1788305538110,
+      "room_id": "!LS2u4mrrNQIvM1B79I:matrix-native-m0-20260901.agentteams.local:28080",
+      "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "type": "m.room.message",
+      "unsigned": {
+        "age": 6921,
+        "transaction_id": "c06ec936-ea28-4c4a-bfe4-a3ceb48687aa"
+      }
+    },
+    {
+      "content": {
+        "body": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080 状态同步：Worker `@native-m1-verify-worker` 已对恢复验证 Task `task-20260901-224400-recovery-verify` 完成 ack/in_progress + 只读基线验证（当前旧容器 hostname `344c1bb4218e` alive、control-plane reachable、health ok）并 submit SUCCESS。\n\n**Manager 已发出真实 FAULT_READY 事件**（外部 operator 现在可按已审计流程 fresh-read 当前旧 container ID 并执行唯一一次 `docker rm -f`）。\n\n请保持就绪，不要执行任何动作。外部 operator 完成 `docker rm -f` 后，将观察：同一 Worker CR/Matrix identity 的新 container、health、Team Ready 恢复；随后由你原生执行 `cancel old with replacementTaskId`、replacement delegate/execute/submit/check/accept，以及旧 Task 迟到 ack/submit 的终态拒绝。等待外部 operator 反馈后再推进。不要 sleep/空转，等待我的下一步指令。",
+        "format": "org.matrix.custom.html",
+        "formatted_body": "<p><a href=\"https://matrix.to/#/%40native-m1-verify-leader%3Amatrix-native-m0-20260901.agentteams.local%3A28080\">@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080</a> 状态同步：Worker <code>@native-m1-verify-worker</code> 已对恢复验证 Task <code>task-20260901-224400-recovery-verify</code> 完成 ack/in_progress + 只读基线验证（当前旧容器 hostname <code>344c1bb4218e</code> alive、control-plane reachable、health ok）并 submit SUCCESS。</p>\n<p><strong>Manager 已发出真实 FAULT_READY 事件</strong>（外部 operator 现在可按已审计流程 fresh-read 当前旧 container ID 并执行唯一一次 <code>docker rm -f</code>）。</p>\n<p>请保持就绪，不要执行任何动作。外部 operator 完成 <code>docker rm -f</code> 后，将观察：同一 Worker CR/Matrix identity 的新 container、health、Team Ready 恢复；随后由你原生执行 <code>cancel old with replacementTaskId</code>、replacement delegate/execute/submit/check/accept，以及旧 Task 迟到 ack/submit 的终态拒绝。等待外部 operator 反馈后再推进。不要 sleep/空转，等待我的下一步指令。</p>",
+        "m.mentions": {
+          "user_ids": [
+            "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080"
+          ]
+        },
+        "msgtype": "m.text"
+      },
+      "event_id": "$KkNwnAImjy4shO2kmXPp27BHHSkxzviXlJDUFPvKeLM",
+      "origin_server_ts": 1788305543251,
+      "room_id": "!IrR5zoeSGDaTVw4Ple:matrix-native-m0-20260901.agentteams.local:28080",
+      "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+      "type": "m.room.message",
+      "unsigned": {
+        "age": 1317
+      }
+    },
+    {
+      "content": {
+        "body": "🔧 **teamharness__message**\n```\n{\"action\": \"send\", \"channel\": \"matrix\", \"target\": \"room:!IrR5zoeSGDaTVw4Ple:matrix-native-m0-20260901.agentteams.local:28080\", \"text\": \"[M2-D FAULT_READY 触发点报告] Manager，M2-D continuation-2 前置条件已全部达成，请...\n```",
+        "format": "org.matrix.custom.html",
+        "formatted_body": "<p>🔧 <strong>teamharness__message</strong></p>\n<pre><code>{&quot;action&quot;: &quot;send&quot;, &quot;channel&quot;: &quot;matrix&quot;, &quot;target&quot;: &quot;room:!IrR5zoeSGDaTVw4Ple:matrix-native-m0-20260901.agentteams.local:28080&quot;, &quot;text&quot;: &quot;[M2-D FAULT_READY 触发点报告] Manager，M2-D continuation-2 前置条件已全部达成，请...\n</code></pre>",
+        "m.relates_to": {
+          "event_id": "$DRYRRjP5jmTk6NAjiKEn5zrvEQ2uWI9L7BUmleAWeV8",
+          "is_falling_back": false,
+          "rel_type": "m.thread"
+        },
+        "msgtype": "m.text"
+      },
+      "event_id": "$2-BdRS51BaFAUhk4psP4xC860XAEEZj9eiO9Ezhq-Jo",
+      "origin_server_ts": 1788305550322,
+      "room_id": "!LS2u4mrrNQIvM1B79I:matrix-native-m0-20260901.agentteams.local:28080",
+      "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "type": "m.room.message",
+      "unsigned": {
+        "age": 15827,
+        "transaction_id": "7ee618b8-7b13-4bdc-b902-4c90a938d9f6"
+      }
+    },
+    {
+      "content": {
+        "body": "[M2-D FAULT_READY 触发点报告] Manager，M2-D continuation-2 前置条件已全部达成，请求发出真实 FAULT_READY 事件：\n\n1. resume_project ✅ project m2d-recovery-prep-20260901-224400 已从 paused 恢复（status: active）。\n2. 新只读恢复验证 Task 已委派 ✅ task-20260901-224400-recovery-verify（assigned_to: native-m1-verify-worker，task room !LS2u4mrrNQIvM1B79I）。\n3. Worker ack/in_progress 确认 ✅ ack_task ok（task status in_progress），TeamHarness health ok，filesync ok。\n4. Worker 已完成只读故障前基线并提交，Leader 已原生 accept_task_result ✅（nodeStatus=completed）：\n   - 容器 344c1bb4218e 存活（PID1 qwenpaw-worker S，uptime ~21.6 天，boot_id 存在）\n   - 控制面可达（health ok / ack ok / filesync ok）、Matrix identity active、无 D/Z 挂起进程\n   - 观察项（未处置）：disk 88%、MemAvailable 7.99GB、load 3.31/1.52/1.19\n   - 零变更执行（无 stop/restart、无 CR/config 修改、无卷触碰、无容器创建/销毁）\n\n结论：Worker 容器/进程/状态当前健康，满足已批准故障演练基线。请 Manager 发出真实 FAULT_READY 事件，外部 operator 方可按已审计流程 fresh-read 当前旧 container ID 并执行唯一一次 `docker rm -f`。本团队等待 FAULT_READY，不自行执行任何故障/恢复动作。",
+        "format": "org.matrix.custom.html",
+        "formatted_body": "<p>[M2-D FAULT_READY 触发点报告] Manager，M2-D continuation-2 前置条件已全部达成，请求发出真实 FAULT_READY 事件：</p>\n<ol>\n<li>resume_project ✅ project m2d-recovery-prep-20260901-224400 已从 paused 恢复（status: active）。</li>\n<li>新只读恢复验证 Task 已委派 ✅ task-20260901-224400-recovery-verify（assigned_to: native-m1-verify-worker，task room !LS2u4mrrNQIvM1B79I）。</li>\n<li>Worker ack/in_progress 确认 ✅ ack_task ok（task status in_progress），TeamHarness health ok，filesync ok。</li>\n<li>Worker 已完成只读故障前基线并提交，Leader 已原生 accept_task_result ✅（nodeStatus=completed）：\n<ul>\n<li>容器 344c1bb4218e 存活（PID1 qwenpaw-worker S，uptime ~21.6 天，boot_id 存在）</li>\n<li>控制面可达（health ok / ack ok / filesync ok）、Matrix identity active、无 D/Z 挂起进程</li>\n<li>观察项（未处置）：disk 88%、MemAvailable 7.99GB、load 3.31/1.52/1.19</li>\n<li>零变更执行（无 stop/restart、无 CR/config 修改、无卷触碰、无容器创建/销毁）</li>\n</ul>\n</li>\n</ol>\n<p>结论：Worker 容器/进程/状态当前健康，满足已批准故障演练基线。请 Manager 发出真实 FAULT_READY 事件，外部 operator 方可按已审计流程 fresh-read 当前旧 container ID 并执行唯一一次 <code>docker rm -f</code>。本团队等待 FAULT_READY，不自行执行任何故障/恢复动作。</p>",
+        "msgtype": "m.text"
+      },
+      "event_id": "$u_GH5U53lwEWyGjFB2uWEWmRmeK4XecImEQyW7UHttA",
+      "origin_server_ts": 1788305550390,
+      "room_id": "!IrR5zoeSGDaTVw4Ple:matrix-native-m0-20260901.agentteams.local:28080",
+      "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "type": "m.room.message",
+      "unsigned": {
+        "age": 7919
+      }
+    },
+    {
+      "content": {
+        "body": "🔧 **teamharness__taskflow**\n```\n{\"action\": \"check_task\", \"payload\": {\"taskId\": \"task-20260901-224400-recovery-verify\"}, \"role\": \"leader\"}\n```",
+        "format": "org.matrix.custom.html",
+        "formatted_body": "<p>🔧 <strong>teamharness__taskflow</strong></p>\n<pre><code>{&quot;action&quot;: &quot;check_task&quot;, &quot;payload&quot;: {&quot;taskId&quot;: &quot;task-20260901-224400-recovery-verify&quot;}, &quot;role&quot;: &quot;leader&quot;}\n</code></pre>",
+        "m.relates_to": {
+          "event_id": "$DRYRRjP5jmTk6NAjiKEn5zrvEQ2uWI9L7BUmleAWeV8",
+          "is_falling_back": false,
+          "rel_type": "m.thread"
+        },
+        "msgtype": "m.text"
+      },
+      "event_id": "$rI7V22cyydSr1ElSjoqV39jb_XtAe-2QJ2MrvrJvDAc",
+      "origin_server_ts": 1788305554433,
+      "room_id": "!LS2u4mrrNQIvM1B79I:matrix-native-m0-20260901.agentteams.local:28080",
+      "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "type": "m.room.message",
+      "unsigned": {
+        "age": 11716,
+        "transaction_id": "63019ad3-bda3-4c48-b346-9c885f8c5f6f"
+      }
+    }
+  ]
+}

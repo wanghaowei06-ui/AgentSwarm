@@ -1,0 +1,7 @@
+collector_pid=14922
+collector_status=stopped
+matrix_collector_stopped_at=2026-09-01T23:42:55Z
+log_stream_descendant_pids=5794,5795,5796,5797,5798,5803,5805,5807,5811,5813
+log_stream_descendant_signal=TERM
+log_stream_descendants_remaining=none
+all_owned_collectors_confirmed_stopped_at=2026-09-01T23:47:19Z

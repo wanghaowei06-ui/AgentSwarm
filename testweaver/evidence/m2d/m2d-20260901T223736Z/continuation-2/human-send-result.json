@@ -1,0 +1,14 @@
+{
+  "schema": "testweaver.m2d.continuation-2-human-send/v1",
+  "room_id": "!hXmoHY3MdNwdH16r3J:matrix-native-m0-20260901.agentteams.local:28080",
+  "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+  "sender_membership": "join",
+  "event_id": "$N7jz49ARX7kpkyDAo1UrYoJohvBdLPag_AZO2XFBABY",
+  "transaction_id": "m2d-human-continuation-2-20260901T232928Z",
+  "sent_at": "2026-09-01T23:29:28Z",
+  "input_body_sha256": "c46be7486fef069344a668a3e1a2d35dd2c9373d2ce1fdfc72948925349eeb67",
+  "api_response": {
+    "event_id": "$N7jz49ARX7kpkyDAo1UrYoJohvBdLPag_AZO2XFBABY"
+  },
+  "token_persisted": false
+}

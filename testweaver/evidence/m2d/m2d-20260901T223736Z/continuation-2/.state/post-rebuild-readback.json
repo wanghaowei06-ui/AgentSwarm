@@ -1,0 +1,69 @@
+{
+  "schema": "testweaver.m2d.continuation-2.post-rebuild/v1",
+  "observed_at": "2026-09-01T23:37:56Z",
+  "old_container_id": "344c1bb4218e786f435e975bef1a5de950271674f18454ef3e4c3d221d3d3a5e",
+  "new_container_id": "09301cc4771ebc6ab43a32b35ccca69ce3307fd8c8310e410948744c64c22ba5",
+  "docker": {
+    "Id": "09301cc4771ebc6ab43a32b35ccca69ce3307fd8c8310e410948744c64c22ba5",
+    "Name": "/agentteams-native-m0-20260901-worker-native-m1-verify-worker",
+    "Config": {
+      "Hostname": "09301cc4771e",
+      "Image": "agentteams/qwenpaw-worker:be10aaf"
+    },
+    "State": {
+      "Status": "running",
+      "Running": true,
+      "Restarting": false,
+      "OOMKilled": false,
+      "StartedAt": "2026-09-01T23:35:50.820387014Z"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "agentteams-native-m0-20260901-net": {
+          "NetworkID": "b52bc4d90fa17a25aa5a743f3694548715f6a6b9651e7a58e8cdcc44ad503371",
+          "EndpointID": "d6bedc084be25be4baf79168b604a84789cf87e494151b139969c663d9024a6d",
+          "IPAddress": "172.29.0.6",
+          "Gateway": "172.29.0.1",
+          "Aliases": null
+        }
+      }
+    }
+  },
+  "health_8088_http": "200",
+  "controller_worker": [
+    {
+      "name": "native-m1-verify-worker",
+      "team": "native-m1-verify-team",
+      "role": "worker",
+      "runtime": "qwenpaw",
+      "image": "agentteams/qwenpaw-worker:be10aaf",
+      "phase": "Running",
+      "containerState": "running",
+      "matrixUserID": "@native-m1-verify-worker:matrix-native-m0-20260901.agentteams.local:28080",
+      "roomID": "!YJn4m2FIISa0gNTx9y:matrix-native-m0-20260901.agentteams.local:28080",
+      "model": "deepseek-v4-flash"
+    }
+  ],
+  "controller_team": [
+    {
+      "name": "native-m1-verify-team",
+      "phase": "Active",
+      "leaderReady": true,
+      "readyWorkers": 1,
+      "totalWorkers": 1,
+      "leaderName": "native-m1-verify-leader",
+      "workerNames": [
+        "native-m1-verify-worker"
+      ]
+    }
+  ],
+  "recovered_worker_joined_rooms": [
+    "!CCb7vkhCTgdLKoG5iB:matrix-native-m0-20260901.agentteams.local:28080",
+    "!LS2u4mrrNQIvM1B79I:matrix-native-m0-20260901.agentteams.local:28080",
+    "!U7WymtNdzmbTIeF6U1:matrix-native-m0-20260901.agentteams.local:28080",
+    "!YJn4m2FIISa0gNTx9y:matrix-native-m0-20260901.agentteams.local:28080",
+    "!srvKopd1vnU0gQoC49:matrix-native-m0-20260901.agentteams.local:28080",
+    "!uARUefsHIPl8TrGTkt:matrix-native-m0-20260901.agentteams.local:28080"
+  ],
+  "operator_mutation_after_rebuild": false
+}
