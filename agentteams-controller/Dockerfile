@@ -7,13 +7,18 @@
 # Since v0.2: includes merged worker lifecycle, auth, credentials, and proxy.
 
 ARG HIGRESS_REGISTRY=higress-registry.cn-hangzhou.cr.aliyuncs.com
+ARG APK_REPOSITORY=
 
 # ============ Stage 1: Build Go binaries ============
 FROM ${HIGRESS_REGISTRY}/higress/golang:1.25-alpine AS builder
 
+ARG APK_REPOSITORY
 ARG GOPROXY=https://goproxy.cn,direct
 ENV GOPROXY=${GOPROXY}
-RUN apk add --no-cache gcc musl-dev
+RUN if [ -n "$APK_REPOSITORY" ]; then \
+      sed -i "s|https://dl-cdn.alpinelinux.org/alpine|${APK_REPOSITORY}|g" /etc/apk/repositories; \
+    fi && \
+    apk add --no-cache gcc musl-dev
 
 WORKDIR /build
 COPY go.mod go.sum ./
@@ -29,12 +34,16 @@ FROM ${HIGRESS_REGISTRY}/higress/mc:20260216 AS mc
 # ============ Stage 3: Download kube-apiserver (native arch to avoid QEMU TLS bugs) ============
 FROM --platform=$BUILDPLATFORM ${HIGRESS_REGISTRY}/higress/alpine:3.20 AS kube-bin
 ARG KUBE_VERSION=v1.31.3
+ARG APK_REPOSITORY
 # TARGETARCH is auto-injected by buildx for multi-arch builds. For plain
 # `docker build` (no buildx) it is unset, so fall back to `uname -m` —
 # safe here because the stage is pinned to BUILDPLATFORM and a non-buildx
 # build is always single-arch == host arch.
 ARG TARGETARCH
-RUN apk add --no-cache curl && \
+RUN if [ -n "$APK_REPOSITORY" ]; then \
+      sed -i "s|https://dl-cdn.alpinelinux.org/alpine|${APK_REPOSITORY}|g" /etc/apk/repositories; \
+    fi && \
+    apk add --no-cache curl && \
     ARCH="${TARGETARCH:-$(uname -m | sed 's/x86_64/amd64/; s/aarch64/arm64/')}" && \
     curl -fSL -o /kube-apiserver \
       "https://dl.k8s.io/release/${KUBE_VERSION}/bin/linux/${ARCH}/kube-apiserver" && \
@@ -43,7 +52,11 @@ RUN apk add --no-cache curl && \
 # ============ Final: Minimal image with all artifacts ============
 FROM ${HIGRESS_REGISTRY}/higress/alpine:3.20
 
-RUN apk add --no-cache bash jq curl unzip kubectl
+ARG APK_REPOSITORY
+RUN if [ -n "$APK_REPOSITORY" ]; then \
+      sed -i "s|https://dl-cdn.alpinelinux.org/alpine|${APK_REPOSITORY}|g" /etc/apk/repositories; \
+    fi && \
+    apk add --no-cache bash jq curl unzip kubectl
 
 COPY --from=mc /usr/bin/mc /usr/local/bin/mc
 COPY --from=builder /agentteams-controller /usr/local/bin/agentteams-controller
