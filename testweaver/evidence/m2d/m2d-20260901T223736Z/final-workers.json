@@ -1,0 +1,46 @@
+{
+  "schema": "testweaver.m2d.final-workers/v1",
+  "captured_at": "2026-09-01T22:49:50Z",
+  "workers": [
+    {
+      "name": "native-m0-clean-worker",
+      "team": "native-m0-clean-team",
+      "role": "worker",
+      "runtime": "qwenpaw",
+      "image": "agentteams/qwenpaw-worker:be10aaf",
+      "phase": "Running",
+      "containerState": "running",
+      "state": "Running"
+    },
+    {
+      "name": "native-m1-verify-worker",
+      "team": "native-m1-verify-team",
+      "role": "worker",
+      "runtime": "qwenpaw",
+      "image": "agentteams/qwenpaw-worker:be10aaf",
+      "phase": "Running",
+      "containerState": "running",
+      "state": "Running"
+    },
+    {
+      "name": "native-m1-verify-leader",
+      "team": "native-m1-verify-team",
+      "role": "team_leader",
+      "runtime": "qwenpaw",
+      "image": "agentteams/qwenpaw-worker:be10aaf",
+      "phase": "Running",
+      "containerState": "running",
+      "state": "Running"
+    },
+    {
+      "name": "native-m0-clean-leader",
+      "team": "native-m0-clean-team",
+      "role": "team_leader",
+      "runtime": "qwenpaw",
+      "image": "agentteams/qwenpaw-worker:be10aaf",
+      "phase": "Running",
+      "containerState": "running",
+      "state": "Running"
+    }
+  ]
+}

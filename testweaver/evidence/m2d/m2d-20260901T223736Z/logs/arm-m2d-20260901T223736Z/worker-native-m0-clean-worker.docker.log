@@ -1,0 +1,265 @@
+2026-09-01T22:41:11.517561604Z INFO:     127.0.0.1:52220 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:41:11.521867126Z INFO:     127.0.0.1:52232 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:41:12.967055001Z INFO:     172.29.0.1:37372 - "GET /api/agents/default/skills HTTP/1.1" 200 OK
+2026-09-01T22:41:13.657150089Z 2026-09-01 22:41:13,656 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:41:16.525490844Z INFO:     127.0.0.1:33530 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:41:16.530623029Z INFO:     127.0.0.1:33538 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:41:16.691651370Z 2026-09-01 22:41:16,691 [INFO] qwenpaw_worker.sync: qwenpaw FileSync push uploaded component=sync worker=native-m0-clean-worker count=1 files=['.qwenpaw/matrix_sync_token']
+2026-09-01T22:41:18.755589527Z 2026-09-01 22:41:18,755 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:41:21.537932539Z INFO:     127.0.0.1:33592 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:41:21.545272695Z INFO:     127.0.0.1:33600 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:41:23.857358582Z 2026-09-01 22:41:23,857 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:41:26.550296020Z INFO:     127.0.0.1:40714 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:41:26.554031896Z INFO:     127.0.0.1:40726 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:41:28.960519513Z 2026-09-01 22:41:28,960 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:41:31.559178730Z INFO:     127.0.0.1:40786 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:41:31.562750004Z INFO:     127.0.0.1:40802 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:41:34.061015988Z 2026-09-01 22:41:34,060 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:41:36.569026973Z INFO:     127.0.0.1:41200 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:41:36.572871097Z INFO:     127.0.0.1:41216 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:41:39.161054309Z 2026-09-01 22:41:39,160 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:41:41.578839596Z INFO:     127.0.0.1:41274 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:41:41.582370308Z INFO:     127.0.0.1:41282 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:41:44.258815787Z 2026-09-01 22:41:44,258 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:41:46.585528936Z INFO:     127.0.0.1:46708 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:41:46.589282135Z INFO:     127.0.0.1:46722 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:41:46.965325271Z 2026-09-01 22:41:46,965 [INFO] qwenpaw_worker.sync: qwenpaw FileSync push uploaded component=sync worker=native-m0-clean-worker count=1 files=['.qwenpaw/matrix_sync_token']
+2026-09-01T22:41:49.360717625Z 2026-09-01 22:41:49,360 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:41:51.592348543Z INFO:     127.0.0.1:46782 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:41:51.596227460Z INFO:     127.0.0.1:46796 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:41:54.462997986Z 2026-09-01 22:41:54,462 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:41:56.601820761Z INFO:     127.0.0.1:34430 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:41:56.605680581Z INFO:     127.0.0.1:34444 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:41:59.563183158Z 2026-09-01 22:41:59,562 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:42:01.611758395Z INFO:     127.0.0.1:34516 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:42:01.615851741Z INFO:     127.0.0.1:34524 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:42:04.668519138Z 2026-09-01 22:42:04,668 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:42:06.621027360Z INFO:     127.0.0.1:41928 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:42:06.624835054Z INFO:     127.0.0.1:41936 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:42:09.768192385Z 2026-09-01 22:42:09,767 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:42:11.629511860Z INFO:     127.0.0.1:41994 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:42:11.633281640Z INFO:     127.0.0.1:42000 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:42:14.868195395Z 2026-09-01 22:42:14,867 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:42:16.637089605Z INFO:     127.0.0.1:36214 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:42:16.640637648Z INFO:     127.0.0.1:36230 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:42:17.234536633Z 2026-09-01 22:42:17,234 [INFO] qwenpaw_worker.sync: qwenpaw FileSync push uploaded component=sync worker=native-m0-clean-worker count=1 files=['.qwenpaw/matrix_sync_token']
+2026-09-01T22:42:19.967695377Z 2026-09-01 22:42:19,967 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:42:21.646271953Z INFO:     127.0.0.1:36290 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:42:21.650165106Z INFO:     127.0.0.1:36304 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:42:25.073294583Z 2026-09-01 22:42:25,073 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:42:26.655557336Z INFO:     127.0.0.1:53184 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:42:26.659267583Z INFO:     127.0.0.1:53200 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:42:30.171518014Z 2026-09-01 22:42:30,171 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:42:31.664303631Z INFO:     127.0.0.1:53266 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:42:31.668000679Z INFO:     127.0.0.1:53278 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:42:35.273872151Z 2026-09-01 22:42:35,272 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:42:36.672216810Z INFO:     127.0.0.1:33016 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:42:36.676025934Z INFO:     127.0.0.1:33028 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:42:40.369932143Z 2026-09-01 22:42:40,369 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:42:41.680220850Z INFO:     127.0.0.1:33104 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:42:41.683955565Z INFO:     127.0.0.1:33118 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:42:45.473706805Z 2026-09-01 22:42:45,473 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:42:46.689384054Z INFO:     127.0.0.1:55890 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:42:46.694268691Z INFO:     127.0.0.1:55900 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:42:47.519588433Z 2026-09-01 22:42:47,519 [INFO] qwenpaw_worker.sync: qwenpaw FileSync push uploaded component=sync worker=native-m0-clean-worker count=1 files=['.qwenpaw/matrix_sync_token']
+2026-09-01T22:42:50.573342582Z 2026-09-01 22:42:50,573 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:42:51.700067180Z INFO:     127.0.0.1:55954 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:42:51.703824071Z INFO:     127.0.0.1:55960 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:42:55.672679293Z 2026-09-01 22:42:55,672 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:42:56.708560610Z INFO:     127.0.0.1:55934 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:42:56.712422305Z INFO:     127.0.0.1:55938 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:43:00.770708574Z 2026-09-01 22:43:00,770 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:43:01.719464780Z INFO:     127.0.0.1:55994 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:43:01.723038831Z INFO:     127.0.0.1:56002 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:43:05.874332230Z 2026-09-01 22:43:05,874 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:43:06.727852946Z INFO:     127.0.0.1:45100 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:43:06.731788636Z INFO:     127.0.0.1:45106 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:43:10.981179793Z 2026-09-01 22:43:10,981 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:43:11.735821039Z INFO:     127.0.0.1:45176 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:43:11.739740403Z INFO:     127.0.0.1:45196 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:43:16.082478980Z 2026-09-01 22:43:16,082 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:43:16.743547063Z INFO:     127.0.0.1:42734 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:43:16.747720074Z INFO:     127.0.0.1:42760 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:43:17.789364564Z 2026-09-01 22:43:17,789 [INFO] qwenpaw_worker.sync: qwenpaw FileSync push uploaded component=sync worker=native-m0-clean-worker count=1 files=['.qwenpaw/matrix_sync_token']
+2026-09-01T22:43:21.182078471Z 2026-09-01 22:43:21,181 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:43:21.752224879Z INFO:     127.0.0.1:42804 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:43:21.756245798Z INFO:     127.0.0.1:42814 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:43:26.282498788Z 2026-09-01 22:43:26,282 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:43:26.760620791Z INFO:     127.0.0.1:35416 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:43:26.764421525Z INFO:     127.0.0.1:35426 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:43:31.383878074Z 2026-09-01 22:43:31,383 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:43:31.768762603Z INFO:     127.0.0.1:35490 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:43:31.772671449Z INFO:     127.0.0.1:35498 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:43:36.486974257Z 2026-09-01 22:43:36,486 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:43:36.777677555Z INFO:     127.0.0.1:49004 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:43:36.781351473Z INFO:     127.0.0.1:49024 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:43:41.590858275Z 2026-09-01 22:43:41,590 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:43:41.784787091Z INFO:     127.0.0.1:49066 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:43:41.788522779Z INFO:     127.0.0.1:49072 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:43:46.703698306Z 2026-09-01 22:43:46,703 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:43:46.793121386Z INFO:     127.0.0.1:41928 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:43:46.796920733Z INFO:     127.0.0.1:41940 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:43:48.056530621Z 2026-09-01 22:43:48,056 [INFO] qwenpaw_worker.sync: qwenpaw FileSync push uploaded component=sync worker=native-m0-clean-worker count=1 files=['.qwenpaw/matrix_sync_token']
+2026-09-01T22:43:51.801167393Z INFO:     127.0.0.1:41976 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:43:51.805063847Z 2026-09-01 22:43:51,804 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:43:51.808637019Z INFO:     127.0.0.1:42004 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:43:56.811973827Z INFO:     127.0.0.1:43830 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:43:56.816175104Z INFO:     127.0.0.1:43850 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:43:56.903314814Z 2026-09-01 22:43:56,903 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:44:01.825468507Z INFO:     127.0.0.1:43906 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:44:01.829197984Z INFO:     127.0.0.1:43910 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:44:02.005454367Z 2026-09-01 22:44:02,005 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:44:06.837015113Z INFO:     127.0.0.1:45652 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:44:06.842162248Z INFO:     127.0.0.1:45666 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:44:07.110489727Z 2026-09-01 22:44:07,110 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:44:11.848987812Z INFO:     127.0.0.1:45722 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:44:11.852938614Z INFO:     127.0.0.1:45742 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:44:12.214202643Z 2026-09-01 22:44:12,214 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:44:16.859894683Z INFO:     127.0.0.1:60272 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:44:16.863863249Z INFO:     127.0.0.1:60286 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:44:17.311965759Z 2026-09-01 22:44:17,311 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:44:18.335159615Z 2026-09-01 22:44:18,334 [INFO] qwenpaw_worker.sync: qwenpaw FileSync push uploaded component=sync worker=native-m0-clean-worker count=1 files=['.qwenpaw/matrix_sync_token']
+2026-09-01T22:44:21.871086033Z INFO:     127.0.0.1:60350 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:44:21.874946252Z INFO:     127.0.0.1:60352 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:44:22.410258575Z 2026-09-01 22:44:22,410 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:44:26.881113063Z INFO:     127.0.0.1:37530 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:44:26.884890138Z INFO:     127.0.0.1:37546 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:44:27.509999847Z 2026-09-01 22:44:27,509 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:44:31.889868827Z INFO:     127.0.0.1:37628 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:44:31.893329325Z INFO:     127.0.0.1:37634 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:44:32.611559190Z 2026-09-01 22:44:32,611 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:44:36.899128686Z INFO:     127.0.0.1:37634 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:44:36.903310376Z INFO:     127.0.0.1:37636 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:44:37.708618364Z 2026-09-01 22:44:37,708 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:44:41.908272586Z INFO:     127.0.0.1:37704 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:44:41.911992455Z INFO:     127.0.0.1:37718 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:44:42.811576129Z 2026-09-01 22:44:42,811 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:44:46.918826937Z INFO:     127.0.0.1:47050 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:44:46.923474311Z INFO:     127.0.0.1:47058 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:44:47.931223489Z 2026-09-01 22:44:47,931 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:44:48.647615146Z 2026-09-01 22:44:48,647 [INFO] qwenpaw_worker.sync: qwenpaw FileSync push uploaded component=sync worker=native-m0-clean-worker count=1 files=['.qwenpaw/matrix_sync_token']
+2026-09-01T22:44:51.929024587Z INFO:     127.0.0.1:47104 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:44:51.932700383Z INFO:     127.0.0.1:47112 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:44:53.051041815Z 2026-09-01 22:44:53,050 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:44:56.940202845Z INFO:     127.0.0.1:57952 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:44:56.944032770Z INFO:     127.0.0.1:57954 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:44:58.215152446Z 2026-09-01 22:44:58,214 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:45:01.952874701Z INFO:     127.0.0.1:58024 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:45:01.957872191Z INFO:     127.0.0.1:58028 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:45:03.336567457Z 2026-09-01 22:45:03,336 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:45:06.963221072Z INFO:     127.0.0.1:48088 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:45:06.966996984Z INFO:     127.0.0.1:48092 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:45:08.431131123Z 2026-09-01 22:45:08,430 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:45:11.973088047Z INFO:     127.0.0.1:48158 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:45:11.976748750Z INFO:     127.0.0.1:48168 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:45:13.547781685Z 2026-09-01 22:45:13,547 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:45:16.983702730Z INFO:     127.0.0.1:53802 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:45:16.987985123Z INFO:     127.0.0.1:53804 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:45:18.651770418Z 2026-09-01 22:45:18,651 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:45:18.952263780Z 2026-09-01 22:45:18,951 [INFO] qwenpaw_worker.sync: qwenpaw FileSync push uploaded component=sync worker=native-m0-clean-worker count=1 files=['.qwenpaw/matrix_sync_token']
+2026-09-01T22:45:21.994146666Z INFO:     127.0.0.1:53862 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:45:21.997917704Z INFO:     127.0.0.1:53870 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:45:23.775271425Z 2026-09-01 22:45:23,773 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:45:27.004416326Z INFO:     127.0.0.1:57344 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:45:27.008334868Z INFO:     127.0.0.1:57346 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:45:28.876172701Z 2026-09-01 22:45:28,875 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:45:32.014197903Z INFO:     127.0.0.1:57416 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:45:32.019321242Z INFO:     127.0.0.1:57420 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:45:33.997312305Z 2026-09-01 22:45:33,997 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:45:37.027168759Z INFO:     127.0.0.1:38110 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:45:37.032897410Z INFO:     127.0.0.1:38112 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:45:39.098173546Z 2026-09-01 22:45:39,097 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:45:42.039491819Z INFO:     127.0.0.1:38172 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:45:42.043614594Z INFO:     127.0.0.1:38178 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:45:44.202458243Z 2026-09-01 22:45:44,202 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:45:47.049068192Z INFO:     127.0.0.1:55324 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:45:47.052930770Z INFO:     127.0.0.1:55338 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:45:49.356097473Z 2026-09-01 22:45:49,355 [INFO] qwenpaw_worker.sync: qwenpaw FileSync push uploaded component=sync worker=native-m0-clean-worker count=1 files=['.qwenpaw/matrix_sync_token']
+2026-09-01T22:45:49.361197892Z 2026-09-01 22:45:49,361 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:45:52.059474010Z INFO:     127.0.0.1:55418 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:45:52.063857559Z INFO:     127.0.0.1:55434 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:45:54.517789322Z 2026-09-01 22:45:54,517 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:45:57.069560629Z INFO:     127.0.0.1:56250 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:45:57.073713152Z INFO:     127.0.0.1:56254 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:45:59.617901071Z 2026-09-01 22:45:59,617 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:46:02.080094726Z INFO:     127.0.0.1:56314 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:46:02.083838600Z INFO:     127.0.0.1:56318 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:46:04.723399168Z 2026-09-01 22:46:04,723 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:46:07.088516180Z INFO:     127.0.0.1:40650 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:46:07.092266770Z INFO:     127.0.0.1:40660 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:46:09.844997991Z 2026-09-01 22:46:09,844 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:46:12.098036508Z INFO:     127.0.0.1:40724 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:46:12.101907946Z INFO:     127.0.0.1:40728 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:46:14.957837445Z 2026-09-01 22:46:14,957 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:46:17.109470462Z INFO:     127.0.0.1:42748 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:46:17.111486271Z INFO:     127.0.0.1:42760 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:46:19.646849567Z 2026-09-01 22:46:19,646 [INFO] qwenpaw_worker.sync: qwenpaw FileSync push uploaded component=sync worker=native-m0-clean-worker count=1 files=['.qwenpaw/matrix_sync_token']
+2026-09-01T22:46:20.061791211Z 2026-09-01 22:46:20,061 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:46:22.117048556Z INFO:     127.0.0.1:42830 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:46:22.120965161Z INFO:     127.0.0.1:42836 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:46:25.160219226Z 2026-09-01 22:46:25,160 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:46:27.126667978Z INFO:     127.0.0.1:38672 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:46:27.130784238Z INFO:     127.0.0.1:38682 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:46:30.270602934Z 2026-09-01 22:46:30,270 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:46:32.135392843Z INFO:     127.0.0.1:38768 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:46:32.139518985Z INFO:     127.0.0.1:38770 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:46:35.368667807Z 2026-09-01 22:46:35,368 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:46:37.144005010Z INFO:     127.0.0.1:37276 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:46:37.147788045Z INFO:     127.0.0.1:37284 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:46:40.464784681Z 2026-09-01 22:46:40,464 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:46:42.152247643Z INFO:     127.0.0.1:37346 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:46:42.155927307Z INFO:     127.0.0.1:37362 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:46:45.572304618Z 2026-09-01 22:46:45,572 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:46:47.163970035Z INFO:     127.0.0.1:42562 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:46:47.166629847Z INFO:     127.0.0.1:42580 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:46:49.960891715Z 2026-09-01 22:46:49,960 [INFO] qwenpaw_worker.sync: qwenpaw FileSync push uploaded component=sync worker=native-m0-clean-worker count=1 files=['.qwenpaw/matrix_sync_token']
+2026-09-01T22:46:50.696643982Z 2026-09-01 22:46:50,696 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:46:52.169963920Z INFO:     127.0.0.1:42624 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:46:52.174177800Z INFO:     127.0.0.1:42628 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:46:55.795859486Z 2026-09-01 22:46:55,795 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:46:57.179125081Z INFO:     127.0.0.1:52758 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:46:57.182711202Z INFO:     127.0.0.1:52774 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:47:00.896365895Z 2026-09-01 22:47:00,896 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:47:02.195290881Z INFO:     127.0.0.1:52850 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:47:02.199453849Z INFO:     127.0.0.1:52860 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:47:05.997184596Z 2026-09-01 22:47:05,997 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:47:07.203138624Z INFO:     127.0.0.1:54034 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:47:07.207238118Z INFO:     127.0.0.1:54048 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:47:11.094846247Z 2026-09-01 22:47:11,094 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:47:12.211222824Z INFO:     127.0.0.1:54120 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:47:12.215198019Z INFO:     127.0.0.1:54130 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:47:16.205081525Z 2026-09-01 22:47:16,204 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:47:17.220934253Z INFO:     127.0.0.1:35166 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:47:17.224508852Z INFO:     127.0.0.1:35178 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:47:20.248971753Z 2026-09-01 22:47:20,248 [INFO] qwenpaw_worker.sync: qwenpaw FileSync push uploaded component=sync worker=native-m0-clean-worker count=1 files=['.qwenpaw/matrix_sync_token']
+2026-09-01T22:47:21.321874566Z 2026-09-01 22:47:21,320 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:47:22.228138260Z INFO:     127.0.0.1:35238 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:47:22.231856703Z INFO:     127.0.0.1:35248 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:47:26.439631090Z 2026-09-01 22:47:26,439 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:47:27.237614447Z INFO:     127.0.0.1:57388 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:47:27.241403038Z INFO:     127.0.0.1:57402 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:47:31.559240191Z 2026-09-01 22:47:31,559 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:47:32.245600834Z INFO:     127.0.0.1:57466 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:47:32.249369698Z INFO:     127.0.0.1:57494 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:47:36.662569029Z 2026-09-01 22:47:36,662 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:47:37.253500357Z INFO:     127.0.0.1:49562 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:47:37.259321637Z INFO:     127.0.0.1:49578 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:47:41.768912264Z 2026-09-01 22:47:41,768 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:47:42.264410122Z INFO:     127.0.0.1:49636 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:47:42.270486953Z INFO:     127.0.0.1:49654 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:47:46.882003971Z 2026-09-01 22:47:46,881 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:47:47.278489673Z INFO:     127.0.0.1:56874 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:47:47.282758846Z INFO:     127.0.0.1:56890 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:47:50.533120286Z 2026-09-01 22:47:50,532 [INFO] qwenpaw_worker.sync: qwenpaw FileSync push uploaded component=sync worker=native-m0-clean-worker count=1 files=['.qwenpaw/matrix_sync_token']
+2026-09-01T22:47:51.984637710Z 2026-09-01 22:47:51,984 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:47:52.286486707Z INFO:     127.0.0.1:56916 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:47:52.290187338Z INFO:     127.0.0.1:56926 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:47:57.085219977Z 2026-09-01 22:47:57,085 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:47:57.295443405Z INFO:     127.0.0.1:58500 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:47:57.299359234Z INFO:     127.0.0.1:58502 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:48:02.195461991Z 2026-09-01 22:48:02,195 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:48:02.305106786Z INFO:     127.0.0.1:58572 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:48:02.309541680Z INFO:     127.0.0.1:58584 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK
+2026-09-01T22:48:07.297476007Z 2026-09-01 22:48:07,296 [INFO] qwenpaw_worker.update: runtime config apply skipped component=update worker=native-m0-clean-worker generation=7 changed=False mcp_server_count=0 channel_names=- credential_binding_count=0 duration_ms=0
+2026-09-01T22:48:07.314489959Z INFO:     127.0.0.1:41100 - "GET /api/version HTTP/1.1" 200 OK
+2026-09-01T22:48:07.318570039Z INFO:     127.0.0.1:41104 - "GET /api/agents/default/agent-status HTTP/1.1" 200 OK

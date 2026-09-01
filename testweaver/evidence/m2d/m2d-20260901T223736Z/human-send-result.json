@@ -1,0 +1,16 @@
+{
+  "status": "SENT",
+  "sent": true,
+  "room_id": "!hXmoHY3MdNwdH16r3J:matrix-native-m0-20260901.agentteams.local:28080",
+  "manager_id": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+  "txn_id": "m2d-human-20260901T223736Z",
+  "event_id": "$DjEw17iaep5RJDMn5HLZLMtL8PKDZGnH-2-Ii1MWVEk",
+  "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+  "origin_server_ts": 1788302669231,
+  "input_bytes": 2565,
+  "input_sha256": "ddf19fb24afa6d093bf1b8d449ecb5f8ce72982790e52a65437233dfbe4d8d05",
+  "event_raw_sha256": "b8b3517bd8314248a031441bac481bb5b0bee5359efbe0802f85d26eccebf314",
+  "event_path": "/root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/human-event.json",
+  "api_response_path": "/root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/human-send-api-response.json",
+  "model_calls": 0
+}

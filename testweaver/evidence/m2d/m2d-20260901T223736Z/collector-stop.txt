@@ -1,0 +1,18 @@
+M2-D native evidence collector stop record
+============================================
+
+Stop boundary: immediately after the first observed native pause_project event
+and the Leader's Human approval request. No AgentTeams container, Manager,
+Controller, Worker, Matrix room, Project, or Task was stopped or modified.
+
+pause_project event: $Ryu0zp5gc60SoEzKdz_y-jTjUVkQHmbol0RQJFngZLg
+Human approval event: $4mbYUHACY6MZA65Su3jyVCvy4ntKszrO9jk2awIrV5I
+collector stop verification: 2026-09-01T22:48:56Z
+
+Matrix collector PID stopped: 3778327
+Docker log collector PIDs stopped: 3754114 3754115 3754116 3754117 3754118 3754119
+Post-stop verification: all listed collector PIDs not running; no matching
+M2-D Matrix collector process remained.
+
+Evidence files remain in this run directory. No approval, resume, fault drill,
+follow-up Human input, or operator intervention was performed.

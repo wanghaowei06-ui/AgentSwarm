@@ -1,0 +1,66 @@
+{
+  "schema": "testweaver.m2d.final-containers/v1",
+  "captured_at": "2026-09-01T22:49:50Z",
+  "containers": [
+    {
+      "container_name": "agentteams-native-m0-20260901-manager",
+      "container_id": "cbc6432f0e51df3c491514c146d31704afe64a5d61bc3acf81fe42698b85e50e",
+      "image": "agentteams/manager:m1plus-15b7b14",
+      "image_id": "sha256:798d52808f58324dcb489517fd87092eaed7ae1aa69e80a19b55464b51092b54",
+      "status": "running",
+      "running": true,
+      "restart_count": 0,
+      "started_at": "2026-09-01T18:48:11.586295224Z"
+    },
+    {
+      "container_name": "agentteams-native-m0-20260901-controller",
+      "container_id": "cc5c2f91197b544c721f1c303fcdf5a3091b0dc7d6aafa5e8f9cb15d51ee7fdc",
+      "image": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-embedded@sha256:3966dc000f20f98033b15fba897f257186653ef8600e760c1cc55aa620b42bd6",
+      "image_id": "sha256:3966dc000f20f98033b15fba897f257186653ef8600e760c1cc55aa620b42bd6",
+      "status": "running",
+      "running": true,
+      "restart_count": 0,
+      "started_at": "2026-09-01T13:30:58.943859072Z"
+    },
+    {
+      "container_name": "agentteams-native-m0-20260901-worker-native-m0-clean-leader",
+      "container_id": "6c986616c22eb2155d1fe62aefac1c632e042fb1f1f7eedf607b1a05b3680736",
+      "image": "agentteams/qwenpaw-worker:be10aaf",
+      "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+      "status": "running",
+      "running": true,
+      "restart_count": 0,
+      "started_at": "2026-09-01T22:24:40.351731239Z"
+    },
+    {
+      "container_name": "agentteams-native-m0-20260901-worker-native-m0-clean-worker",
+      "container_id": "20736420e86f27a080b73b8425aca0730c45fc1c805324b99cd8e693ec25ebd8",
+      "image": "agentteams/qwenpaw-worker:be10aaf",
+      "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+      "status": "running",
+      "running": true,
+      "restart_count": 0,
+      "started_at": "2026-09-01T22:25:42.438030687Z"
+    },
+    {
+      "container_name": "agentteams-native-m0-20260901-worker-native-m1-verify-leader",
+      "container_id": "048528582d172668353509bb66e0dfdb891ea9eaba10765824a9b2bda09dcf6a",
+      "image": "agentteams/qwenpaw-worker:be10aaf",
+      "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+      "status": "running",
+      "running": true,
+      "restart_count": 0,
+      "started_at": "2026-09-01T22:26:18.938278615Z"
+    },
+    {
+      "container_name": "agentteams-native-m0-20260901-worker-native-m1-verify-worker",
+      "container_id": "344c1bb4218e786f435e975bef1a5de950271674f18454ef3e4c3d221d3d3a5e",
+      "image": "agentteams/qwenpaw-worker:be10aaf",
+      "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+      "status": "running",
+      "running": true,
+      "restart_count": 0,
+      "started_at": "2026-09-01T22:26:52.76157996Z"
+    }
+  ]
+}

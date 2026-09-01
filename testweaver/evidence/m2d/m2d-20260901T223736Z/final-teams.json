@@ -1,0 +1,28 @@
+{
+  "schema": "testweaver.m2d.final-teams/v1",
+  "captured_at": "2026-09-01T22:49:50Z",
+  "teams": [
+    {
+      "name": "native-m0-clean-team",
+      "leader": "native-m0-clean-leader",
+      "phase": "Active",
+      "leaderReady": true,
+      "readyWorkers": 1,
+      "totalWorkers": 1,
+      "workerNames": [
+        "native-m0-clean-worker"
+      ]
+    },
+    {
+      "name": "native-m1-verify-team",
+      "leader": "native-m1-verify-leader",
+      "phase": "Active",
+      "leaderReady": true,
+      "readyWorkers": 1,
+      "totalWorkers": 1,
+      "workerNames": [
+        "native-m1-verify-worker"
+      ]
+    }
+  ]
+}

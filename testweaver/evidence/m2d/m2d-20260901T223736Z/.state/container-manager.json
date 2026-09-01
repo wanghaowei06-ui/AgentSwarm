@@ -1,0 +1,10 @@
+{
+  "container_name": "agentteams-native-m0-20260901-manager",
+  "container_id": "cbc6432f0e51df3c491514c146d31704afe64a5d61bc3acf81fe42698b85e50e",
+  "image": "agentteams/manager:m1plus-15b7b14",
+  "image_id": "sha256:798d52808f58324dcb489517fd87092eaed7ae1aa69e80a19b55464b51092b54",
+  "status": "running",
+  "running": true,
+  "restart_count": 0,
+  "started_at": "2026-09-01T18:48:11.586295224Z"
+}

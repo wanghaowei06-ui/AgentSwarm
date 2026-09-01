@@ -1,0 +1,15 @@
+{
+  "schema": "testweaver.m2d.post-approval-human-clarification/v1",
+  "room_id": "!LS2u4mrrNQIvM1B79I:matrix-native-m0-20260901.agentteams.local:28080",
+  "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+  "sender_membership": "join",
+  "event_id": "$GAfRBGVY0_rWsVhtllVo0OAU2f1Y_5F2KCF3M2drf_g",
+  "transaction_id": "m2d-human-clarification-20260901T230829Z",
+  "sent_at": "2026-09-01T23:08:29Z",
+  "reply_to_permission_event": "$WPgqfiiN_CMekPWEt1jr02VPbYxJNyUVMg4OVCflEts",
+  "body_sha256": "f5f5995d8f78316a595de3f0fb00b8134f1494ef78cb41dc5a39fb6a27df5a07",
+  "api_response": {
+    "event_id": "$GAfRBGVY0_rWsVhtllVo0OAU2f1Y_5F2KCF3M2drf_g"
+  },
+  "token_persisted": false
+}

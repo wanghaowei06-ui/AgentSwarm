@@ -1,0 +1,12 @@
+M2-D pre-send transport note
+============================
+
+Before the accepted Human event, one attempted PUT was rejected by Matrix
+with HTTP 400 and returned no event. A read-only room message query immediately
+afterward reported zero m.room.message events. No Human input bytes were
+accepted by Matrix in that attempt; the only accepted Human event is recorded
+in human-event.json and human-send-result.json.
+
+This note records the transport failure for attribution. It did not trigger a
+Manager run and was not retried as an input; the later accepted send used the
+frozen human-input.txt bytes exactly once.

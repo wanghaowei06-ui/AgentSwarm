@@ -1,0 +1,132 @@
+M2-D native AgentTeams run receipt
+=================================
+
+status: PARTIAL (native pause_project and approval request reached; the later Human decision entered the approval Task room and was rejected by the native authorization boundary; no resume, fault, replacement, or Oracle occurred)
+run_id: m2d-20260901T223736Z
+run_owner: external Human operator
+repository_head_at_arm: 819ea0a61645d42d7bf3dd32a0cc0fce10cb3cb2
+basis: 819ea0a deployment result; M2-C assignment-notification root cause; be10aaf Worker notification rule
+
+Run boundary
+------------
+arm_started: 2026-09-01T22:41:11Z
+new_private_human_room: !hXmoHY3MdNwdH16r3J:matrix-native-m0-20260901.agentteams.local:28080
+manager_membership_before_send: join (read back before sending)
+accepted_human_event: $DjEw17iaep5RJDMn5HLZLMtL8PKDZGnH-2-Ii1MWVEk
+human_event_origin_server_ts: 1788302669231 (2026-09-01T22:44:29.231Z)
+human_sender: @nativeadmin:matrix-native-m0-20260901.agentteams.local:28080
+human_transaction_id: m2d-human-20260901T223736Z
+human_input_bytes: 2565
+human_input_sha256: ddf19fb24afa6d093bf1b8d449ecb5f8ce72982790e52a65437233dfbe4d8d05
+human_event_raw_sha256: b8b3517bd8314248a031441bac481bb5b0bee5359efbe0802f85d26eccebf314
+human_event_count_in_new_room: 1
+
+Transport attribution
+---------------------
+One earlier PUT setup attempt was rejected with HTTP 400 and produced no Matrix
+event; an immediate read-only room query showed zero m.room.message events.
+It did not accept Human input bytes and was not retried as an input. The event
+above is the only accepted Human input, sent byte-for-byte from the frozen file.
+
+Manager dynamic selection
+-------------------------
+selection evidence: $9wEnPyc8or0iWTwWWpjhnHbzghNVhnZNRXAHZkOej9Y
+selection stream predecessor: $9xNH2iOCbPSS-JX-myQ78FHO37kyXVZ3x4u8l7yi8O0
+selected Team: native-m1-verify-team
+selected Leader: native-m1-verify-leader
+selection basis: Manager's provider-driven fresh roster read; native-m0-clean-team
+was excluded because M2-C task-20260901-212347 remained non-terminal/paused;
+the selection was not supplied by the Human or a collector.
+Manager-to-Leader assignment event: $aj34WReVzBezwqQgK8-jXU66DG100i6Eqn3yaQK-jcw
+Leader room: !IrR5zoeSGDaTVw4Ple:matrix-native-m0-20260901.agentteams.local:28080
+
+Native TeamHarness chain
+------------------------
+new project_id: m2d-recovery-prep-20260901-224400
+new task_id: task-20260901-224400
+new task room: !LS2u4mrrNQIvM1B79I:matrix-native-m0-20260901.agentteams.local:28080
+roomflow create_task_room event: $9FIwfUhvvnSIQxC8Few3egcKc5x0QL4Yuy1TBhf37rg
+projectflow create_project event: $2aJi6-SqsHihj4SDQ4rqmMmUqMQusVPnZbJglDQscaQ
+projectflow plan_dag event: $PmWypGCLzmw9Wh19Opg5lhpGUBIAJqmV3ocmww_QuHU
+taskflow delegate_task event: $T30t3F7TSUr6RqQ2xP6wx5TgO73eau7E-h2vHtNwYM8
+delegate notificationNeeded readback event: $QXngPF_CcLTWMiYfjUtVK3JRUqsT6hIqM1YZuHhwDFk
+cross-room assignment message event: $prgDYN6uNqjJ9GO9mbsd9bCTbVvMCQ-CJOe1fIxouM8
+assignment target: notificationNeeded.targetRoom = room:!LS2u4mrrNQIvM1B79I:matrix-native-m0-20260901.agentteams.local:28080
+assignment recipient: @native-m1-verify-worker:matrix-native-m0-20260901.agentteams.local:28080
+assignment behavior: one complete Matrix ID mention, one cross-room message, Leader ended
+turn without sleep/check_task polling.
+
+Worker and acceptance
+---------------------
+Worker: native-m1-verify-worker
+Worker container at final readback: agentteams-native-m0-20260901-worker-native-m1-verify-worker
+Worker container ID: 344c1bb4218e786f435e975bef1a5de950271674f18454ef3e4c3d221d3d3a5e
+Worker image: agentteams/qwenpaw-worker:be10aaf
+Worker image ID: sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb
+Worker native ack event: $JB0pIy_j70eukgCR02HH3JzPNL94MEElqb14138TW94
+Worker selected Skill events: teamharness-file-sharing ($ZcaEFCinlGsZfB145M7NdUWXnrTyz8-k6XfISPltQZs), teamharness-task-execution ($9oL-tGsHDlx5oOhqcsqSQITQ6sg6gaenMuaOP6mP6Rg), diagnose-by-competing-hypotheses ($B5vPPhy0WtBEwrkjQPMkDuTJXx_YoJuxcSgS6NOxsfo), reconcile-before-retry ($kUIpJThA8xbfe-xSFtij5Tp-_2rfao7IxkGWF3VNXLs)
+Skill provenance evidence: $k_u4DJYtrY1CnyzTuSkRLfzcsawRgeOf1NGK1S1SYUA (source_commit 19a929ea084c32e0e551881ec709b1d9b1792512, version 1.0 recorded in the Worker output)
+Worker submit_task event: $Iku00uGzdEE7golqfe2SHAYtMVOGeH-LKbkV966aKIg
+Worker completion event: $qECWVHhFWfvfCum1RZEc13dgujc99eqcorn0Gekq4a8
+Leader check_task event: $QCeAvfYCyMwIXBDY4PFMqs-gR1KJuOHVLcC8yEDhhVw
+Leader check result: effective=true, no validation errors, SUCCESS (raw follow-up event $7x9zz7FCPKt4EofFiGEk6X4GcRWBkWEmKDbBs9c_GvY)
+Leader accept_task_result event: $qIWcq3mnyReVPGnd4Une4OwrrDQPeGPuaN3Vf2DUW1k
+
+Pause and Human approval boundary
+----------------------------------
+native pause_project event: $Ryu0zp5gc60SoEzKdz_y-jTjUVkQHmbol0RQJFngZ
+pause origin_server_ts: 1788302824377 (2026-09-01T22:47:04.377Z)
+Human approval request event: $4mbYUHACY6MZA65Su3jyVCvy4ntKszrO9jk2awIrV5I
+approval origin_server_ts: 1788302848068 (2026-09-01T22:47:28.068Z)
+approval room: !LS2u4mrrNQIvM1B79I:matrix-native-m0-20260901.agentteams.local:28080
+approval contents: project/task native IDs, Worker full Matrix identity, current
+Worker hostname/container, read-only plan impact, and reversible recovery method
+were stated; the request explicitly asks for approval before any drill.
+pre-approval operator boundary: no approval decision, resume_project, fault injection,
+container stop/restart, follow-up Human input, or corrective message was performed.
+
+Post-approval continuation
+-------------------------
+post-approval evidence root: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/post-approval
+post-approval arm: completed before the Human decision; six redacted Docker log streams and the Matrix collector were armed.
+Human decision event: $ghxvwpYf8porbRcJ3zFDlE12ektHdxo5kSw21K5LQr8 in the approval Task room, replying to $4mbYUHACY6MZA65Su3jyVCvy4ntKszrO9jk2awIrV5I; sender @nativeadmin:matrix-native-m0-20260901.agentteams.local:28080.
+Human clarification event: $GAfRBGVY0_rWsVhtllVo0OAU2f1Y_5F2KCF3M2drf_g, the one permitted clarification after five minutes without native progress.
+native authorization blocker: Leader events $WPgqfiiN_CMekPWEt1jr02VPbYxJNyUVMg4OVCflEts and $Zri9okTOl4_aLo416GkHIYfk0kJA4j6vQZAzOU01NHk both returned "您目前没有访问此智能体的权限，需要审批。 ID: nativeadmin".
+post-approval native actions: resume_project=0, new execution Task/assignment=0, FAULT_READY=0, cancel/replacement=0.
+post-approval operator action: the approved docker rm -f was not executed because the required Worker ack/in_progress and FAULT_READY events never appeared. The target container remained 344c1bb4218e786f435e975bef1a5de950271674f18454ef3e4c3d221d3d3a5e, running with restart=0.
+Post-approval Worker informational events were observed before collection stop;
+they contain no mutation and no resume/fault marker. No Manager message occurred
+after the approval event in the captured stream.
+
+Runtime/evidence integrity
+--------------------------
+final resource state: all six in-scope containers Running with restart_count=0;
+Manager/Controller were not restarted; all four Worker /health endpoints returned 200;
+both Teams remained Active with leaderReady=true and readyWorkers=1/totalWorkers=1.
+model/provider/account settings: unchanged.
+collector stop verification: 2026-09-01T22:48:56Z; collector-stop.txt records
+the owned PIDs and confirms no AgentTeams container was stopped.
+secret scan: PASS; no high-confidence credential value detected; only protected
+variable names were used and no credential value was persisted or output.
+path containment: PASS; all evidence files resolve under this M2-D run directory;
+no M2-C/M1+ evidence path was written or referenced by the collector outputs.
+
+Evidence paths (all local paths are absolute and under this run)
+------------------------------------------------------------------
+run_dir: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/
+baseline: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/baseline-manifest.json
+human setup: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/human-room-setup.json
+human input/event/send receipt: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/human-input.txt, /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/human-event.json, /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/human-send-result.json, /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/human-event-hash.json
+raw Matrix stream/index/stages: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/matrix-events.jsonl, /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/matrix-event-index.jsonl, /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/matrix-stage-observations.jsonl, /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/matrix-collector-status.json
+final resource readback: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/final-containers.json, /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/final-teams.json, /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/final-workers.json, /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/final-health.tsv
+logs: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/logs/arm-m2d-20260901T223736Z/
+collector scripts/stop record: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/arm-evidence.sh, /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/collect-matrix-readback.sh, /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/redact-docker-log.pl, /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/collector-stop.txt
+transport attribution: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/human-send-rejected-preflight.txt
+post-approval receipt/manifest: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/post-approval/m2d-post-approval-receipt.txt, /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/post-approval/m2d-post-approval-manifest.sha256
+manifest: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/m2d-manifest.sha256 (167 parent+post-approval entries; sha256=1b8b499e8513750473412d2dcc1bac77d9395b0170674bbbde5a611d6e37f5dc; top-level receipt and manifest excluded to avoid a hash cycle)
+
+This Run is frozen as PARTIAL after the requested native PAUSE and the
+post-approval authorization block. The Human decision entered the approval Task
+room instead of a Manager-mediated route and was rejected by the native Leader
+authorization boundary. No resume, new Task, FAULT_READY, docker rm -f, fault,
+replacement, or Oracle action was performed.

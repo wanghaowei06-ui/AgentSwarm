@@ -1,0 +1,10 @@
+{
+  "container_name": "agentteams-native-m0-20260901-worker-native-m1-verify-worker",
+  "container_id": "344c1bb4218e786f435e975bef1a5de950271674f18454ef3e4c3d221d3d3a5e",
+  "image": "agentteams/qwenpaw-worker:be10aaf",
+  "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+  "status": "running",
+  "running": true,
+  "restart_count": 0,
+  "started_at": "2026-09-01T22:26:52.76157996Z"
+}

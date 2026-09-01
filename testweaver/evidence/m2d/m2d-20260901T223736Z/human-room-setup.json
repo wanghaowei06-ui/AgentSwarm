@@ -1,0 +1,9 @@
+{
+  "status": "READY",
+  "room_id": "!hXmoHY3MdNwdH16r3J:matrix-native-m0-20260901.agentteams.local:28080",
+  "manager_id": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+  "manager_membership": "join",
+  "send_permitted": true,
+  "checked_at": "2026-09-01T22:42:43Z",
+  "operation": "official Matrix createRoom with trusted_private_chat invite; membership readback only; no message sent"
+}

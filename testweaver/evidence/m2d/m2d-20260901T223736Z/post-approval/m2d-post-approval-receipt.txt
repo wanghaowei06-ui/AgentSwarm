@@ -1,0 +1,76 @@
+TestWeaver M2-D post-approval receipt
+=====================================
+
+status: PARTIAL (the approved continuation did not pass the native authorization boundary; no fault was executed)
+run_id: m2d-20260901T223736Z
+post_approval_evidence_root: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/post-approval
+parent_receipt_preserved: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/m2d-receipt.txt
+repository_head: 819ea0a61645d42d7bf3dd32a0cc0fce10cb3cb2
+
+ARM AND BOUNDARY
+-----------------
+post-approval arm completed at 2026-09-01T22:59:26Z using the reused M2-D collector with only its subdirectory repo-root resolution corrected. Six redacted container log streams and the Matrix readback collector were armed before the Human decision. All post-approval evidence paths are within this post-approval directory.
+
+approval_task_room: !LS2u4mrrNQIvM1B79I:matrix-native-m0-20260901.agentteams.local:28080
+approval_event: $4mbYUHACY6MZA65Su3jyVCvy4ntKszrO9jk2awIrV5I
+human_join_readback: nativeadmin joined the existing invite through the official Matrix API; no new invite was created.
+human_approval_event: $ghxvwpYf8porbRcJ3zFDlE12ektHdxo5kSw21K5LQr8
+human_approval_sender: @nativeadmin:matrix-native-m0-20260901.agentteams.local:28080
+human_approval_origin_server_ts: 1788303781619 (2026-09-01T23:03:01.619Z)
+human_approval_reply_to: $4mbYUHACY6MZA65Su3jyVCvy4ntKszrO9jk2awIrV5I
+human_approval_body_sha256: 69cd12407b6ba5ba493fd94e67930eca2ec673b8b0c2ebda90cf4d4685758d8c
+approved_target_container_id: 344c1bb4218e786f435e975bef1a5de950271674f18454ef3e4c3d221d3d3a5e
+
+The first send command's local response file is intentionally retained as an empty failed-readback artifact at:
+/root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/post-approval/human-approval-send.json
+The successful Matrix event above, captured in matrix-events.jsonl and indexed in matrix-event-index.jsonl, is the authoritative send proof; no resend was performed.
+
+CLARIFICATION
+-------------
+After five minutes without native progress, one and only one Human clarification was sent, as allowed by the run instruction.
+clarification_event: $GAfRBGVY0_rWsVhtllVo0OAU2f1Y_5F2KCF3M2drf_g
+clarification_sender: @nativeadmin:matrix-native-m0-20260901.agentteams.local:28080
+clarification_origin_server_ts: 1788304109581 (2026-09-01T23:08:29.581Z)
+clarification_reply_to: $WPgqfiiN_CMekPWEt1jr02VPbYxJNyUVMg4OVCflEts
+clarification_body_sha256: f20dfd5edce3bf01595d019f5796fd0371bdc8c8aedc75c8bf10a8a641576301
+
+NATIVE BLOCKER
+--------------
+The Leader emitted the same permission boundary twice:
+- $WPgqfiiN_CMekPWEt1jr02VPbYxJNyUVMg4OVCflEts at 1788303781641: "您目前没有访问此智能体的权限，需要审批。 ID: nativeadmin"
+- $Zri9okTOl4_aLo416GkHIYfk0kJA4j6vQZAzOU01NHk at 1788304109597: same response after the single clarification
+
+After excluding the two Human messages, exact readback of the approval Task room showed:
+resume_project: 0
+new native execution Task / taskflow assignment: 0
+FAULT_READY: 0
+cancel_task / replacement flow: 0
+The Manager did not produce a continuation event in this room. The permitted clarification did not clear the native authorization boundary. No additional Human message was sent.
+
+OPERATOR SAFETY RESULT
+----------------------
+The approved docker rm -f was NOT executed because the required real Worker ack/in_progress and FAULT_READY prerequisites never appeared. No -v, volume deletion, CR change, configuration change, or action against another container occurred.
+
+target_worker_cr: native-m1-verify-worker
+target_worker_image: agentteams/qwenpaw-worker:be10aaf
+target_worker_image_id: sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb
+target_worker_final_container_id: 344c1bb4218e786f435e975bef1a5de950271674f18454ef3e4c3d221d3d3a5e
+target_worker_final_state: running, restart=0
+target_worker_cr_state: Running, role=worker, runtime=qwenpaw, team=native-m1-verify-team
+target_team_state: Active, leaderReady=true, readyWorkers=1, totalWorkers=1
+
+All six in-scope containers remained running with restart=0. The post-approval collectors were stopped after the blocked boundary; no AgentTeams container was stopped or restarted.
+
+EVIDENCE
+--------
+matrix raw stream: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/post-approval/matrix-events.jsonl
+matrix index: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/post-approval/matrix-event-index.jsonl
+matrix stage/status: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/post-approval/matrix-stage-observations.jsonl, /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/post-approval/matrix-collector-status.json
+human approval API receipt: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/post-approval/human-approval-send.json
+human clarification API receipt: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/post-approval/human-clarification-send.json
+baseline and redacted logs: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/post-approval/baseline-manifest.json and /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/post-approval/logs/
+secret scan: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/post-approval/secret-scan.txt (CLEAN; values not output)
+sha256 manifest: /root/projects/agentteams/testweaver/evidence/m2d/m2d-20260901T223736Z/post-approval/m2d-post-approval-manifest.sha256 (79 entries; sha256=3883090420211194bd213e369b69b9614466af223d112d8b5b889780ea7ff5f5; verification passed)
+path boundary verification: out_of_scope_files=0
+
+conclusion: PARTIAL due the unchanged native authorization boundary for nativeadmin; stop without docker rm -f, resume, task creation, fault injection, Oracle, or architecture changes.
