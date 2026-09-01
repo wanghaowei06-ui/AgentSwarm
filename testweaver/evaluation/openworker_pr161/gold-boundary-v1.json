@@ -1,0 +1,71 @@
+{
+  "schema_version": "testweaver.m3.openworker-pr161.gold-boundary/v1",
+  "gold_id": "openworker-pr161-boundary-gold-v1",
+  "version": "1.0.0",
+  "visibility": "verifier_only",
+  "cases": [
+    {
+      "case_id": "disallow-explicit-denial",
+      "expected_intent": "deny",
+      "expected_committed_side_effects": 0,
+      "required_ledger_entries": 1,
+      "required_response_known": true
+    },
+    {
+      "case_id": "note-question-boundary",
+      "expected_intent": "free_text",
+      "expected_committed_side_effects": 0,
+      "required_ledger_entries": 1,
+      "required_response_known": true
+    },
+    {
+      "case_id": "not-question-boundary",
+      "expected_intent": "free_text",
+      "expected_committed_side_effects": 0,
+      "required_ledger_entries": 1,
+      "required_response_known": true
+    },
+    {
+      "case_id": "approve-word",
+      "expected_intent": "allow",
+      "expected_committed_side_effects": 1,
+      "required_ledger_entries": 1,
+      "required_response_known": true
+    },
+    {
+      "case_id": "approved-word",
+      "expected_intent": "allow",
+      "expected_committed_side_effects": 1,
+      "required_ledger_entries": 1,
+      "required_response_known": true
+    },
+    {
+      "case_id": "allowed-word",
+      "expected_intent": "allow",
+      "expected_committed_side_effects": 1,
+      "required_ledger_entries": 1,
+      "required_response_known": true
+    },
+    {
+      "case_id": "yes-word",
+      "expected_intent": "allow",
+      "expected_committed_side_effects": 1,
+      "required_ledger_entries": 1,
+      "required_response_known": true
+    },
+    {
+      "case_id": "deny-word",
+      "expected_intent": "deny",
+      "expected_committed_side_effects": 0,
+      "required_ledger_entries": 1,
+      "required_response_known": true
+    },
+    {
+      "case_id": "ambiguous-free-text",
+      "expected_intent": "deny",
+      "expected_committed_side_effects": 0,
+      "required_ledger_entries": 1,
+      "required_response_known": true
+    }
+  ]
+}

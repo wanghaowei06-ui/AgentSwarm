@@ -1,0 +1,79 @@
+{
+  "schema_version": "testweaver.m3.openworker-pr161.manifest/v1",
+  "dataset_id": "openworker-pr161-public-inputs",
+  "version": "1.0.0",
+  "license": {
+    "spdx_id": "MIT",
+    "attribution": "Copyright (c) 2024 Andrew Ng",
+    "source": "https://github.com/andrewyng/openworker/blob/38e1f030219c75e7423a9a9813253d8178915db7/LICENSE"
+  },
+  "upstream": {
+    "repository": "https://github.com/andrewyng/openworker.git",
+    "pull_request": 161,
+    "source_path": "coworker/inbox_routing.py",
+    "license": "MIT",
+    "license_reference": "upstream commit 38e1f030219c75e7423a9a9813253d8178915db7:LICENSE"
+  },
+  "baselines": {
+    "historical-vulnerable": {
+      "commit": "98445fee112eec07423da5eeef2a3ebba54f6acd",
+      "tree": "858874a7c8bd075026d52124d6c2b01f84381d23",
+      "source_kind": "upstream_historical",
+      "case_scope": "inbox-free-text-approval-fallback"
+    },
+    "historical-fixed": {
+      "commit": "38e1f030219c75e7423a9a9813253d8178915db7",
+      "tree": "f70b3a42ad5328908630ffb0dc5127c73c3ded7e",
+      "source_kind": "upstream_historical_fix",
+      "case_scope": "inbox-free-text-approval-fallback"
+    }
+  },
+  "source_files": {
+    "inbox_routing_vulnerable_sha256": "9170af275ab252b338651dd1dc5d357ad1f3a54525ad94f86942f16f8005e519",
+    "inbox_routing_fixed_sha256": "1a75dad625fdb6c9257b3d9225175042579c6a8712d40532aed7e37f3431c98e"
+  },
+  "testweaver_provenance": {
+    "asset_register_commit": "27157efd241ed1028f20074530315b88c6f5491a",
+    "register_assets": [
+      "GOLD-EVALUATION-BASELINE-007",
+      "HERO-GOLDEN-PUBLIC-HOLDOUT-008"
+    ],
+    "legacy_contract_sources": [
+      "benchmark/internal/openworker-pr161-locked-suite.yaml",
+      "benchmark/contracts/openworker-pr161-quality-contract.yaml",
+      "benchmark/regressions/openworker-pr161-regression.yaml"
+    ],
+    "legacy_metric_sources": [
+      "evaluation/external_gold/g10-gold-suite.json",
+      "scripts/benchmark/g10_gold_evaluator.py"
+    ],
+    "legacy_source_sha256": {
+      "benchmark/internal/openworker-pr161-locked-suite.yaml": "71932b715a7b4845239dc0e965cfb37b22e48def5894446f3ca2f8c8c88f2e8d",
+      "benchmark/contracts/openworker-pr161-quality-contract.yaml": "46e87b718b50db52eb530bde9a687b9c18eef256f44e8541d0cd18e6564fa71",
+      "benchmark/regressions/openworker-pr161-regression.yaml": "2c61151d5c96990cdfeeca42634e479a54872fef0fdcc60a8b21d4fdf45e9403",
+      "evaluation/external_gold/g10-gold-suite.json": "453c3f47ec5742e741e91a6ff42e1ea685d71c79e317ef6ec268a54c9ae4bdf7",
+      "scripts/benchmark/g10_gold_evaluator.py": "f5776ef4400f2e0e92fc03f02bf3a2705201e535a2274e999b716a5f6d4e745f"
+    },
+    "migration_kind": "behavioral_contract_only"
+  },
+  "agentteams_gap_audit": {
+    "repository": "https://github.com/agentscope-ai/AgentTeams.git",
+    "pinned_commit": "2ea027403398dfa06f3fc86445042d59f4684d71",
+    "pinned_matching_domain_asset_paths": 0,
+    "observed_main_commit": "223ddc2b8073e4c8b93bcbb15e1d717f196c04d9",
+    "observed_main_matching_domain_asset_paths": 0,
+    "finding": "AgentTeams provides runtime orchestration and generic AgentLoop integration, not this OpenWorker PR #161 evaluation dataset"
+  },
+  "gold_boundary": {
+    "path": "gold-boundary-v1.json",
+    "visibility": "verifier_only",
+    "must_not_be_loaded_into_target_context": true
+  },
+  "runtime_boundary": {
+    "target_start_allowed": false,
+    "network_allowed": false,
+    "model_calls_allowed": false,
+    "matrix_calls_allowed": false,
+    "runtime_state_writes_allowed": false
+  }
+}
