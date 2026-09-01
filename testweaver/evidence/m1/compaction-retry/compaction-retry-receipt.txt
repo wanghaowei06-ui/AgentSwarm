@@ -1,0 +1,120 @@
+M1 P0 Compaction-Retry Intake Receipt
+=======================================
+
+Recorded: 2026-09-01 (UTC)
+Overall: PARTIAL
+Root cause: PASS
+Minimal native fix + focused regression: PASS
+Live isolated-manager rollout/replay: NOT RUN (the M1 run is frozen)
+
+Scope and safety
+----------------
+- Frozen inputs were read only:
+  - testweaver/evidence/m1/m1-receipt.txt
+  - testweaver/evidence/m1/replay-20260901-230740.log
+  - existing task-20260901-153651 / project m1-leg1-20260901-153651
+- No M1 replay was sent. No provider, Matrix, Controller, TeamHarness, Project, or
+  Task mutation was made during this investigation or verification.
+- No model, account, thinking level, credential, or global configuration was changed.
+- No old TestWeaver runner, fixture, synthetic result, Observer, Gate, HITL,
+  recovery layer, Oracle, AgentLoop, Scheduler, or second coordinator was added.
+- No worktree, git add, commit, push, or M0 evidence write was performed.
+- No credential value is present in this receipt.
+
+Causal proof
+------------
+- Matrix admin room:
+  !Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080
+- The exact Human M1 marker was present in exactly one Matrix event:
+  event_id=$XkqZp9FpxzPkWFu7qNr0Rslugt8yCWEho04n6w3IPEo
+  history_events=324, matching_marker_events=1.
+- Native Matrix inbound handling has event-id deduplication
+  inboundDeduper.claimEvent({roomId,eventId}); the room history contains no second
+  Human event for this replay.
+- replay-task transport performed one PUT to
+  /_matrix/client/v3/rooms/<room>/send/m.room.message/<unique-txn-id>; its wait
+  loop only polled for a reply and did not resend the Human message.
+- Manager run/session:
+  runId=672e1246-7752-441f-94e5-16b34924d274
+  sessionId=72f72165-65e6-4911-95d4-415b63ffac21
+  session_file=/root/manager-workspace/.openclaw/agents/main/sessions/72f72165-65e6-4911-95d4-415b63ffac21.jsonl
+- The same marker/event metadata appeared in two session user records:
+  original user record at 15:07:46.673Z and a second user record at
+  15:35:49.276Z. Between them, the same run/session logged:
+  context overflow at 15:35:09.484Z,
+  compaction start at 15:35:18.884Z,
+  compaction end at 15:35:48.330Z,
+  and "auto-compaction succeeded ...; retrying prompt" at 15:35:48.332Z.
+- OpenClaw source path confirms the trigger: run.ts retried the same params.prompt
+  after compaction; run/attempt.ts called activeSession.prompt(), and
+  AgentSession.prompt() appends a new role=user message. This is prompt/checkpoint
+  re-consumption, not Matrix redelivery.
+
+Minimal native fix
+------------------
+- openclaw-base/Dockerfile now applies
+  openclaw-base/patches/openclaw-compaction-retry-continuation.patch after the
+  pinned upstream OpenClaw commit
+  2f35b6fa6b65d012e3b0c9f24af3f8a4b617a6e0 and before the official build.
+- The patch changes only the existing OpenClaw retry path:
+  - run.ts carries a one-attempt internal continuation marker only after a
+    successful overflow compaction.
+  - run/attempt.ts uses activeSession.agent.continue() for that retry, reusing
+    the compaction transcript without appending another user message.
+  - All ordinary Human prompts and non-compaction retries keep the existing
+    activeSession.prompt() path.
+- The patch contains no task-name allowlist and no new coordination component.
+
+Focused regression (RED -> GREEN)
+----------------------------------
+- RED, unpatched official image, test-only patch:
+  pnpm exec vitest run
+  src/agents/pi-embedded-runner/run.overflow-compaction.loop.test.ts
+  Result: 1 failed, 15 passed; the new test failed because the second attempt had
+  no continueFromCompactionRetry marker.
+- GREEN, same official image with the native patch:
+  pnpm exec vitest run
+  src/agents/pi-embedded-runner/run.overflow-compaction.loop.test.ts
+  src/agents/pi-embedded-runner/run/compaction-retry-intake.test.ts
+  Result: 2 test files passed, 17 tests passed.
+- The focused native Agent test observed one Human role=user message event across
+  prompt plus compacted-transcript continuation; the retry context contained only
+  the compacted transcript, not a second Human user turn.
+- git apply --check passed against the running image's OpenClaw source tree.
+- A full tsc --noEmit check was attempted in a --rm container but ended in Node
+  heap OOM/SIGABRT; it produced no source diagnostic. A temporary pnpm build was
+  also stopped after no output during tsdown and exited 137. These are verification
+  limits, not test failures.
+
+Side-effect-free post-check
+---------------------------
+- Read-only roster/metadata query at 16:28:38Z found no task/project metadata
+  created or assigned after 15:40:19Z:
+  - native-m0-clean-team tasks: task-20260901-144228,
+    task-20260901-150850, task-20260901-153651
+  - native-m1-verify-team tasks: task-20260901-151200,
+    task-20260901-153942
+- Existing task-20260901-153651 / project m1-leg1-20260901-153651 and the
+  existing 153942 artifacts were only read; the verification did not create them.
+- The running Manager was not restarted and remains on the pre-fix image digest:
+  sha256:a429666fcc66fa01b81da3bc9ea5af98437697ef794f811ac7d358d4286c317e
+  started=2026-09-01T13:35:26.05650013Z.
+- Frozen M0 hashes remained unchanged:
+  m0-native-verdict.txt
+  sha256=76e92d291986b5e27ac8e46babe06e1cb784d8d2d6df0b958c95673932da3079
+  native-chain-readiness-review.txt
+  sha256=8529481cb45dfa48ed6ee894d3c7c10da95e6138a1d1d30f73876a6526a6160b
+  provider-independent-review.txt
+  sha256=51dd7cde4e330cf4bb9e049e40fb183c1a24f3500d4bf7308350a4e65df1de22
+  provider-recovery-verdict.txt
+  sha256=b1b351919313fab3d36a7d3a58324f6193ac971541bb8947c59978c07bca8ea1
+
+Unique remaining blocker
+------------------------
+The source fix is ready and regression-green, but the currently running isolated
+Manager still uses the old digest. Activating it requires rebuilding/replacing
+that Manager image; no live rollout or M1 replay was performed because the
+existing M1 run and its evidence were frozen. This receipt therefore remains
+PARTIAL for runtime activation, while the root-cause fix itself is PASS.
+
+End of receipt.

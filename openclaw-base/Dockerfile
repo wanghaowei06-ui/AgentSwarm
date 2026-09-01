@@ -61,15 +61,20 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     npm install -g pnpm && \
     rm -rf /var/lib/apt/lists/*
 
-# Clone, build, and optimize OpenClaw
+# Clone, patch, build, and optimize OpenClaw
 # 1. Fetch only the pinned commit to minimize .git size
-# 2. Install dependencies and build
-# 3. Remove unnecessary files (tests, .git, etc.) - keep all node_modules for extensions
+# 2. Apply the pinned native compaction-retry fix
+# 3. Install dependencies and build
+# 4. Remove unnecessary files (tests, .git, etc.) - keep all node_modules for extensions
+COPY patches/openclaw-compaction-retry-continuation.patch /tmp/openclaw-compaction-retry-continuation.patch
+
 RUN git init /opt/openclaw && \
     cd /opt/openclaw && \
     git remote add origin ${OPENCLAW_REPO_URL} && \
     git fetch --depth 1 origin 2f35b6fa6b65d012e3b0c9f24af3f8a4b617a6e0 && \
     git checkout --detach FETCH_HEAD && \
+    git apply --check /tmp/openclaw-compaction-retry-continuation.patch && \
+    git apply /tmp/openclaw-compaction-retry-continuation.patch && \
     pnpm config set registry ${NPM_REGISTRY} && \
     pnpm install && \
     pnpm build && \
