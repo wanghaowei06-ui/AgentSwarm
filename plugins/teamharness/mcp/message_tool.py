@@ -24,7 +24,7 @@ class MessageToolDeps:
     matrix_target: Callable[[str], tuple[str, str]]
     mentions: Callable[[str, str], list[str]]
     ping_pong_error: Callable[[str, list[str]], str | None]
-    matrix_content: Callable[[str, list[str]], dict[str, Any]]
+    matrix_content: Callable[[str, list[str], str], dict[str, Any]]
     record_matrix_outbound_to_session: Callable[[str, str, str | None, str], bool]
 
 
@@ -394,7 +394,7 @@ def message(arguments: dict[str, Any], deps: MessageToolDeps) -> dict[str, Any]:
     if blocked:
         return {"ok": False, "tool": "message", "error": blocked}
 
-    content = deps.matrix_content(message_text, mentions)
+    content = deps.matrix_content(message_text, mentions, target_id)
     trigger = _self_trigger_intent(arguments, route, channel=channel, target_id=target_id)
     if _message_type(arguments) in SELF_TRIGGER_MESSAGE_TYPES and trigger is None:
         return {

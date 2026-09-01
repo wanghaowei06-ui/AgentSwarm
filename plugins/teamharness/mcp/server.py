@@ -602,13 +602,33 @@ def _matrix_room_domain(room_id: str) -> str:
     return room_id.split(":", 1)[1] if ":" in room_id else ""
 
 
+def _normalize_matrix_mentions(mentions: list[str], room_id: str = "") -> list[str]:
+    """Return only complete Matrix user IDs for the outbound event content."""
+
+    domain = _matrix_room_domain(room_id)
+    normalized: list[str] = []
+    for value in mentions:
+        candidate = str(value).strip()
+        if not candidate:
+            continue
+        if MATRIX_USER_RE.fullmatch(candidate):
+            normalized.append(candidate)
+            continue
+
+        local = candidate[1:] if candidate.startswith("@") else candidate
+        if not domain or not re.fullmatch(rf"[{MENTION_LOCAL_CHARS}]+", local):
+            raise ValueError("Matrix mentions must be complete Matrix user IDs")
+        normalized.append(f"@{local}:{domain}")
+    return list(dict.fromkeys(normalized))
+
+
 def _mentions(text: str, room_id: str = "") -> list[str]:
     mentions = list(MATRIX_USER_RE.findall(text or ""))
     domain = _matrix_room_domain(room_id)
     if domain:
         for local in SHORT_MATRIX_MENTION_RE.findall(text or ""):
             mentions.append(f"@{local}:{domain}")
-    return list(dict.fromkeys(mentions))
+    return _normalize_matrix_mentions(mentions, room_id)
 
 
 def _compact_without_mentions(text: str, mentions: list[str]) -> str:
@@ -786,7 +806,8 @@ def _formatted_body(text: str, mentions: list[str]) -> str:
     return body
 
 
-def _matrix_content(text: str, mentions: list[str]) -> dict[str, Any]:
+def _matrix_content(text: str, mentions: list[str], room_id: str = "") -> dict[str, Any]:
+    mentions = _normalize_matrix_mentions(mentions, room_id)
     content: dict[str, Any] = {
         "msgtype": "m.text",
         "body": text,
