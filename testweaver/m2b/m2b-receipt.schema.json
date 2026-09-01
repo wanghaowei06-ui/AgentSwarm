@@ -1,0 +1,307 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentteams.local/testweaver/m2b-receipt.schema.json",
+  "title": "TestWeaver M2-B observed receipt",
+  "description": "A ref-and-hash-only receipt for one native run; it does not create work or decide an outcome.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "native_refs",
+    "observations",
+    "oracle_observations",
+    "evidence_bundle_hash"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "testweaver.m2b.receipt/v1"
+    },
+    "run_id": {
+      "$ref": "#/$defs/ref"
+    },
+    "native_refs": {
+      "$ref": "#/$defs/native_refs"
+    },
+    "observations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/observation"
+      }
+    },
+    "oracle_observations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_root_ref",
+        "outcome",
+        "boundary"
+      ],
+      "properties": {
+        "evidence_root_ref": {
+          "$ref": "#/$defs/ref"
+        },
+        "outcome": {
+          "$ref": "#/$defs/oracle_observation"
+        },
+        "boundary": {
+          "$ref": "#/$defs/oracle_observation"
+        }
+      }
+    },
+    "evidence_bundle_hash": {
+      "$ref": "#/$defs/hash"
+    },
+    "receipt_created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "native_refs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project_id",
+        "task_id",
+        "room_id",
+        "read_only"
+      ],
+      "properties": {
+        "project_id": {
+          "$ref": "#/$defs/ref"
+        },
+        "task_id": {
+          "$ref": "#/$defs/ref"
+        },
+        "room_id": {
+          "$ref": "#/$defs/ref"
+        },
+        "read_only": {
+          "const": true
+        }
+      }
+    },
+    "runtime_facts": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "provider_ref",
+        "model_ref",
+        "usage_ref"
+      ],
+      "properties": {
+        "provider_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "model_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "usage_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stage",
+        "status",
+        "run_id",
+        "native_refs",
+        "actor_ref",
+        "source_ref",
+        "observed_at",
+        "event_ref",
+        "content_hash",
+        "runtime_facts"
+      ],
+      "properties": {
+        "stage": {
+          "enum": [
+            "human_input",
+            "manager_selection",
+            "leader_delegation",
+            "worker_execution",
+            "leader_acceptance",
+            "manager_followup",
+            "human_pause",
+            "human_resume",
+            "fault_operation",
+            "runtime_recovery",
+            "task_recovery"
+          ]
+        },
+        "status": {
+          "enum": [
+            "OBSERVED",
+            "NOT_OBSERVED",
+            "BLOCKED"
+          ]
+        },
+        "run_id": {
+          "$ref": "#/$defs/ref"
+        },
+        "native_refs": {
+          "$ref": "#/$defs/native_refs"
+        },
+        "actor_ref": {
+          "$ref": "#/$defs/ref"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/ref"
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "event_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "content_hash": {
+          "$ref": "#/$defs/hash"
+        },
+        "runtime_facts": {
+          "$ref": "#/$defs/runtime_facts"
+        },
+        "decision_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ref"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "OBSERVED"
+              },
+              "stage": {
+                "enum": [
+                  "manager_selection",
+                  "leader_delegation",
+                  "worker_execution",
+                  "leader_acceptance",
+                  "manager_followup",
+                  "task_recovery"
+                ]
+              }
+            },
+            "required": [
+              "status",
+              "stage"
+            ]
+          },
+          "then": {
+            "properties": {
+              "runtime_facts": {
+                "type": "object",
+                "required": [
+                  "provider_ref",
+                  "model_ref",
+                  "usage_ref"
+                ],
+                "properties": {
+                  "provider_ref": {
+                    "$ref": "#/$defs/ref"
+                  },
+                  "model_ref": {
+                    "$ref": "#/$defs/ref"
+                  },
+                  "usage_ref": {
+                    "$ref": "#/$defs/ref"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "oracle_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "identity_ref",
+        "process_ref",
+        "evidence_root_ref",
+        "source_ref",
+        "observed_at",
+        "content_hash",
+        "result_ref",
+        "read_only"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "OBSERVED",
+            "NOT_OBSERVED",
+            "BLOCKED"
+          ]
+        },
+        "identity_ref": {
+          "$ref": "#/$defs/ref"
+        },
+        "process_ref": {
+          "$ref": "#/$defs/ref"
+        },
+        "evidence_root_ref": {
+          "$ref": "#/$defs/ref"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/ref"
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "content_hash": {
+          "$ref": "#/$defs/hash"
+        },
+        "result_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "read_only": {
+          "const": true
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "schema_version": "testweaver.m2b.runner/v1",
+  "contract_version": 1,
+  "control_baseline": {
+    "document_commit": "eb0364d",
+    "binding": "unbound-template",
+    "case_binding": null
+  },
+  "scope": {
+    "mode": "preflight-only",
+    "live_run_allowed": false,
+    "runtime_mutation": false,
+    "package_mutation": false,
+    "model_invocations": false,
+    "human_input": false
+  },
+  "native_chain": {
+    "manager": {
+      "role": "manager",
+      "identity_ref": "native-ref://manager"
+    },
+    "leader": {
+      "role": "team_leader",
+      "identity_ref": "native-ref://leader"
+    },
+    "worker": {
+      "role": "worker",
+      "identity_ref": "native-ref://worker"
+    },
+    "required_tools": [
+      "roomflow",
+      "projectflow",
+      "taskflow"
+    ],
+    "required_edges": [
+      "manager_selects_team_and_leader",
+      "leader_creates_project_and_delegates_task",
+      "worker_acknowledges_and_submits",
+      "leader_checks_and_accepts",
+      "leader_handoffs_to_manager",
+      "manager_makes_followup_decision"
+    ]
+  },
+  "human_gate": {
+    "actor_ref": "human-ref://external-codex",
+    "transport": "matrix",
+    "pause_signal": "native-event-ref",
+    "decision": "external-manual",
+    "resume_signal": "later-native-event-ref",
+    "auto_resume": false,
+    "agent_auto_approval": false,
+    "same_model_request_and_approval": false
+  },
+  "recovery": {
+    "fault": {
+      "kind": "worker-process-or-container",
+      "source": "external-approved-lifecycle-operation",
+      "real_only": true,
+      "event_injection": false,
+      "repeat_count": 1
+    },
+    "native_sequence": [
+      "observe_task_before_fault",
+      "observe_runtime_generation_before_fault",
+      "observe_native_fault",
+      "observe_controller_runtime_recovery",
+      "observe_task_and_project_after_recovery",
+      "leader_replans_or_redelegates"
+    ],
+    "generation": {
+      "required": true,
+      "evidence_sources": [
+        "controller.metadata.generation",
+        "controller.status.observedGeneration",
+        "runtime.metadata.generation"
+      ],
+      "task_fencing": "not_available_in_current_teamharness"
+    },
+    "late_result_rule": "old_task_result_is_input_only"
+  },
+  "oracles": {
+    "same_evidence_root_ref": "run-evidence-ref://same-run",
+    "outcome": {
+      "identity_ref": "oracle-agent-ref://outcome",
+      "process_ref": "oracle-process-ref://outcome",
+      "read_only": true,
+      "source_ref": "evidence-source-ref://outcome"
+    },
+    "boundary": {
+      "identity_ref": "oracle-agent-ref://boundary",
+      "process_ref": "oracle-process-ref://boundary",
+      "read_only": true,
+      "source_ref": "evidence-source-ref://boundary"
+    }
+  },
+  "receipt": {
+    "record_mode": "append-only-observed-facts",
+    "required_observation_fields": [
+      "stage",
+      "status",
+      "run_id",
+      "native_refs",
+      "actor_ref",
+      "source_ref",
+      "observed_at",
+      "event_ref",
+      "content_hash",
+      "runtime_facts"
+    ],
+    "required_native_refs": [
+      "project_id",
+      "task_id",
+      "room_id"
+    ],
+    "allowed_statuses": [
+      "OBSERVED",
+      "NOT_OBSERVED",
+      "BLOCKED"
+    ],
+    "secret_handling": "variable-names-and-content-hashes-only",
+    "result_authority": "native-events-and-oracle-records",
+    "bundle_hash": "computed-after-run"
+  },
+  "allowed_script_operations": [
+    "validate_configuration",
+    "observe_existing_state",
+    "record_external_fault_reference",
+    "write_redacted_receipt"
+  ],
+  "forbidden_script_operations": [
+    "create_or_delegate_native_work",
+    "send_human_input",
+    "call_model",
+    "invent_event_or_result",
+    "resume_without_external_decision",
+    "compute_oracle_conclusion"
+  ],
+  "known_gaps": [
+    "TeamHarness has no task lease or takeover generation",
+    "INTERRUPTED is documented but is not an allowed TeamHarness result status",
+    "No checked-in independent HITL Policy service or dual Oracle runtime",
+    "TeamHarness has no dedicated event-read tool; Matrix readback and logs are evidence sources"
+  ]
+}
