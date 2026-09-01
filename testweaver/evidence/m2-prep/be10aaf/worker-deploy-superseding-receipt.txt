@@ -1,0 +1,124 @@
+be10aaf QwenPaw Worker superseding deployment receipt
+======================================================
+
+schema: testweaver.m2-be10aaf.worker-deploy-superseding-receipt/v1
+status: PASS (runtime); package readback: PARTIAL/non-blocking
+recorded_at_utc: 2026-09-01T22:28:25Z
+
+supersedes:
+  prior_receipt_commit: 74c9d2791c43be2fc0c601d0bbcf83af9614582b
+  prior_receipt_path: testweaver/evidence/m2-prep/be10aaf/worker-deploy-receipt.txt
+  prior_status: PARTIAL
+  prior_PARTIAL_reason: exact-hash gate incorrectly rejected the official QwenPaw SESSION_FILE_PROMPT_POLICY append in workspace/default/AGENTS.md
+  corrected_rule: package-current/config/AGENTS.md must match the package hash; workspace AGENTS.md must contain that complete text plus exactly one official session privacy block
+
+official_rule:
+  source: qwenpaw/src/qwenpaw_worker/worker.py
+  regression_source: qwenpaw/tests/test_worker_lifecycle.py::test_session_file_prompt_policy_is_appended_idempotently
+  marker: Session files are runtime-private state
+  policy_lines: 3
+  behavior: _ensure_session_file_prompt_policy appends the block only when the marker is absent and applies it to AGENTS.md and SOUL.md
+  runtime_validation: PASS on all four updated Workers; package text plus one exact block, marker count=1, policy count=1
+  local_pytest: not run; pytest executable is unavailable in the host shell (runtime validation above was performed directly in each Worker)
+
+source:
+  commit: be10aaf0e1fb660a1bcc48de14b25c950bff83e3
+  changed_paths_exact:
+    - plugins/teamharness/prompts/team/TEAMS.md
+    - plugins/teamharness/skills/team/task-delegation/SKILL.md
+    - plugins/tests/teamharness/test-contracts.rb
+  scope_check: PASS
+  focused_test: PASS (ruby plugins/tests/teamharness/test-contracts.rb)
+
+image:
+  ref: agentteams/qwenpaw-worker:be10aaf
+  immutable_id: sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb
+  TEAMS.md_sha256: 6b75e094edc73de61f0b22b85c826e5179d094b3d4a90eac8c9060881461cda3
+  task_delegation_SKILL.md_sha256: 050c5d28b179c93a00828d7099a4fd0f20310ee40ccaa7fca7427fa3d586719b
+  source_hash_match: PASS
+
+deployment:
+  official_command: agt update worker --name <target> --image agentteams/qwenpaw-worker:be10aaf
+  order: native-m0-clean-leader,native-m0-clean-worker,native-m1-verify-leader,native-m1-verify-worker
+  concurrency: one Worker at a time; validation passed before the next update
+  model_calls: 0
+  matrix_messages: 0
+  human_inputs: 0
+  manager_controller_matrix_restarted: false
+  runtime_files_or_package_modified: false
+
+rollback_points_and_results:
+  common_old_image_digest: sha256:884f8bf1db0e47dccbbc89282e1c6b82c7821ece0951b42b7ca5ba5fdcf8ae68
+  native-m0-clean-leader:
+    role: team_leader
+    team: native-m0-clean-team
+    old_container: 296c8468676706649a89b71cedfe30c978e7ff4b01295cd499ce03d6b9a505e3
+    old_image_ref: agentteams/qwenpaw-worker@sha256:884f8bf1db0e47dccbbc89282e1c6b82c7821ece0951b42b7ca5ba5fdcf8ae68
+    new_container: 6c986616c22eb2155d1fe62aefac1c632e042fb1f1f7eedf607b1a05b3680736
+    new_image_id: sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb
+    result: PASS
+  native-m0-clean-worker:
+    role: worker
+    team: native-m0-clean-team
+    old_container: 950cec661a56e0386f4d19514fe0a99a9efac007c1a44cb1070a66d6b05794c0
+    old_image_ref: agentteams/qwenpaw-worker:m1plus-342d1ee
+    new_container: 20736420e86f27a080b73b8425aca0730c45fc1c805324b99cd8e693ec25ebd8
+    new_image_id: sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb
+    result: PASS
+  native-m1-verify-leader:
+    role: team_leader
+    team: native-m1-verify-team
+    old_container: 80691121dd63fc70b0748c79fd84a3a6630d908c3fbe9d5cc8209375c98841a1
+    old_image_ref: agentteams/qwenpaw-worker:m1plus-342d1ee
+    new_container: 048528582d172668353509bb66e0dfdb891ea9eaba10765824a9b2bda09dcf6a
+    new_image_id: sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb
+    result: PASS
+  native-m1-verify-worker:
+    role: worker
+    team: native-m1-verify-team
+    old_container: 2e8c167eb015ae38b33163ecb7387799077b0709aa5710e770ed21877b85af55
+    old_image_ref: agentteams/qwenpaw-worker:m1plus-342d1ee
+    new_container: 344c1bb4218e786f435e975bef1a5de950271674f18454ef3e4c3d221d3d3a5e
+    new_image_id: sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb
+    result: PASS
+
+final_cr_readback:
+  native-m0-clean-leader: matrixUserID=@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080; roomID=!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080; role=team_leader; team=native-m0-clean-team; runtime=qwenpaw; model=deepseek-v4-flash; phase=Running; containerState=running; image=agentteams/qwenpaw-worker:be10aaf
+  native-m0-clean-worker: matrixUserID=@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080; roomID=!htUIJW5HXUYvFSIFW6:matrix-native-m0-20260901.agentteams.local:28080; role=worker; team=native-m0-clean-team; runtime=qwenpaw; model=deepseek-v4-flash; phase=Running; containerState=running; image=agentteams/qwenpaw-worker:be10aaf
+  native-m1-verify-leader: matrixUserID=@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080; roomID=!IrR5zoeSGDaTVw4Ple:matrix-native-m0-20260901.agentteams.local:28080; role=team_leader; team=native-m1-verify-team; runtime=qwenpaw; model=deepseek-v4-flash; phase=Running; containerState=running; image=agentteams/qwenpaw-worker:be10aaf
+  native-m1-verify-worker: matrixUserID=@native-m1-verify-worker:matrix-native-m0-20260901.agentteams.local:28080; roomID=!YJn4m2FIISa0gNTx9y:matrix-native-m0-20260901.agentteams.local:28080; role=worker; team=native-m1-verify-team; runtime=qwenpaw; model=deepseek-v4-flash; phase=Running; containerState=running; image=agentteams/qwenpaw-worker:be10aaf
+  all_image_ids: sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb
+
+runtime_validation:
+  package_current_config_AGENTS_sha256_all_targets: bd610687885983581da61dfe828ff5f86f8c83e4c49111bec5138bc47cb8291d
+  workspace_AGENTS_rule_all_targets: package text is complete; official session block appended exactly once
+  workspace_AGENTS_sha256_all_targets: d8cde7a6c5b02fe0f6aec7a28dc659f745eb1631bd035dd0b6fe07108c0cbc4c
+  SOUL_session_block_all_targets: marker count=1; policy count=1
+  five_skill_hashes_all_targets:
+    approval-intent-boundary-check: 9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66
+    avoid-redundant-exploration: eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd
+    diagnose-by-competing-hypotheses: 3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954
+    preserve-critical-constraints: fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f
+    reconcile-before-retry: cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e
+  five_skill_api_readback: all four GET /api/agents/default/skills returned the five names with enabled=true and source=customized
+  worker_env_names: unchanged across all four; values were not read or recorded
+  worker_env_names_checked: AGENTTEAMS_AI_GATEWAY_URL,AGENTTEAMS_AUTH_TOKEN_FILE,AGENTTEAMS_CONTROLLER_URL,AGENTTEAMS_FS_ACCESS_KEY,AGENTTEAMS_FS_BUCKET,AGENTTEAMS_FS_ENDPOINT,AGENTTEAMS_FS_SECRET_KEY,AGENTTEAMS_MATRIX_DEBUG,AGENTTEAMS_MATRIX_DOMAIN,AGENTTEAMS_MATRIX_URL,AGENTTEAMS_STORAGE_PREFIX,AGENTTEAMS_STORAGE_PROVIDER,AGENTTEAMS_WORKER_CR_NAME,AGENTTEAMS_WORKER_GATEWAY_KEY,AGENTTEAMS_WORKER_MATRIX_TOKEN,AGENTTEAMS_WORKER_NAME,AGENTTEAMS_WORKER_ROLE,AGENTTEAMS_WORKER_ROOM_ID
+  health_all_targets: /health=200,/healthz=200,/ready=200 on all four
+  teams: native-m0-clean-team Active leaderReady=true totalWorkers=1 readyWorkers=1; native-m1-verify-team Active leaderReady=true totalWorkers=1 readyWorkers=1
+  manager_container_unchanged: cbc6432f0e51df3c491514c146d31704afe64a5d61bc3acf81fe42698b85e50e
+  controller_container_unchanged: cc5c2f91197b544c721f1c303fcdf5a3091b0dc7d6aafa5e8f9cb15d51ee7fdc
+
+official_readback:
+  worker_response_package_field: absent from agt get workers -o json; recorded as PARTIAL only, not a deployment blocker
+  worker_response_keys: containerManaged,containerState,image,matrixUserID,model,name,phase,role,roomID,runtime,state,team
+
+secret_scan:
+  scope: superseding receipt, be10aaf changed files, image TEAMS.md and task-delegation SKILL.md
+  credential_values_recorded: 0
+  result: PASS (no high-confidence credential values)
+
+conclusion:
+  runtime_result: PASS
+  all_four_workers_updated_sequentially: true
+  old_74c9d27_PARTIAL: superseded; its exact-hash failure was a false gate against the official idempotent session-policy append
+  no_source_or_runtime_file_fix_applied: true
