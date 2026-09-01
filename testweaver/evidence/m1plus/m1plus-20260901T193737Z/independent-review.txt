@@ -1,0 +1,169 @@
+M1+ independent review (post-run, read-only)
+Run: m1plus-20260901T193737Z
+Review HEAD: 56c05557f40a517b300b032228f83aeab1fe28a4
+Declaration source: m1plus-receipt.txt (used as claims to challenge, not as evidence)
+
+VERDICT
+CORE (overall): PARTIAL
+CORE_NATIVE_DUAL_TEAM_CHAIN: PASS
+RED-LINE: HOLD full M1+ certification. The five TestWeaver domain Skills have no
+independent native runtime load/invoke evidence in this Run. Installed/enabled is
+not equivalent to loaded/invoked.
+
+1. Human input and binding — PASS
+
+  human-event.json has exactly one m.room.message: event
+  $Q3Ax2m6ZOJmHaNHfN4kmtAujljMXIEzuu7avi7kA4hU, sender
+  @nativeadmin:matrix-native-m0-20260901.agentteams.local:28080, room
+  !hNaeZwz6TWUHhA6I97:matrix-native-m0-20260901.agentteams.local:28080,
+  origin_server_ts 1788291460693. human-event-hash.json binds the body to
+  33bdc27fb6ca1052b1c9ffd1cf7d194557947fdfbe7feb7045ee185c0e074aa5.
+  matrix-human-final.jsonl independently contains 80 unique message events:
+  one Human sender and 79 Manager senders. The final room readback contains
+  80 message events with the same sender split; its other events are room state.
+  No second Human message was observed.
+
+2. Manager choice and identities — PASS, with attribution qualification
+
+  In matrix-human-final.jsonl, Manager event origin_server_ts 1788291470417
+  records the existing Team/Leader role mapping before delegation; event
+  origin_server_ts 1788291479504 records the first task push. The final
+  managers.json, teams.json, and workers.json show:
+
+    native-m0-clean-team  -> native-m0-clean-leader -> native-m0-clean-worker
+    native-m1-verify-team -> native-m1-verify-leader -> native-m1-verify-worker
+
+  Both Teams report leaderReady=true and readyWorkers=1. The Manager is
+  openclaw image agentteams/manager:m1plus-15b7b14; the four Worker records
+  identify qwenpaw runtime and the expected Leader/Worker roles.
+
+3. Native Leader -> Worker execution — PASS for both legs
+
+  Leg 1 is independently bound by artifacts/first-leg/project-meta.json and
+  task-meta.json to project m1-leg1-20260901-193754 and task
+  task-20260901-193754. Its task-meta fields include status=submitted,
+  result_status=SUCCESS, and submitted_by_role=worker. The raw
+  matrix-first-leader-final.jsonl stream and the redacted final logs show
+  native TeamHarness filesync, roomflow, projectflow, and taskflow activity.
+  The Leader creates/plans/delegates; the Worker performs taskflow and returns
+  the handoff; projectflow acceptance is recorded at
+  worker-native-m0-clean-worker.docker.log lines 150, 162, 172, and 173. The
+  Leader-side submit is at lines 115 and 154 of
+  worker-native-m0-clean-leader.docker.log.
+
+  Leg 2 is independently bound by artifacts/second-leg/project-meta.json,
+  task-meta.json, and worker-result.md to project
+  m1-phase2-verify-20260901-194103 and task task-20260901-194103. Its
+  task-meta fields include status=submitted, result_status=SUCCESS, and
+  submitted_by_role=worker. In leader-room-events.jsonl, Manager delegation is
+  at origin_server_ts 1788291668252 and the native Leader stream contains
+  create_task_room, create_project, plan_dag, delegate_task, check_task, and
+  accept_task_result. The redacted Worker log records taskflow/check at line
+  275 and projectflow acceptance at lines 329 and 331; roomflow activity is
+  recorded at lines 375, 378, 385, 387, and 390. The Leader submit is at line
+  287 of worker-native-m1-verify-leader.docker.log.
+
+  These are raw Matrix/log/tool records, not receipt text. The accepted
+  reports are tied to the two project/task identities and are relayed through
+  the Leader path before Manager's final report.
+
+4. Provider, model, usage, and handoff — PASS for Workers; PARTIAL for Manager
+
+  The redacted Worker logs independently record provider_id=agentteams-gateway,
+  model_name=deepseek-v4-flash, and numeric usage:
+
+    m0-clean-worker: line 137 at 19:39:38Z, 25535/319/25854
+    m0-clean-leader: lines 228 and 308 at 19:40:09Z and 19:40:42Z,
+      90819/1102/91921 and 44974/798/45772
+    m1-verify-worker: line 268 at 19:43:02Z, 26563/663/27226
+    m1-verify-leader: lines 369 and 471 at 19:43:26Z and 19:44:42Z,
+      107977/885/108862 and 44778/957/45735
+
+  manager-session-registry-safe.json pairs agent:main:main with
+  model=deepseek-v4-flash and modelProvider=agentteams-gateway and points its
+  last Matrix delivery at the Human room. However, the registry snapshot says
+  status=running, while the receipt says done; manager.docker.log has model and
+  provider labels but no independently attributable structured provider-usage
+  record here. session-manifest.tsv contains five metadata/hash rows, but none
+  of the corresponding session payload files is present under this Run.
+  Manager provider/model is therefore observed, but Manager usage and a
+  per-room session attribution remain PARTIAL rather than being inferred.
+
+5. Manager follow-up and accepted report — PASS, with routing qualification
+
+  matrix-manager-admin-final.jsonl contains the Manager final summary event
+  $OnNdxsRGCN5G1o40qh3ypMwoDK1IehWf-vjtridng6E at
+  origin_server_ts 1788291848628. The Human-room stream contains the accepted
+  first- and second-leg reports and subsequent Manager decisions. This
+  confirms the post-accept handoff path. The global task projection is stale
+  for the second leg and its replyRoute remains the older admin room, so the
+  projection is not used as proof of the Team-scoped acceptance.
+
+6. No-repeat and cross-Run check — PASS within the observed boundary
+
+  artifacts/tasks-list-initial.jsonl has 17 non-.gitkeep task objects across
+  five historical task IDs plus task-20260901-193754. The first complete
+  snapshot observe-20260901T194133Z/tasks-list.jsonl has 19 non-.gitkeep
+  objects, adding only task-20260901-194103/meta.json and spec.json. All 39
+  observe-* snapshots through observe-20260901T201118Z retain that same
+  19-object set; final-20260901T201419Z/shared-tasks.jsonl matches it.
+  Thus repeated snapshot copies and repeated Manager prose do not represent
+  repeated task creation. The run-labeled start at 19:37:37Z through the final
+  readback at 20:14:19Z is about 36 minutes 42 seconds; the 39 sampled points
+  cover 19:41:33Z through 20:11:18Z.
+
+  The historical task IDs task-20260901-144228, -150850, -151200, -153651,
+  and -153942 occur in object-list metadata only; no occurrence was found in
+  the current Matrix streams or final Docker logs. The current two task IDs
+  are the ones present in the current chain. The project listing is scoped and
+  only exposes the first project, so second-leg project identity is taken from
+  its dedicated project/task artifacts and raw Leader room instead.
+
+7. Five TestWeaver domain Skills — NOT_OBSERVED for every name
+
+  Baseline/setup evidence only: baseline-manifest.json records source_commit
+  19a929ea084c32e0e551881ec709b1d9b1792512 and source/runtime hashes matching
+  with enabled=true for the five names on native-m1-verify-leader and
+  native-m1-verify-worker. That proves installed/enabled state before the Run.
+
+    approval-intent-boundary-check       NOT_OBSERVED (Run load/invoke)
+    avoid-redundant-exploration           NOT_OBSERVED (Run load/invoke)
+    diagnose-by-competing-hypotheses      NOT_OBSERVED (Run load/invoke)
+    preserve-critical-constraints         NOT_OBSERVED (Run load/invoke)
+    reconcile-before-retry                NOT_OBSERVED (Run load/invoke)
+
+  A scoped exact-name scan of this Run, including all five final Docker logs
+  and the raw Matrix/TeamHarness artifacts, found zero occurrences of all five
+  names. It also found no native skills/refresh, batch-enable, or SKILL.md
+  runtime event. The observed generic Skill records refer to built-in
+  TeamHarness skills, not these five TestWeaver domains. No automatic enabled
+  label is promoted to a runtime fact.
+
+8. Runner/fixture/synthetic and evidence hygiene — NOT_OBSERVED
+
+  Event-level inspection of the raw Matrix arrays found runner/fixture/
+  synthetic/script-task terms only in the fixed Human prompt, where they are
+  prohibitions. No Manager, Leader, or Worker event represents a Runner,
+  fixture, synthetic execution, or script-created task. The observed command
+  families are TeamHarness operations plus bounded shell waits/runtime checks;
+  no script task-creation call is present. Project/task result narratives and
+  the receipt were used only as corroboration, never as substitutes for raw
+  events.
+
+  Logs were consumed in their redacted form. The review records no token,
+  password, API key, or authorization value. A credential-pattern scan found
+  no long token-like unredacted candidate; only short narrative/marker matches
+  remained. Session evidence is limited to safe metadata, sizes, and hashes.
+
+RED-LINE CONCLUSION
+
+  The native dual-Team execution path is supported by raw Matrix, TeamHarness,
+  artifact, and Worker-log evidence, and no duplicate current task or
+  cross-Run task stitching was found in the observed boundary. Full M1+
+  certification remains PARTIAL because native runtime load/invoke of all five
+  TestWeaver Skills is NOT_OBSERVED and Manager session/usage attribution is
+  incomplete. The minimum next proof is one same-Run native runtime record per
+  exact Skill name, tied to actor/time/task, plus a structured Manager usage
+  record; do not replace either with a receipt, fixture, or Runner event.
+
+No runtime resource, receipt, or original evidence was modified by this review.
