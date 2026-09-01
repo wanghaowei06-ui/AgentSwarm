@@ -1090,6 +1090,12 @@ func (p *Provisioner) ReconcileRoomMembershipWithActorToken(ctx context.Context,
 	if err != nil {
 		return fmt.Errorf("list members of %s: %w", roomID, err)
 	}
+	// Matrix clients normally filter historical leave/ban/knock events, but
+	// keep this reconcile boundary defensive so only active memberships affect
+	// invites and removals.
+	isActiveMembership := func(m matrix.RoomMember) bool {
+		return m.Membership == "join" || m.Membership == "invite"
+	}
 
 	desiredSet := make(map[string]struct{}, len(desired))
 	for _, u := range desired {
@@ -1100,6 +1106,9 @@ func (p *Provisioner) ReconcileRoomMembershipWithActorToken(ctx context.Context,
 	}
 	currentSet := make(map[string]struct{}, len(current))
 	for _, m := range current {
+		if !isActiveMembership(m) {
+			continue
+		}
 		currentSet[m.UserID] = struct{}{}
 	}
 
@@ -1125,6 +1134,9 @@ func (p *Provisioner) ReconcileRoomMembershipWithActorToken(ctx context.Context,
 	}
 
 	for _, m := range current {
+		if !isActiveMembership(m) {
+			continue
+		}
 		if _, ok := desiredSet[m.UserID]; ok {
 			continue
 		}

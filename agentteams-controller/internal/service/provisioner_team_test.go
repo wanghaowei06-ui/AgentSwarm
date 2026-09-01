@@ -22,6 +22,7 @@ type fakeTeamMatrix struct {
 	tokenUsers   map[string]string
 	leaves       []string
 	joins        []roomUserCall
+	invites      []roomUserCall
 	kicks        []roomUserCall
 	tokenKicks   []roomUserCall
 	kickErr      error
@@ -164,6 +165,7 @@ func (f *fakeTeamMatrix) ListRoomMembersWithToken(_ context.Context, roomID, _ s
 }
 
 func (f *fakeTeamMatrix) InviteToRoom(_ context.Context, roomID, userID string) error {
+	f.invites = append(f.invites, roomUserCall{roomID: roomID, userID: userID})
 	f.members[roomID] = append(f.members[roomID], matrix.RoomMember{UserID: userID, Membership: "invite"})
 	return nil
 }
@@ -803,6 +805,52 @@ func TestProvisionTeamRoomsUsesTeamAdminTokenForExistingTeamRoom(t *testing.T) {
 	}
 	if len(matrixClient.kicks) != 0 {
 		t.Fatalf("team room should not use admin kicks, got %v", matrixClient.kicks)
+	}
+}
+
+func TestReconcileRoomMembershipDoesNotRemoveInactiveMembership(t *testing.T) {
+	for _, membership := range []string{"leave", "ban", "knock"} {
+		t.Run(membership, func(t *testing.T) {
+			matrixClient := newFakeTeamMatrix()
+			matrixClient.members["!worker-dm:localhost"] = []matrix.RoomMember{
+				{UserID: "@manager:localhost", Membership: membership},
+			}
+			p := NewProvisioner(ProvisionerConfig{
+				Matrix:    matrixClient,
+				AdminUser: "admin",
+			})
+
+			if err := p.ReconcileRoomMembership(context.Background(), "!worker-dm:localhost", nil); err != nil {
+				t.Fatalf("ReconcileRoomMembership: %v", err)
+			}
+
+			if len(matrixClient.kicks) != 0 {
+				t.Fatalf("inactive membership must not be kicked: %v", matrixClient.kicks)
+			}
+			if len(matrixClient.adminCmds) != 0 {
+				t.Fatalf("inactive membership must not trigger force-leave: %v", matrixClient.adminCmds)
+			}
+		})
+	}
+}
+
+func TestReconcileRoomMembershipInvitesDesiredLeave(t *testing.T) {
+	matrixClient := newFakeTeamMatrix()
+	matrixClient.members["!worker-dm:localhost"] = []matrix.RoomMember{
+		{UserID: "@manager:localhost", Membership: "leave"},
+	}
+	p := NewProvisioner(ProvisionerConfig{
+		Matrix:    matrixClient,
+		AdminUser: "admin",
+	})
+
+	if err := p.ReconcileRoomMembership(context.Background(), "!worker-dm:localhost", []string{"@manager:localhost"}); err != nil {
+		t.Fatalf("ReconcileRoomMembership: %v", err)
+	}
+
+	want := []roomUserCall{{roomID: "!worker-dm:localhost", userID: "@manager:localhost"}}
+	if !reflect.DeepEqual(matrixClient.invites, want) {
+		t.Fatalf("invites=%v, want %v", matrixClient.invites, want)
 	}
 }
 
