@@ -126,6 +126,13 @@ assert(team_prompt.include?("artifact publish_file"), "team prompt must use arti
 assert(team_prompt.include?("only for Matrix rooms") && team_prompt.include?("non-Matrix requester channels"), "team prompt must not imply artifact publish_file works for external requester channels")
 assert(team_prompt.include?("Leader Cross-Room Communication"), "team prompt must define leader cross-room communication")
 assert(team_prompt.include?("teamharness-communication") && team_prompt.include?("message-tool payloads"), "team prompt must route detailed cross-room messaging to communication skill")
+team_assignment_text = normalized(team_prompt)
+assert(team_assignment_text.include?("After a successful `delegate_task`"), "team prompt must define post-delegate assignment notification")
+assert(team_assignment_text.include?("notificationNeeded.targetRoom"), "team prompt must consume the delegate target-room hint")
+assert(team_assignment_text.include?("same-room") && team_assignment_text.include?("one normal direct reply") && team_assignment_text.include?("Do not call the `message` tool"), "team prompt must use one direct same-room assignment reply")
+assert(team_assignment_text.include?("different room") && team_assignment_text.include?("message` tool exactly once"), "team prompt must use one message-tool cross-room assignment")
+assert(team_assignment_text.include?("complete Worker Matrix user ID") && team_assignment_text.include?("@localpart:server"), "team prompt must require a complete Worker Matrix mention")
+assert(team_assignment_text.include?("Never send both") && team_assignment_text.include?("end the current turn"), "team prompt must prevent duplicate assignment sends and end the turn")
 
 worker_prompt = read(plugin_root / agent_prompts.fetch("worker"))
 assert(worker_prompt.include?("NO_REPLY") && worker_prompt.include?("ping-pong"), "worker prompt must suppress ping-pong")
@@ -244,6 +251,20 @@ assert(delegation_skill.include?("normal current-session reply") && delegation_s
 assert(delegation_skill.include?("`teamharness-roomflow` owns task-room creation"), "delegation skill must leave room setup details to roomflow")
 assert(!delegation_skill.include?("roomBindingScope: \"sender\""), "delegation skill must not duplicate roomflow sender binding details")
 assert(delegation_skill_text.include?("Do not fall back to the requester/source session"), "delegation skill must keep Project Work assignment inside the task room")
+assert(delegation_skill_text.include?("After `delegate_task` returns `ok: true`"), "delegation skill must define post-delegate notification handling")
+assert(delegation_skill_text.include?("notificationNeeded.targetRoom"), "delegation skill must consume the delegate target-room hint")
+assert(delegation_skill_text.include?("same-room") && delegation_skill_text.include?("one normal direct reply") && delegation_skill_text.include?("Do not call the `message` tool"), "delegation skill must use one direct same-room assignment reply")
+assert(delegation_skill_text.include?("cross-room") && delegation_skill_text.include?("message` tool exactly once"), "delegation skill must use one message-tool cross-room assignment")
+assert(delegation_skill_text.include?("complete Worker Matrix user ID") && delegation_skill_text.include?("@localpart:server"), "delegation skill must require a complete Worker Matrix mention")
+assert(delegation_skill_text.include?("Never send both") && delegation_skill_text.include?("end the current turn"), "delegation skill must prevent duplicate sends and end the turn")
+assert(
+  delegation_skill_text.include?("Do not call `execute_shell_command`") &&
+    delegation_skill_text.include?("sleep") &&
+    delegation_skill_text.include?("check_task") &&
+    delegation_skill_text.include?("submitted-result") &&
+    delegation_skill_text.include?("Worker event"),
+  "delegation skill must wait for Worker events instead of blocking polling after delegate_task"
+)
 assert(communication_skill.include?("matrix:!roomid:domain"), "communication skill must support legacy Matrix requester routing")
 assert(communication_skill.include?("Matrix DM requester reports") && communication_skill.include?("targetSession"), "communication skill must document Matrix DM reply routes")
 assert(communication_skill.include?("requester report") && communication_skill.include?("mandatory"), "communication skill must require requester reports after accepted state changes")

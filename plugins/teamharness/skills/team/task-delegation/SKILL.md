@@ -85,6 +85,35 @@ shared/tasks/{task-id}/spec.md
 
 It also changes the project node status to `assigned`.
 
+## Post-Delegation Assignment Notification
+
+`delegate_task` returns a structured `notificationNeeded.targetRoom` hint; the
+tool does not send the assignment message. After `delegate_task` returns
+`ok: true`, compare that target with the current Matrix session, using
+`roomflow describe_room` if the current room is unclear.
+
+- Same-room: if the current session is the assignment Task room, send one
+  normal direct reply in that room. Do not call the `message` tool.
+- Cross-room: if `notificationNeeded.targetRoom` differs from the current
+  session, call the official `message` tool exactly once, targeting that Matrix
+  room. The text must start with the complete Worker Matrix user ID resolved
+  from the roster/task result, for example `@localpart:server`:
+
+  ```json
+  {
+    "action": "send",
+    "channel": "matrix",
+    "target": "room:!task-room:matrix.local",
+    "text": "@worker-a:matrix.local TASK_ASSIGNED: <task-id> - Please start this task. Spec: shared/tasks/<task-id>/spec.md"
+  }
+  ```
+
+Use exactly one branch. Never send both the direct reply and the cross-room
+`message` event. After the one assignment notification, end the current turn.
+Do not call `execute_shell_command` for `sleep`, call `check_task`, or poll for
+the Worker result after delegation. Wait for a `submitted-result` or Worker
+event to wake a later turn.
+
 ## Task Spec Completion Report
 
 Every delegated task spec must include this final instruction, with the task id
@@ -106,16 +135,18 @@ still make the Leader mention requirement explicit.
 
 ## Assignment Message
 
-After `delegate_task` or `create_quick_project` returns `ok: true`, send a
-normal current-session reply in the Task room and mention the Worker:
+For the same-room branch, after `delegate_task` or `create_quick_project`
+returns `ok: true`, send one normal current-session reply in the Task room and
+mention the Worker:
 
 ```text
 @worker-a:matrix.local TASK_ASSIGNED: demo-project-001-01 - Please start this task. Spec: shared/tasks/demo-project-001-01/spec.md
 ```
 
 Do not use the `message` tool for this same-room assignment. The direct Task
-room reply is the trigger; using `message` plus a direct mention can trigger the
-Worker twice.
+room reply is the trigger; using `message` plus a direct mention can trigger
+the Worker twice. For a cross-room `delegate_task`, follow
+Post-Delegation Assignment Notification and do not also send this direct reply.
 
 Do not ask the Worker to edit project files. Do not ask several Workers to own
 the same task directory.
@@ -174,10 +205,10 @@ project node and delegate a new task.
 succeed. This field is a structured hint — the tool does not send any message
 automatically.
 
-For `delegate_task`: the assignment message in the Task room (see Assignment
-Message above) already serves as the notification. No additional cross-room
-notification is needed unless the `notificationNeeded.targetRoom` differs from
-the current Task room.
+For `delegate_task`: follow Post-Delegation Assignment Notification. The
+same-room direct reply is the one notification when the target is the current
+Task room; when `notificationNeeded.targetRoom` differs, the one official
+cross-room `message` send is mandatory. The hint itself never sends a message.
 
 For `submit_task`: the Worker completion message in the Task room already serves
 as the notification to the Leader. The `notificationNeeded` field confirms the

@@ -152,8 +152,8 @@ In the Task room:
 
 - On the task request message, load `teamharness-project-management` to
   `create_project`, `plan_dag` or `plan_loop`, and find `ready_nodes`.
-- Load `teamharness-task-delegation` to delegate only ready nodes and send
-  assignment messages as normal replies in the current Task room.
+- Load `teamharness-task-delegation` to delegate only ready nodes and follow
+  its post-delegation assignment-notification routing.
 - When a Worker reports `TASK_COMPLETED`, `TASK_BLOCKED`, or a task result path,
   first extract the task id and resolve project context with
   `projectflow resolve_project`.
@@ -167,8 +167,36 @@ In the Task room:
 
 Only accepted results may advance dependencies or project progress. Use
 `teamharness-communication` for requester-visible progress and final reports.
-After delegating a task, do not keep polling for the Worker result in the same
-turn; resume when a submitted-result event arrives.
+
+### Assignment Notification After `delegate_task`
+
+`delegate_task` writes task state and returns a structured
+`notificationNeeded.targetRoom` hint; it does not send the assignment message.
+After a successful `delegate_task`, compare that target with the current
+Matrix session (use `roomflow describe_room` if the current room is unclear):
+
+- For the same-room branch, when the current session is the assignment Task
+  room, send one normal direct reply there. Do not call the `message` tool.
+- For the cross-room branch, when `notificationNeeded.targetRoom` is a
+  different room, call the `message` tool exactly once with that Matrix room as
+  the target. Put the complete Worker Matrix user ID, such as
+  `@localpart:server`, at the start of the assignment text:
+
+  ```json
+  {
+    "action": "send",
+    "channel": "matrix",
+    "target": "room:!task-room:matrix.local",
+    "text": "@worker-a:matrix.local TASK_ASSIGNED: <task-id> - Please start this task. Spec: shared/tasks/<task-id>/spec.md"
+  }
+  ```
+
+Use the exact Worker Matrix ID resolved from the roster/task result, never a
+display name or short `@name`. Choose exactly one branch. Never send both a
+direct reply and a `message` event. After the one assignment notification, end
+the current turn. Do not call `execute_shell_command` for `sleep`, call
+`check_task`, or poll for the Worker result in this turn; wait for a
+`submitted-result` or Worker event to wake the next turn.
 
 ## Shared Workspace
 
