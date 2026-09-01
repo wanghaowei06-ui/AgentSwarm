@@ -1,0 +1,34 @@
+M2-C canonical retained evidence manifest
+=========================================
+
+schema: testweaver.m2c.canonical-manifest/v1
+run_root: testweaver/evidence/m2c/m2c-20260901T211748Z/
+scope: human input/event/send; baseline; Matrix raw streams/index; corrected stage/status; post-freeze audit; collector scripts/stop record; six final redacted logs; m2c receipt
+secret_scan: PASS (high-confidence credential value patterns matched zero files in retained and archived inputs; values were not printed)
+archive_manifest: /root/projects/.testweaver-evidence-archive/m2c-20260901T211748Z/archive-manifest.sha256
+
+columns: retained_relative_path<TAB>size_bytes<TAB>sha256
+arm-evidence.sh	14881	31883b89fc171377dea7542deb4d5b0df93a94c7342a8ae0a89b605e95e5fb57
+baseline-manifest.json	23272	a25ef0245386e05250a33edcf2590edd36484fb2915330c623a34f03115dc548
+collect-matrix-readback.sh	14538	7618d9742925dca7b2a6bbc8cde0e6a8156c095eb1406037fe55dab013f0cc4b
+collector-stop.txt	618	21a9292a91790f0e5cbf1cb762b8db4cd99640fdc3b9fef65e82b78a7883de12
+human-event.json	3257	511b0dffbd7dc86003f6ee350a3bbb6cb7b105a54c5e582382b51bb5f96ab366
+human-input.txt	2867	6184134379c78409f8043a2987daa4038066f9b72563beff76fda417860e6f96
+human-send-result.json	662	3d292cceeb3bad0bd2418f2fa01a6dac3e541ca2078277d4a3506e0f565581a6
+logs/arm-m2c20260901T211921Z/controller.docker.log	0	e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+logs/arm-m2c20260901T211921Z/manager.docker.log	2822652	93e45a821f9233cbd3f1ae8fa207b292453c8590fc880778d883bcfceae608b4
+logs/arm-m2c20260901T211921Z/worker-native-m0-clean-leader.docker.log	308896	89c57e2c30aeceeea712fb46b333fbe071d43aa243e3f823476faf06e5b95308
+logs/arm-m2c20260901T211921Z/worker-native-m0-clean-worker.docker.log	280206	a8c1540fb510c21892c0ddd0389886e31441bbf36bbe45a89c910d833c8358ff
+logs/arm-m2c20260901T211921Z/worker-native-m1-verify-leader.docker.log	280808	70347a133ab8cadf18b2c756aa0d59e897b7ff1f93e472fb951e663e035c56d0
+logs/arm-m2c20260901T211921Z/worker-native-m1-verify-worker.docker.log	280805	49624c59a7a5f655d6cd9c3bdd87c10e83ca7aded1c9270f5d8a66ae62dfbc15
+m2c-receipt.txt	9730	8ef3e4de798ea810a9d57e6e5a4daa63f7a7ac8af661088c5e172c313bed0eb6
+matrix-collector-status.json	536	2b73f1fe37ff9a155d526f9dbd6809e1024570e0322c59d7acbf7c99736eb181
+matrix-event-index.jsonl	45806	fae21b7b8d977f1af6b40954841e655c009864cea356bf708e6cea85819f3882
+matrix-events.jsonl	97509	50e194ccc2cc13296b027a10e2a3bc63d37da13b23af77144306bcbd94d7867d
+matrix-stage-observations.jsonl	27962	b63ecfb5e709b0f08cace7609e0efead02ba53a45724b93dcbc5a47049d21bc8
+matrix-team-event-index.jsonl	30471	5a1ed9dd4acc0f4f8e00869bf516e764c8937bc9f8b85596c6bdea188841f69f
+matrix-team-events.jsonl	70837	5e81414bd616b650cea9a03ccbd745617b9265d719d4a0880b2139551b4cc665
+post-freeze-membership-audit.json	1848	0e135f86d3a32e98d010e48bc1c1a8b85ebed013dadc4fa1eb870e56ad7b45b3
+redact-docker-log.pl	877	c576943601ed9da90721dd77bebbec7aa7a09e3b9edf7052eec9f669a1e09393
+
+This manifest excludes itself; all log files in scope were collected through the redacting collector.

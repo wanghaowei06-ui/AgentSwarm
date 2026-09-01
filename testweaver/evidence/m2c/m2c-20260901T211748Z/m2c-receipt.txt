@@ -1,0 +1,131 @@
+M2-C native AgentTeams run receipt
+=================================
+
+status: PARTIAL (30-minute boundary reached without native PAUSE/approval)
+run_id: m2c-20260901T211748Z
+run_owner: external Human operator
+repository_head_at_run: 37d76609b7699e8e662e66fc9cf3dac71bd7b474
+basis_commits: eb0364d, 37d7660, eb50990
+frozen_prior_evidence: not modified (M1+ evidence was not read back into this run)
+
+Run boundary
+------------
+evidence_arm_started: 2026-09-01T21:19:21Z
+human_event_origin_server_ts: 1788297805430 (2026-09-01T21:23:25.430Z)
+30-minute_cutoff: 2026-09-01T21:53:25.430Z
+final_human_room_readback: 2026-09-01T21:53:47Z
+human_input_count: 1
+human_transaction_id: m2c-human-20260901T211748Z
+human_room_id: !gE12Hcd446ROvwW7bl:matrix-native-m0-20260901.agentteams.local:28080
+human_event_id: $q3RtKViRebduGiL2NeA3g81QtzfQhQbhE3S13fzPomg
+human_sender: @nativeadmin:matrix-native-m0-20260901.agentteams.local:28080
+human_input_bytes: 2867
+human_input_sha256: 6184134379c78409f8043a2987daa4038066f9b72563beff76fda417860e6f96
+human_raw_event_sha256: 511b0dffbd7dc86003f6ee350a3bbb6cb7b105a54c5e582382b51bb5f96ab366
+manager_join_before_send: verified by Matrix membership readback
+
+Observed native chain
+----------------------
+manager_dynamic_selection_event: $e-0d0FxqrPFwNWNHIzBh4NjVi-QVHW-FFeO80lqnLyc
+selected_team: native-m0-clean-team
+selected_leader: native-m0-clean-leader
+leader_room_id: !Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080
+selection_source: post-input Manager Matrix output; no Human/script choice supplied
+
+leader_roomflow_create_task_room_event: $LxNGvFngfjuxjs_T_9V26IIhvbwLf673gZ-O7B9i9jE
+task_room_id: !GZszv254rHF8ZgjESM:matrix-native-m0-20260901.agentteams.local:28080
+leader_projectflow_create_project_event: $gUmdyU_GKuf_j1wguBqed3z3R6x2Z9TubcGtvf2dDXg
+project_id: m2c-recovery-20260901-212347
+leader_projectflow_plan_dag_event: $ILLsADJSfDVdeSAywgZeJ6B0UECbQe-Ow9dSVBSTepg
+task_id: task-20260901-212347
+leader_taskflow_delegate_event: $uB6j5RQH4f7xfGGSec56fh6Xyl0dJipHxy6QI4SlQFk
+task_room_first_matrix_event: $jELhcUIhZ1LVFOFuFfns26DdIDu9lndaEOimykOUZCo (m.room.create only)
+leader_check_task_events: $rx4ASmiW3yInxGY0z9DnMeEscw7EvGxFO8r-6bMN2rU, $nW_N_KhgWfGnoOMnU1xyJcZAQ58GpWcfC1AN3gep5jU, $YNtsMy1uc_yD_BAEYMviH7Pr-AP5aggtstAjUZXFWhY, $P1kwUyCe369-egE_jNd57g6AWcyR4OAoM9CVHCEAVk4, $EnXLkgHFWH3HcxaIUwxpbVGsx_6JoLtap38ga9MQHuc
+
+Acceptance boundary
+--------------------
+worker_result_or_submit: NOT_OBSERVED
+accepted_result_or_handoff: NOT_OBSERVED
+exact_runtime_skill_selection/source/version/evidence_ref: NOT_OBSERVED
+native_pause_project_tool_event: NOT_OBSERVED (zero exact pause_project TeamHarness tool events in captured Matrix streams)
+human_approval_request: NOT_OBSERVED
+heuristic_pause_candidate_stream: diagnostic only; early generic matching captured instruction-text references and was not used as pause proof
+resume_project: NOT_PERFORMED
+fault_drill: NOT_PERFORMED
+human_follow-up_input: NOT_SENT
+
+Actual blocker
+--------------
+membership_audit: Leader-token readback at 2026-09-01T21:58:24.244Z verified both @native-m0-clean-worker and @native-m0-clean-leader membership=join in the task room; task-room m.room.message count was 0 at the 30-minute cutoff and remained 0 at readback.
+manager_correction_events: $nHEPiYl6yu-mZ0zOTkh3nyru0ipvtRJA01OpJua5uVs, $7jqHTn1YbvaHrakLjO7c0iy4yMc-a-RtK0ZTh0WSlx4, $ZULOkpK6WjzT7dijTmQQhoerkGEgNUisBtE8C3b_4DA
+root_cause: after successful native delegate_task, the Leader did not send the required assignment/notificationNeeded message to the Task room. The native create_task_room call used a bare invite, but direct Leader-token membership evidence proves the Worker joined; membership was not the blocker.
+runtime_effect: the Task room had no m.room.message assignment event. The Leader then entered repeated 90/120/180/240/300-second sleep plus check_task polling, so it did not consume the Manager's corrective messages within the frozen 30-minute window and no Worker task message/result was captured.
+manager_correction_consumption: not_consumed_before_cutoff; the post-cutoff Leader events still show check_task plus long sleep, not assignment notification or Worker execution.
+no_operator_intervention: no join, message, re-delegation, model call, resource update, container restart, approval, resume, or fault injection was performed by this operator.
+
+Post-freeze read-only audit
+---------------------------
+audit_evidence: testweaver/evidence/m2c/m2c-20260901T211748Z/post-freeze-membership-audit.json
+task_room_membership: worker=join (membership event ts 1788297850346); leader=join (membership event ts 1788297850322)
+task_room_messages: current=0; at_cutoff=0; post_cutoff_events=[]
+leader_room_messages: current=97; at_cutoff=93
+leader_post_cutoff_events: $1Za9RE5A_XRnqAnuy-9HBbrKyLt4n1B6rV_Yk4-Ts-U (check_task), $hpvDu8NabFS_zcMT_Y6pivSCFoEUrwnXtfnfJCss-Kc (waiting), $1HJd1EEoniSHorymOk_eRdQMLF1s_NgwXAfbSwNuabo (waiting), $ZufrE-ljs3qYbDpz-P4C6v63xrGy4n-4jh02PsofhkU (sleep 300)
+chain_after_cutoff: continued only in Leader-room waiting/check activity; no Worker/Task-room progress, accepted result, pause, or approval was observed.
+
+Early collector error inventory
+--------------------------------
+nested_error_dir: testweaver/testweaver/evidence/m2c/m2c-20260901T211748Z/
+nested_error_files: matrix-team-events.jsonl (0 bytes), matrix-team-event-index.jsonl (18395 bytes), matrix-pause-candidate-events.jsonl (0 bytes)
+nested_error_disposition: preserved as early collector path/attribution evidence; not deleted or treated as live chain evidence; eligible for later recoverable archive only.
+
+Final resource readback
+-----------------------
+selected_worker: native-m0-clean-worker
+selected_worker_container_id: 950cec661a56e0386f4d19514fe0a99a9efac007c1a44cb1070a66d6b05794c0
+selected_worker_image: agentteams/qwenpaw-worker:m1plus-342d1ee
+selected_worker_image_id: sha256:884f8bf1db0e47dccbbc89282e1c6b82c7821ece0951b42b7ca5ba5fdcf8ae68
+selected_worker_phase_state: Running/running; activeTask readback null
+selected_team_state_at_arm: Active; Leader Ready; 1/1 Worker Ready
+other_in-scope_workers: native-m0-clean-leader, native-m1-verify-leader, native-m1-verify-worker (all remained Running on the final readback)
+model_provider_account_settings: unchanged
+
+Evidence and integrity
+----------------------
+baseline_manifest: testweaver/evidence/m2c/m2c-20260901T211748Z/baseline-manifest.json
+human_event: testweaver/evidence/m2c/m2c-20260901T211748Z/human-event.json
+human_send_result: testweaver/evidence/m2c/m2c-20260901T211748Z/human-send-result.json
+human_matrix_stream: testweaver/evidence/m2c/m2c-20260901T211748Z/matrix-events.jsonl (89 events)
+team_matrix_stream: testweaver/evidence/m2c/m2c-20260901T211748Z/matrix-team-events.jsonl (58 events)
+team_event_index: testweaver/evidence/m2c/m2c-20260901T211748Z/matrix-team-event-index.jsonl
+stage_observations: testweaver/evidence/m2c/m2c-20260901T211748Z/matrix-stage-observations.jsonl
+final_matrix_status: testweaver/evidence/m2c/m2c-20260901T211748Z/matrix-collector-status.json
+raw_log_directory: testweaver/evidence/m2c/m2c-20260901T211748Z/logs/arm-m2c20260901T211921Z/
+log_collector_stop_record: testweaver/evidence/m2c/m2c-20260901T211748Z/collector-stop.txt
+matrix_event_index_raw_path: corrected to this M2-C run directory; no M1+ file was overwritten
+credentials: only variable names were used/persisted by collectors; values_persisted=false
+secret_scan: PASS; no high-confidence credential value patterns in retained or archived evidence; values were not printed
+canonical_manifest: testweaver/evidence/m2c/m2c-20260901T211748Z/canonical-manifest.sha256
+archive_root: /root/projects/.testweaver-evidence-archive/m2c-20260901T211748Z/
+archive_manifest: /root/projects/.testweaver-evidence-archive/m2c-20260901T211748Z/archive-manifest.sha256
+archived_state: /root/projects/.testweaver-evidence-archive/m2c-20260901T211748Z/canonical-state/.state/
+archived_false_pause_stream: /root/projects/.testweaver-evidence-archive/m2c-20260901T211748Z/false-pause-candidates/matrix-pause-candidate-events.jsonl
+archived_nested_error_output: /root/projects/.testweaver-evidence-archive/m2c-20260901T211748Z/nested-testweaver-testweaver/m2c-20260901T211748Z/
+
+Key SHA256
+----------
+human-input.txt  6184134379c78409f8043a2987daa4038066f9b72563beff76fda417860e6f96
+human-event.json  511b0dffbd7dc86003f6ee350a3bbb6cb7b105a54c5e582382b51bb5f96ab366
+human-send-result.json  3d292cceeb3bad0bd2418f2fa01a6dac3e541ca2078277d4a3506e0f565581a6
+baseline-manifest.json  a25ef0245386e05250a33edcf2590edd36484fb2915330c623a34f03115dc548
+matrix-events.jsonl  50e194ccc2cc13296b027a10e2a3bc63d37da13b23af77144306bcbd94d7867d
+matrix-event-index.jsonl  fae21b7b8d977f1af6b40954841e655c009864cea356bf708e6cea85819f3882
+matrix-stage-observations.jsonl  b63ecfb5e709b0f08cace7609e0efead02ba53a45724b93dcbc5a47049d21bc8
+matrix-team-events.jsonl  5e81414bd616b650cea9a03ccbd745617b9265d719d4a0880b2139551b4cc665
+matrix-team-event-index.jsonl  5a1ed9dd4acc0f4f8e00869bf516e764c8937bc9f8b85596c6bdea188841f69f
+archived false-pause-candidates/matrix-pause-candidate-events.jsonl  55c1d04be32263960ab94ea770b8676ddfb95784d6ee5de2a38a35f5a61efb7c
+matrix-collector-status.json  2b73f1fe37ff9a155d526f9dbd6809e1024570e0322c59d7acbf7c99736eb181
+post-freeze-membership-audit.json  0e135f86d3a32e98d010e48bc1c8a1b85ebed013dadc4fa1eb870e56ad7b45b3
+manager.docker.log  b93d80f9bdd1dc3efa798df407d56dd39162738ecff1b5223e97acee978a1b7a
+worker-native-m0-clean-worker.docker.log  c31ecd4da4226805453d390bb613a502099d0f6c2ad2de916ec4947bd3fc22be
+
+This receipt records the natural boundary only. No approval content exists because no PAUSE/approval request was produced.

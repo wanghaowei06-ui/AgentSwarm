@@ -1,0 +1,29 @@
+{
+  "schema": "testweaver.m2c.post-freeze-membership-audit/v1",
+  "read_at": "2026-09-01T21:58:24.244Z",
+  "token_source": "native-m0-clean-leader container; variable name AGENTTEAMS_WORKER_MATRIX_TOKEN; value not persisted",
+  "cutoff_origin_server_ts": 1788299605430,
+  "task_room": {
+    "room_id": "!GZszv254rHF8ZgjESM:matrix-native-m0-20260901.agentteams.local:28080",
+    "members": [
+      {"user_id": "@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080", "membership": "join", "membership_event_origin_server_ts": 1788297850346},
+      {"user_id": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080", "membership": "join", "membership_event_origin_server_ts": 1788297850322}
+    ],
+    "current_m_room_message_count": 0,
+    "m_room_message_count_at_cutoff": 0,
+    "post_cutoff_events": []
+  },
+  "leader_room": {
+    "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+    "current_m_room_message_count": 97,
+    "m_room_message_count_at_cutoff": 93,
+    "post_cutoff_events": [
+      {"event_id": "$1Za9RE5A_XRnqAnuy-9HBbrKyLt4n1B6rV_Yk4-Ts-U", "origin_server_ts": 1788299759061, "kind": "leader check_task"},
+      {"event_id": "$hpvDu8NabFS_zcMT_Y6pivSCFoEUrwnXtfnfJCss-Kc", "origin_server_ts": 1788299760933, "kind": "leader waiting"},
+      {"event_id": "$1HJd1EEoniSHorymOk_eRdQMLF1s_NgwXAfbSwNuabo", "origin_server_ts": 1788299761335, "kind": "leader waiting"},
+      {"event_id": "$ZufrE-ljs3qYbDpz-P4C6v63xrGy4n-4jh02PsofhkU", "origin_server_ts": 1788299761347, "kind": "leader sleep 300"}
+    ]
+  },
+  "conclusion": "Both native members were joined. The Task room had no assignment message at or after cutoff. The native chain continued after cutoff only as Leader wait/check activity; no Worker execution or result was observed.",
+  "writes": false
+}

@@ -1,0 +1,10 @@
+M2-C evidence collector stop record
+===================================
+
+The following processes were started by this run's evidence arm and were stopped after the 30-minute boundary. No AgentTeams container or runtime process was stopped.
+
+closure stop completed UTC: 2026-09-01T22:05:59Z
+matrix readback collector PID: 3171978 (not running at closure)
+docker log/redaction collector PIDs stopped: 3116130 3116131 3116133 3116134 3116136 3116137 3116138 3116144 3116145 3116146 3116147 3116148
+matrix/team observation process: stopped by its owning session after cutoff
+evidence files: retained in this run directory
