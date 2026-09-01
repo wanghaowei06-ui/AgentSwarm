@@ -1,0 +1,3 @@
+/root/agentteams-fs/teams/native-m1-verify-team/shared/projects/m1-phase2-verify-20260901-194103/meta.json
+/root/agentteams-fs/teams/native-m1-verify-team/shared/projects/m1-phase2-verify-20260901-194103/plan.md
+/root/agentteams-fs/teams/native-m1-verify-team/shared/projects/m1-phase2-verify-20260901-194103/result.md

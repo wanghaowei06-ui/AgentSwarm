@@ -1,0 +1,612 @@
+{
+  "schema": "testweaver.m1plus.evidence-boundary/v1",
+  "status": "EVIDENCE_ARMED",
+  "started_at": "2026-09-01T19:32:14Z",
+  "head": "56c05557f40a517b300b032228f83aeab1fe28a4",
+  "frozen_human_input": {
+    "hash": "33bdc27f…e074aa5",
+    "run_id": "m1plus-20260901T193737Z",
+    "room_id": "!hNaeZwz6TWUHhA6I97:matrix-native-m0-20260901.agentteams.local:28080",
+    "event_id": "$Q3Ax2m6ZOJmHaNHfN4kmtAujljMXIEzuu7avi7kA4hU",
+    "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+    "origin_server_ts": 1788291460693,
+    "body_sha256": "33bdc27fb6ca1052b1c9ffd1cf7d194557947fdfbe7feb7045ee185c0e074aa5",
+    "policy": "The supplied event is bound for readback only. Later room use is filter/readback only; no Matrix write is permitted."
+  },
+  "scope": {
+    "containers": [
+      "manager",
+      "controller",
+      "worker-native-m0-clean-leader",
+      "worker-native-m0-clean-worker",
+      "worker-native-m1-verify-leader",
+      "worker-native-m1-verify-worker"
+    ],
+    "manager": "default",
+    "teams": [
+      "native-m0-clean-team",
+      "native-m1-verify-team"
+    ],
+    "workers": [
+      "native-m0-clean-leader",
+      "native-m0-clean-worker",
+      "native-m1-verify-leader",
+      "native-m1-verify-worker"
+    ],
+    "skills": [
+      "approval-intent-boundary-check",
+      "avoid-redundant-exploration",
+      "diagnose-by-competing-hypotheses",
+      "preserve-critical-constraints",
+      "reconcile-before-retry"
+    ],
+    "exclude_other_containers": true
+  },
+  "manager": {
+    "identity": {
+      "resource_name": "default",
+      "container_name": "agentteams-native-m0-20260901-manager"
+    },
+    "image": {
+      "resource": "agentteams/manager:m1plus-15b7b14",
+      "container": "agentteams/manager:m1plus-15b7b14",
+      "image_id": "sha256:798d52808f58324dcb489517fd87092eaed7ae1aa69e80a19b55464b51092b54"
+    },
+    "resource": {
+      "name": "default",
+      "phase": "Running",
+      "runtime": "openclaw",
+      "image": "agentteams/manager:m1plus-15b7b14",
+      "version": "agentteams/manager:m1plus-15b7b14",
+      "matrixUserID": "@manager:matrix-native-m0-20260901.agentteams.local:28080"
+    },
+    "container": {
+      "container_name": "agentteams-native-m0-20260901-manager",
+      "container_id": "cbc6432f0e51df3c491514c146d31704afe64a5d61bc3acf81fe42698b85e50e",
+      "image": "agentteams/manager:m1plus-15b7b14",
+      "image_id": "sha256:798d52808f58324dcb489517fd87092eaed7ae1aa69e80a19b55464b51092b54",
+      "status": "running",
+      "running": true,
+      "restart_count": 0,
+      "started_at": "2026-09-01T18:48:11.586295224Z"
+    }
+  },
+  "controller": {
+    "identity": {
+      "container_name": "agentteams-native-m0-20260901-controller"
+    },
+    "image": {
+      "container": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-embedded@sha256:3966dc000f20f98033b15fba897f257186653ef8600e760c1cc55aa620b42bd6",
+      "image_id": "sha256:3966dc000f20f98033b15fba897f257186653ef8600e760c1cc55aa620b42bd6"
+    },
+    "container": {
+      "container_name": "agentteams-native-m0-20260901-controller",
+      "container_id": "cc5c2f91197b544c721f1c303fcdf5a3091b0dc7d6aafa5e8f9cb15d51ee7fdc",
+      "image": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-embedded@sha256:3966dc000f20f98033b15fba897f257186653ef8600e760c1cc55aa620b42bd6",
+      "image_id": "sha256:3966dc000f20f98033b15fba897f257186653ef8600e760c1cc55aa620b42bd6",
+      "status": "running",
+      "running": true,
+      "restart_count": 0,
+      "started_at": "2026-09-01T13:30:58.943859072Z"
+    }
+  },
+  "teams": [
+    {
+      "identity": {
+        "resource_name": "native-m0-clean-team"
+      },
+      "image": null,
+      "image_note": "Team resource has no image field; member image references are recorded below.",
+      "member_images": {
+        "native-m0-clean-leader": {
+          "resource": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-qwenpaw-worker:latest@sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d",
+          "container": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-qwenpaw-worker:latest@sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d",
+          "image_id": "sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d"
+        },
+        "native-m0-clean-worker": {
+          "resource": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-qwenpaw-worker:latest@sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d",
+          "container": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-qwenpaw-worker:latest@sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d",
+          "image_id": "sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d"
+        }
+      },
+      "resource": {
+        "name": "native-m0-clean-team",
+        "teamName": "native-m0-clean-team",
+        "leader": "native-m0-clean-leader",
+        "workerNames": [
+          "native-m0-clean-worker"
+        ],
+        "workerMembers": [
+          {
+            "name": "native-m0-clean-leader",
+            "role": "team_leader"
+          },
+          {
+            "name": "native-m0-clean-worker",
+            "role": "worker"
+          }
+        ],
+        "phase": "Active",
+        "leaderReady": true,
+        "readyWorkers": 1,
+        "totalWorkers": 1
+      }
+    },
+    {
+      "identity": {
+        "resource_name": "native-m1-verify-team"
+      },
+      "image": null,
+      "image_note": "Team resource has no image field; member image references are recorded below.",
+      "member_images": {
+        "native-m1-verify-leader": {
+          "resource": "agentteams/qwenpaw-worker:m1plus-342d1ee",
+          "container": "agentteams/qwenpaw-worker:m1plus-342d1ee",
+          "image_id": "sha256:884f8bf1db0e47dccbbc89282e1c6b82c7821ece0951b42b7ca5ba5fdcf8ae68"
+        },
+        "native-m1-verify-worker": {
+          "resource": "agentteams/qwenpaw-worker:m1plus-342d1ee",
+          "container": "agentteams/qwenpaw-worker:m1plus-342d1ee",
+          "image_id": "sha256:884f8bf1db0e47dccbbc89282e1c6b82c7821ece0951b42b7ca5ba5fdcf8ae68"
+        }
+      },
+      "resource": {
+        "name": "native-m1-verify-team",
+        "teamName": "native-m1-verify-team",
+        "leader": "native-m1-verify-leader",
+        "workerNames": [
+          "native-m1-verify-worker"
+        ],
+        "workerMembers": [
+          {
+            "name": "native-m1-verify-leader",
+            "role": "team_leader"
+          },
+          {
+            "name": "native-m1-verify-worker",
+            "role": "worker"
+          }
+        ],
+        "phase": "Active",
+        "leaderReady": true,
+        "readyWorkers": 1,
+        "totalWorkers": 1
+      }
+    }
+  ],
+  "workers": [
+    {
+      "identity": {
+        "resource_name": "native-m0-clean-leader",
+        "container_name": "agentteams-native-m0-20260901-worker-native-m0-clean-leader",
+        "role": "team_leader",
+        "team": "native-m0-clean-team"
+      },
+      "runtime": "qwenpaw",
+      "image": {
+        "resource": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-qwenpaw-worker:latest@sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d",
+        "container": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-qwenpaw-worker:latest@sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d",
+        "image_id": "sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d"
+      },
+      "resource": {
+        "name": "native-m0-clean-leader",
+        "workerName": null,
+        "team": "native-m0-clean-team",
+        "role": "team_leader",
+        "runtime": "qwenpaw",
+        "image": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-qwenpaw-worker:latest@sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d",
+        "phase": "Running",
+        "containerState": "running"
+      },
+      "container": {
+        "container_name": "agentteams-native-m0-20260901-worker-native-m0-clean-leader",
+        "container_id": "7ff2ae454c0783463926945d6d3d93079f347b23424df5b7736dce090db0493b",
+        "image": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-qwenpaw-worker:latest@sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d",
+        "image_id": "sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d",
+        "status": "running",
+        "running": true,
+        "restart_count": 0,
+        "started_at": "2026-09-01T13:34:12.554604221Z"
+      }
+    },
+    {
+      "identity": {
+        "resource_name": "native-m0-clean-worker",
+        "container_name": "agentteams-native-m0-20260901-worker-native-m0-clean-worker",
+        "role": "worker",
+        "team": "native-m0-clean-team"
+      },
+      "runtime": "qwenpaw",
+      "image": {
+        "resource": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-qwenpaw-worker:latest@sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d",
+        "container": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-qwenpaw-worker:latest@sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d",
+        "image_id": "sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d"
+      },
+      "resource": {
+        "name": "native-m0-clean-worker",
+        "workerName": null,
+        "team": "native-m0-clean-team",
+        "role": "worker",
+        "runtime": "qwenpaw",
+        "image": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-qwenpaw-worker:latest@sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d",
+        "phase": "Running",
+        "containerState": "running"
+      },
+      "container": {
+        "container_name": "agentteams-native-m0-20260901-worker-native-m0-clean-worker",
+        "container_id": "8c16d7eac460fc2f544d0ffa7cf1490f99e40ac54a223a728d2da6b0e1f0ffbf",
+        "image": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-qwenpaw-worker:latest@sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d",
+        "image_id": "sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d",
+        "status": "running",
+        "running": true,
+        "restart_count": 0,
+        "started_at": "2026-09-01T13:33:44.540123834Z"
+      }
+    },
+    {
+      "identity": {
+        "resource_name": "native-m1-verify-leader",
+        "container_name": "agentteams-native-m0-20260901-worker-native-m1-verify-leader",
+        "role": "team_leader",
+        "team": "native-m1-verify-team"
+      },
+      "runtime": "qwenpaw",
+      "image": {
+        "resource": "agentteams/qwenpaw-worker:m1plus-342d1ee",
+        "container": "agentteams/qwenpaw-worker:m1plus-342d1ee",
+        "image_id": "sha256:884f8bf1db0e47dccbbc89282e1c6b82c7821ece0951b42b7ca5ba5fdcf8ae68"
+      },
+      "resource": {
+        "name": "native-m1-verify-leader",
+        "workerName": null,
+        "team": "native-m1-verify-team",
+        "role": "team_leader",
+        "runtime": "qwenpaw",
+        "image": "agentteams/qwenpaw-worker:m1plus-342d1ee",
+        "phase": "Running",
+        "containerState": "running"
+      },
+      "container": {
+        "container_name": "agentteams-native-m0-20260901-worker-native-m1-verify-leader",
+        "container_id": "80691121dd63fc70b0748c79fd84a3a6630d908c3fbe9d5cc8209375c98841a1",
+        "image": "agentteams/qwenpaw-worker:m1plus-342d1ee",
+        "image_id": "sha256:884f8bf1db0e47dccbbc89282e1c6b82c7821ece0951b42b7ca5ba5fdcf8ae68",
+        "status": "running",
+        "running": true,
+        "restart_count": 0,
+        "started_at": "2026-09-01T18:56:05.224663667Z"
+      }
+    },
+    {
+      "identity": {
+        "resource_name": "native-m1-verify-worker",
+        "container_name": "agentteams-native-m0-20260901-worker-native-m1-verify-worker",
+        "role": "worker",
+        "team": "native-m1-verify-team"
+      },
+      "runtime": "qwenpaw",
+      "image": {
+        "resource": "agentteams/qwenpaw-worker:m1plus-342d1ee",
+        "container": "agentteams/qwenpaw-worker:m1plus-342d1ee",
+        "image_id": "sha256:884f8bf1db0e47dccbbc89282e1c6b82c7821ece0951b42b7ca5ba5fdcf8ae68"
+      },
+      "resource": {
+        "name": "native-m1-verify-worker",
+        "workerName": null,
+        "team": "native-m1-verify-team",
+        "role": "worker",
+        "runtime": "qwenpaw",
+        "image": "agentteams/qwenpaw-worker:m1plus-342d1ee",
+        "phase": "Running",
+        "containerState": "running"
+      },
+      "container": {
+        "container_name": "agentteams-native-m0-20260901-worker-native-m1-verify-worker",
+        "container_id": "2e8c167eb015ae38b33163ecb7387799077b0709aa5710e770ed21877b85af55",
+        "image": "agentteams/qwenpaw-worker:m1plus-342d1ee",
+        "image_id": "sha256:884f8bf1db0e47dccbbc89282e1c6b82c7821ece0951b42b7ca5ba5fdcf8ae68",
+        "status": "running",
+        "running": true,
+        "restart_count": 0,
+        "started_at": "2026-09-01T18:56:51.993466215Z"
+      }
+    }
+  ],
+  "skills": [
+    {
+      "worker": "native-m0-clean-leader",
+      "skill": "approval-intent-boundary-check",
+      "api_port": 13687,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66",
+      "runtime_sha256": null,
+      "enabled": null
+    },
+    {
+      "worker": "native-m0-clean-leader",
+      "skill": "avoid-redundant-exploration",
+      "api_port": 13687,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd",
+      "runtime_sha256": null,
+      "enabled": null
+    },
+    {
+      "worker": "native-m0-clean-leader",
+      "skill": "diagnose-by-competing-hypotheses",
+      "api_port": 13687,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954",
+      "runtime_sha256": null,
+      "enabled": null
+    },
+    {
+      "worker": "native-m0-clean-leader",
+      "skill": "preserve-critical-constraints",
+      "api_port": 13687,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f",
+      "runtime_sha256": null,
+      "enabled": null
+    },
+    {
+      "worker": "native-m0-clean-leader",
+      "skill": "reconcile-before-retry",
+      "api_port": 13687,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e",
+      "runtime_sha256": null,
+      "enabled": null
+    },
+    {
+      "worker": "native-m0-clean-worker",
+      "skill": "approval-intent-boundary-check",
+      "api_port": 17507,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66",
+      "runtime_sha256": null,
+      "enabled": null
+    },
+    {
+      "worker": "native-m0-clean-worker",
+      "skill": "avoid-redundant-exploration",
+      "api_port": 17507,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd",
+      "runtime_sha256": null,
+      "enabled": null
+    },
+    {
+      "worker": "native-m0-clean-worker",
+      "skill": "diagnose-by-competing-hypotheses",
+      "api_port": 17507,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954",
+      "runtime_sha256": null,
+      "enabled": null
+    },
+    {
+      "worker": "native-m0-clean-worker",
+      "skill": "preserve-critical-constraints",
+      "api_port": 17507,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f",
+      "runtime_sha256": null,
+      "enabled": null
+    },
+    {
+      "worker": "native-m0-clean-worker",
+      "skill": "reconcile-before-retry",
+      "api_port": 17507,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e",
+      "runtime_sha256": null,
+      "enabled": null
+    },
+    {
+      "worker": "native-m1-verify-leader",
+      "skill": "approval-intent-boundary-check",
+      "api_port": 16346,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66",
+      "runtime_sha256": "9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-leader",
+      "skill": "avoid-redundant-exploration",
+      "api_port": 16346,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd",
+      "runtime_sha256": "eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-leader",
+      "skill": "diagnose-by-competing-hypotheses",
+      "api_port": 16346,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954",
+      "runtime_sha256": "3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-leader",
+      "skill": "preserve-critical-constraints",
+      "api_port": 16346,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f",
+      "runtime_sha256": "fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-leader",
+      "skill": "reconcile-before-retry",
+      "api_port": 16346,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e",
+      "runtime_sha256": "cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-worker",
+      "skill": "approval-intent-boundary-check",
+      "api_port": 19810,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66",
+      "runtime_sha256": "9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-worker",
+      "skill": "avoid-redundant-exploration",
+      "api_port": 19810,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd",
+      "runtime_sha256": "eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-worker",
+      "skill": "diagnose-by-competing-hypotheses",
+      "api_port": 19810,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954",
+      "runtime_sha256": "3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-worker",
+      "skill": "preserve-critical-constraints",
+      "api_port": 19810,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f",
+      "runtime_sha256": "fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f",
+      "enabled": true
+    },
+    {
+      "worker": "native-m1-verify-worker",
+      "skill": "reconcile-before-retry",
+      "api_port": 19810,
+      "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512",
+      "source_sha256": "cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e",
+      "runtime_sha256": "cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e",
+      "enabled": true
+    }
+  ],
+  "skill_api_observation": [
+    {
+      "worker": "native-m0-clean-leader",
+      "api_port": 13687,
+      "state": "reachable"
+    },
+    {
+      "worker": "native-m0-clean-worker",
+      "api_port": 17507,
+      "state": "reachable"
+    },
+    {
+      "worker": "native-m1-verify-leader",
+      "api_port": 16346,
+      "state": "reachable"
+    },
+    {
+      "worker": "native-m1-verify-worker",
+      "api_port": 19810,
+      "state": "reachable"
+    }
+  ],
+  "docker_log_collection": {
+    "mode": "incremental_from_boundary",
+    "since": "2026-09-01T19:32:14Z",
+    "timestamps": true,
+    "stdout_stderr_combined": true,
+    "sources": [
+      {
+        "label": "manager",
+        "container": "agentteams-native-m0-20260901-manager",
+        "log": "testweaver/evidence/m1plus/logs/arm-20260901T193214Z/manager.docker.log",
+        "pid": 2363809,
+        "alive_at_manifest": true
+      },
+      {
+        "label": "controller",
+        "container": "agentteams-native-m0-20260901-controller",
+        "log": "testweaver/evidence/m1plus/logs/arm-20260901T193214Z/controller.docker.log",
+        "pid": 2363810,
+        "alive_at_manifest": true
+      },
+      {
+        "label": "worker-native-m0-clean-leader",
+        "container": "agentteams-native-m0-20260901-worker-native-m0-clean-leader",
+        "log": "testweaver/evidence/m1plus/logs/arm-20260901T193214Z/worker-native-m0-clean-leader.docker.log",
+        "pid": 2363811,
+        "alive_at_manifest": true
+      },
+      {
+        "label": "worker-native-m0-clean-worker",
+        "container": "agentteams-native-m0-20260901-worker-native-m0-clean-worker",
+        "log": "testweaver/evidence/m1plus/logs/arm-20260901T193214Z/worker-native-m0-clean-worker.docker.log",
+        "pid": 2363812,
+        "alive_at_manifest": true
+      },
+      {
+        "label": "worker-native-m1-verify-leader",
+        "container": "agentteams-native-m0-20260901-worker-native-m1-verify-leader",
+        "log": "testweaver/evidence/m1plus/logs/arm-20260901T193214Z/worker-native-m1-verify-leader.docker.log",
+        "pid": 2363813,
+        "alive_at_manifest": true
+      },
+      {
+        "label": "worker-native-m1-verify-worker",
+        "container": "agentteams-native-m0-20260901-worker-native-m1-verify-worker",
+        "log": "testweaver/evidence/m1plus/logs/arm-20260901T193214Z/worker-native-m1-verify-worker.docker.log",
+        "pid": 2363814,
+        "alive_at_manifest": true
+      }
+    ],
+    "redaction": {
+      "values": "credential-like values are replaced with [REDACTED] before persistence",
+      "variable_names": "retained where present",
+      "input_lines": "streamed line-by-line; no event parsing or rewriting"
+    },
+    "raw_event_parsing": false,
+    "event_injection": false
+  },
+  "matrix_readback": {
+    "mode": "read_only_client_server_get",
+    "run_id": "m1plus-20260901T193737Z",
+    "room_id": "!hNaeZwz6TWUHhA6I97:matrix-native-m0-20260901.agentteams.local:28080",
+    "fixed_event_id": "$Q3Ax2m6ZOJmHaNHfN4kmtAujljMXIEzuu7avi7kA4hU",
+    "fixed_event_endpoint": "GET /_matrix/client/v3/rooms/{roomId}/event/{eventId}",
+    "subsequent_event_endpoint": "GET /_matrix/client/v3/rooms/{roomId}/context/{eventId} then GET /_matrix/client/v3/rooms/{roomId}/messages",
+    "raw_event_path": "testweaver/evidence/m1plus/matrix-events.jsonl",
+    "event_index_path": "testweaver/evidence/m1plus/matrix-event-index.jsonl",
+    "stage_observation_path": "testweaver/evidence/m1plus/matrix-stage-observations.jsonl",
+    "collector_script": "testweaver/evidence/m1plus/collect-matrix-readback.sh",
+    "collector_status_path": "testweaver/evidence/m1plus/matrix-collector-status.json",
+    "collector_pid_path": "testweaver/evidence/m1plus/.state/matrix-collector.pid",
+    "initial_fixed_event_readback": "observed",
+    "initial_fixed_event_body_hash": "matched",
+    "initial_fixed_event_metadata": "matched",
+    "writes": false,
+    "model_calls": false,
+    "credential_source": {
+      "base_url_variable": "AGENTTEAMS_MATRIX_URL",
+      "access_token_variable": "AGENTTEAMS_MANAGER_MATRIX_TOKEN",
+      "values_persisted": false
+    },
+    "policy": "Only the supplied room/event is queried; subsequent reads are limited to that room and pagination after that event."
+  },
+  "forbidden_actions_for_this_boundary": [
+    "send Matrix messages",
+    "create Project or Task",
+    "invoke a model",
+    "restart, replace, or modify runtime resources",
+    "parse logs and inject derived events"
+  ],
+  "notes": [
+    "This is a baseline collection boundary only; no run outcome is recorded.",
+    "Evidence files remain uncommitted until the Run is frozen."
+  ]
+}

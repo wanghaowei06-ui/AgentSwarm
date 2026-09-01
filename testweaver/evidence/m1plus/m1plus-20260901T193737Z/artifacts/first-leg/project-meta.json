@@ -1,0 +1,33 @@
+{
+  "plan_type": "dag",
+  "project_id": "m1-leg1-20260901-193754",
+  "reply_route": {
+    "channel": "matrix",
+    "target_session": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080"
+  },
+  "requester": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+  "requester_report": {
+    "pending": false,
+    "reason": "task_result_accepted",
+    "report_path": "shared/projects/m1-leg1-20260901-193754/result.md",
+    "result_status": "SUCCESS",
+    "sent_at": "2026-09-01T19:40:28Z",
+    "summary": "",
+    "task_id": "task-20260901-193754"
+  },
+  "source": "matrix",
+  "source_room_id": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+  "status": "completed",
+  "tasks": [
+    {
+      "assigned_to": "@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080",
+      "depends_on": [],
+      "source_room_id": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+      "status": "completed",
+      "task_id": "task-20260901-193754",
+      "title": "M1 Leg 1: bounded runtime/provenance inventory"
+    }
+  ],
+  "team_id": "native-m0-clean-team",
+  "title": "M1 Leg 1: Bounded Runtime/Provenance Inventory"
+}

@@ -1,0 +1,48 @@
+[
+  {
+    "key": "agent:main:main",
+    "value": {
+      "sessionId": "72f72165-65e6-4911-95d4-415b63ffac21",
+      "sessionFile": "/root/manager-workspace/.openclaw/agents/main/sessions/72f72165-65e6-4911-95d4-415b63ffac21.jsonl",
+      "model": "deepseek-v4-flash",
+      "modelProvider": "agentteams-gateway",
+      "startedAt": 1788293658995,
+      "updatedAt": 1788293659055,
+      "compactionCount": 1,
+      "compactionCheckpoints": 2,
+      "inputTokens": 111544,
+      "outputTokens": 5,
+      "totalTokens": 116152,
+      "status": "running",
+      "lastChannel": "matrix",
+      "lastTo": "room:!hNaeZwz6TWUHhA6I97:matrix-native-m0-20260901.agentteams.local:28080",
+      "deliveryContext": {
+        "channel": "matrix",
+        "to": "room:!hNaeZwz6TWUHhA6I97:matrix-native-m0-20260901.agentteams.local:28080",
+        "accountId": "default"
+      }
+    }
+  },
+  {
+    "key": "agent:main:matrix:channel:!jwsd6heovfcqfcxoiz:matrix-native-m0-20260901.agentteams.local:28080",
+    "value": {
+      "sessionId": "df735e19-78f2-4eeb-b09a-20da7ad469d7",
+      "sessionFile": "/root/manager-workspace/.openclaw/agents/main/sessions/df735e19-78f2-4eeb-b09a-20da7ad469d7.jsonl",
+      "model": null,
+      "modelProvider": null,
+      "startedAt": null,
+      "updatedAt": 1788274387323,
+      "compactionCount": null,
+      "compactionCheckpoints": 0,
+      "inputTokens": null,
+      "outputTokens": null,
+      "totalTokens": null,
+      "status": null,
+      "lastChannel": "matrix",
+      "lastTo": null,
+      "deliveryContext": {
+        "channel": "matrix"
+      }
+    }
+  }
+]

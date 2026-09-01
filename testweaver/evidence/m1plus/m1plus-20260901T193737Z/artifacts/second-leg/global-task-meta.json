@@ -1,0 +1,13 @@
+{
+  "task_id": "task-20260901-194103",
+  "title": "M1 Leg 2: independent convergence/cross-validation (native-m1-verify-team)",
+  "assigned_to": "native-m1-verify-leader",
+  "delegated_to_team": "native-m1-verify-team",
+  "status": "assigned",
+  "created_at": "2026-09-01T19:41:03Z",
+  "requester": "nativeadmin",
+  "replyRoute": {
+    "channel": "matrix",
+    "targetSession": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080"
+  }
+}

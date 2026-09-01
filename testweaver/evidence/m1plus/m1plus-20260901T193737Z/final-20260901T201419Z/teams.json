@@ -1,0 +1,42 @@
+[
+  {
+    "name": "native-m0-clean-team",
+    "phase": "Active",
+    "leader": "native-m0-clean-leader",
+    "leaderReady": true,
+    "readyWorkers": 1,
+    "totalWorkers": 1,
+    "teamRoomID": "!NbRmgvdkZMdRcCvLg4:matrix-native-m0-20260901.agentteams.local:28080",
+    "leaderDMRoomID": "!Ypl073FDlR3fHMbFWW:matrix-native-m0-20260901.agentteams.local:28080",
+    "workerMembers": [
+      {
+        "name": "native-m0-clean-leader",
+        "role": "team_leader"
+      },
+      {
+        "name": "native-m0-clean-worker",
+        "role": "worker"
+      }
+    ]
+  },
+  {
+    "name": "native-m1-verify-team",
+    "phase": "Active",
+    "leader": "native-m1-verify-leader",
+    "leaderReady": true,
+    "readyWorkers": 1,
+    "totalWorkers": 1,
+    "teamRoomID": "!srvKopd1vnU0gQoC49:matrix-native-m0-20260901.agentteams.local:28080",
+    "leaderDMRoomID": "!Ytn2oG1asU4ujGQQki:matrix-native-m0-20260901.agentteams.local:28080",
+    "workerMembers": [
+      {
+        "name": "native-m1-verify-leader",
+        "role": "team_leader"
+      },
+      {
+        "name": "native-m1-verify-worker",
+        "role": "worker"
+      }
+    ]
+  }
+]

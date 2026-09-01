@@ -1,0 +1,32 @@
+{
+  "plan_type": "dag",
+  "project_id": "m1-phase2-verify-20260901-194103",
+  "reply_route": {
+    "channel": "matrix",
+    "target_session": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+    "target_user": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080"
+  },
+  "requester": "nativeadmin",
+  "requester_report": {
+    "pending": true,
+    "reason": "task_result_accepted",
+    "report_path": "shared/projects/m1-phase2-verify-20260901-194103/result.md",
+    "result_status": "SUCCESS",
+    "summary": "",
+    "task_id": "task-20260901-194103"
+  },
+  "source": "matrix",
+  "source_room_id": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+  "status": "active",
+  "tasks": [
+    {
+      "assigned_to": "native-m1-verify-worker",
+      "depends_on": [],
+      "source_room_id": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+      "status": "completed",
+      "task_id": "task-20260901-194103",
+      "title": "M1 Leg 2: independent convergence/cross-validation (native-m1-verify-team)"
+    }
+  ],
+  "title": "M1 Leg 2: independent convergence/cross-validation (native-m1-verify-team)"
+}

@@ -1,0 +1,12 @@
+[
+  {
+    "name": "default",
+    "phase": "Running",
+    "state": null,
+    "model": "deepseek-v4-flash",
+    "runtime": "openclaw",
+    "image": "agentteams/manager:m1plus-15b7b14",
+    "matrixUserID": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+    "roomID": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080"
+  }
+]

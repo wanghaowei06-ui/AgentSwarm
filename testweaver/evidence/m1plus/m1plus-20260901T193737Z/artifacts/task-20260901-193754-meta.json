@@ -1,0 +1,13 @@
+{
+  "task_id": "task-20260901-193754",
+  "title": "M1 Leg 1: bounded runtime/provenance inventory (native-m0-clean-team)",
+  "assigned_to": "native-m0-clean-leader",
+  "delegated_to_team": "native-m0-clean-team",
+  "status": "assigned",
+  "created_at": "2026-09-01T19:37:54Z",
+  "requester": "nativeadmin",
+  "replyRoute": {
+    "channel": "matrix",
+    "targetSession": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080"
+  }
+}

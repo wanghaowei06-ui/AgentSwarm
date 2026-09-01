@@ -1,0 +1,117 @@
+{
+  "schema": "testweaver.m1plus.evidence-manifest/v1",
+  "run_id": "m1plus-20260901T193737Z",
+  "sealed_at_utc": "2026-09-01T20:41:42Z",
+  "source_head_before_archive": "84bd152ce9e089ccda61d88dc0dee82551b9fab0",
+  "independent_review": {
+    "path": "testweaver/evidence/m1plus/m1plus-20260901T193737Z/independent-review.txt",
+    "preserved_commit": "e09309b",
+    "sha256": "061f4b39629c89ff9e6d6a5faf9618c7fdd29432c990edd473c1e2f5a86322b7"
+  },
+  "scope": {
+    "retained_root": "testweaver/evidence/m1plus/m1plus-20260901T193737Z",
+    "archive_root": "/root/projects/.testweaver-evidence-archive/m1plus-20260901T193737Z",
+    "m0_evidence_touched": false,
+    "other_untracked_assets_touched": false,
+    "external_state_changed": false,
+    "model_provider_or_account_changed": false,
+    "push_performed": false
+  },
+  "inventory": {
+    "prearchive": {
+      "file_count": 608,
+      "total_bytes": 24884131,
+      "files": "/root/projects/.testweaver-evidence-archive/m1plus-20260901T193737Z/prearchive-files.tsv",
+      "sha256_index": "/root/projects/.testweaver-evidence-archive/m1plus-20260901T193737Z/prearchive-sha256.txt",
+      "index_sha256": "/root/projects/.testweaver-evidence-archive/m1plus-20260901T193737Z/prearchive-index-sha256.txt",
+      "index_file_sha256": "00452c3d15c1b4ccc05b99ae50552975b4947aef092e011d7c968e7c2b675cfb"
+    },
+    "moved_to_recoverable_archive": {
+      "file_count": 557,
+      "total_bytes": 20722447,
+      "observe_directory_count": 39,
+      "map": "/root/projects/.testweaver-evidence-archive/m1plus-20260901T193737Z/archive-move-map.tsv",
+      "sha256": "/root/projects/.testweaver-evidence-archive/m1plus-20260901T193737Z/archive-moved-sha256.txt",
+      "verification": "/root/projects/.testweaver-evidence-archive/m1plus-20260901T193737Z/archive-moved-verification.tsv",
+      "index_sha256": "/root/projects/.testweaver-evidence-archive/m1plus-20260901T193737Z/archive-index-sha256.txt",
+      "index_file_sha256": "1611e186319447ae652b31360a86106947feacbc2d8aa16baa051c9b3ac59048"
+    },
+    "retained_before_indexes": {
+      "file_count": 51,
+      "total_bytes": 4162312
+    },
+    "retained_sealed_set": {
+      "file_count": 54,
+      "hash_index": "testweaver/evidence/m1plus/m1plus-20260901T193737Z/m1plus-files.sha256",
+      "hash_index_excludes": [
+        "m1plus-files.sha256",
+        "m1plus-manifest.sha256"
+      ],
+      "manifest_hash": "testweaver/evidence/m1plus/m1plus-20260901T193737Z/m1plus-manifest.sha256"
+    }
+  },
+  "retained_groups": {
+    "baseline": [
+      "testweaver/evidence/m1plus/baseline-manifest.json"
+    ],
+    "human_original_event_and_hash": [
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/human-input.txt",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/human-send-result.json",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/human-event.json",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/human-event-hash.json"
+    ],
+    "final_raw_matrix": [
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/matrix-human-final.jsonl",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/matrix-first-leader-final.jsonl",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/matrix-second-leader-final.jsonl",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/matrix-manager-admin-final.jsonl"
+    ],
+    "leg_artifacts": [
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/artifacts/first-leg/",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/artifacts/second-leg/"
+    ],
+    "final_resources_session_provider_usage_and_logs": [
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/final-20260901T201419Z/managers.json",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/final-20260901T201419Z/teams.json",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/final-20260901T201419Z/workers.json",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/final-20260901T201419Z/shared-projects.jsonl",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/final-20260901T201419Z/shared-tasks.jsonl",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/final-20260901T201419Z/human-room-readback.json",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/final-20260901T201419Z/manager-session-registry-safe.json",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/final-20260901T201419Z/session-manifest.tsv",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/final-20260901T201419Z/worker-session-manifest.tsv",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/final-20260901T201419Z/logs/manager.docker.log",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/final-20260901T201419Z/logs/controller.docker.log",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/final-20260901T201419Z/logs/worker-native-m0-clean-leader.docker.log",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/final-20260901T201419Z/logs/worker-native-m0-clean-worker.docker.log",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/final-20260901T201419Z/logs/worker-native-m1-verify-leader.docker.log",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/final-20260901T201419Z/logs/worker-native-m1-verify-worker.docker.log"
+    ],
+    "receipt_and_review": [
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/m1plus-receipt.txt",
+      "testweaver/evidence/m1plus/m1plus-20260901T193737Z/independent-review.txt"
+    ],
+    "rerunnable_collection_helpers": [
+      "testweaver/evidence/m1plus/arm-evidence.sh",
+      "testweaver/evidence/m1plus/collect-matrix-readback.sh",
+      "testweaver/evidence/m1plus/redact-docker-log.pl"
+    ]
+  },
+  "validation": {
+    "checked_at_utc": "2026-09-01T20:43:44Z",
+    "retained_hash_index": "PASS",
+    "retained_hash_index_entries": 52,
+    "manifest_group_paths": "PASS",
+    "receipt_references": "PASS",
+    "archive_digest_verification": "PASS",
+    "forbidden_non_final_retained": "PASS",
+    "secret_scan": {
+      "status": "PASS",
+      "values_persisted": false,
+      "scanned_roots": [
+        "retained evidence",
+        "recoverable archive"
+      ]
+    }
+  }
+}

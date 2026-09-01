@@ -1,0 +1,46 @@
+[
+  {
+    "name": "native-m0-clean-leader",
+    "team": "native-m0-clean-team",
+    "role": "team_leader",
+    "runtime": "qwenpaw",
+    "image": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-qwenpaw-worker:latest@sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d",
+    "phase": "Running",
+    "containerState": "running",
+    "roomID": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+    "matrixUserID": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080"
+  },
+  {
+    "name": "native-m0-clean-worker",
+    "team": "native-m0-clean-team",
+    "role": "worker",
+    "runtime": "qwenpaw",
+    "image": "higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-qwenpaw-worker:latest@sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d",
+    "phase": "Running",
+    "containerState": "running",
+    "roomID": "!htUIJW5HXUYvFSIFW6:matrix-native-m0-20260901.agentteams.local:28080",
+    "matrixUserID": "@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080"
+  },
+  {
+    "name": "native-m1-verify-worker",
+    "team": "native-m1-verify-team",
+    "role": "worker",
+    "runtime": "qwenpaw",
+    "image": "agentteams/qwenpaw-worker:m1plus-342d1ee",
+    "phase": "Running",
+    "containerState": "running",
+    "roomID": "!YJn4m2FIISa0gNTx9y:matrix-native-m0-20260901.agentteams.local:28080",
+    "matrixUserID": "@native-m1-verify-worker:matrix-native-m0-20260901.agentteams.local:28080"
+  },
+  {
+    "name": "native-m1-verify-leader",
+    "team": "native-m1-verify-team",
+    "role": "team_leader",
+    "runtime": "qwenpaw",
+    "image": "agentteams/qwenpaw-worker:m1plus-342d1ee",
+    "phase": "Running",
+    "containerState": "running",
+    "roomID": "!IrR5zoeSGDaTVw4Ple:matrix-native-m0-20260901.agentteams.local:28080",
+    "matrixUserID": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080"
+  }
+]

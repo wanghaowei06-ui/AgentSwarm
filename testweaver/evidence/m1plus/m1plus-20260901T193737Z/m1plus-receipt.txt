@@ -1,0 +1,98 @@
+M1+ native vertical run receipt
+================================
+
+Run: m1plus-20260901T193737Z
+Operator mode: external Human via official Matrix Client v3 Human->Manager path
+Model/provider/settings: unchanged; Manager runtime observed as deepseek-v4-flash via agentteams-gateway
+Actions not performed: no model/tool injection, no retry message, no Team/Leader prompt, no task creation by script, no resource change
+
+Outcome
+-------
+core_native_dual_team_chain: PASS
+human_single_input: PASS
+30_minute_no_extra_task_observation: PASS
+clean_human_room_session_and_reply_route: PARTIAL
+overall: PARTIAL (functional native chain completed; routing/session/status projection gaps remain)
+
+Human input and event
+---------------------
+Source: testweaver/evidence/m1/replay-20260901-230740.log lines 270-280
+Input bytes: 3295
+Input SHA256: 33bdc27fb6ca1052b1c9ffd1cf7d194557947fdfbe7feb7045ee185c0e074aa5
+Raw source log SHA256: a3bcf0144117cded64aa517c8e90c38c008bdbdd169c07b98ac56a1b62b544c9
+Human room: !hNaeZwz6TWUHhA6I97:matrix-native-m0-20260901.agentteams.local:28080
+Human event: $Q3Ax2m6ZOJmHaNHfN4kmtAujljMXIEzuu7avi7kA4hU
+Sender: @nativeadmin:matrix-native-m0-20260901.agentteams.local:28080
+origin_server_ts: 1788291460693
+Event body SHA256: 33bdc27fb6ca1052b1c9ffd1cf7d194557947fdfbe7feb7045ee185c0e074aa5
+Raw event SHA256: 3cf4dd62764885396ff2f823a0808cd1716b9ba41994d186a4f6aa1d1048f688
+Canonical event SHA256: 62d9018242032608e3be444d2559320ab62958fa7f1267dbeca73bbbbcb491d7
+Manager membership was read as join before send. Final readback: one @nativeadmin m.room.message and 79 Manager messages in this room; no second Human input.
+
+Native chain
+------------
+Manager dynamically selected from the observed roster, with no operator choice injected:
+
+1. Team native-m0-clean-team / Leader native-m0-clean-leader
+   task: task-20260901-193754
+   project: m1-leg1-20260901-193754
+   task room: !TrVnYKzAspxpc2vXrD:matrix-native-m0-20260901.agentteams.local:28080
+   Worker: native-m0-clean-worker (real QwenPaw/provider execution)
+   handoff: ACCEPTED; evidence_ref shared/tasks/task-20260901-193754/result.md
+   Worker facts: 2026-09-01 19:39:10Z, hostname 8c16d7eac460, 39 AGENTTEAMS_* names, deepseek-v4-flash@agentteams-gateway
+   observed flow: TeamHarness filesync/projectflow/roomflow/taskflow -> submit SUCCESS -> check_task -> accept_task_result
+
+2. Team native-m1-verify-team / Leader native-m1-verify-leader
+   task: task-20260901-194103
+   project: m1-phase2-verify-20260901-194103
+   task room: !CCb7vkhCTgdLKoG5iB:matrix-native-m0-20260901.agentteams.local:28080
+   Worker: native-m1-verify-worker (real QwenPaw/provider execution)
+   handoff: PASS; evidence_ref shared/tasks/task-20260901-194103/result.md
+   Worker facts: 2026-09-01T19:42:27Z, hostname 2e8c167eb015, 39 AGENTTEAMS_* names, deepseek-v4-flash@agentteams-gateway
+   Leader independent recheck: 2026-09-01T19:43:17Z, hostname 80691121dd63; no first-leg result copied
+   observed flow: TeamHarness filesync/projectflow/roomflow/taskflow -> submit SUCCESS -> check_task effective -> accept_task_result accepted
+
+Manager final provider/report evidence
+---------------------------------------
+Final summary event in Manager admin room: $OnNdxsRGCN5G1o40qh3ypMwoDK1IehWf-vjtridng6E
+Admin room: !Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080
+origin_server_ts: 1788291848628
+Report body SHA256: b694ca0893f62ca777f954f60215d51ccce61fbb2b005d6e336af1c842ccb190
+Manager session registry: model deepseek-v4-flash, provider agentteams-gateway, status done; final delivery context was the new Human room.
+
+Observation window
+------------------
+Started after send: 2026-09-01T19:41:33Z
+Ended: 2026-09-01T20:11:18Z; final readback at 2026-09-01T20:14:19Z
+39 read-only observation points. Human room remained one Human input; no third Project/Task or replay-created extra task appeared.
+
+Known native gaps recorded without repair
+------------------------------------------
+- The new Human DM emitted the native notice that it shared a session with another Matrix DM room; sessions registry resolved it through agent:main:main rather than a per-room key. Manager produced 79 Matrix messages, but no extra Project/Task was created during the observation window.
+- Both global task meta projections retained stale/null project linkage (second global meta remained assigned) while Team-scoped project/task artifacts and accepted Matrix reports existed. This is recorded as evidence, not rewritten.
+- Task replyRoute in both global task metas points to the old admin room; Manager's complete final summary is evidenced there. No route correction or extra message was sent.
+- Existing force-leave/conduit error noise was observed in the historical Worker room and was not treated as the new run's Worker failure or modified.
+
+Evidence files
+--------------
+- human-input.txt, human-send-result.json, human-event.json, human-event-hash.json
+- matrix-human-final.jsonl, matrix-first-leader-final.jsonl, matrix-second-leader-final.jsonl
+- matrix-manager-admin-final.jsonl
+- artifacts/first-leg/ and artifacts/second-leg/
+- final-20260901T201419Z/ (filtered final resource/task/project/session/provider/usage snapshots)
+- final-20260901T201419Z/logs/ contains bounded logs passed through the existing redactor
+- m1plus-manifest.json and m1plus-files.sha256 seal the retained file set and hashes
+- arm-evidence.sh, collect-matrix-readback.sh, and redact-docker-log.pl are the retained rerunnable collection helpers
+
+The 39 observe-* snapshots, the initial observation, old collector state/logs,
+and duplicate/non-final Matrix/resource snapshots were moved (not deleted) to:
+/root/projects/.testweaver-evidence-archive/m1plus-20260901T193737Z/
+with prearchive-files.tsv, prearchive-sha256.txt, archive-move-map.tsv, and
+archive-moved-verification.tsv providing recoverable path and digest evidence:
+/root/projects/.testweaver-evidence-archive/m1plus-20260901T193737Z/prearchive-files.tsv
+/root/projects/.testweaver-evidence-archive/m1plus-20260901T193737Z/prearchive-sha256.txt
+/root/projects/.testweaver-evidence-archive/m1plus-20260901T193737Z/archive-move-map.tsv
+/root/projects/.testweaver-evidence-archive/m1plus-20260901T193737Z/archive-moved-verification.tsv
+Retained run files are under this run directory; the three collection helpers
+and baseline-manifest.json are under testweaver/evidence/m1plus/; M0 evidence
+was not touched.

@@ -1,0 +1,11 @@
+{
+  "room_id": "!hNaeZwz6TWUHhA6I97:matrix-native-m0-20260901.agentteams.local:28080",
+  "event_id": "$Q3Ax2m6ZOJmHaNHfN4kmtAujljMXIEzuu7avi7kA4hU",
+  "type": "m.room.message",
+  "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+  "origin_server_ts": "1788291460693",
+  "body_sha256": "33bdc27fb6ca1052b1c9ffd1cf7d194557947fdfbe7feb7045ee185c0e074aa5",
+  "raw_event_sha256": "3cf4dd62764885396ff2f823a0808cd1716b9ba41994d186a4f6aa1d1048f688",
+  "canonical_event_sha256": "62d9018242032608e3be444d2559320ab62958fa7f1267dbeca73bbbbcb491d7",
+  "content_sha256": "e7aa27a71d82a9bd80f83cb6cae9da0008f76a46f75c7eabd14c67dcab6c634e"
+}

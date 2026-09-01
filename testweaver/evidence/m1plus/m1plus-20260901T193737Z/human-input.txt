@@ -1,0 +1,11 @@
+请完成一次 M1 双 Team 原生纵向链路，严格使用当前隔离环境的真实状态和官方 AgentTeams/QwenPaw/TeamHarness 能力；这是一次新的 M1 请求，不要重跑、修改或覆盖任何 M0 task/project/replay/evidence。
+
+先用官方 roster/资源查询读取当前全部 Team、Leader、Worker 的真实 phase、runtime、model、ready 状态与能力，再由你的真实 provider 动态选择第一职能 Team/Leader。必须复用 roster 中的 native-m0-clean-team 作为第一职能 Team候选/资源，但不要把 Team/Leader 名称、choice、Worker 输出或结论硬编码进脚本或 Manager 决策。Manager 只负责协调 Team/Leader，不直接替 Leader 创建或执行 Worker task。
+
+如果 fresh roster 中没有第二个可用且职能不同的现有 Team/Leader/Worker，则只通过官方 Manager 资源路径最小新增一个不同职能 Team，含恰好一个 Leader 和一个 Worker；使用当前已部署的相同模型、账号、runtime、推理设置和官方白名单，不改已有 M0 资源，不创建第三个 Team/Worker。新增资源必须由官方命令/Controller 生命周期创建并等待真实 Ready，禁止 curl 直接创建、fixture、synthetic、旧 TestWeaver runner/Observer/Gate、第二调度器或任何恢复/Oracle/HITL 机制。
+
+第一职能 Team 的任务固定为一个有界、非敏感的 runtime/provenance inventory：Leader 必须只用官方 TeamHarness roomflow/projectflow/taskflow 创建 project/task，并通过 taskflow 委派真实 Worker；Worker 必须由真实 provider 执行并使用官方 task-execution/filesync 或可用 TeamHarness 工具读取任务、采集不含凭据值/密钥/host 文件的运行时事实，写入任务目录并 submit；Leader 必须真实 check_task、accept_task_result，并在 accepted report 中生成最小结构化 handoff，字段必须来自真实结果：task_id、project_id、provider_run_id、conclusion、evidence_ref、provenance、unresolved_items。
+
+Manager 收到并读取第一 Team 的真实 accepted result/handoff 后，必须再次基于 fresh roster 和真实 provider 动态选择第二个不同职能 Team/Leader；不得预设或硬编码第二选择。然后只向第二 Leader 委派一个与第一职能不同的、有界独立收敛/交叉验证任务。第二 Leader 必须再次使用官方 TeamHarness roomflow/projectflow/taskflow 原生创建/委派真实 Worker，Worker 进行独立验证而不是复制第一结果，Leader 完成 check_task、accept_task_result 和 accepted report。最后 Manager 必须读取第二个真实 accepted result，做后续 provider 判断并给出最终报告，包含两次动态选择、两组 task/project/run、submit/check/accept、真实工具/Skill、结构化 handoff、第二次验证结论和 evidence_ref。
+
+保持所有真实调用使用当前部署的模型/账号/推理设置；不得输出任何凭据值。只在两组 Team/Leader/Worker 之间协调，不发送中间 admin DM 进度，待第二组 accepted result 和最终 provider 判断完成后再向本 Human 请求所在的 admin DM 发一条最终总结；若 Leader 无法直接进入私有 admin DM，使用现有官方 Manager/Leader Room→Manager 转发路径，不修改房间成员、不重建房间。
