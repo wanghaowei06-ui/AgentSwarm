@@ -12,12 +12,19 @@ from testweaver.adapters.codex_cli import (
     build_codex_cli_launch,
 )
 from testweaver.adapters.config import AdapterConfig, AdapterConfigError
+from testweaver.adapters.native_worker import (
+    DSH_PROVIDER_PROFILES,
+    DshProviderProfile,
+    NativeWorkerAssignment,
+    prepare_native_worker_invocation,
+)
 from testweaver.adapters.result import (
     EvidenceReference,
     NativeReferences,
     NormalizedResult,
     Provenance,
     ResultContractError,
+    WorkerResult,
     normalize_result,
 )
 
@@ -274,7 +281,19 @@ class CodexCliContractTests(unittest.TestCase):
     def test_fixed_command_defaults_and_protected_environment_names(self) -> None:
         launch = build_codex_cli_launch()
         self.assertEqual(launch.command[0], CODEX_EXECUTABLE)
-        self.assertEqual(launch.command, ("codex-cc", "app-server", "--listen", "stdio://"))
+        self.assertEqual(
+            launch.command,
+            (
+                "codex-cc",
+                "-m",
+                "gpt-5.6-luna",
+                "-c",
+                "model_reasoning_effort=max",
+                "app-server",
+                "--listen",
+                "stdio://",
+            ),
+        )
         self.assertEqual(launch.model, DEFAULT_MODEL)
         self.assertEqual(launch.reasoning, DEFAULT_REASONING)
         self.assertEqual(
@@ -288,6 +307,118 @@ class CodexCliContractTests(unittest.TestCase):
             from testweaver.adapters.codex_cli import CodexCliLaunch
 
             CodexCliLaunch(model="another-model")
+
+
+class NativeWorkerAdapterTests(unittest.TestCase):
+    def test_dsh_has_explicit_deepseek_and_bailian_profiles_without_values(self) -> None:
+        self.assertEqual(DSH_PROVIDER_PROFILES, frozenset({"deepseek", "aliyun-bailian"}))
+        deepseek = DshProviderProfile.deepseek(
+            endpoint_ref={"source": "env", "name": "TESTWEAVER_DSH_ENDPOINT"},
+            model_ref={"source": "file", "path": "/etc/agentteams/deepseek-model"},
+            credential_ref={"source": "env", "name": "TESTWEAVER_DSH_CREDENTIAL"},
+        )
+        bailian = DshProviderProfile.aliyun_bailian(
+            endpoint_ref={"source": "file", "path": "/etc/agentteams/bailian-endpoint"},
+            model_ref={"source": "env", "name": "TESTWEAVER_BAILIAN_MODEL"},
+            credential_ref={"source": "env", "name": "TESTWEAVER_BAILIAN_CREDENTIAL"},
+        )
+        self.assertEqual(deepseek.provider, "deepseek")
+        self.assertEqual(bailian.provider, "aliyun-bailian")
+        self.assertNotIn("value", deepseek.as_dict())
+        self.assertNotIn("value", bailian.as_dict())
+        self.assertEqual(deepseek.as_config(_limits()).adapter_kind, "dsh")
+        self.assertEqual(bailian.as_config(_limits()).adapter_kind, "dsh")
+        generic = DshProviderProfile.from_provider(
+            "vendor-openai-compatible",
+            endpoint_ref={"source": "env", "name": "TESTWEAVER_GENERIC_ENDPOINT"},
+            model_ref={"source": "env", "name": "TESTWEAVER_GENERIC_MODEL"},
+            credential_ref={"source": "env", "name": "TESTWEAVER_GENERIC_CREDENTIAL"},
+        )
+        self.assertEqual(generic.provider, "vendor-openai-compatible")
+        self.assertEqual(generic.as_config(_limits()).route.provider, "vendor-openai-compatible")
+
+    def test_native_binding_preserves_leader_assignment_and_normalizes_result(self) -> None:
+        assignment = NativeWorkerAssignment(
+            project_id="native-project-ref",
+            task_id="native-task-ref",
+            room_id="!native-room-ref:example.invalid",
+            worker_id="native-worker-ref",
+            leader_id="native-leader-ref",
+            task_ref="native-task-spec-ref",
+        )
+        profile = DshProviderProfile.deepseek(
+            endpoint_ref={"source": "env", "name": "TESTWEAVER_DSH_ENDPOINT"},
+            model_ref={"source": "env", "name": "TESTWEAVER_DSH_MODEL"},
+            credential_ref={"source": "env", "name": "TESTWEAVER_DSH_CREDENTIAL"},
+        )
+        invocation = prepare_native_worker_invocation(
+            assignment=assignment,
+            config=profile.as_config(_limits()),
+            provenance=_provenance(),
+        )
+        metadata = invocation.as_dict()
+        self.assertEqual(metadata["native_assignment"]["leader_id"], "native-leader-ref")
+        self.assertTrue(metadata["native_assignment"]["read_only"])
+        self.assertEqual(metadata["lifecycle_owner"], "agentteams-native-worker")
+        self.assertEqual(metadata["dispatch_owner"], "native-leader")
+
+        result = invocation.normalize_result(
+            {
+                "status": "completed",
+                "result_ref": "native-result-artifact-ref",
+                "evidence_refs": _evidence(),
+                "usage": {"model_decisions": 1, "tool_calls": 2},
+            },
+            latency_seconds=1.75,
+        )
+        payload = result.as_dict()
+        self.assertIsInstance(result, WorkerResult)
+        self.assertEqual(result.provider, "deepseek")
+        self.assertEqual(result.model_ref.location, "TESTWEAVER_DSH_MODEL")
+        self.assertEqual(result.latency_seconds, 1.75)
+        self.assertEqual(payload["route"]["provider"], "deepseek")
+        self.assertEqual(payload["route"]["model"]["name"], "TESTWEAVER_DSH_MODEL")
+        self.assertEqual(payload["elapsed_seconds"], 1.75)
+        self.assertEqual(payload["provenance"]["source"], "external-result-receipt")
+
+    def test_codex_binding_is_metadata_only_and_uses_approved_launch(self) -> None:
+        assignment = NativeWorkerAssignment(
+            project_id="native-project-ref",
+            task_id="native-task-ref",
+            room_id="!native-room-ref:example.invalid",
+            worker_id="native-worker-ref",
+            leader_id="native-leader-ref",
+            task_ref="native-task-spec-ref",
+        )
+        invocation = prepare_native_worker_invocation(
+            assignment=assignment,
+            config=AdapterConfig.from_mapping(
+                {
+                    "adapter_kind": "codex-cli",
+                    "route": _route(
+                        "codex-cc",
+                        {"source": "file", "path": "/etc/agentteams/codex-endpoint"},
+                        {"source": "env", "name": "CODEX_WORKER_MODEL"},
+                    ),
+                    "limits": _limits(),
+                }
+            ),
+            provenance=_provenance(),
+        )
+        self.assertEqual(
+            invocation.as_dict()["launch"]["command"][0:5],
+            ["codex-cc", "-m", "gpt-5.6-luna", "-c", "model_reasoning_effort=max"],
+        )
+        self.assertNotIn("process", invocation.as_dict())
+
+    def test_binding_source_has_no_scheduler_or_process_surface(self) -> None:
+        from pathlib import Path
+
+        source = Path(__import__("testweaver.adapters.native_worker", fromlist=["__file__"]).__file__).read_text(
+            encoding="utf-8"
+        )
+        for forbidden in ("subprocess", "create_project", "delegate_task", "room_send", "scheduler"):
+            self.assertNotIn(forbidden, source)
 
 
 if __name__ == "__main__":

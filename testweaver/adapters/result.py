@@ -15,7 +15,13 @@ import re
 from collections.abc import Mapping, Sequence
 from typing import Any, ClassVar
 
-from .config import AdapterConfig, AdapterConfigError, ExecutionLimits, ProviderRoute
+from .config import (
+    AdapterConfig,
+    AdapterConfigError,
+    ExecutionLimits,
+    ProtectedReference,
+    ProviderRoute,
+)
 
 
 class ResultContractError(ValueError):
@@ -331,6 +337,24 @@ class NormalizedResult:
     elapsed_seconds: float | None
     content_hash: str
 
+    @property
+    def provider(self) -> str:
+        """Provider identity copied from the protected route declaration."""
+
+        return self.route.provider
+
+    @property
+    def model_ref(self) -> ProtectedReference:
+        """Location-only model reference; the model value is never resolved here."""
+
+        return self.route.model_ref
+
+    @property
+    def latency_seconds(self) -> float | None:
+        """Common latency name for the external Worker's elapsed duration."""
+
+        return self.elapsed_seconds
+
     def __post_init__(self) -> None:
         if not isinstance(self.adapter_kind, str) or self.adapter_kind not in {"dsh", "codex-cli"}:
             raise ResultContractError("adapter_kind is unsupported")
@@ -571,3 +595,8 @@ def normalize_result(
         limits=config.limits,
         elapsed_seconds=elapsed,
     )
+
+
+# Public name used by native Worker callers; the normalized projection remains
+# the single implementation and schema.
+WorkerResult = NormalizedResult

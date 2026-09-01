@@ -10,7 +10,17 @@ from .config import ProtectedReference
 CODEX_EXECUTABLE = "codex-cc"
 DEFAULT_MODEL = "gpt-5.6-luna"
 DEFAULT_REASONING = "max"
-_APP_SERVER_COMMAND = (CODEX_EXECUTABLE, "app-server", "--listen", "stdio://")
+CODEX_REASONING_CONFIG = "model_reasoning_effort=max"
+_APP_SERVER_COMMAND = (
+    CODEX_EXECUTABLE,
+    "-m",
+    DEFAULT_MODEL,
+    "-c",
+    CODEX_REASONING_CONFIG,
+    "app-server",
+    "--listen",
+    "stdio://",
+)
 
 
 @dataclass(frozen=True)
@@ -43,6 +53,7 @@ class CodexCliLaunch:
             "command": list(self.command),
             "model": self.model,
             "reasoning": self.reasoning,
+            "config_overrides": [CODEX_REASONING_CONFIG],
             "protected_environment": [ref.as_dict() for ref in self.protected_environment],
         }
 

@@ -18,8 +18,10 @@ protected configuration locations around AgentTeams-native work.
 `testweaver/adapters/config.py` accepts one generic `ProviderRoute`.  The
 provider identifier is not restricted to a single vendor, while endpoint,
 model, and credential fields are location-only references (`env` or absolute
-protected `file`).  Thus the same DSH contract covers existing DeepSeek and
-Alibaba Bailian routes without embedding either endpoint or any credential.
+protected `file`).  `native_worker.py` makes DeepSeek and Alibaba Bailian
+explicit DSH profiles while retaining the generic provider path; neither
+profile resolves its references.  Thus the same DSH contract covers both
+providers without embedding either endpoint or any credential.
 
 `result.py` is shared by both adapter kinds.  It keeps native project/task/room
 IDs as read-only opaque correlation references, records only evidence pointers,
@@ -28,10 +30,22 @@ with a canonical SHA-256.  A reported limit overrun changes an otherwise
 completed projection into a terminated budget result; it does not stop or
 retry anything.
 
-`codex_cli.py` records the fixed `codex-cc` app-server entrypoint, model
-`gpt-5.6-luna`, reasoning `max`, and only the protected `HOME`/`CODEX_HOME`
-environment names.  It never resolves the executable, reads those locations,
-copies login material, or starts an external process.
+`codex_cli.py` records the fixed lowercase `codex-cc` app-server entrypoint,
+model `gpt-5.6-luna`, reasoning `max`, and only the protected
+`HOME`/`CODEX_HOME` environment names.  Local `codex-cc` 0.152.0 help
+confirmed that `app-server --listen stdio://` is the real transport, `-m`
+and `-c key=value` are global options, and there is no separate `config`
+subcommand.  The launch contract therefore places `-m gpt-5.6-luna` and
+`-c model_reasoning_effort=max` before `app-server`.  It never resolves the
+executable, reads those locations, copies login material, or starts an
+external process.
+
+`native_worker.py` is the only lifecycle-facing seam: a native Leader-provided
+assignment is carried as opaque project/task/room/Leader/Worker references;
+the native Worker supplies an already-produced result; and the adapter returns
+the shared result projection with provider, model reference, usage, elapsed
+latency, evidence, and provenance.  AgentTeams remains the owner of assignment
+and result collection.
 
 The tests use explicit `TEST_FIXTURE_ONLY_NOT_LIVE` values.  They exercise
 configuration and result contracts only; they do not call a provider, execute
