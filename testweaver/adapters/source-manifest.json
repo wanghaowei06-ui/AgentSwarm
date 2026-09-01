@@ -1,0 +1,121 @@
+{
+  "bundle": "testweaver-heterogeneous-worker-adapters",
+  "bundle_version": "1.0.0",
+  "source_refs": [
+    {
+      "repository": "TestWeaver",
+      "commit": "de497eadaf2fee450e5aa3dbf20f58188d077697",
+      "path": "packages/agentteams_adapter/src/testweaver/agentteams/deepseek_harness_adapter.py",
+      "sha256": "847bc3d0eacd9ad831707083da3da744ef2c3dc044e2cfe9044b31ee9ba7462e",
+      "use": "DSH native assignment/result boundary reference"
+    },
+    {
+      "repository": "TestWeaver",
+      "commit": "de497eadaf2fee450e5aa3dbf20f58188d077697",
+      "path": "packages/agentteams_adapter/src/testweaver/agentteams/deepseek_harness_runtime.py",
+      "sha256": "8a5731df4569b041cb44f480e9c02853e86839d52c558d9253e07729b58ab207",
+      "use": "provider-neutral usage and receipt field reference"
+    },
+    {
+      "repository": "TestWeaver",
+      "commit": "de497eadaf2fee450e5aa3dbf20f58188d077697",
+      "path": "packages/agentteams_adapter/src/testweaver/agentteams/deepseek_harness_transition_normalizer.py",
+      "sha256": "ca94d9d03ddfe4124bc6c21f9cc6e6641d1ae31ce3481e05882e609a8e60b8e6",
+      "use": "privacy-safe transition/result normalization reference"
+    },
+    {
+      "repository": "TestWeaver",
+      "commit": "de497eadaf2fee450e5aa3dbf20f58188d077697",
+      "path": "packages/quality_domain/src/testweaver/quality_domain/schemas.py",
+      "sha256": "03bb50d64bc916cd001853b5379329bd15ec81862bad99384280d3869913369d",
+      "use": "model/provider route and bounded budget reference"
+    },
+    {
+      "repository": "TestWeaver",
+      "commit": "fadee4d49155f8b9c23c5af772cce07167433d00",
+      "path": "packages/agentteams_adapter/src/testweaver/agentteams/deepseek_harness_runtime.py",
+      "sha256": "eb03b834af22c27c01f33b0b598dc3ccf6a5a8e4f7f0e9342c01c7f24d0e478f",
+      "use": "archived DSH termination-budget reference"
+    },
+    {
+      "repository": "TestWeaver",
+      "commit": "fadee4d49155f8b9c23c5af772cce07167433d00",
+      "path": "packages/agentteams_adapter/src/testweaver/agentteams/deepseek_harness_adapter.py",
+      "sha256": "847bc3d0eacd9ad831707083da3da744ef2c3dc044e2cfe9044b31ee9ba7462e",
+      "use": "archived DSH receipt binding reference"
+    },
+    {
+      "repository": "TestWeaver",
+      "commit": "fadee4d49155f8b9c23c5af772cce07167433d00",
+      "path": "packages/agentteams_adapter/src/testweaver/agentteams/hero_value_loop_runtime.py",
+      "sha256": "2cd57057b20ce30dd0bcdea65096e431a820e3fb9d454cd0e13618fc5dfc1a9a",
+      "use": "archived post-process budget validation reference"
+    },
+    {
+      "repository": "AgentTeams",
+      "commit": "0d3f137957c619b4ac43e3a9a062d33fa41d2702",
+      "path": "plugins/teamharness/remote/codex-cli/agentteams_codex_runtime/app_server.py",
+      "sha256": "ebe72c5dd98e9300ea2d792dad6163ba186a8369869cde2a738f8b923af551ec",
+      "use": "committed PR1139 native app-server capability reference"
+    },
+    {
+      "repository": "AgentTeams",
+      "commit": "0d3f137957c619b4ac43e3a9a062d33fa41d2702",
+      "path": "plugins/teamharness/remote/codex-cli/agentteams_codex_runtime/security.py",
+      "sha256": "df0000e66eccf2b175b788b46c49f6f8238964ed1624afbc9bdbaa19b6657829",
+      "use": "committed PR1139 secret isolation reference"
+    },
+    {
+      "repository": "AgentTeams",
+      "commit": "0d3f137957c619b4ac43e3a9a062d33fa41d2702",
+      "path": "plugins/teamharness/remote/codex-cli/agentteams_codex_worker/config.py",
+      "sha256": "d08b217b38c322445078e9acff195fd8846e9344c2c54053a0c4e7e30c356c93",
+      "use": "committed PR1139 location-only runtime config reference"
+    },
+    {
+      "repository": "AgentTeams",
+      "commit": "2ea027403398dfa06f3fc86445042d59f4684d71",
+      "path": "agentteams-controller/internal/backend/interface.go",
+      "sha256": "602459eb017c2ec766be81e0b89af0ed400ecb177b7a647559311bcd64595e0f",
+      "use": "native Worker runtime and lifecycle ownership"
+    },
+    {
+      "repository": "AgentTeams",
+      "commit": "2ea027403398dfa06f3fc86445042d59f4684d71",
+      "path": "agentteams-controller/internal/service/runtime_config.go",
+      "sha256": "c57f2e070057d6c5cb71725f31d39af1b994b2eb583c38fc2f49735d0319b406",
+      "use": "native runtime configuration ownership"
+    },
+    {
+      "repository": "AgentTeams",
+      "commit": "2ea027403398dfa06f3fc86445042d59f4684d71",
+      "path": "plugins/teamharness/plugin.yaml",
+      "sha256": "0c740c91b19c249796409d1d66de37cec135edcf40c0924a254d32f4351e70b8",
+      "use": "native TeamHarness resource and tool surface"
+    },
+    {
+      "repository": "AgentTeams",
+      "commit": "2ea027403398dfa06f3fc86445042d59f4684d71",
+      "path": "plugins/teamharness/mcp/server.py",
+      "sha256": "8c2a4e716eb87c6cccd376cb7a6572d84decf6041400d5f58259a9befe24c45a",
+      "use": "native project/task/room transport surface"
+    },
+    {
+      "repository": "AgentTeams",
+      "commit": "2ea027403398dfa06f3fc86445042d59f4684d71",
+      "path": "plugins/teamharness/prompts/agent/remote-member.md",
+      "sha256": "895362da0c597c373f1d14c1ff3c1c6b7c68de1722b2262688cb9af691ffe42e",
+      "use": "native external-member role boundary"
+    }
+  ],
+  "contract_surface": {
+    "provider_agnostic": true,
+    "supported_existing_provider_examples": ["deepseek", "aliyun-bailian"],
+    "endpoint_model_credential_values_embedded": false,
+    "native_transport_owner": "AgentTeams TeamHarness",
+    "native_worker_lifecycle_owner": "AgentTeams Controller and upstream PR1139 bridge",
+    "external_execution_in_this_bundle": false,
+    "test_samples_are_live_evidence": false,
+    "secret_values_embedded": false
+  }
+}
