@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/agentscope-ai/AgentTeams/testweaver/contracts/schemas/handoff-v1.json",
+  "title": "TestWeaver Native Structured Handoff",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "testweaver.handoff/v1"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "content_hash": {
+      "$ref": "common-v1.json#/$defs/Hash"
+    },
+    "handoff_id": {
+      "$ref": "common-v1.json#/$defs/Identifier"
+    },
+    "native_refs": {
+      "$ref": "common-v1.json#/$defs/NativeRefs"
+    },
+    "producer": {
+      "$ref": "common-v1.json#/$defs/Producer"
+    },
+    "claim": {
+      "$ref": "#/$defs/ClaimBody"
+    },
+    "evidence_ref": {
+      "$ref": "common-v1.json#/$defs/EvidenceRef"
+    },
+    "provenance": {
+      "$ref": "common-v1.json#/$defs/Provenance"
+    },
+    "confidence": {
+      "$ref": "common-v1.json#/$defs/Confidence"
+    },
+    "unresolved_items": {
+      "$ref": "common-v1.json#/$defs/UnresolvedItems"
+    },
+    "artifact": {
+      "$ref": "common-v1.json#/$defs/TransportArtifact"
+    }
+  },
+  "$defs": {
+    "ClaimBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "claim_type"
+      ],
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "claim_type": {
+          "type": "string",
+          "enum": [
+            "ROOT_CAUSE",
+            "IMPACT",
+            "REPAIR",
+            "ATTACK"
+          ]
+        }
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "version",
+    "revision",
+    "content_hash",
+    "handoff_id",
+    "native_refs",
+    "producer",
+    "claim",
+    "evidence_ref",
+    "provenance",
+    "confidence",
+    "unresolved_items",
+    "artifact"
+  ]
+}

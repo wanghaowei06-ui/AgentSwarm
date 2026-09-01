@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/agentscope-ai/AgentTeams/testweaver/contracts/schemas/common-v1.json",
+  "title": "TestWeaver Native Artifact Common Definitions",
+  "$defs": {
+    "Identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9:._/@-]*$"
+    },
+    "NativeIdentifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "^[^\\s]+$",
+      "description": "An opaque native AgentTeams identifier; its value is not owned by this contract."
+    },
+    "ArtifactRef": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000,
+      "pattern": "^[^\\s]+$"
+    },
+    "Hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "NativeRefs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "project_id",
+        "task_id",
+        "room_id",
+        "read_only"
+      ],
+      "properties": {
+        "project_id": {
+          "$ref": "#/$defs/NativeIdentifier",
+          "readOnly": true
+        },
+        "task_id": {
+          "$ref": "#/$defs/NativeIdentifier",
+          "readOnly": true
+        },
+        "room_id": {
+          "$ref": "#/$defs/NativeIdentifier",
+          "readOnly": true
+        },
+        "read_only": {
+          "const": true,
+          "description": "The three native IDs are references and cannot be changed by this artifact."
+        }
+      }
+    },
+    "Producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity",
+        "role"
+      ],
+      "properties": {
+        "identity": {
+          "$ref": "#/$defs/NativeIdentifier"
+        },
+        "role": {
+          "$ref": "#/$defs/Identifier"
+        }
+      }
+    },
+    "EvidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "artifact_ref",
+        "content_hash"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "file",
+            "message",
+            "artifact"
+          ]
+        },
+        "artifact_ref": {
+          "$ref": "#/$defs/ArtifactRef"
+        },
+        "content_hash": {
+          "$ref": "#/$defs/Hash"
+        }
+      }
+    },
+    "Provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_refs",
+        "method"
+      ],
+      "properties": {
+        "source_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/ArtifactRef"
+          }
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      }
+    },
+    "TransportArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "channel",
+        "artifact_ref"
+      ],
+      "properties": {
+        "channel": {
+          "type": "string",
+          "enum": [
+            "filesync",
+            "message"
+          ]
+        },
+        "artifact_ref": {
+          "$ref": "#/$defs/ArtifactRef"
+        }
+      },
+      "description": "A native TeamHarness transport annotation, not a control instruction."
+    },
+    "Confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "UnresolvedItems": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2000
+      }
+    }
+  }
+}

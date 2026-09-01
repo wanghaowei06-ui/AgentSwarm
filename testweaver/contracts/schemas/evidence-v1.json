@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/agentscope-ai/AgentTeams/testweaver/contracts/schemas/evidence-v1.json",
+  "title": "TestWeaver Native Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "testweaver.evidence/v1"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "content_hash": {
+      "$ref": "common-v1.json#/$defs/Hash"
+    },
+    "evidence_id": {
+      "$ref": "common-v1.json#/$defs/Identifier"
+    },
+    "native_refs": {
+      "$ref": "common-v1.json#/$defs/NativeRefs"
+    },
+    "producer": {
+      "$ref": "common-v1.json#/$defs/Producer"
+    },
+    "evidence_type": {
+      "$ref": "common-v1.json#/$defs/Identifier"
+    },
+    "evidence_ref": {
+      "$ref": "common-v1.json#/$defs/EvidenceRef"
+    },
+    "provenance": {
+      "$ref": "common-v1.json#/$defs/Provenance"
+    },
+    "artifact": {
+      "$ref": "common-v1.json#/$defs/TransportArtifact"
+    }
+  },
+  "required": [
+    "schema_version",
+    "version",
+    "revision",
+    "content_hash",
+    "evidence_id",
+    "native_refs",
+    "producer",
+    "evidence_type",
+    "evidence_ref",
+    "provenance",
+    "artifact"
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "bundle": "testweaver-native-artifact-contracts",
+  "bundle_version": "1.0.0",
+  "source": {
+    "repository": "TestWeaver",
+    "commit": "de497eadaf2fee450e5aa3dbf20f58188d077697",
+    "files": [
+      {
+        "path": "packages/collaboration_core/src/testweaver/collaboration_core/handoff.py",
+        "sha256": "3ebeb56d6eefa28bee1255899dc601539435d2c506d300c78ce2bd40679f9b92"
+      },
+      {
+        "path": "packages/collaboration_core/src/testweaver/collaboration_core/schemas.py",
+        "sha256": "be69767b2dc88f2162c9199880c4b3e0b8fc385b5e43d4c7855dbf8eadf01296"
+      },
+      {
+        "path": "contracts/schemas/context-manifest-v1.json",
+        "sha256": "18fb759020113bc6dca449fac9f8a533d153da4427e8d7260fdf9867d24b8305"
+      },
+      {
+        "path": "contracts/schemas/claim-v1.json",
+        "sha256": "d252a798ba502dd05621a07a685fc50281d8704d86e6d02595682007377c64b5"
+      },
+      {
+        "path": "contracts/schemas/evidence-v1.json",
+        "sha256": "19d45cf6b87b84369756795210bfe71d14b2c5304bf9788c24b767f9ff022d32"
+      },
+      {
+        "path": "contracts/schemas/handoff-v1.json",
+        "sha256": "bfb30b5e9bc2bcb1d2cdd2b13f6eb2ee40d5e6b1ea5d52ba89b8b77208df2c60"
+      },
+      {
+        "path": "tests/unit/test_handoff.py",
+        "sha256": "195f4ef9de49ccef6608acd114042c27ff3042ef656a1cf8aa2809d07f8a70d3"
+      },
+      {
+        "path": "tests/unit/test_agentloop_context.py",
+        "sha256": "06f9b77f3a1ec1515d7600df928d2a1bd64f6a94ec92ad9773d29f33f59e4bc8"
+      }
+    ]
+  },
+  "contract_surface": {
+    "native_refs_are_read_only": true,
+    "native_transport": "AgentTeams TeamHarness Artifact",
+    "transport_channels": [
+      "filesync",
+      "message"
+    ],
+    "execution_authority": false,
+    "native_state_copy": false,
+    "test_samples_are_live_evidence": false
+  },
+  "contracts": [
+    "schemas/context-v1.json",
+    "schemas/claim-v1.json",
+    "schemas/evidence-v1.json",
+    "schemas/provenance-v1.json",
+    "schemas/handoff-v1.json"
+  ]
+}
