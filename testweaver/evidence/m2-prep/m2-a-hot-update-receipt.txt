@@ -1,0 +1,87 @@
+schema: testweaver.m2-prep.receipt/v1
+status: PARTIAL
+recorded_at_utc: 2026-09-01T21:05:10Z
+control_commit: eb0364da4cfec90da0b36c6320a74a92ad09771e
+skill_discipline_commit: 84bd152ce9e089ccda61d88dc0dee82551b9fab0
+native_baseline_commit: 2ea027403398dfa06f3fc86445042d59f4684d71
+mention_fix_image_commit: 342d1ee0dad3831cd2b8a27758d95dd352c75248
+
+scope:
+  targets: native-m0-clean-leader,native-m0-clean-worker,native-m1-verify-leader,native-m1-verify-worker
+  teams: native-m0-clean-team,native-m1-verify-team
+  runtime: qwenpaw
+  model_readback_all_targets: deepseek-v4-flash
+  model_provider_key_changed: false
+  model_calls: 0
+  hero_or_task_run: 0
+  manager_controller_matrix_restarted: false
+
+preflight_red:
+  official_status: all four CRs Running; both Teams Active; leaderReady=true; readyWorkers=1; totalWorkers=1
+  native-m0-clean-leader: old_image=higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-qwenpaw-worker:latest@sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d; old_container=7ff2ae454c07; agents_md_sha256=20e9ca013e7e619c8ffa370bd887bbe9162069a9bfec87cd0d77b11e4a715064; five_target_skills=MISSING
+  native-m0-clean-worker: old_image=higress-registry.cn-hangzhou.cr.aliyuncs.com/agentteams/agentteams-qwenpaw-worker:latest@sha256:6bc61f3857c5cd290d5f75f2d07eb584b6560cdacdce373a7aedf786f95abd0d; old_container=8c16d7eac460; agents_md_sha256=20e9ca013e7e619c8ffa370bd887bbe9162069a9bfec87cd0d77b11e4a715064; five_target_skills=MISSING
+  native-m1-verify-leader: image=agentteams/qwenpaw-worker:m1plus-342d1ee; old_container=80691121dd63; agents_md_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; five_target_skills=present_enabled
+  native-m1-verify-worker: image=agentteams/qwenpaw-worker:m1plus-342d1ee; old_container=2e8c167eb015; agents_md_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; five_target_skills=present_enabled
+  package_readback_preflight: official agt get workers response has no package/packageURI field
+
+image_update:
+  official_command: agt update worker --name <target> --image agentteams/qwenpaw-worker:m1plus-342d1ee
+  order: native-m0-clean-leader then native-m0-clean-worker; no concurrent M0 stop
+  target_image_id: sha256:884f8bf1db0e47dccbbc89282e1c6b82c7821ece0951b42b7ca5ba5fdcf8ae68
+  native-m0-clean-leader: old_container=7ff2ae454c07; new_container=c21cb6d8bbd6; host_port=10007; old_image_digest_retained=true
+  native-m0-clean-worker: old_container=8c16d7eac460; new_container=950cec661a56; host_port=19327; old_image_digest_retained=true
+  native-m1-verify-leader: already_target_image=true; container=80691121dd63; host_port=16346
+  native-m1-verify-worker: already_target_image=true; container=2e8c167eb015; host_port=19810
+
+package:
+  package_name: testweaver-native-skill-discipline-84bd152-m2a
+  package_ref: oss://agentteams-config/packages/testweaver-native-skill-discipline-84bd152-m2a-6ba22dcc17a28732.zip
+  zip_sha256: 6ba22dcc17a287326520e533df2446986996d682a5ea4eb3239509eafe255afb
+  zip_size_bytes: 7744
+  entries: config/AGENTS.md,manifest.json,skills/approval-intent-boundary-check/SKILL.md,skills/avoid-redundant-exploration/SKILL.md,skills/diagnose-by-competing-hypotheses/SKILL.md,skills/preserve-critical-constraints/SKILL.md,skills/reconcile-before-retry/SKILL.md
+  config_source: testweaver/skills/native-agentspec-package/config/AGENTS.md; source_commit=84bd152ce9e089ccda61d88dc0dee82551b9fab0; sha256=bd610687885983581da61dfe828ff5f86f8c83e4c49111bec5138bc47cb8291d
+  manifest_sha256: fcd609d12f303636d2bdf7ef45d2d4263e181ac22acf4296672b2cad3e541863
+  skill_source_commit: 19a929ea084c32e0e551881ec709b1d9b1792512
+  skill_source_sha256:
+    approval-intent-boundary-check=9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66
+    avoid-redundant-exploration=eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd
+    diagnose-by-competing-hypotheses=3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954
+    preserve-critical-constraints=fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f
+    reconcile-before-retry=cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e
+  upload_path: official POST /api/v1/packages using existing Manager auth; secret value omitted
+  update_path: official agt update worker --name <target> --package <package_ref>
+  package_rollback: old package ref unavailable because official worker readback omits package; new OSS object is immutable and no old object was deleted; old M0 image digests retained
+
+runtime_green:
+  package_update_order: native-m0-clean-leader,native-m0-clean-worker,native-m1-verify-leader,native-m1-verify-worker
+  qwenpaw_agent_id: default
+  refresh_endpoint: POST /api/agents/default/skills/refresh -> HTTP 200 on all four; target list present and source=customized
+  batch_enable_endpoint: POST /api/agents/default/skills/batch-enable with exactly five target names -> HTTP 200; all five success=true on all four
+  enabled_readback: GET /api/agents/default/skills -> HTTP 200; all five target names enabled=true, source=customized on all four
+  workspace_agents_md_sha256_all_targets: bd610687885983581da61dfe828ff5f86f8c83e4c49111bec5138bc47cb8291d
+  workspace_skill_sha256_all_targets:
+    approval-intent-boundary-check=9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66
+    avoid-redundant-exploration=eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd
+    diagnose-by-competing-hypotheses=3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954
+    preserve-critical-constraints=fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f
+    reconcile-before-retry=cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e
+  native-m0-clean-leader: role=team_leader; matrix_user=@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080; phase=Running; state=Running; health=/health:200,/healthz:200,/ready:200; team=native-m0-clean-team Active leaderReady=true readyWorkers=1 totalWorkers=1
+  native-m0-clean-worker: role=worker; matrix_user=@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080; phase=Running; state=Running; health=/health:200,/healthz:200,/ready:200; team=native-m0-clean-team Active leaderReady=true readyWorkers=1 totalWorkers=1
+  native-m1-verify-leader: role=team_leader; matrix_user=@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080; phase=Running; state=Running; health=/health:200,/healthz:200,/ready:200; team=native-m1-verify-team Active leaderReady=true readyWorkers=1 totalWorkers=1
+  native-m1-verify-worker: role=worker; matrix_user=@native-m1-verify-worker:matrix-native-m0-20260901.agentteams.local:28080; phase=Running; state=Running; health=/health:200,/healthz:200,/ready:200; team=native-m1-verify-team Active leaderReady=true readyWorkers=1 totalWorkers=1
+  actual_image_all_targets: agentteams/qwenpaw-worker:m1plus-342d1ee; image_id=sha256:884f8bf1db0e47dccbbc89282e1c6b82c7821ece0951b42b7ca5ba5fdcf8ae68
+  official_get_package_readback: PARTIAL_NOT_EXPOSED; response_keys contain no package field; runtime file/API evidence above is authoritative for this run
+
+config_and_safety:
+  worker_config_env_names_checked: AGENTTEAMS_AI_GATEWAY_URL,AGENTTEAMS_AUTH_TOKEN_FILE,AGENTTEAMS_CONSOLE_PORT,AGENTTEAMS_CONTROLLER_URL,AGENTTEAMS_FS_ACCESS_KEY,AGENTTEAMS_FS_BUCKET,AGENTTEAMS_FS_ENDPOINT,AGENTTEAMS_FS_SECRET_KEY,AGENTTEAMS_MATRIX_DEBUG,AGENTTEAMS_MATRIX_DOMAIN,AGENTTEAMS_MATRIX_URL,AGENTTEAMS_STORAGE_PREFIX,AGENTTEAMS_STORAGE_PROVIDER,AGENTTEAMS_WORKER_CR_NAME,AGENTTEAMS_WORKER_GATEWAY_KEY,AGENTTEAMS_WORKER_MATRIX_TOKEN,AGENTTEAMS_WORKER_NAME,AGENTTEAMS_WORKER_ROLE,AGENTTEAMS_WORKER_ROOM_ID,AGENTTEAMS_YOLO
+  model_provider_key_config_write: false
+  credential_values_recorded: 0
+  credential_scan: PASS; source concrete-secret hits=0; private-key hits=0; package false positives were non-value authorization words only
+  source_contract_tests: GREEN testweaver/skills/native-agentspec-package/test-skill-selection-contract.sh; PASS testweaver/skills/test-native-agentspec-package.sh
+  prohibited_architecture_added: false
+  control_containers_unchanged: manager=cbc6432f0e51; controller=cc5c2f91197b
+
+conclusion:
+  runtime_result: PASS
+  overall_result: PARTIAL solely because official agt worker readback exposes no package/packageURI field and therefore cannot prove the prior package ref for rollback
+  only_blocker: official package readback field unavailable; no runtime/hash/health/identity/Team blocker
