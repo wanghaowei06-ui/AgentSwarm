@@ -2,9 +2,9 @@
 
 更新时间：2026-09-02（Asia/Shanghai）
 
-状态：`M1_RUNTIME_FIXES_DEPLOYED / M1_NATIVE_SKILL_PACKAGE_NEXT`
+状态：`M1_NATIVE_DUAL_TEAM_PASS / M1_SKILL_INVOKE_PARTIAL`
 
-唯一当前里程碑：把五个已验证领域 Skill 通过 AgentTeams 原生 `AgentSpec/package` 装入当前 M1 QwenPaw Team，随后立即做一次干净 M1+ 原生复跑，在同一真实 Run 中验证 Manager 动态选择、双 Team、结构化 Handoff、真实 Skill discovery/load/invoke 与证据驱动的二次决策；不恢复第二编排器。异构 DSH/百炼与 `codex-cc` 在该原生复跑稳定后接入同一链路。
+唯一当前里程碑：把 `84bd152` 的通用 Skill 选择/溯源纪律通过原生 `AgentSpec/package` 热更新到四个 QwenPaw Agent，然后进入最小真实 M2：继续由原生 Manager→Leader→Worker 驱动，在自然任务中验证适用 Skill 的真实 load/invoke、一次 Human PAUSE→人工决定→resume、一次真实可恢复故障，以及不同身份/进程的 Outcome/Boundary Oracle。异构 DSH/阿里云百炼与 `codex-cc` 随后接入同一权威链，不恢复第二编排器。
 
 ## 1. 已冻结决策
 
@@ -69,6 +69,9 @@ TestWeaver 只做产品差异：
 - M1 两个功能阻断修复已进入运行镜像：Manager `agentteams/manager:m1plus-15b7b14`（image `798d52808f58…`）和两个 M1 QwenPaw Worker `agentteams/qwenpaw-worker:m1plus-342d1ee`（image `884f8bf1db0e…`）已通过原生 `agt update` 逐个可回滚更新，健康、身份、Team 状态及配置名称均通过；尚未运行修复后的真实模型任务，故仍不能把修复写成 LIVE 行为 PASS。
 - Controller/embedded 修复镜像已由官方入口成功产出（`d9480c0`，embedded `7bacad3eb7ec…`），但当前隔离栈没有可证明等价的完整受保护重建入口。membership 修复仅消除重复 force-leave 噪声，不阻止安全真实运行，因此不替换当前 Controller，登记为 `WARN/PARTIAL` 后置。
 - 五个领域 Skill 的 AgentTeams frontmatter、目录/名称、manifest hash 与凭据扫描均 PASS；当前缺口不是 Skill 内容，而是尚未通过 QwenPaw 原生 `AgentSpec/package → workspace/skills → refresh → batch-enable` 装入运行态。CMS/OTel 不负责 Skill 安装，静态文件和 receipt 也不能证明 invoke。
+- M1+ 真实 Run `m1plus-20260901T193737Z` 已冻结：单次 Human 输入触发 Manager 动态选择两个 Team/Leader，两条新原生 Project/Task、两个真实 Worker provider 调用、两次 submit/check/accept/handoff 和 Manager 最终报告；36 分钟内无第三 Task 或重复 intake。核心原生双 Team 链 PASS，整体仍 PARTIAL。receipt/manifest/hash 为 `82332fc`，独立 review 为 `e09309b`。
+- M1+ 独立复核确认五个领域 Skill 的 source/runtime hash 与 enabled 状态，但本 Run exact-name load/invoke 全部 `NOT_OBSERVED`；不得用安装状态冒充调用。`84bd152` 已在原生 AgentSpec `config/AGENTS.md` 增加通用、非案例化纪律：按 `assign_when` 选择零个或多个适用 Skill，经原生路径读取，并在正常 result/handoff 记录 exact name、source commit/version 与 evidence ref；尚未热更新或真实复跑。
+- M1+ 仍记录三个非阻断原生缺口：新 Human room 共享 `agent:main:main` session、global task/project 状态投影滞后、global `replyRoute` 指向旧 admin room。它们不推翻已观察的 Team-scoped accepted artifacts，但在后续严格收口前保持 `PARTIAL/WARN`。
 - 配置线已建立 names-only preflight，并确认 `/etc/agentteams/agentteams.env`、`providers.env`、LoongSuite、OTel 和 Nacos 只通过外部受保护引用复用；当前 Nacos 探测、OTel Collector 和 LoongSuite 服务状态如实标为延后，不冒充 LIVE。
 - AgentLoop 旧资产目前只可称合同/replay/历史受限证据；必须等待同一真实 M0/Hero 后完成真实查询回读。
 
