@@ -8,6 +8,7 @@
 
 ARG HIGRESS_REGISTRY=higress-registry.cn-hangzhou.cr.aliyuncs.com
 ARG APK_REPOSITORY=
+ARG BUILDPLATFORM
 
 # ============ Stage 1: Build Go binaries ============
 FROM ${HIGRESS_REGISTRY}/higress/golang:1.25-alpine AS builder
