@@ -2,9 +2,18 @@
 
 更新时间：2026-09-02（Asia/Shanghai）
 
-状态：`M2-C_PARTIAL / M2-D_HITL_AND_CONTAINER_RECOVERY_PASS / M2-D_REPLACEMENT_NOT_OBSERVED / M2-E_NATIVE_RECOVERY_PARTIAL / M2-F_PARTIAL`
+状态：`M2-G_CORE_INTEGRATION / M0-M1_NATIVE_CHAIN_PASS / M2-D_HITL_RECOVERY_PASS / CURRENT_HERO_NOT_STARTED`
 
-唯一当前里程碑：跨房间 assignment 通知修复镜像 `be10aaf` 已部署并由 M2-D 的真实 Worker assignment/submit 验证；M2-D continuation-2 已证明真实 HITL 与单容器恢复 PASS。M2-F continuation 已确认 Controller 在约五分钟周期内自然恢复同一 Worker；P0 terminal-cancelled rejection PASS，但 Leader 重复唤醒导致两次旧 Task submit 探针、exactly-once FAIL，整体为 `PARTIAL`。原 M2-F 观察窗 FAIL 保持不改写。
+唯一当前里程碑：冻结已通过的 AgentTeams 原生 Manager→Leader→Worker 主链，不再逐缺口构建和短跑。先把异构 Worker、双 Oracle、AgentLoop 观测评估、Skill/Context/Evidence/Handoff 进化机制四块既有资产一次性完成薄接线、静态测试、运行配置和安全预检；汇总缺口后一次修复、一次镜像构建，再运行完整 Hero。`6fee879` 的严格 DSH MCP schema 已进入镜像 `dsh-headless-6fee879`；尚未发送 `-09`，不得称 LIVE。
+
+## 0. 今晚批量收口策略（最高优先级，覆盖后文的逐小步运行措辞）
+
+- 不再采用“一处修复→一次构建→一个短实验”的循环。当前先暂停新 Hero，保持已运行原生栈和 `dsh-headless-6fee879`，不重复部署。
+- 一个集成批次只补 AgentTeams 原生没有的四层：DSH/Codex 异构薄适配与统一结果；Outcome/Boundary 双 Oracle；OTel/LoongSuite→AgentLoop 同 Run 查询评估；五个领域 Skill 加 Context/Claim/Evidence/Provenance/Handoff 的版本化改进边界。
+- 先对当前仓库、24 项资产清单、旧供体和运行配置做一次完整差距审计；能直接复用的只接线，不重写。把所有可由代码、Schema、配置和离线测试发现的问题合并为一个 allowlist，一次实现和一次独立复核。
+- 仅在批量预检全部通过后构建一次最终候选镜像并运行完整 Hero。Hero 自然暴露的问题集中冻结后再做至多一个通用修复批次；只有 provider/异步时序等无法静态证明的问题允许通过真实运行发现。
+- 完整 Hero 必须自然包含 Manager 动态选 Team/Leader、双 Team/结构化 handoff、真实 DSH Worker、真实 Skill、Context/Evidence/Claim、真实 HITL、两个独立 Oracle、Leader 收敛和 Manager 二次决策；脚本只配置、采集和收据化。
+- 今晚先冻结一条真实纵向闭环；AgentLoop 同 Run 回读、最小 E0–E3 和 M4 离线包随后连续完成。百炼统一网关、Codex 第二外部 Worker、HA/PITR/RAG/高并发和第二场景不阻塞今晚闭环。
 
 ## 1. 已冻结决策
 
