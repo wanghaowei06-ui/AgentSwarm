@@ -99,6 +99,18 @@ class ReadOnlyQueryContractTests(unittest.TestCase):
         result = verify_hero_correlation(_hero_export("otel_export"), missing_source)
 
         self.assertEqual(result["status"], "NOT_AVAILABLE")
+
+    def test_hero_verifier_rejects_nonfinite_latency_and_blank_identity(self) -> None:
+        nonfinite = verify_hero_correlation(
+            _hero_export("otel_export", latency_ms=float("nan")),
+            _hero_export("agentloop_query"),
+        )
+        blank_provider = verify_hero_correlation(
+            _hero_export("otel_export", provider="   "),
+            _hero_export("agentloop_query"),
+        )
+        self.assertEqual(nonfinite["status"], "BLOCKED")
+        self.assertEqual(blank_provider["status"], "BLOCKED")
     def test_protected_reference_inspects_metadata_without_loading_content(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "protected.env"

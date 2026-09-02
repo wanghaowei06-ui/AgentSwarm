@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import re
 import stat
 from collections.abc import Callable, Mapping
@@ -560,14 +561,14 @@ def verify_hero_correlation(
                 raise ValueError("content_hash")
             if not isinstance(observation["trace_id"], str) or not _TRACE_ID.fullmatch(observation["trace_id"]):
                 raise ValueError("trace_id")
-            if not isinstance(observation["provider"], str) or not observation["provider"]:
+            if not isinstance(observation["provider"], str) or not observation["provider"].strip():
                 raise ValueError("provider")
-            if not isinstance(observation["model"], str) or not observation["model"]:
+            if not isinstance(observation["model"], str) or not observation["model"].strip():
                 raise ValueError("model")
             if not isinstance(observation["usage"], Mapping) or not observation["usage"]:
                 raise ValueError("usage")
             latency = observation["latency_ms"]
-            if isinstance(latency, bool) or not isinstance(latency, (int, float)) or latency < 0:
+            if isinstance(latency, bool) or not isinstance(latency, (int, float)) or not math.isfinite(latency) or latency < 0:
                 raise ValueError("latency_ms")
         except ValueError:
             return {"status": "BLOCKED", "reason": "invalid_observation"}
