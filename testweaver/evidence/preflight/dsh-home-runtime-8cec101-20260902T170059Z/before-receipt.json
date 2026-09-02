@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "run_id": "dsh-home-runtime-8cec101-20260902T170059Z",
+  "phase": "BEFORE_IMAGE_UPDATE",
+  "captured_at": "2026-09-02T17:00:59Z",
+  "source": {
+    "adapter_fix_commit": "8cec101",
+    "workspace_head_at_capture": "b98bd8197ddc3ea86e3fce51385c3374201bd7fd",
+    "build_image": "agentteams/qwenpaw-worker:dsh-home-runtime-8cec101",
+    "build_image_id": "sha256:8350724041493b7f8ca87ae2865e85e09faf0e0be6eba1aa41837ce5a6472a13",
+    "build_image_digest": "agentteams/qwenpaw-worker@sha256:8350724041493b7f8ca87ae2865e85e09faf0e0be6eba1aa41837ce5a6472a13",
+    "base_image": "agentteams/qwenpaw-worker:be10aaf",
+    "base_image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+    "dsh_package_sha256": "1d21f3e9c74f2dbad004da5c3d054cc2b9e31c80721067b4319a34f89905e31f",
+    "official_build_entrypoint": "testweaver/adapters/build-qwenpaw-native-extension.sh",
+    "focused_tests": "52 adapter tests PASS"
+  },
+  "team_before": {
+    "name": "native-m0-clean-team",
+    "phase": "Active",
+    "leader_name": "native-m0-clean-leader",
+    "team_room_id": "!NbRmgvdkZMdRcCvLg4:matrix-native-m0-20260901.agentteams.local:28080",
+    "leader_dm_room_id": "!Ypl073FDlR3fHMbFWW:matrix-native-m0-20260901.agentteams.local:28080",
+    "leader_ready": true,
+    "ready_workers": 3,
+    "total_workers": 3,
+    "worker_names": ["native-m0-clean-worker", "native-m0-boundary-oracle", "native-m0-clean-dsh-worker"],
+    "worker_members": [
+      {"name": "native-m0-clean-leader", "role": "team_leader"},
+      {"name": "native-m0-clean-worker", "role": "worker"},
+      {"name": "native-m0-boundary-oracle", "role": "worker"},
+      {"name": "native-m0-clean-dsh-worker", "role": "worker"}
+    ]
+  },
+  "worker_before": {
+    "name": "native-m0-clean-dsh-worker",
+    "phase": "Running",
+    "state": "Running",
+    "container_managed": true,
+    "backend_runtime": "pod",
+    "runtime": "qwenpaw",
+    "model": "deepseek-v4-flash",
+    "model_provider": "testweaver-bailian",
+    "image": "agentteams/qwenpaw-worker:dsh-headless-6fee879",
+    "image_id": "sha256:84788af57ad896dc52d40bffc16bc7e623c82060552d7d149d273935b66aa39b",
+    "identity": "Provider-neutral DSH heterogeneous Worker; gateway credential rotated; built-in tools disabled; DeepSeek path ready",
+    "matrix_user_id": "@native-m0-clean-dsh-worker:matrix-native-m0-20260901.agentteams.local:28080",
+    "room_id": "!t8ycL6WDpsGf9D0mGo:matrix-native-m0-20260901.agentteams.local:28080",
+    "team": "native-m0-clean-team",
+    "role": "worker",
+    "container_id": "9831fb3884532b6ce37ab10e9df7758c272c50a68be4d9c5adf4bef4981dec87",
+    "container_created_at": "2026-09-02T10:59:45.382004069Z",
+    "container_started_at": "2026-09-02T11:00:15.115829785Z",
+    "container_state": "running",
+    "host_port": 10227,
+    "container_port": 8088,
+    "health": {"http://127.0.0.1:10227/health": 200, "http://127.0.0.1:10227/api/version": 200},
+    "generation": 22,
+    "observed_generation": 22,
+    "kine_id": 26813,
+    "kine_create_revision": 10430,
+    "spec_hash": "6231bc6152e5f77"
+  },
+  "routes_before": {
+    "testweaver-bailian-route": {
+      "configmap": "/data/configmaps/ai-route-testweaver-bailian-route.yaml",
+      "configmap_sha256": "b12e5819893652eb51c5370a84e24bfa957fc3847772afffaf4d98ec2558be0d",
+      "path": "/v1/testweaver-bailian",
+      "domains": [],
+      "provider": "testweaver-bailian",
+      "model_mapping": {"deepseek-v4-flash": "qwen3.7-flash"},
+      "auth_enabled": true,
+      "allowed_credential_types": ["key-auth"],
+      "allowed_consumers": ["manager", "worker-native-m0-clean-dsh-worker"]
+    },
+    "default-ai-route": {
+      "configmap": "/data/configmaps/ai-route-default-ai-route.yaml",
+      "configmap_sha256": "b175d178fd73e80d6c62bee9bcb9494996bc743c6ae065d15242507583a4e5c7",
+      "path": "/v1",
+      "domains": [],
+      "provider": "openai-compat",
+      "auth_enabled": true,
+      "allowed_credential_types": ["key-auth"],
+      "target_consumer_authorized": false
+    }
+  },
+  "runtime_projection": {
+    "file": "/root/agentteams-fs/agents/native-m0-clean-dsh-worker/runtime/runtime.yaml",
+    "source": "HOME/runtime/runtime.yaml",
+    "absolute": true,
+    "regular": true,
+    "mode": "0644",
+    "size_bytes": 2751,
+    "desired_model": "deepseek-v4-flash",
+    "desired_gateway_path": "/v1/testweaver-bailian",
+    "metadata_generation": 22
+  },
+  "planned_mutation": {
+    "official_entrypoint": "agt update worker --name native-m0-clean-dsh-worker --image agentteams/qwenpaw-worker:dsh-home-runtime-8cec101",
+    "changed_fields": ["spec.image"],
+    "preserved_fields": ["spec.modelProvider", "spec.model", "spec.identity", "team", "matrix_user_id", "room_id", "spec.runtime", "spec.package", "spec.containerManaged", "spec.state"],
+    "team_change": false,
+    "provider_call_before_update": false,
+    "hero_run": false
+  },
+  "rollback": {
+    "official_entrypoint": "agt update worker --name native-m0-clean-dsh-worker --image agentteams/qwenpaw-worker:dsh-headless-6fee879",
+    "old_image_id": "sha256:84788af57ad896dc52d40bffc16bc7e623c82060552d7d149d273935b66aa39b",
+    "old_container_id": "9831fb3884532b6ce37ab10e9df7758c272c50a68be4d9c5adf4bef4981dec87",
+    "identity_must_remain": "@native-m0-clean-dsh-worker and !t8ycL6WDpsGf9D0mGo:matrix-native-m0-20260901.agentteams.local:28080"
+  },
+  "secret_policy": {
+    "values_read": false,
+    "values_written": false,
+    "values_logged": false,
+    "values_hashed": false,
+    "argv_secret": false,
+    "receipt_secret": false
+  }
+}

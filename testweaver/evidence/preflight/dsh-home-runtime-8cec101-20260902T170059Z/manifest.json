@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "run_id": "dsh-home-runtime-8cec101-20260902T170059Z",
+  "status": "FAIL",
+  "classification": "NOT_LIVE_PROVIDER_PROBE_FAIL",
+  "files": ["before-receipt.json", "receipt.json", "manifest.json", "SHA256SUMS"],
+  "predecessor": "3896995e6cfe2042b66af07aaaf02c5d5c88b673",
+  "source_commit": "8cec101",
+  "image": "agentteams/qwenpaw-worker@sha256:8350724041493b7f8ca87ae2865e85e09faf0e0be6eba1aa41837ce5a6472a13",
+  "scope": {
+    "image_update": true,
+    "worker_name": "native-m0-clean-dsh-worker",
+    "native_task_created": false,
+    "native_result_submitted": false,
+    "hero_run": false
+  },
+  "secret_scan": "PASS_NO_VALUES",
+  "sha256": {
+    "before-receipt.json": "3656102d4fc747dbb1ec47c0017fd6254b9271b7587daa633e19e60c5fb5be8b",
+    "receipt.json": "9d0874262c311502cdb945272a49a48c358aae58e69bd84850d7f93131c0c92d",
+    "manifest.json": "SELF_EXCLUDED",
+    "SHA256SUMS": "SELF_EXCLUDED"
+  }
+}
