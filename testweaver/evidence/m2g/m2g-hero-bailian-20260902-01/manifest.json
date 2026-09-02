@@ -1,0 +1,38 @@
+{
+  "schema": "testweaver.m2g.hero.manifest.v1",
+  "run_id": "m2g-hero-bailian-20260902-01",
+  "classification": "FAIL",
+  "status": "INPUT_UNAVAILABLE",
+  "receipt": "receipt.json",
+  "receipt_sha256": "269e5b963a568c5fae188753a7e2c346adca8fcffe98cef4697242da8e27f972",
+  "files": ["receipt.json", "manifest.json", "SHA256SUMS"],
+  "observed": [
+    "authoritative Worker CR/status readiness",
+    "authoritative Team readiness",
+    "authoritative Bailian/default route consumer shape",
+    "Manager stream metadata only"
+  ],
+  "not_observed": [
+    "exact Human event ID and body hash",
+    "Manager provider/model/usage/latency/response hash",
+    "new Project",
+    "new Task",
+    "Leader identity or assignment",
+    "Worker identity or acknowledgement",
+    "DSH call",
+    "Bailian call",
+    "submit/check/accept",
+    "Manager second decision"
+  ],
+  "input_policy": {
+    "candidate_shared_inputs": [],
+    "excluded_classes": ["gold-boundary", "verifier", "expected"],
+    "gold_ref": null,
+    "body_or_prompt_persisted": false
+  },
+  "integrity": {
+    "secret_values": "NOT_READ_OR_STORED",
+    "historical_substitution": false,
+    "runtime_or_agent_calls_from_witness": false
+  }
+}

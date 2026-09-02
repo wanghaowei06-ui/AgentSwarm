@@ -1,0 +1,110 @@
+{
+  "schema": "testweaver.m2g.hero.observation.v1",
+  "run_id": "m2g-hero-bailian-20260902-01",
+  "collected_at": "2026-09-02T08:04:46Z",
+  "source_head": "e6668fe4715551b53c73dfc951bd9134285a44e8",
+  "classification": "FAIL",
+  "status": "INPUT_UNAVAILABLE",
+  "scope": {
+    "run_id_filter": "exact",
+    "read_only": true,
+    "runtime_mutated": false,
+    "matrix_messages_sent": 0,
+    "agent_tool_calls": 0,
+    "message_bodies_stored": false,
+    "prompts_or_results_stored": false,
+    "historical_receipt_substitution": false
+  },
+  "human_initial": {
+    "status": "NOT_OBSERVED",
+    "event_id": "NOT_OBSERVED",
+    "body_sha256": "NOT_OBSERVED",
+    "room_id": "NOT_OBSERVED",
+    "sender": "NOT_OBSERVED",
+    "reason": "No permitted authoritative event readback or run-scoped published artifact exposed the exact Human event metadata."
+  },
+  "manager": {
+    "status": "STREAM_METADATA_ONLY",
+    "run_id": "NOT_OBSERVED",
+    "runtime_log_token": "d18ad344…8e56 (logger-redacted; not treated as an exact run ID)",
+    "session": "main",
+    "assistant_stream_event_count": 29,
+    "provider": "NOT_OBSERVED",
+    "model": "NOT_OBSERVED",
+    "usage": "NOT_OBSERVED",
+    "latency": "NOT_OBSERVED",
+    "response_hash": "NOT_OBSERVED",
+    "source": "exact run-id filter over the current Manager Docker log; stream text was not retained"
+  },
+  "native_lifecycle": {
+    "project": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "task": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "leader_identity": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "leader_assignment": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "worker_identity": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "worker_ack": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "dsh_call": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "bailian_call": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "submit": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "check": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "accept": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "manager_second_decision": {"status": "NOT_OBSERVED", "observed_count": 0}
+  },
+  "readiness": {
+    "worker_cr": {
+      "status": "OBSERVED",
+      "name": "native-m0-clean-dsh-worker",
+      "modelProvider": "testweaver-bailian",
+      "phase": "Running",
+      "health_phase": "Ready",
+      "container_state": "running",
+      "container_managed": true,
+      "runtime": "qwenpaw",
+      "image": "agentteams/qwenpaw-worker:dsh-headless-e6171b2",
+      "matrix_user_id": "@native-m0-clean-dsh-worker:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!t8ycL6WDpsGf9D0mGo:matrix-native-m0-20260901.agentteams.local:28080",
+      "resource_version": "NOT_OBSERVED",
+      "source": "authoritative current CR/status readback; REST projection does not expose resourceVersion"
+    },
+    "team": {
+      "status": "OBSERVED",
+      "name": "native-m0-clean-team",
+      "phase": "Active",
+      "team_room_id": "!NbRmgvdkZMdRcCvLg4:matrix-native-m0-20260901.agentteams.local:28080",
+      "source": "authoritative current Team readback"
+    },
+    "routes": {
+      "bailian": {
+        "status": "OBSERVED",
+        "provider": "testweaver-bailian",
+        "path": "/v1/testweaver-bailian",
+        "auth_enabled": true,
+        "target_consumer": "worker-native-m0-clean-dsh-worker",
+        "target_consumer_present": true
+      },
+      "default": {
+        "status": "OBSERVED",
+        "path": "/v1",
+        "provider": "openai-compat",
+        "target_consumer": "worker-native-m0-clean-dsh-worker",
+        "target_consumer_present": false
+      },
+      "source": "authoritative current Higress route readback; no credentials or headers retained"
+    }
+  },
+  "candidate_shared_inputs": {
+    "included_files": [],
+    "included_hashes": [],
+    "excluded_classes": ["gold-boundary", "verifier", "expected"],
+    "excluded_files_copied": false,
+    "reason": "No run-scoped candidate input artifact was available; gold-boundary/verifier/expected material is excluded by policy."
+  },
+  "security": {
+    "secret_values": "NOT_READ_OR_STORED",
+    "headers_or_tokens": "NOT_READ_OR_STORED",
+    "message_bodies": "NOT_STORED",
+    "fixture_or_synthetic_substitution": false,
+    "credential_scan": "PENDING_FINAL_FILE_SCAN"
+  },
+  "failure_reason": "INPUT_UNAVAILABLE"
+}
