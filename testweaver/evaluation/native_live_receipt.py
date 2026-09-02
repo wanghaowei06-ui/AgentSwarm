@@ -16,6 +16,7 @@ from testweaver.contracts.validator import canonical_hash
 from testweaver.evaluation.paired_metrics import (
     METRIC_NAMES,
     NOT_AVAILABLE,
+    PAIRING_FIELDS,
     PairingError,
     compare_pair,
 )
@@ -34,7 +35,9 @@ _TOP_FIELDS = frozenset(
         "run_id",
         "case_id",
         "input_hash",
+        "golden_revision",
         "budget_hash",
+        "environment_hash",
         "profile",
         "repetition",
         "run_state",
@@ -139,7 +142,9 @@ def normalize_native_run_export(
     run_id = _identifier(export["run_id"], "run_id")
     case_id = _identifier(export["case_id"], "case_id")
     input_hash = _hash_value(export["input_hash"], "input_hash")
+    golden_revision = _identifier(export["golden_revision"], "golden_revision")
     budget_hash = _hash_value(export["budget_hash"], "budget_hash")
+    environment_hash = _hash_value(export["environment_hash"], "environment_hash")
     if input_hash != expected_input_hash:
         raise LiveReceiptError("input_hash does not match expected public input")
     if budget_hash != expected_budget_hash:
@@ -198,7 +203,9 @@ def normalize_native_run_export(
         "run_id": run_id,
         "case_id": case_id,
         "input_hash": input_hash,
+        "golden_revision": golden_revision,
         "budget_hash": budget_hash,
+        "environment_hash": environment_hash,
         "profile": profile,
         "repetition": repetition,
         "frozen": True,
@@ -218,7 +225,9 @@ def normalize_native_run_export(
         "run_id": run_id,
         "case_id": case_id,
         "input_hash": input_hash,
+        "golden_revision": golden_revision,
         "budget_hash": budget_hash,
+        "environment_hash": environment_hash,
         "profile": profile,
         "repetition": repetition,
         "run_state": "completed",
@@ -276,7 +285,7 @@ def normalize_native_run_exports(
             raise LiveReceiptError("duplicate fresh native identity")
         if len(set(all_ids)) != len(all_ids):
             raise LiveReceiptError("duplicate identity within normalized export")
-        pair_key = tuple(row[field] for field in ("case_id", "input_hash", "budget_hash", "profile", "repetition"))
+        pair_key = tuple(row[field] for field in PAIRING_FIELDS)
         if pair_key in seen_pair_keys:
             raise LiveReceiptError("duplicate paired observation")
         seen_ids.update(all_ids)

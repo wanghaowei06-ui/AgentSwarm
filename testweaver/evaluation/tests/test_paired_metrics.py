@@ -31,7 +31,9 @@ def _run(run_id: str, *, repetition: int = 1, metrics: dict | None = None) -> di
         "run_id": run_id,
         "case_id": "case-alpha",
         "input_hash": _HASH,
+        "golden_revision": "golden-v1",
         "budget_hash": _HASH,
+        "environment_hash": _HASH,
         "profile": "native-profile",
         "repetition": repetition,
         "frozen": True,
@@ -82,8 +84,9 @@ class PairedMetricsTests(unittest.TestCase):
             {
                 "case_id": "case-alpha",
                 "input_hash": _HASH,
+                "golden_revision": "golden-v1",
                 "budget_hash": _HASH,
-                "profile": "native-profile",
+                "environment_hash": _HASH,
                 "repetition": 1,
             },
         )
@@ -111,10 +114,16 @@ class PairedMetricsTests(unittest.TestCase):
             self.assertEqual(result["metrics"][metric]["treatment"], NOT_AVAILABLE)
             self.assertEqual(result["metrics"][metric]["delta"], NOT_AVAILABLE)
 
-    def test_pairing_key_mismatch_and_duplicate_are_rejected(self) -> None:
+    def test_profile_is_a_comparison_dimension_not_a_pairing_key(self) -> None:
         baseline = _run("baseline-3")
         treatment = _run("treatment-3")
         treatment["profile"] = "other-profile"
+        result = compare_pair(baseline, treatment)
+        self.assertEqual(result["pairing_key"]["case_id"], "case-alpha")
+        self.assertEqual(result["baseline"]["profile"], "native-profile")
+        self.assertEqual(result["treatment"]["profile"], "other-profile")
+
+        treatment["environment_hash"] = "sha256:" + "b" * 64
         with self.assertRaisesRegex(PairingError, "pairing key"):
             compare_pair(baseline, treatment)
 

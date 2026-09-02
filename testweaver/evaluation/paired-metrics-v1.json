@@ -26,8 +26,9 @@
       "const": [
         "case_id",
         "input_hash",
+        "golden_revision",
         "budget_hash",
-        "profile",
+        "environment_hash",
         "repetition"
       ]
     },
@@ -127,6 +128,7 @@
       "additionalProperties": false,
       "required": [
         "run_id",
+        "profile",
         "frozen",
         "receipt_ref",
         "manifest_ref",
@@ -134,6 +136,9 @@
       ],
       "properties": {
         "run_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "profile": {
           "$ref": "#/$defs/Identifier"
         },
         "frozen": {
@@ -160,8 +165,9 @@
       "required": [
         "case_id",
         "input_hash",
+        "golden_revision",
         "budget_hash",
-        "profile",
+        "environment_hash",
         "repetition"
       ],
       "properties": {
@@ -171,11 +177,14 @@
         "input_hash": {
           "$ref": "#/$defs/Hash"
         },
+        "golden_revision": {
+          "$ref": "#/$defs/Identifier"
+        },
         "budget_hash": {
           "$ref": "#/$defs/Hash"
         },
-        "profile": {
-          "$ref": "#/$defs/Identifier"
+        "environment_hash": {
+          "$ref": "#/$defs/Hash"
         },
         "repetition": {
           "type": "integer",

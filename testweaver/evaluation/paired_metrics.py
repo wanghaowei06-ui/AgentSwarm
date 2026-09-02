@@ -17,7 +17,14 @@ from testweaver.contracts.validator import canonical_hash
 
 NOT_AVAILABLE = "NOT_AVAILABLE"
 SCHEMA_VERSION = "testweaver.m3.paired-comparison/v1"
-PAIRING_FIELDS = ("case_id", "input_hash", "budget_hash", "profile", "repetition")
+PAIRING_FIELDS = (
+    "case_id",
+    "input_hash",
+    "golden_revision",
+    "budget_hash",
+    "environment_hash",
+    "repetition",
+)
 METRIC_NAMES = (
     "quality",
     "duplicate_work_rate",
@@ -56,7 +63,9 @@ _RUN_FIELDS = frozenset(
         "run_id",
         "case_id",
         "input_hash",
+        "golden_revision",
         "budget_hash",
+        "environment_hash",
         "profile",
         "repetition",
         "frozen",
@@ -143,7 +152,9 @@ def _validate_run(label: str, run: Mapping[str, Any]) -> dict[str, Any]:
     _require_identifier(normalized["run_id"], f"{label}.run_id")
     _require_identifier(normalized["case_id"], f"{label}.case_id")
     _require_hash(normalized["input_hash"], f"{label}.input_hash")
+    _require_identifier(normalized["golden_revision"], f"{label}.golden_revision")
     _require_hash(normalized["budget_hash"], f"{label}.budget_hash")
+    _require_hash(normalized["environment_hash"], f"{label}.environment_hash")
     _require_identifier(normalized["profile"], f"{label}.profile")
     if type(normalized["repetition"]) is not int or normalized["repetition"] < 1:
         raise PairingError(f"{label}.repetition must be a positive integer")
@@ -261,6 +272,7 @@ def _pair_result(
 def _run_projection(run: Mapping[str, Any]) -> dict[str, Any]:
     return {
         "run_id": run["run_id"],
+        "profile": run["profile"],
         "frozen": True,
         "receipt_ref": dict(run["receipt_ref"]),
         "manifest_ref": dict(run["manifest_ref"]),
