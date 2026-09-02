@@ -1,0 +1,167 @@
+{
+  "schema": "testweaver.m2g.hero-observation-receipt.v2",
+  "run_id": "m2g-hero-bailian-20260902-02",
+  "classification": "FAIL",
+  "status": "DSH_PROTECTED_REFERENCE_UNAVAILABLE",
+  "review_mode": "independent_read_only_exact_run",
+  "old_receipt": {
+    "commit": "fa76e96",
+    "path": "testweaver/evidence/m2g/m2g-hero-bailian-20260902-02/receipt.json",
+    "sha256": "6d6096f09d8c18086153b590e3e8b44984112242abf9ea28186ce78726ad4a1a",
+    "disposition": "INVALIDATED_BY_INCOMPLETE_OBSERVATION",
+    "bytes_changed": false
+  },
+  "input_verification": {
+    "status": "OBSERVED",
+    "gold_free": true,
+    "sandboxed": true,
+    "input_root": "global-shared/cases/openworker-pr161/v1/",
+    "file_count": 5,
+    "source": "/root/agentteams-native-m0-20260901-manager/m2g-hero/m2g-hero-bailian-20260902-02/evidence/baseline-hashes.json",
+    "files": {
+      "LICENSE": "b874c49d0408b72b87638e9cab1349c12d9525e924d2e625525095430b88f449",
+      "inbox_routing_vulnerable.py": "9170af275ab252b338651dd1dc5d357ad1f3a54525ad94f86942f16f8005e519",
+      "inbox_routing_fixed.py": "1a75dad625fdb6c9257b3d9225175042579c6a8712d40532aed7e37f3431c98e",
+      "public-inputs-v1.json": "16b17b27561d9c863578b23d47acddd0c98f58f73e8e30c192b6625104686572",
+      "manifest-v1.json": "99179f8e4483dd66906d30d1c1d8dff5c65ddb9ef2896952cc558673e3e184fa"
+    },
+    "expected_match": true
+  },
+  "manager": {
+    "human_initial": {
+      "count": 1,
+      "event_id": "$jAnw2e11d9dTgoYwmOZm8P-LmaeVOQyzUkm2_M8frHo",
+      "room_id": "!sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080",
+      "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+      "origin_server_ts": 1788336306819,
+      "type": "m.room.message",
+      "body_length": 1060,
+      "body_sha256": "27501a1ae6c1d400990d9852060982b5ffe9c9a5dda9aa3c03e0c6a2a63dd548",
+      "body_stored": false
+    },
+    "dynamic_choice": {
+      "status": "OBSERVED",
+      "team": "native-m0-clean-team",
+      "leader": "native-m0-clean-leader",
+      "event": {
+        "event_id": "$DsznnASAwyXuGDhu4cZ_-o8kc_kOXAs2-oiAjR-0XlU",
+        "room_id": "!sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080",
+        "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788336413213,
+        "type": "m.room.message",
+        "body_length": 527,
+        "body_sha256": "e6af2baee8fa1f38cec31d54399600a80ea7bdc3f6e5dcef8d2015eca2b64392",
+        "body_stored": false
+      }
+    },
+    "model_turn": {
+      "status": "OBSERVED",
+      "source": "Manager raw log exact run/task filter",
+      "provider": "NOT_OBSERVED",
+      "model": "NOT_OBSERVED",
+      "usage": "NOT_OBSERVED",
+      "latency": "NOT_OBSERVED"
+    },
+    "global_task_meta": {
+      "status": "assigned",
+      "task_id": "m2g-hero-bailian-20260902-02-20260902T080625Z",
+      "assigned_to": "native-m0-clean-leader",
+      "delegated_to_team": "native-m0-clean-team",
+      "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+      "source": [
+        "/root/agentteams-native-m0-20260901-manager/state.json",
+        "shared/tasks/m2g-hero-bailian-20260902-02-20260902T080625Z/meta.json"
+      ]
+    },
+    "manager_model_provider_usage_latency": "NOT_OBSERVED",
+    "second_decision": "NOT_OBSERVED"
+  },
+  "native_lifecycle": {
+    "team_project": {
+      "status": "OBSERVED",
+      "project_id": "m2g-hero-bailian-20260902-02-20260902T080625Z",
+      "plan_type": "dag",
+      "source_room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+      "task_status": "assigned",
+      "task_assigned_to": "native-m0-clean-dsh-worker",
+      "source": "/root/agentteams-fs/teams/native-m0-clean-team/shared/projects/m2g-hero-bailian-20260902-02-20260902T080625Z/meta.json"
+    },
+    "leader_delegation": {
+      "status": "OBSERVED",
+      "actor": "native-m0-clean-leader",
+      "target": "native-m0-clean-dsh-worker",
+      "task_id": "m2g-hero-bailian-20260902-20260902T080625Z",
+      "task_room_id": "!zAKn5Q55zC2aMSvZ4W:matrix-native-m0-20260901.agentteams.local:28080",
+      "event": {
+        "event_id": "$GswEh3FULBHlcEGTL2WYJKJ0DKVx7Wd3PzigREB3n-M",
+        "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+        "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788336510284,
+        "type": "m.room.message",
+        "body_length": 1236,
+        "body_sha256": "5912d24874a8c67b46fcd1c7b042a641bd0487e5a0024be5c1411af01bad7326",
+        "body_stored": false,
+        "marker": "testweaver-native-worker__native_worker_execute"
+      }
+    },
+    "worker_ack": "NOT_OBSERVED",
+    "native_worker_execute": {
+      "status": "OBSERVED_FAILED",
+      "result_ok": false,
+      "error": "endpoint protected reference is unavailable",
+      "provider_called": false,
+      "source": "exact assignment reference plus DSH result artifact",
+      "body_stored": false
+    },
+    "dsh_provider_call": {
+      "status": "NOT_OBSERVED",
+      "provider_called": false,
+      "provider": "NOT_OBSERVED",
+      "model": "NOT_OBSERVED",
+      "usage": "NOT_OBSERVED",
+      "latency": "NOT_OBSERVED"
+    },
+    "task_projection": {
+      "status": "OBSERVED",
+      "source": "/root/agentteams-fs/teams/native-m0-clean-team/shared/tasks/m2g-hero-bailian-20260902-02-20260902T080625Z/meta.json",
+      "task_status": "submitted",
+      "result_status": "SUCCESS",
+      "result_path": "shared/tasks/m2g-hero-bailian-20260902-02-20260902T080625Z/result.md",
+      "raw_lifecycle_event": "NOT_OBSERVED",
+      "interpretation": "projection_only; not acceptance"
+    },
+    "submit": "NOT_OBSERVED",
+    "check": "NOT_OBSERVED",
+    "accept": "NOT_OBSERVED"
+  },
+  "result_artifact": {
+    "path": "/root/agentteams-fs/teams/native-m0-clean-team/shared/tasks/m2g-hero-bailian-20260902-02-20260902T080625Z/result.md",
+    "bytes": 4435,
+    "sha256": "1cd2342c4a87e91a50b6ecfba9043c632c8a7878a087d1d9e7601f032e561a22",
+    "body_stored": false,
+    "error_marker": "endpoint protected reference is unavailable",
+    "provider_called": false,
+    "usage_marker_present": true,
+    "submit_marker_present": false,
+    "check_marker_present": false,
+    "accept_marker_present": false
+  },
+  "sources": [
+    "docker logs: agentteams-native-m0-20260901-manager (exact run/task filter; body not retained)",
+    "docker logs: native-m0-clean-leader (exact run/task filter; body not retained)",
+    "docker logs: native-m0-clean-dsh-worker (exact run/task filter; body not retained)",
+    "Manager persisted Matrix sync: exact run event filter; event bodies not retained",
+    "/root/agentteams-native-m0-20260901-manager/state.json",
+    "/root/agentteams-native-m0-20260901-manager/m2g-hero/m2g-hero-bailian-20260902-02/evidence/baseline-hashes.json",
+    "/root/agentteams-fs/teams/native-m0-clean-team/shared/projects/.../meta.json",
+    "/root/agentteams-fs/teams/native-m0-clean-team/shared/tasks/.../meta.json",
+    "/root/agentteams-fs/teams/native-m0-clean-team/shared/tasks/.../result.md"
+  ],
+  "security": {
+    "event_bodies": "not stored",
+    "result_body": "not stored",
+    "prompt_and_response_body": "not stored",
+    "credentials": "not read or stored",
+    "secret_scan": "PASS"
+  }
+}

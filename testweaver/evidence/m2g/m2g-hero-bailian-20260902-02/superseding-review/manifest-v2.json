@@ -1,0 +1,71 @@
+{
+  "schema": "testweaver.m2g.hero-observation-manifest.v2",
+  "run_id": "m2g-hero-bailian-20260902-02",
+  "classification": "FAIL",
+  "status": "DSH_PROTECTED_REFERENCE_UNAVAILABLE",
+  "receipt": {
+    "path": "receipt-v2.json",
+    "sha256": "c3eaee93732101ed4f5c8047263defe3f46820845cfb711101522c12115d2cda"
+  },
+  "supersedes": {
+    "commit": "fa76e96",
+    "path": "../receipt.json",
+    "sha256": "6d6096f09d8c18086153b590e3e8b44984112242abf9ea28186ce78726ad4a1a",
+    "disposition": "INVALIDATED_BY_INCOMPLETE_OBSERVATION",
+    "original_bytes_preserved": true
+  },
+  "verified_facts": [
+    "five Gold-free input hashes match the run-scoped baseline",
+    "Manager dynamically selected native-m0-clean-team and native-m0-clean-leader",
+    "global task metadata is assigned to native-m0-clean-leader",
+    "team-scoped project metadata is active and assigns the task to native-m0-clean-dsh-worker",
+    "Leader assignment contains the testweaver-native-worker__native_worker_execute marker",
+    "DSH result artifact records ok=false and endpoint protected reference is unavailable",
+    "DSH result artifact records provider_called=false"
+  ],
+  "not_observed": [
+    "Bailian provider call",
+    "provider/model/usage/latency telemetry",
+    "raw submit lifecycle event",
+    "Leader check",
+    "Leader accept",
+    "Manager second decision"
+  ],
+  "projection_note": {
+    "team_task_meta_status": "submitted",
+    "team_task_meta_result_status": "SUCCESS",
+    "raw_submit_event": "NOT_OBSERVED",
+    "interpretation": "metadata projection retained as a fact; it does not establish raw submit, check, accept, or success"
+  },
+  "artifact_hashes": {
+    "dsh_result.md": {
+      "path": "/root/agentteams-fs/teams/native-m0-clean-team/shared/tasks/m2g-hero-bailian-20260902-02-20260902T080625Z/result.md",
+      "bytes": 4435,
+      "sha256": "1cd2342c4a87e91a50b6ecfba9043c632c8a7878a087d1d9e7601f032e561a22"
+    }
+  },
+  "source_index": [
+    "Manager raw log, exact run/task filter; bodies not retained",
+    "Leader raw log, exact run/task filter; bodies not retained",
+    "DSH worker raw log, exact run/task filter; bodies not retained",
+    "Manager persisted Matrix sync, exact run filter; event bodies not retained",
+    "/root/agentteams-native-m0-20260901-manager/state.json",
+    "/root/agentteams-native-m0-20260901-manager/m2g-hero/m2g-hero-bailian-20260902-02/evidence/baseline-hashes.json",
+    "shared/tasks/m2g-hero-bailian-20260902-02-20260902T080625Z/meta.json",
+    "/root/agentteams-fs/teams/native-m0-clean-team/shared/projects/m2g-hero-bailian-20260902-02-20260902T080625Z/meta.json",
+    "/root/agentteams-fs/teams/native-m0-clean-team/shared/tasks/m2g-hero-bailian-20260902-02-20260902T080625Z/meta.json",
+    "/root/agentteams-fs/teams/native-m0-clean-team/shared/tasks/m2g-hero-bailian-20260902-02-20260902T080625Z/result.md"
+  ],
+  "integrity": {
+    "hash_algorithm": "sha256",
+    "event_bodies_stored": false,
+    "result_body_stored": false,
+    "credentials_read_or_stored": false,
+    "old_receipt_modified": false,
+    "files": [
+      "receipt-v2.json",
+      "manifest-v2.json",
+      "SHA256SUMS-v2"
+    ]
+  }
+}
