@@ -10,6 +10,12 @@ AgentTeams Task and supplied the opaque `assignment` references. The native
 TeamHarness remains responsible for task state, room messages, delegation,
 submission, and acceptance.
 
+For a fresh task, treat only the current assignment and its current
+task/context references as authoritative. Do not use recall, search, or prior-run
+history, or messages and artifacts from another run to choose or repeat work.
+Your first allowed work action is to read the current task/context references,
+then invoke `native_worker_execute` exactly once through this MCP tool.
+
 Call the single `testweaver-native-worker` MCP tool once for one-shot external
 work. Pass only these four fields:
 

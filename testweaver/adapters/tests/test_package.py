@@ -70,6 +70,17 @@ class PackageWiringTests(unittest.TestCase):
         self.assertIsNotNone(description)
         self.assertTrue(description.group(1).strip().strip('"').strip("'"))
 
+    def test_worker_system_and_skill_order_fresh_task_native_call(self) -> None:
+        system = (PACKAGE / "config/AGENTS.md").read_text(encoding="utf-8")
+        skill = (PACKAGE / "skills/testweaver-native-external-worker/SKILL.md").read_text(encoding="utf-8")
+        for content in (system, skill):
+            normalized = " ".join(content.split())
+            self.assertIn("current task/context references", normalized)
+            self.assertIn("prior-run history", normalized)
+            self.assertIn("native_worker_execute", normalized)
+            self.assertIn("first allowed work action", normalized)
+            self.assertNotRegex(content, r"(?i)m2g-|native-m0|room[_ -]?id\s*[:=]")
+
     def test_extension_build_is_immutable_and_dsh_package_is_fixed(self) -> None:
         dockerfile = (ROOT / "Dockerfile.qwenpaw").read_text(encoding="utf-8")
         script = ROOT / "build-qwenpaw-native-extension.sh"
