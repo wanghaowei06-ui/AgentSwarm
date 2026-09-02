@@ -1,0 +1,102 @@
+{
+  "schema": "testweaver.m2g.stageb.observation.v1",
+  "run_id": "m2g-stageb-20260902T041117Z-container",
+  "classification": "PARTIAL",
+  "status": "NOT_OBSERVED",
+  "filter": {
+    "run_id_exact": "m2g-stageb-20260902T041117Z-container",
+    "origin_server_ts_from": 1788322277616,
+    "body_persisted": false,
+    "runtime_mutated": false,
+    "messages_sent_after_initial": false
+  },
+  "human_initial": {
+    "status": "PASS",
+    "event_id": "$X9UCes2aMcQAQ0EIkI8_SjPXMDo_zaMKUD9VZHiHC5k",
+    "room_id": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+    "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+    "origin_server_ts": 1788322277616,
+    "type": "m.room.message",
+    "body_length": 2435,
+    "body_sha256": "6eb9a1aef0951973f17af9fa058152ce52b1f7464db83c1da557f8dde6ca3783"
+  },
+  "manager_native_response": {
+    "status": "PASS",
+    "event_id": "$sY_28fJlFyizC_F_jmklWAnCCoSORoPVLlIj4iLGB84",
+    "room_id": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+    "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+    "origin_server_ts": 1788322456724,
+    "type": "m.room.message",
+    "body_length": 1039,
+    "body_sha256": "76f14cf938954776fbd2d2c7c5a0a5ce0c300cf4754b4c0221bcacfa7d44decd",
+    "task_reference_seen": "task-20260902-041117-m2g-stageb"
+  },
+  "native_lifecycle": {
+    "manager_dynamic_choice": "NOT_OBSERVED",
+    "new_project": "NOT_OBSERVED",
+    "new_task_object": "NOT_OBSERVED",
+    "task_room": "NOT_OBSERVED",
+    "leader_assignment": "NOT_OBSERVED",
+    "worker_ack": "NOT_OBSERVED",
+    "submit": "NOT_OBSERVED",
+    "check": "NOT_OBSERVED",
+    "accept": "NOT_OBSERVED",
+    "manager_second_decision": "NOT_OBSERVED",
+    "assignment_event_ids": [],
+    "ack_event_ids": [],
+    "submit_event_ids": [],
+    "check_event_ids": [],
+    "accept_event_ids": []
+  },
+  "team_and_worker_readback": {
+    "team": {
+      "name": "native-m0-clean-team",
+      "phase": "Active",
+      "team_room_id": "!NbRmgvdkZMdRcCvLg4:matrix-native-m0-20260901.agentteams.local:28080"
+    },
+    "leader": {
+      "name": "native-m0-clean-leader",
+      "run_identity": "NOT_OBSERVED"
+    },
+    "worker": {
+      "name": "native-m0-clean-dsh-worker",
+      "role": "worker",
+      "runtime": "qwenpaw",
+      "phase": "Running",
+      "state": "Running",
+      "matrix_user_id": "@native-m0-clean-dsh-worker:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!t8ycL6WDpsGf9D0mGo:matrix-native-m0-20260901.agentteams.local:28080",
+      "image": "agentteams/qwenpaw-worker:m1plus-ae2d696-dsh-v2",
+      "run_assignment": "NOT_OBSERVED"
+    }
+  },
+  "heterogeneous_execution": {
+    "dsh_provider_call": "NOT_OBSERVED",
+    "provider": "NOT_OBSERVED",
+    "model": "NOT_OBSERVED",
+    "usage": "NOT_OBSERVED",
+    "latency": "NOT_OBSERVED",
+    "skill_or_tool_invoke": "NOT_OBSERVED"
+  },
+  "readback": {
+    "surface": "in-container Matrix client v3 room history",
+    "rooms_queried": [
+      "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+      "!NbRmgvdkZMdRcCvLg4:matrix-native-m0-20260901.agentteams.local:28080",
+      "!htUIJW5HXUYvFSIFW6:matrix-native-m0-20260901.agentteams.local:28080",
+      "!iEirWTQL9ft7JywW83:matrix-native-m0-20260901.agentteams.local:28080",
+      "!t8ycL6WDpsGf9D0mGo:matrix-native-m0-20260901.agentteams.local:28080"
+    ],
+    "http_statuses": [200],
+    "matched_event_count": 2,
+    "new_objects": "NOT_OBSERVED",
+    "bounded_observation_polls": 5,
+    "no_substitute_source": true
+  },
+  "security": {
+    "secret_values": "NOT_READ_OR_STORED",
+    "message_bodies": "NOT_STORED",
+    "prompts_and_results": "NOT_STORED",
+    "fixture_or_synthetic_substitution": false
+  }
+}

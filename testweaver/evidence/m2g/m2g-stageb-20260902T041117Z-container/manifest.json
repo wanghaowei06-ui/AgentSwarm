@@ -1,0 +1,23 @@
+{
+  "schema": "testweaver.m2g.stageb.manifest.v1",
+  "run_id": "m2g-stageb-20260902T041117Z-container",
+  "classification": "PARTIAL",
+  "receipt": "receipt.json",
+  "receipt_sha256": "25ea72ff50bb287558125469c962a7911e61a78f5ddcf4ca5e1bb6a516a18a01",
+  "evidence_scope": "exact run_id Matrix readback only; no body/prompt/result persisted",
+  "observed": [
+    "Human initial event",
+    "Manager native response event"
+  ],
+  "not_observed": [
+    "new native Project",
+    "new native Task object",
+    "Task room",
+    "Leader assignment",
+    "Worker ack",
+    "DSH provider/model/tool call",
+    "submit/check/accept",
+    "Manager second decision"
+  ],
+  "supplement": false
+}
