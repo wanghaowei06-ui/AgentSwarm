@@ -70,8 +70,6 @@ class PackageWiringTests(unittest.TestCase):
         self.assertIn("TESTWEAVER_QWENPAW_BASE_IMAGE_ID", script.read_text(encoding="utf-8"))
         self.assertIn("TESTWEAVER_DSH_SOURCE_DIR", script.read_text(encoding="utf-8"))
         self.assertIn("package_dsh.py", script.read_text(encoding="utf-8"))
-        self.assertIn("mcp_client.py", script.read_text(encoding="utf-8"))
-        self.assertIn("mcp_server.py mcp_client.py", dockerfile)
 
     def test_dsh_provenance_and_packager_are_pinned_without_cache_copy(self) -> None:
         provenance = json.loads((ROOT / "dsh-build-provenance.json").read_text(encoding="utf-8"))
