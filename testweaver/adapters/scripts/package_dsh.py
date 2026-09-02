@@ -21,6 +21,7 @@ EXPECTED_ENTRYPOINT_SHA256 = "c0226687bb20f45c603ec6fe50f3de16d1c3510c3a803304ec
 EXPECTED_CANONICAL_LOCK_SHA256 = "6177ec61bdb8194eb5a606813a62ffb0ab2cc7fdfe2cd6e0249dcbfe4bce58e0"
 EXPECTED_MATERIALIZED_LOCK_SHA256 = "b6f01683dca822848360087255d7847b4961afd2ad6e08cf6ed36a4d38daa377"
 EXPECTED_CACHE_SHA256 = "bf23d5e48eadc9468442f035afd90f1624b9c0ad6784a1809150512f7376c761"
+HEADLESS_PLUGIN_PACKAGE = "@deepseek-ai/dsh-llm"
 
 
 class PackageError(ValueError):
@@ -115,8 +116,63 @@ def instance_root(path: Path, pnpm_root: Path) -> Path | None:
     return None
 
 
-def collect(source: Path) -> tuple[dict[tuple[str, str], tuple[Path, dict[str, Any]]], list[tuple[str, str, str]]]:
+def _node_resolvable(root: Path, names: list[str]) -> set[str]:
+    if not names:
+        return set()
+    node = shutil.which("node")
+    if node is None:
+        raise PackageError("node is required for dependency resolution preflight")
+    script = (
+        "const root = process.argv[1];"
+        "const names = JSON.parse(process.argv[2]);"
+        "const resolved = [];"
+        "for (const name of names) {"
+        "  try { require.resolve(name, {paths: [root]}); resolved.push(name); }"
+        "  catch (_) {}"
+        "}"
+        "process.stdout.write(JSON.stringify(resolved));"
+    )
+    try:
+        completed = subprocess.run(
+            [node, "-e", script, str(root), json.dumps(names)],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise PackageError("dependency resolution preflight failed") from exc
+    if completed.returncode != 0:
+        raise PackageError("dependency resolution preflight failed")
+    try:
+        resolved = json.loads(completed.stdout)
+    except json.JSONDecodeError as exc:
+        raise PackageError("dependency resolution preflight failed") from exc
+    if not isinstance(resolved, list) or not all(isinstance(name, str) for name in resolved):
+        raise PackageError("dependency resolution preflight failed")
+    return set(resolved)
+
+
+def root_runtime_resolution(source: Path, package: dict[str, Any]) -> tuple[set[str], list[str]]:
+    names: set[str] = set()
+    for field in ("dependencies", "optionalDependencies", "devDependencies"):
+        values = package.get(field) or {}
+        if isinstance(values, dict):
+            names.update(values)
+    if HEADLESS_PLUGIN_PACKAGE not in names:
+        raise PackageError("headless plugin dependency is not declared")
+    resolved = _node_resolvable(source.resolve(), sorted(names))
+    if HEADLESS_PLUGIN_PACKAGE not in resolved:
+        raise PackageError("headless plugin dependency is not resolvable")
+    return resolved, sorted(names - resolved)
+
+
+def collect(
+    source: Path,
+    skip_root_names: set[str] | None = None,
+) -> tuple[dict[tuple[str, str], tuple[Path, dict[str, Any]]], list[tuple[str, str, str]]]:
     root = source.resolve()
+    skip_root_names = skip_root_names or set()
     queue = [(source / "package.json", "<root>")]
     seen: dict[tuple[str, str], tuple[Path, dict[str, Any]]] = {}
     missing: list[tuple[str, str, str]] = []
@@ -134,6 +190,8 @@ def collect(source: Path) -> tuple[dict[tuple[str, str], tuple[Path, dict[str, A
             if isinstance(values, dict):
                 dependencies.update({name: (field, spec) for name, spec in values.items()})
         for name, (field, _spec) in dependencies.items():
+            if package_dir == root and name in skip_root_names:
+                continue
             dependency = find_dependency(root, package_dir, name)
             if dependency is None:
                 missing.append((str(package.get("name")), field, name))
@@ -146,36 +204,18 @@ def collect(source: Path) -> tuple[dict[tuple[str, str], tuple[Path, dict[str, A
 
 
 def preflight_plugin_tree(output: Path, package: dict[str, Any] | None = None) -> None:
-    """Verify the packaged root can resolve its runtime module tree."""
+    """Verify the packaged root can resolve the headless plugin entrypoint."""
 
     root = output.resolve()
     package = package or manifest(root / "package.json")
-    names: set[str] = set()
+    declared = set()
     for field in ("dependencies", "devDependencies"):
         values = package.get(field) or {}
         if isinstance(values, dict):
-            names.update(name for name in values if not name.startswith("@types/"))
-    if not names:
-        return
-    node = shutil.which("node")
-    if node is None:
-        raise PackageError("node is required for the packaged plugin-tree preflight")
-    script = (
-        "const root = process.argv[1];"
-        "const names = JSON.parse(process.argv[2]);"
-        "for (const name of names) require.resolve(name, {paths: [root]});"
-    )
-    try:
-        completed = subprocess.run(
-            [node, "-e", script, str(root), json.dumps(sorted(names))],
-            capture_output=True,
-            text=True,
-            timeout=5,
-            check=False,
-        )
-    except (OSError, subprocess.TimeoutExpired) as exc:
-        raise PackageError("packaged plugin-tree preflight failed") from exc
-    if completed.returncode != 0:
+            declared.update(values)
+    if HEADLESS_PLUGIN_PACKAGE not in declared:
+        raise PackageError("headless plugin dependency is not declared")
+    if HEADLESS_PLUGIN_PACKAGE not in _node_resolvable(root, [HEADLESS_PLUGIN_PACKAGE]):
         raise PackageError("packaged plugin-tree preflight failed")
 
 
@@ -211,13 +251,15 @@ def remove_broken_symlinks(root: Path) -> None:
 
 def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) -> dict[str, Any]:
     validate_inputs(source, canonical_lock, provenance)
+    package = manifest(source / "package.json")
+    _resolved, skipped_unresolved = root_runtime_resolution(source, package)
     if output.exists():
         if not output.is_dir() or any(output.iterdir()):
             raise PackageError("output directory must be absent or empty")
     else:
         output.mkdir(parents=True)
 
-    seen, missing = collect(source)
+    seen, missing = collect(source, set(skipped_unresolved))
     pnpm_root = source / "node_modules" / ".pnpm"
     instances: dict[str, Path] = {}
     root_packages: dict[str, Path] = {}
@@ -246,13 +288,14 @@ def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) ->
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copytree(package_dir, destination, symlinks=True)
 
-    package = manifest(source / "package.json")
     direct: dict[str, Any] = {}
     for field in ("dependencies", "optionalDependencies", "devDependencies"):
         values = package.get(field) or {}
         if isinstance(values, dict):
             direct.update(values)
     for name in sorted(direct):
+        if name in skipped_unresolved:
+            continue
         source_link = source / "node_modules" / name
         destination = target_node_modules / name
         if source_link.is_symlink():
@@ -278,6 +321,7 @@ def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) ->
         "pnpm_instances": len(instances),
         "root_packages": len(root_packages),
         "missing_optional_or_peer": len(missing),
+        "skipped_unresolved": skipped_unresolved,
         "published_files": ["package.json", "lib", "config"],
         "node_modules_source_copied": False,
     }
