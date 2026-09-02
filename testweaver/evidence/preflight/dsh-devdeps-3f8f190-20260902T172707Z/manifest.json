@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "run_id": "dsh-devdeps-3f8f190-20260902T172707Z",
+  "status": "FAIL",
+  "classification": "PACKAGE_PREFLIGHT_PLUGIN_TREE_UNRESOLVED",
+  "files": ["receipt.json", "manifest.json", "SHA256SUMS"],
+  "predecessor": "357903c",
+  "source_commit": "3f8f190ae0592fc5cfbbcfca5c93acbf952df2af",
+  "artifact_scope": "hash-only; no model/provider response or protected value",
+  "secret_scan": "PASS_NO_VALUES",
+  "sha256": {
+    "receipt.json": "c2270c1f0781095a54809566587453c9a268d0119b6bed3dff702d7bcec02655",
+    "manifest.json": "SELF_EXCLUDED",
+    "SHA256SUMS": "SELF_EXCLUDED"
+  }
+}

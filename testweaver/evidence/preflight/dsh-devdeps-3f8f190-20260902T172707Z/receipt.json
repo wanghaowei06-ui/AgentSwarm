@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "run_id": "dsh-devdeps-3f8f190-20260902T172707Z",
+  "status": "FAIL",
+  "classification": "PACKAGE_PREFLIGHT_PLUGIN_TREE_UNRESOLVED",
+  "live_claim": false,
+  "predecessor_receipt_preserved": "testweaver/evidence/preflight/dsh-home-runtime-8cec101-20260902T170059Z/receipt.json",
+  "source": {
+    "commit": "3f8f190ae0592fc5cfbbcfca5c93acbf952df2af",
+    "paths": ["testweaver/adapters/scripts/package_dsh.py", "testweaver/adapters/tests/test_package.py"],
+    "tests": "55 adapter/package tests PASS"
+  },
+  "build": {
+    "official_entrypoint": "testweaver/adapters/build-qwenpaw-native-extension.sh",
+    "command": "TESTWEAVER_QWENPAW_BASE_IMAGE=agentteams/qwenpaw-worker:be10aaf TESTWEAVER_QWENPAW_BASE_IMAGE_ID=sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb TESTWEAVER_QWENPAW_IMAGE=agentteams/qwenpaw-worker:dsh-devdeps-3f8f190 TESTWEAVER_DSH_SOURCE_DIR=/root/projects/muti-agent/.testweaver/cache/g13-deepseek-runtime/dsh-package TESTWEAVER_DSH_LOCKFILE=/root/projects/muti-agent/artifacts/verification/g13/deepseek-harness-official-cache/pnpm-lock.yaml TESTWEAVER_DSH_PROVENANCE=/root/projects/muti-agent/artifacts/verification/g13/deepseek-harness-provenance.json bash testweaver/adapters/build-qwenpaw-native-extension.sh",
+    "tag_requested": "agentteams/qwenpaw-worker:dsh-devdeps-3f8f190",
+    "base_image": "agentteams/qwenpaw-worker:be10aaf",
+    "base_image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+    "result": "FAIL_BEFORE_DOCKER_BUILD",
+    "candidate_image_exists": false,
+    "failure": {
+      "class": "PackageError",
+      "sanitized_message": "packaged plugin-tree preflight failed",
+      "runtime_dependency_count": 74,
+      "resolved_count": 71,
+      "unresolved_modules": [
+        "@deepseek-ai/dsh-client-ui-agent-preset",
+        "@deepseek-ai/dsh-client-ui-cordis",
+        "@deepseek-ai/dsh-cordis-client-runner"
+      ],
+      "dsh_llm_root_link": true
+    }
+  },
+  "runtime": {
+    "image_update_attempted": false,
+    "provider_probe_attempted": false,
+    "current_worker_unchanged": true,
+    "current_worker_image": "agentteams/qwenpaw-worker:dsh-home-runtime-8cec101",
+    "current_worker_phase": "Running",
+    "current_worker_model": "deepseek-v4-flash",
+    "current_worker_runtime": "qwenpaw",
+    "current_worker_team": "native-m0-clean-team"
+  },
+  "scope": {
+    "docker_image_built": false,
+    "worker_updated": false,
+    "provider_called": false,
+    "hero_run": false,
+    "old_failure_receipt_changed": false
+  },
+  "secret_policy": {
+    "protected_values_read": false,
+    "protected_values_persisted": false,
+    "protected_values_logged": false,
+    "protected_values_hashed": false,
+    "protected_values_in_argv": false,
+    "protected_values_in_receipt": false,
+    "model_or_provider_response_recorded": false
+  },
+  "next_blocker": "The fixed package materialization lacks three root-resolvable runtime module links; no further build or runtime retry was performed."
+}
