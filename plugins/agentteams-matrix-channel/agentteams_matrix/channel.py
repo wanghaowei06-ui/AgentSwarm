@@ -14,6 +14,7 @@ import mimetypes
 import os
 import random
 import re
+import sqlite3
 import time
 import urllib.parse
 from uuid import uuid4
@@ -90,6 +91,10 @@ TASK_ROOM_CACHE_TTL_MS = 30_000
 MATRIX_EVENT_PROTOCOL_LIMIT_BYTES = 64 * 1024
 MATRIX_TEXT_EVENT_SAFE_BYTES = (MATRIX_EVENT_PROTOCOL_LIMIT_BYTES * 3) // 4
 MATRIX_TEXT_EVENT_FALLBACK_BUDGET_BYTES = MATRIX_TEXT_EVENT_SAFE_BYTES - 1024
+MATRIX_EVENT_CLAIM_RETENTION_S = 7 * 24 * 60 * 60
+MATRIX_EVENT_CLAIM_MAX_ROWS = 10_000
+MATRIX_EVENT_CLAIM_TIMEOUT_S = 5.0
+MATRIX_EVENT_CLAIM_DB_NAME = "matrix-event-claims.sqlite3"
 MATRIX_LONG_MESSAGE_METADATA_KEY = "com.agentteams.long_message"
 TEAMHARNESS_TRIGGER_CONTENT_KEY = "m.teamharness.trigger"
 TEAMHARNESS_SELF_TRIGGER_TYPES = frozenset({"PROJECT_REQUESTED"})
@@ -433,6 +438,73 @@ class AgentTeamsMatrixChannel(BaseChannel):
                 return f"matrix:{room_id}"
             return payload.get("sender_id") or ""
         return getattr(payload, "session_id", "") or ""
+
+    def _event_claim_store_path(self) -> Path:
+        root = self._workspace_dir or Path(WORKING_DIR)
+        return Path(root) / ".agentteams" / MATRIX_EVENT_CLAIM_DB_NAME
+
+    def _claim_matrix_event(self, room_id: Any, event_id: Any) -> bool:
+        """Atomically claim a Matrix event before any inbound side effect.
+
+        Each overlapping workspace instance points at the same workspace-local
+        SQLite file. The primary key makes the claim atomic across processes;
+        age and row-count pruning keep this inbox marker bounded.
+        """
+        room = str(room_id or "").strip()
+        event = str(event_id or "").strip()
+        if not event:
+            return True
+
+        path = self._event_claim_store_path()
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            with sqlite3.connect(path, timeout=MATRIX_EVENT_CLAIM_TIMEOUT_S) as db:
+                db.execute("PRAGMA busy_timeout = 5000")
+                db.execute("BEGIN IMMEDIATE")
+                db.execute(
+                    """
+                    CREATE TABLE IF NOT EXISTS matrix_event_claims (
+                        room_id TEXT NOT NULL,
+                        event_id TEXT NOT NULL,
+                        claimed_at REAL NOT NULL,
+                        PRIMARY KEY (room_id, event_id)
+                    )
+                    """,
+                )
+                now = time.time()
+                db.execute(
+                    "DELETE FROM matrix_event_claims WHERE claimed_at < ?",
+                    (now - MATRIX_EVENT_CLAIM_RETENTION_S,),
+                )
+                inserted = db.execute(
+                    """
+                    INSERT OR IGNORE INTO matrix_event_claims
+                        (room_id, event_id, claimed_at)
+                    VALUES (?, ?, ?)
+                    """,
+                    (room, event, now),
+                ).rowcount
+                db.execute(
+                    """
+                    DELETE FROM matrix_event_claims
+                    WHERE rowid IN (
+                        SELECT rowid FROM matrix_event_claims
+                        ORDER BY claimed_at ASC, rowid ASC
+                        LIMIT -1 OFFSET ?
+                    )
+                    """,
+                    (MATRIX_EVENT_CLAIM_MAX_ROWS,),
+                )
+                return inserted == 1
+        except (OSError, sqlite3.Error) as exc:
+            logger.error(
+                "MatrixChannel: event claim unavailable; dropping event "
+                "for safety room=%s event_id=%s error_type=%s",
+                room,
+                event,
+                type(exc).__name__,
+            )
+            return False
 
     # ------------------------------------------------------------------
     # Factory — from_config / from_env
@@ -2669,6 +2741,9 @@ class AgentTeamsMatrixChannel(BaseChannel):
         if self._is_channel_disabled(sender_id, room_id, is_dm):
             return
 
+        if not self._claim_matrix_event(room_id, getattr(event, "event_id", "")):
+            return
+
         if teamharness_self_trigger is None and _is_teamharness_tool_display(text):
             logger.info(
                 "MatrixChannel: skipping TeamHarness tool display event "
@@ -2827,6 +2902,9 @@ class AgentTeamsMatrixChannel(BaseChannel):
         is_dm = await self._is_dm_room(room_id, sender_id, room)
 
         if self._is_channel_disabled(sender_id, room_id, is_dm):
+            return
+
+        if not self._claim_matrix_event(room_id, getattr(event, "event_id", "")):
             return
 
         is_thread_event = self._is_thread_event(event)

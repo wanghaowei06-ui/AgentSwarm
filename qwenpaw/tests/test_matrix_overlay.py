@@ -1,9 +1,12 @@
 from pathlib import Path
 import ast
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
 import importlib.util
 import json
+import sqlite3
 import sys
+import tempfile
 import types
 from types import SimpleNamespace
 
@@ -914,6 +917,7 @@ def _make_inbound_channel(command_registry=True):
     channel.group_disabled = False
     channel.groups = {}
     channel.history_limit = 50
+    channel._workspace_dir = Path(tempfile.mkdtemp(prefix="matrix-overlay-test-"))
     channel._room_histories = {}
     if command_registry:
         channel._command_registry = _FakeCommandRegistry()
@@ -1295,3 +1299,131 @@ def test_matrix_control_command_requires_mention_in_group() -> None:
     asyncio.run(channel._on_room_event(_FakeInboundRoom(), _matrix_event("/approve")))
 
     assert len(channel.enqueued) == 0
+
+
+def _prepare_event_claim_channel(tmp_path):
+    channel = _make_inbound_channel()
+    channel._workspace_dir = tmp_path
+    return channel
+
+
+def _dispatch_inbound_event(channel, event) -> None:
+    asyncio.run(channel._on_room_event(_FakeInboundRoom(), event))
+
+
+def test_matrix_same_event_is_enqueued_once_across_workspace_instances(tmp_path) -> None:
+    first = _prepare_event_claim_channel(tmp_path)
+    second = _prepare_event_claim_channel(tmp_path)
+    event = _matrix_event_from(
+        "@teamleader:hs.local",
+        "@copywriting-assistant:hs.local REVISION_REQUESTED",
+        event_id="$same-event",
+    )
+
+    _dispatch_inbound_event(first, event)
+    _dispatch_inbound_event(second, event)
+
+    assert len(first.enqueued) + len(second.enqueued) == 1
+
+
+def test_matrix_event_claim_survives_channel_restart(tmp_path) -> None:
+    first = _prepare_event_claim_channel(tmp_path)
+    event = _matrix_event_from(
+        "@teamleader:hs.local",
+        "@copywriting-assistant:hs.local REVISION_REQUESTED",
+        event_id="$restart-event",
+    )
+
+    _dispatch_inbound_event(first, event)
+
+    restarted = _prepare_event_claim_channel(tmp_path)
+    _dispatch_inbound_event(restarted, event)
+
+    assert len(first.enqueued) == 1
+    assert restarted.enqueued == []
+
+
+def test_matrix_distinct_events_are_each_enqueued(tmp_path) -> None:
+    channel = _prepare_event_claim_channel(tmp_path)
+
+    _dispatch_inbound_event(
+        channel,
+        _matrix_event_from(
+            "@teamleader:hs.local",
+            "@copywriting-assistant:hs.local REVISION_REQUESTED one",
+            event_id="$event-one",
+        ),
+    )
+    _dispatch_inbound_event(
+        channel,
+        _matrix_event_from(
+            "@teamleader:hs.local",
+            "@copywriting-assistant:hs.local REVISION_REQUESTED two",
+            event_id="$event-two",
+        ),
+    )
+
+    assert len(channel.enqueued) == 2
+
+
+def test_matrix_same_event_id_in_different_rooms_is_not_deduplicated(tmp_path) -> None:
+    channel = _prepare_event_claim_channel(tmp_path)
+    first_room = _FakeInboundRoom()
+    first_room.room_id = "!first:hs.local"
+    second_room = _FakeInboundRoom()
+    second_room.room_id = "!second:hs.local"
+    event = _matrix_event_from(
+        "@teamleader:hs.local",
+        "@copywriting-assistant:hs.local REVISION_REQUESTED same-id",
+        event_id="$same-id",
+    )
+
+    asyncio.run(channel._on_room_event(first_room, event))
+    asyncio.run(channel._on_room_event(second_room, event))
+
+    assert len(channel.enqueued) == 2
+
+
+def test_matrix_missing_event_id_preserves_existing_enqueue_behavior(tmp_path) -> None:
+    first = _prepare_event_claim_channel(tmp_path)
+    second = _prepare_event_claim_channel(tmp_path)
+    event = _matrix_event_from(
+        "@teamleader:hs.local",
+        "@copywriting-assistant:hs.local REVISION_REQUESTED without-id",
+        event_id="",
+    )
+
+    _dispatch_inbound_event(first, event)
+    _dispatch_inbound_event(second, event)
+
+    assert len(first.enqueued) + len(second.enqueued) == 2
+
+
+def test_matrix_concurrent_same_event_claims_only_once(tmp_path) -> None:
+    channels = [
+        _prepare_event_claim_channel(tmp_path),
+        _prepare_event_claim_channel(tmp_path),
+    ]
+    event = _matrix_event_from(
+        "@teamleader:hs.local",
+        "@copywriting-assistant:hs.local REVISION_REQUESTED concurrent",
+        event_id="$concurrent-event",
+    )
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        list(executor.map(lambda channel: _dispatch_inbound_event(channel, event), channels))
+
+    assert sum(len(channel.enqueued) for channel in channels) == 1
+
+
+def test_matrix_event_claim_store_prunes_to_bounded_size(tmp_path, monkeypatch) -> None:
+    channel = _prepare_event_claim_channel(tmp_path)
+    module = sys.modules[channel.__class__.__module__]
+    monkeypatch.setattr(module, "MATRIX_EVENT_CLAIM_MAX_ROWS", 2)
+
+    for index in range(3):
+        assert channel._claim_matrix_event("!room:hs.local", f"$bounded-{index}")
+
+    with sqlite3.connect(channel._event_claim_store_path()) as db:
+        count = db.execute("SELECT COUNT(*) FROM matrix_event_claims").fetchone()[0]
+    assert count == 2
