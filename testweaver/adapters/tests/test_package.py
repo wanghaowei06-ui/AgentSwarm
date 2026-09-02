@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 import subprocess
 import tempfile
+from unittest import mock
 import unittest
 
 
@@ -32,6 +33,108 @@ class PackageWiringTests(unittest.TestCase):
             module.remove_broken_symlinks(root)
             self.assertTrue((root / "inside-link").is_symlink())
             self.assertFalse((root / "source-link").exists())
+
+    def test_collect_tracks_root_dev_dependency_for_runtime_plugin(self) -> None:
+        source = ROOT / "scripts/package_dsh.py"
+        spec = importlib.util.spec_from_file_location("package_dsh", source)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "runtime"
+            instance = root / "node_modules/.pnpm/@deepseek-ai+dsh-llm@fixture/node_modules/@deepseek-ai/dsh-llm"
+            instance.mkdir(parents=True)
+            (instance / "package.json").write_text(
+                json.dumps({"name": "@deepseek-ai/dsh-llm", "version": "fixture"}),
+                encoding="utf-8",
+            )
+            (root / "node_modules/@deepseek-ai").mkdir(parents=True)
+            (root / "node_modules/@deepseek-ai/dsh-llm").symlink_to(
+                "../.pnpm/@deepseek-ai+dsh-llm@fixture/node_modules/@deepseek-ai/dsh-llm",
+                target_is_directory=True,
+            )
+            (root / "package.json").write_text(
+                json.dumps(
+                    {
+                        "name": "@deepseek-ai/dsh",
+                        "devDependencies": {"@deepseek-ai/dsh-llm": "workspace:^"},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            seen, _missing = module.collect(root)
+            names = {package.get("name") for _path, package in seen.values()}
+            self.assertIn("@deepseek-ai/dsh-llm", names)
+
+    def test_packaged_runtime_links_root_dev_dependency_and_resolves(self) -> None:
+        source = ROOT / "scripts/package_dsh.py"
+        spec = importlib.util.spec_from_file_location("package_dsh", source)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        with tempfile.TemporaryDirectory() as temporary:
+            source_root = Path(temporary) / "source"
+            output = Path(temporary) / "output"
+            instance = source_root / "node_modules/.pnpm/@deepseek-ai+dsh-llm@fixture/node_modules/@deepseek-ai/dsh-llm"
+            instance.mkdir(parents=True)
+            (instance / "package.json").write_text(
+                json.dumps(
+                    {
+                        "name": "@deepseek-ai/dsh-llm",
+                        "version": "fixture",
+                        "main": "lib/index.js",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (instance / "lib").mkdir()
+            (instance / "lib/index.js").write_text("module.exports = {};\n", encoding="utf-8")
+            (source_root / "node_modules/@deepseek-ai").mkdir(parents=True)
+            (source_root / "node_modules/@deepseek-ai/dsh-llm").symlink_to(
+                "../.pnpm/@deepseek-ai+dsh-llm@fixture/node_modules/@deepseek-ai/dsh-llm",
+                target_is_directory=True,
+            )
+            (source_root / "package.json").write_text(
+                json.dumps(
+                    {
+                        "name": "@deepseek-ai/dsh",
+                        "devDependencies": {"@deepseek-ai/dsh-llm": "workspace:^"},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (source_root / "lib").mkdir()
+            (source_root / "lib/bin.js").write_text("module.exports = {};\n", encoding="utf-8")
+            (source_root / "config").mkdir()
+            with mock.patch.object(module, "validate_inputs", return_value={}):
+                module.build(source_root, output, Path("/unused/lock"), Path("/unused/provenance"))
+            link = output / "node_modules/@deepseek-ai/dsh-llm"
+            self.assertTrue(link.is_symlink())
+            module.preflight_plugin_tree(output)
+
+    def test_plugin_tree_preflight_rejects_missing_root_dev_dependency(self) -> None:
+        source = ROOT / "scripts/package_dsh.py"
+        spec = importlib.util.spec_from_file_location("package_dsh", source)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / "output"
+            (output / "node_modules").mkdir(parents=True)
+            (output / "package.json").write_text(
+                json.dumps(
+                    {
+                        "name": "@deepseek-ai/dsh",
+                        "devDependencies": {"@deepseek-ai/dsh-llm": "workspace:^"},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(module.PackageError, "plugin-tree"):
+                module.preflight_plugin_tree(output)
 
     def test_agentspec_package_uses_official_skill_and_stdio_shape(self) -> None:
         manifest = json.loads((PACKAGE / "manifest.json").read_text(encoding="utf-8"))

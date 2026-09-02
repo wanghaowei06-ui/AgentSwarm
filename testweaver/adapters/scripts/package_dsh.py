@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import subprocess
 from typing import Any
 
 
@@ -128,7 +129,7 @@ def collect(source: Path) -> tuple[dict[tuple[str, str], tuple[Path, dict[str, A
             continue
         seen[key] = (package_dir, package)
         dependencies: dict[str, Any] = {}
-        for field in ("dependencies", "optionalDependencies", "peerDependencies"):
+        for field in ("dependencies", "optionalDependencies", "peerDependencies", "devDependencies"):
             values = package.get(field) or {}
             if isinstance(values, dict):
                 dependencies.update({name: (field, spec) for name, spec in values.items()})
@@ -142,6 +143,40 @@ def collect(source: Path) -> tuple[dict[tuple[str, str], tuple[Path, dict[str, A
     if required:
         raise PackageError(f"required dependency is absent: {required[0][2]}")
     return seen, missing
+
+
+def preflight_plugin_tree(output: Path, package: dict[str, Any] | None = None) -> None:
+    """Verify the packaged root can resolve its runtime module tree."""
+
+    root = output.resolve()
+    package = package or manifest(root / "package.json")
+    names: set[str] = set()
+    for field in ("dependencies", "devDependencies"):
+        values = package.get(field) or {}
+        if isinstance(values, dict):
+            names.update(name for name in values if not name.startswith("@types/"))
+    if not names:
+        return
+    node = shutil.which("node")
+    if node is None:
+        raise PackageError("node is required for the packaged plugin-tree preflight")
+    script = (
+        "const root = process.argv[1];"
+        "const names = JSON.parse(process.argv[2]);"
+        "for (const name of names) require.resolve(name, {paths: [root]});"
+    )
+    try:
+        completed = subprocess.run(
+            [node, "-e", script, str(root), json.dumps(sorted(names))],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise PackageError("packaged plugin-tree preflight failed") from exc
+    if completed.returncode != 0:
+        raise PackageError("packaged plugin-tree preflight failed")
 
 
 def remove_broken_symlinks(root: Path) -> None:
@@ -213,7 +248,7 @@ def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) ->
 
     package = manifest(source / "package.json")
     direct: dict[str, Any] = {}
-    for field in ("dependencies", "optionalDependencies"):
+    for field in ("dependencies", "optionalDependencies", "devDependencies"):
         values = package.get(field) or {}
         if isinstance(values, dict):
             direct.update(values)
@@ -236,6 +271,7 @@ def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) ->
         self_link.parent.mkdir(parents=True, exist_ok=True)
         os.symlink(os.path.relpath(output, self_link.parent), self_link)
     remove_broken_symlinks(output)
+    preflight_plugin_tree(output, package)
     return {
         "package": "@deepseek-ai/dsh",
         "version": EXPECTED_VERSION,
