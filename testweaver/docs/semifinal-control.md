@@ -96,6 +96,14 @@ TestWeaver 只做产品差异：
 
 ## 6. 实施顺序与完成条件
 
+### 2026-09-02 今晚止损顺序（supersedes 本节中更严格的首次闭环前置）
+
+- 不打断已唯一发送的 `m2g-hero-bailian-20260902-04`；它只获得这一次自然运行机会。若再次由百炼凭据、路由或 telemetry 阻断，冻结真实失败后停止修百炼，改用已验证的 DeepSeek 网关驱动同一个 DSH 异构运行时。
+- 今晚 P0 是同一真实输入完成：Manager 动态选择 Team/Leader → Leader 原生委派 → 至少两个独立 Worker 的真实模型/工具/Skill → 结构化 handoff → 结果验证与 Leader 汇总 → Manager 二次决策，并保留同一 run 的原始身份、来源、hash 与生命周期证据。已有 HITL 机制可直接复用时纳入；不得为凑项修改案例或结果。
+- 今晚闭环若使用 DSH+DeepSeek，只证明“AgentTeams 原生协作 + DSH 异构运行时”，不声称不同模型供应商异构；分类必须诚实。M2-D/M2-F 的既有 HITL/恢复证据保留，但不能冒充在今晚同一 run 内发生。
+- 百炼独立路由、`codex-cc` Worker、故障恢复同 run 重演、物理隔离双 Oracle、AgentLoop/LoongSuite 查询回读、PG 强一致/HA/PITR/RAG、高并发、E0–E3 三轮统计与完整材料打包全部后置到首个稳定纵向闭环之后；只复用既有资产，不重写机制。
+- 首个闭环后，明日优先顺序为：双 Oracle 与 AgentLoop 绑定同一真实 run → 百炼/Codex 至少一条模型异构 → E0–E3 → clean-room 离线包与参赛材料 → 其余工程硬化。真实性、身份、来源、越权和危险操作审批仍然是硬阻断。
+
 1. `M0 原生闭环`：同一真实请求完成 Manager→Leader→Worker→Leader→Manager 二次决策；无旧 Runner 参与。
 2. `M1 协作与 Skill`：双 Team、至少三个不同职能 Agent、真实 Skill discovery/load/invoke、结构化 Handoff；证据改变至少一次后续路径。
 3. `M2-C`：run `m2c-20260901T211748Z` 保持冻结 `PARTIAL`，不回填未观察的 Skill invoke、HITL、恢复或 Oracle。
