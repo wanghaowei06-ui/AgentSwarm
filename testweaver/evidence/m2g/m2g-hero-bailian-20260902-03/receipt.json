@@ -1,0 +1,171 @@
+{
+  "schema": "testweaver.m2g.hero-observation-receipt.v1",
+  "run_id": "m2g-hero-bailian-20260902-03",
+  "status": "FAIL",
+  "failure_classes": [
+    "SKILL_PACKAGE_INVALID",
+    "REPEATED_APPROVAL_LOOP"
+  ],
+  "observation_scope": "exact run only; no -01/-02 evidence used",
+  "human_initial": {
+    "count": 1,
+    "event_id": "$8h6RVOJjs9s8Gm34pi72ikhsMlr1nBc0vijV_6cbY4I",
+    "room_id": "!sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080",
+    "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+    "origin_server_ts": 1788338607125,
+    "type": "m.room.message",
+    "body_length": 792,
+    "body_sha256": "832f2dae47f2a2d904bf2c343456526191fd31143cfbe9ffd86f5f0d5d3f7ad1",
+    "body_stored": false
+  },
+  "manager": {
+    "model_turn": {
+      "status": "OBSERVED",
+      "provider": "agentteams-gateway",
+      "model": "deepseek-v4-flash",
+      "turn_count": 20,
+      "latest_cumulative_total_tokens": 106928,
+      "latency": "NOT_OBSERVED",
+      "source": "/root/agentteams-native-m0-20260901-manager/.openclaw/agents/main/sessions/72f72165-65e6-4911-95d4-415b63ffac21.jsonl"
+    },
+    "dynamic_choice": {
+      "status": "OBSERVED",
+      "team": "native-m0-clean-team",
+      "leader": "native-m0-clean-leader",
+      "event": {
+        "event_id": "$wndwsAbl3ZONmCQPrydBHM74prwU3D7Y7RqM7QzQD2c",
+        "room_id": "!sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080",
+        "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788338742693,
+        "type": "m.room.message",
+        "body_length": 572,
+        "body_sha256": "d7fa94f5cfe861c5ba6c77871d5912866ad954ac062265e443cbd4e7bc33567a",
+        "body_stored": false
+      }
+    },
+    "global_task": {
+      "status": "assigned",
+      "task_id": "m2g-hero-bailian-20260902-03-20260902T084348Z",
+      "assigned_to": "native-m0-clean-leader",
+      "delegated_to_team": "native-m0-clean-team",
+      "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+      "source": "Manager state.json and global task meta"
+    },
+    "second_decision": "NOT_OBSERVED"
+  },
+  "native_lifecycle": {
+    "project": {
+      "status": "active",
+      "project_id": "m2g-hero-bailian-20260902-03-20260902T084348Z",
+      "plan_type": "dag",
+      "source_room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+      "source": "/root/agentteams-fs/teams/native-m0-clean-team/shared/projects/m2g-hero-bailian-20260902-03-20260902T084348Z/meta.json"
+    },
+    "leader_delegation": {
+      "status": "OBSERVED",
+      "actor": "native-m0-clean-leader",
+      "target": "native-m0-clean-dsh-worker",
+      "task_id": "m2g-hero-bailian-20260902-03-20260902T084348Z",
+      "task_room_id": "!JeaUs68Pd63FtopIju:matrix-native-m0-20260901.agentteams.local:28080",
+      "events": [
+        {
+          "event_id": "$CmwHrhlqzz9s0T9Ha2c_k8CwcGj2Ita2OShebqoUsAY",
+          "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "origin_server_ts": 1788338763805,
+          "type": "m.room.message",
+          "body_length": 239,
+          "body_sha256": "75005fe232a9f6f3fdfa7d61a42027559ee35392eab7fb4226bd1a1b7559f8aa",
+          "body_stored": false
+        },
+        {
+          "event_id": "$EM5E-8px5mVz1jffFdGrR8Oq19xugOBsVBdQSH6sCl4",
+          "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "origin_server_ts": 1788338774129,
+          "type": "m.room.message",
+          "body_length": 1081,
+          "body_sha256": "8a619a96f6ddaabf8c4b195023dd37ee9d3637f1896579f8e9ea0845388ddac6",
+          "body_stored": false,
+          "marker": "testweaver-native-worker__native_worker_execute"
+        }
+      ]
+    },
+    "task_projection": {
+      "status": "in_progress",
+      "assigned_to": "native-m0-clean-dsh-worker",
+      "room_id": "room:!JeaUs68Pd63FtopIju:matrix-native-m0-20260901.agentteams.local:28080",
+      "acknowledged_by_role": "worker",
+      "submitted_by_role": null,
+      "result_path": null,
+      "raw_lifecycle_event": "NOT_OBSERVED",
+      "source": "/root/agentteams-fs/teams/native-m0-clean-team/shared/tasks/m2g-hero-bailian-20260902-03-20260902T084348Z/meta.json"
+    },
+    "native_worker_execute": {
+      "status": "OBSERVED_CALLS",
+      "tool_name": "testweaver-native-worker__native_worker_execute",
+      "call_count": 5,
+      "result_count": 5,
+      "driver_policy_denied_count": 2,
+      "denied_operation": "invoke",
+      "raw_tool_output_stored": false,
+      "source": "/root/agentteams-fs/agents/native-m0-clean-dsh-worker/.qwenpaw/workspaces/default/sessions/agentteams_matrix/!JeaUs68Pd63FtopIju--matrix-native-m0-20260901.agentteams.local--28080_matrix--!JeaUs68Pd63FtopIju--matrix-native-m0-20260901.agentteams.local--28080.json"
+    },
+    "dsh_headless": {
+      "status": "FINISHED_WITHOUT_RESULT",
+      "container_id_during_run": "2ecf79eb9612f561352e109756a3716d799f1f5039dac3f08fc4f4b9b22dbe38",
+      "image_during_run": "agentteams/qwenpaw-worker:dsh-headless-068d9ce",
+      "agent_status_last_run_at": "2026-09-02T08:46:09.616371Z",
+      "agent_status_last_finish_at": "2026-09-02T09:03:11.072603Z",
+      "running_task_count_after_finish": 0,
+      "result_artifact": "NOT_OBSERVED"
+    },
+    "provider": {
+      "dsh_provider_call": "NOT_OBSERVED",
+      "bailian_provider_call": "NOT_OBSERVED",
+      "provider": "NOT_OBSERVED",
+      "model": "NOT_OBSERVED",
+      "usage": "NOT_OBSERVED",
+      "latency": "NOT_OBSERVED",
+      "request_response_hash": "NOT_OBSERVED"
+    },
+    "result": "NOT_OBSERVED",
+    "submit": "NOT_OBSERVED",
+    "check": "NOT_OBSERVED",
+    "accept": "NOT_OBSERVED"
+  },
+  "operational_controls": {
+    "timeout_count": 1,
+    "approval_api_approve_count": 2,
+    "cancel": {
+      "status_code": 202,
+      "scope": "current native_worker_execute",
+      "count": 1
+    },
+    "orphan_approval": {
+      "approval_id": "31eda5f3",
+      "deny_count": 1,
+      "pending_count_after_deny": 0
+    },
+    "approval_deny_is_hitl": false,
+    "human_hitl_decision": "NOT_OBSERVED"
+  },
+  "matrix_exact_run_event_count": 33,
+  "sources": [
+    "Manager persisted Matrix sync, exact run filter; event bodies not retained",
+    "/root/agentteams-native-m0-20260901-manager/state.json",
+    "/root/agentteams-native-m0-20260901-manager/.openclaw/agents/main/sessions/72f72165-65e6-4911-95d4-415b63ffac21.jsonl",
+    "/root/agentteams-fs/teams/native-m0-clean-team/shared/projects/m2g-hero-bailian-20260902-03-20260902T084348Z/meta.json",
+    "/root/agentteams-fs/teams/native-m0-clean-team/shared/tasks/m2g-hero-bailian-20260902-03-20260902T084348Z/meta.json",
+    "/root/agentteams-fs/agents/native-m0-clean-dsh-worker/.qwenpaw/workspaces/default/sessions/agentteams_matrix/!JeaUs68Pd63FtopIju--matrix-native-m0-20260901.agentteams.local--28080_matrix--!JeaUs68Pd63FtopIju--matrix-native-m0-20260901.agentteams.local--28080.json",
+    "official QwenPaw status/control-plane readback"
+  ],
+  "security": {
+    "event_bodies_stored": false,
+    "tool_input_output_stored": false,
+    "credentials_read_or_stored": false,
+    "frontmatter_repair_included": false,
+    "historical_evidence_used": false,
+    "secret_scan": "PASS"
+  }
+}

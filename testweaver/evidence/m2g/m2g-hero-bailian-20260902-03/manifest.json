@@ -1,0 +1,46 @@
+{
+  "schema": "testweaver.m2g.hero-observation-manifest.v1",
+  "run_id": "m2g-hero-bailian-20260902-03",
+  "status": "FAIL",
+  "failure_classes": [
+    "SKILL_PACKAGE_INVALID",
+    "REPEATED_APPROVAL_LOOP"
+  ],
+  "receipt": {
+    "path": "receipt.json",
+    "sha256": "cf0af5da07a94f5bf66def82df16a8467cb3c2c86899aabc1468548101fce190"
+  },
+  "observed": [
+    "one exact Human initial event",
+    "Manager model turn and dynamic Team/Leader choice",
+    "native Project/Task/room projection",
+    "Leader delegation to native-m0-clean-dsh-worker",
+    "native_worker_execute calls and DSH headless finish",
+    "one timeout, two operational approval API approve actions, one HTTP 202 cancel, and one operational deny"
+  ],
+  "not_observed": [
+    "DSH or Bailian provider call",
+    "provider/model/usage/latency/request-response telemetry",
+    "Worker result artifact",
+    "raw submit/check/accept lifecycle",
+    "Manager second decision"
+  ],
+  "projection_boundary": {
+    "team_meta_acknowledged_by_role": "worker",
+    "team_meta_status": "in_progress",
+    "projection_is_raw_lifecycle": false
+  },
+  "integrity": {
+    "hash_algorithm": "sha256",
+    "event_bodies_stored": false,
+    "tool_output_stored": false,
+    "credentials_read_or_stored": false,
+    "historical_evidence_used": false,
+    "frontmatter_repair_as_run_evidence": false,
+    "files": [
+      "receipt.json",
+      "manifest.json",
+      "SHA256SUMS"
+    ]
+  }
+}
