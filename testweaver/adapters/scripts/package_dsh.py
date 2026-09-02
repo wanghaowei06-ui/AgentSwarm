@@ -251,8 +251,8 @@ def remove_broken_symlinks(root: Path) -> None:
 
 def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) -> dict[str, Any]:
     validate_inputs(source, canonical_lock, provenance)
-    package = manifest(source / "package.json")
-    _resolved, skipped_unresolved = root_runtime_resolution(source, package)
+    root_manifest = manifest(source / "package.json")
+    _resolved, skipped_unresolved = root_runtime_resolution(source, root_manifest)
     if output.exists():
         if not output.is_dir() or any(output.iterdir()):
             raise PackageError("output directory must be absent or empty")
@@ -263,7 +263,7 @@ def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) ->
     pnpm_root = source / "node_modules" / ".pnpm"
     instances: dict[str, Path] = {}
     root_packages: dict[str, Path] = {}
-    for (directory, _name), (_path, _package) in seen.items():
+    for (directory, _name), (_path, dependency_manifest) in seen.items():
         package_dir = Path(directory)
         if package_dir == source.resolve():
             continue
@@ -271,8 +271,7 @@ def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) ->
         if instance is not None:
             instances[instance.name] = instance
         else:
-            package = manifest(package_dir / "package.json")
-            root_packages[str(package["name"])] = package_dir
+            root_packages[str(dependency_manifest["name"])] = package_dir
 
     shutil.copy2(source / "package.json", output / "package.json")
     for name in ("lib", "config"):
@@ -290,7 +289,7 @@ def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) ->
 
     direct: dict[str, Any] = {}
     for field in ("dependencies", "optionalDependencies", "devDependencies"):
-        values = package.get(field) or {}
+        values = root_manifest.get(field) or {}
         if isinstance(values, dict):
             direct.update(values)
     for name in sorted(direct):
@@ -314,7 +313,7 @@ def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) ->
         self_link.parent.mkdir(parents=True, exist_ok=True)
         os.symlink(os.path.relpath(output, self_link.parent), self_link)
     remove_broken_symlinks(output)
-    preflight_plugin_tree(output, package)
+    preflight_plugin_tree(output, root_manifest)
     return {
         "package": "@deepseek-ai/dsh",
         "version": EXPECTED_VERSION,
