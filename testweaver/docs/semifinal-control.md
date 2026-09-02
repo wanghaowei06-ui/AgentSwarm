@@ -15,7 +15,9 @@
 - 现有 API Key、AgentLoop、LoongSuite、OTel 和 Nacos 配置必须复用，不要求用户重新填写。只引用 `/etc` 下受保护文件或受控挂载，不读取到输出、不复制或提交密钥值。
 - 当前原生基线继续使用已验证的 `agentteams-gateway/deepseek-v4-flash`，直到 M1 原生稳定性收口；异构资产接入前不得为了提前展示而修改在途 Run 的模型、账号、推理强度或 service tier。
 - 异构阶段的 DSH 是 provider-agnostic Harness，不得只用 DeepSeek 形成“异构”结论；必须复用现有受保护配置，让至少一个真实 DSH Worker 调用阿里云百炼模型，并把 provider/model/usage/延迟和结果证据与 DeepSeek 路径分开记录。
-- Codex CLI 外部 Worker 必须由 `codex-cc` 启动，不使用裸 `codex`；计划模型固定为 `gpt-5.6-luna`、推理强度 `max`。该配置只在 M1 异构 Worker 薄适配步骤落地，当前不得提前改动运行环境。
+- 首个真实 Hero 的 DSH 百炼接线采用风险分层：P0 允许把现有百炼凭据以只读容器 Secret 仅挂载给目标 DSH adapter，先直连百炼跑通真实调用；Secret 不得进入镜像、仓库、Prompt、任务产物、日志或 receipt，运行后必须做 names-only readback 与泄密扫描。即使暂时绕过统一网关，adapter 仍必须记录同一 Run 的 provider/model、usage、延迟、HTTP/退出状态、request/response hash 和 Worker/Task 身份。该路径只证明真实异构调用，不得宣称已完成网关级统一限流、计费、轮换或消费者鉴权。
+- P1 在首个 Hero 冻结后把 DSH 切回现有 AgentTeams Provider/Route 和 Worker consumer credential；沿用同一统计/receipt schema，不重写上层任务链。网关化不得重新成为首次闭环前置条件。
+- Codex CLI 外部 Worker 必须由 `codex-cc` 启动，不使用裸 `codex`；计划模型固定为 `gpt-5.6-luna`、推理强度 `max`。首跑复用当前已登录的受保护 `CODEX_HOME`，只挂载到目标 Codex Worker，不复制认证缓存；M4 稳定复跑可把同一 CLI adapter 改为 API Key 登录。完整 Responses API adapter 属于 P1，不阻塞首次闭环。
 - 当前协作在同一工作区完成；按文件范围并行，不再为小任务创建大量 worktree。
 - 完整目标态以 [`semifinal-complete-project-proposal.md`](semifinal-complete-project-proposal.md) 为准；该方案已按最新复赛五项评分维度、工程安全七个子项和 AgentTeams 原生边界修订。它不承载实时进度，本文件仍是唯一实施总控。
 
@@ -95,8 +97,9 @@ TestWeaver 只做产品差异：
 2. `M1 协作与 Skill`：双 Team、至少三个不同职能 Agent、真实 Skill discovery/load/invoke、结构化 Handoff；证据改变至少一次后续路径。
 3. `M2-C`：run `m2c-20260901T211748Z` 保持冻结 `PARTIAL`，不回填未观察的 Skill invoke、HITL、恢复或 Oracle。
 4. `M2-D`：continuation-2 已证明真实 HITL 与 Controller 容器恢复；由于故障发生时 Task 已终态，原生 replacement/迟到拒绝为 `NOT_OBSERVED`。若后续需要复制该边界，必须先确保故障发生时 Task 仍处于可取消执行态；本次结论是实验时序边界，不归因于 AgentTeams 故障。
-5. `M3 效果`：冻结同输入、预算和 Oracle，单 Agent、同质多 Agent、异质多 Agent至少三次配对复跑；报告质量、重复率、幻觉阻断、协调开销、Token/成本和净价值。
-6. `M4 交付`：clean-room 一键运行/复跑、离线包、产品接入、PPT/PDF、8 分钟内视频、许可证/SBOM/贡献指南。第二场景随后用于证明复制性。
+5. `M2-G 异构闭环`：先以只读容器 Secret 完成一次真实 DSH→百炼调用和原生 submit/check/accept；只有实际运行需要且能在短时间内完成时才切统一网关。随后以 `codex-cc` 受保护登录完成独立 Codex Worker 证据。两条路径都必须有模型身份、usage、延迟、hash、进程/runtime 与同一权威 Run 关联，凭据值永不进入证据包。
+6. `M3 效果`：冻结同输入、预算和 Oracle，单 Agent、同质多 Agent、异质多 Agent至少三次配对复跑；报告质量、重复率、幻觉阻断、协调开销、Token/成本和净价值。
+7. `M4 交付`：clean-room 一键运行/复跑、离线包、产品接入、PPT/PDF、8 分钟内视频、许可证/SBOM/贡献指南。第二场景随后用于证明复制性。
 
 HA、PITR、RAG、高并发、容量和灾备在核心闭环前只保留设计，不阻塞 M0–M3。
 
