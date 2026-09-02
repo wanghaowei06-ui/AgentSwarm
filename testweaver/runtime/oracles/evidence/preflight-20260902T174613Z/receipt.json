@@ -1,0 +1,79 @@
+{
+  "schema": "testweaver.oracle-package-preflight.v1",
+  "recorded_at": "2026-09-02T17:46:13Z",
+  "status": "PASS",
+  "classification": "RUNTIME_ISOLATION_PREFLIGHT_ONLY",
+  "source": {
+    "commit": "abfd7f7",
+    "verifier_source_commit": "4fb580c8da24b880f054246cb9273341940b92f7",
+    "verifier_sha256": "896ea473e5a7fddae905aee3e697c8b99a5cea94ed749918969437fe176db2aa"
+  },
+  "deployment": {
+    "method": "official agt update worker package-and-soul",
+    "generation": 2,
+    "initial_file_uri_result": "BLOCKED_CONTROLLER_LOCAL_URI",
+    "resolution": "same immutable zip copied to the matching worker-local file URI before native runtime apply",
+    "messages_sent": false,
+    "tasks_created_or_changed": false,
+    "oracle_conclusions_executed": false
+  },
+  "boundary": {
+    "worker": "native-m0-boundary-oracle",
+    "team": "native-m0-clean-team",
+    "worker_phase": "Running",
+    "container_state": "running",
+    "runtime": "qwenpaw",
+    "image": "agentteams/qwenpaw-worker:be10aaf",
+    "container_id": "66973bbec61b715b2083187120cfeafe30d8bdd89b87e59144d7b5e9740fc96b",
+    "restart_count": 0,
+    "health_http_status": 200,
+    "package_zip_sha256": "bc10968baa626d8f1864709bbe5514556ecee646db4c877707f3d711e4c46660",
+    "soul_sha256": "eec51bbc4178fd107879f93949ae39d0f03c5b184e3b9a94ea354c03125e01f9",
+    "mode_sha256": "508199a6fd5e1d37f058de517ef58f7368ed330f72c9ff9ec9879dbb929a50f5",
+    "gold_named_file_count": 0
+  },
+  "outcome": {
+    "worker": "native-m1-outcome-oracle",
+    "team": "native-m1-verify-team",
+    "worker_phase": "Running",
+    "container_state": "running",
+    "runtime": "qwenpaw",
+    "image": "agentteams/qwenpaw-worker:be10aaf",
+    "container_id": "97ad3445817374e31637bc574b2799a508d7322ceb3b5c3192eabc10d35f1feb",
+    "restart_count": 0,
+    "health_http_status": 200,
+    "package_zip_sha256": "92254e799cf7fcf78b88e38b8a62b96f9f1bb1bf6ab3afb6181a8b6d09510b5a",
+    "soul_sha256": "f79e9cd518206915bb0aff77ed444c2a9a41c05cac236a9c8369bd3fe5eb84cc",
+    "mode_sha256": "eca0c8c2c7fe352c134d7fce80c52cc41cfbc2f204de1c705810430ca7dfc8f3",
+    "private_gold_sha256": "bf309d1227547ca12bf48d5f2d21c65409f39bc5c9940564e20d6f0854e70a57",
+    "gold_named_file_count": 1
+  },
+  "isolation_readback": {
+    "native-m0-clean-worker_gold_named_file_count": 0,
+    "native-m0-clean-dsh-worker_gold_named_file_count": 0,
+    "native-m1-verify-worker_gold_named_file_count": 0,
+    "boundary_can_read_outcome_private_gold": false,
+    "candidate_workers_can_read_gold": false
+  },
+  "team_readiness": {
+    "native-m0-clean-team": {
+      "phase": "Active",
+      "leader_ready": true,
+      "ready_workers": 3,
+      "total_workers": 3
+    },
+    "native-m1-verify-team": {
+      "phase": "Active",
+      "leader_ready": true,
+      "ready_workers": 2,
+      "total_workers": 2
+    }
+  },
+  "attestation": {
+    "gold_body_recorded": false,
+    "secret_value_recorded": false,
+    "matrix_message_sent": false,
+    "task_or_project_mutated": false,
+    "live_oracle_claim": false
+  }
+}
