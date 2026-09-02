@@ -78,6 +78,25 @@ def _codex_config(timeout: float = 2.0) -> AdapterConfig:
     )
 
 
+def _gateway_dsh_config(timeout: float = 2.0) -> AdapterConfig:
+    return AdapterConfig.from_mapping(
+        {
+            "adapter_kind": "dsh",
+            "route": {
+                "provider": "aliyun-bailian",
+                "endpoint": {"source": "env", "name": "AGENTTEAMS_AI_GATEWAY_URL"},
+                "model": {"source": "env", "name": "TESTWEAVER_BAILIAN_MODEL"},
+                "credential": {
+                    "source": "env",
+                    "name": "AGENTTEAMS_WORKER_GATEWAY_KEY",
+                },
+                "wire_api": "chat",
+            },
+            "limits": _limits(timeout),
+        }
+    )
+
+
 def _script(directory: Path, body: str) -> Path:
     path = directory / "fake-external"
     path.write_text("#!/usr/bin/python3\n" + body, encoding="utf-8")
@@ -98,6 +117,8 @@ class OneShotExecutorTests(unittest.TestCase):
             "TESTWEAVER_CODEX_ENDPOINT": "https://codex.invalid",
             "TESTWEAVER_CODEX_MODEL": "fixture-codex-model",
             "TESTWEAVER_CODEX_CREDENTIAL": "fixture-codex-credential-1234",
+            "AGENTTEAMS_AI_GATEWAY_URL": "https://gateway.invalid/testweaver-bailian/v1",
+            "AGENTTEAMS_WORKER_GATEWAY_KEY": "fixture-worker-gateway-key-1234",
             "HOME": str(workspace),
             "CODEX_HOME": str(workspace / "codex-home"),
         }
@@ -165,6 +186,23 @@ class OneShotExecutorTests(unittest.TestCase):
             result, metadata = self._run(script, _config("deepseek"), workspace)
             self.assertEqual(result.termination, "protocol_error")
             self.assertNotIn("read the assigned source", repr(metadata))
+
+    def test_dsh_aliases_route_refs_only_in_child_environment(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory) / "workspace"
+            workspace.mkdir()
+            script = _script(
+                workspace,
+                "import os\n"
+                "print(os.environ['DEEPSEEK_BASE_URL'])\n"
+                "print(os.environ['DEEPSEEK_API_KEY'])\n",
+            )
+            result, _ = self._run(script, _gateway_dsh_config(), workspace)
+            content = (workspace / result.result_ref).read_text(encoding="utf-8")
+            self.assertNotIn("https://gateway.invalid", content)
+            self.assertNotIn("fixture-worker-gateway-key-1234", content)
+            self.assertNotIn("DEEPSEEK_BASE_URL", os.environ)
+            self.assertNotIn("DEEPSEEK_API_KEY", os.environ)
 
     def test_codex_uses_fixed_noninteractive_exec_and_stdin_prompt(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

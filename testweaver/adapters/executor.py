@@ -41,6 +41,7 @@ KILL_GRACE_SECONDS = 1.0
 
 _PROTECTED_REFERENCE_ENV_NAMES = frozenset(
     "HOME CODEX_HOME CODEX_ENDPOINT CODEX_MODEL CODEX_WORKER_MODEL "
+    "AGENTTEAMS_AI_GATEWAY_URL AGENTTEAMS_WORKER_GATEWAY_KEY "
     "DEEPSEEK_API_KEY DEEPSEEK_BASE_URL DEEPSEEK_MODEL "
     "DASHSCOPE_API_KEY DASHSCOPE_BASE_URL DASHSCOPE_MODEL "
     "TESTWEAVER_BAILIAN_CREDENTIAL TESTWEAVER_BAILIAN_ENDPOINT TESTWEAVER_BAILIAN_MODEL "
@@ -106,6 +107,17 @@ def _environment(config: AdapterConfig) -> tuple[dict[str, str], tuple[str, ...]
     refs = (config.route.endpoint_ref, config.route.model_ref, config.route.credential_ref)
     names.update(ref.location for ref in refs if ref.source == "env")
     values = {name: os.environ[name] for name in names if name in os.environ}
+    if config.adapter_kind == "dsh":
+        for alias, reference in (
+            ("DEEPSEEK_BASE_URL", config.route.endpoint_ref),
+            ("DEEPSEEK_API_KEY", config.route.credential_ref),
+        ):
+            if reference.source != "env":
+                raise NativeExecutionError("DSH routes require environment references")
+            value = os.environ.get(reference.location)
+            if not value:
+                raise NativeExecutionError("DSH protected reference is empty")
+            values[alias] = value
     if config.adapter_kind == "codex-cli" and any(not values.get(name) for name in ("HOME", "CODEX_HOME")):
         raise NativeExecutionError("Codex protected environment is not bound")
     return values, tuple(values.values())
