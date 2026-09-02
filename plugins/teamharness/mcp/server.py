@@ -62,6 +62,14 @@ ATTACHMENT_PARENT_EVENT_KEYS = (
     "matrix_attachment_parent_event_id",
 )
 TEXT_ARTIFACT_SAMPLE_BYTES = 256 * 1024
+TASK_RESULT_STATUS_VALUES = (
+    "SUCCESS",
+    "SUCCESS_WITH_NOTES",
+    "REVISION_NEEDED",
+    "BLOCKED",
+    "FAILED",
+    "PARTIAL",
+)
 
 TOOL_SCHEMAS: dict[str, dict[str, Any]] = {
     "health": {
@@ -498,6 +506,14 @@ TOOL_SCHEMAS: dict[str, dict[str, Any]] = {
                 "summary": {
                     "type": "string",
                     "description": "Worker result summary for submit_task.",
+                },
+                "status": {
+                    "type": "string",
+                    "enum": list(TASK_RESULT_STATUS_VALUES),
+                    "description": (
+                        "Structured worker result status for submit_task. "
+                        "Compatibility aliases resultStatus and result_status are accepted."
+                    ),
                 },
                 "deliverables": {
                     "type": "array",
@@ -3694,7 +3710,30 @@ def _write_task(arguments: dict[str, Any], task: dict[str, Any]) -> None:
     _write_json(_task_state_path(arguments, task["task_id"]), task)
 
 
-ALLOWED_TASK_RESULT_STATUSES = {"SUCCESS", "SUCCESS_WITH_NOTES", "REVISION_NEEDED", "BLOCKED", "FAILED", "PARTIAL"}
+ALLOWED_TASK_RESULT_STATUSES = set(TASK_RESULT_STATUS_VALUES)
+
+
+def _submit_task_result_status(payload: dict[str, Any]) -> str:
+    """Resolve one explicit structured result status before submit side effects."""
+    values: list[tuple[str, str]] = []
+    for key in ("status", "resultStatus", "result_status"):
+        if key not in payload:
+            continue
+        value = payload[key]
+        if value is None:
+            raise ValueError("result status must be a non-empty string")
+        normalized = str(value).strip()
+        if not normalized:
+            raise ValueError("result status must be a non-empty string")
+        values.append((key, normalized))
+    if not values:
+        raise ValueError("status is required for submit_task")
+    if len({value for _key, value in values}) != 1:
+        raise ValueError("conflicting result status fields")
+    status = values[0][1]
+    if status not in ALLOWED_TASK_RESULT_STATUSES:
+        raise ValueError("invalid result status")
+    return status
 
 
 def _validate_task_deliverables(task_id: str, deliverables: list[Any]) -> list[str]:
@@ -3929,8 +3968,8 @@ def _taskflow(arguments: dict[str, Any]) -> dict[str, Any]:
             task_id = _safe_id(payload.get("taskId") or payload.get("task_id"), "taskId")
             task = _load_task(arguments, task_id)
             _require_task_mutable(arguments, task, task_id, action)
+            status = _submit_task_result_status(payload)
             summary = str(payload.get("summary") or "")
-            status = str(payload.get("status") or "SUCCESS")
             deliverables = payload.get("deliverables") or []
             if not isinstance(deliverables, list):
                 raise ValueError("deliverables must be a list")

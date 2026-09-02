@@ -88,6 +88,13 @@ fail!("message schema target must use Matrix room string payloads") unless targe
 fail!("message schema message must support typed trigger payloads") unless JSON.generate(message_properties.fetch("message")).include?("PROJECT_REQUESTED")
 fail!("message schema must document PROJECT_REQUESTED") unless JSON.generate(message_schema).include?("PROJECT_REQUESTED")
 
+taskflow_schema = tool_by_name.fetch("taskflow").fetch("inputSchema")
+taskflow_status = taskflow_schema.fetch("properties")["status"]
+fail!("taskflow schema must expose structured submit status") unless taskflow_status.is_a?(Hash)
+expected_statuses = %w[SUCCESS SUCCESS_WITH_NOTES REVISION_NEEDED BLOCKED FAILED PARTIAL]
+fail!("taskflow status enum mismatch: #{taskflow_status.inspect}") unless taskflow_status["enum"] == expected_statuses
+fail!("taskflow status schema must document compatibility aliases") unless JSON.generate(taskflow_status).include?("resultStatus") && JSON.generate(taskflow_status).include?("result_status")
+
 puts JSON.pretty_generate(
   "ok" => true,
   "responses" => lines.length,

@@ -358,6 +358,134 @@ Dir.mktmpdir("teamharness-taskflow-") do |dir|
     )
     if submitted_result_text != expected_result_text:
         raise AssertionError(f"submit_task should not rewrite agent-owned result.md: {submitted_result_text!r}")
+    alias_blocked_project_id = "structured-status-blocked-project"
+    alias_blocked_task_id = "structured-status-blocked-task"
+    payload("projectflow", {
+        "action": "create_project",
+        "payload": {"projectId": alias_blocked_project_id, "title": "Structured blocked status"},
+    })
+    payload("projectflow", {
+        "action": "plan_dag",
+        "payload": {
+            "projectId": alias_blocked_project_id,
+            "tasks": [{
+                "taskId": alias_blocked_task_id,
+                "title": "Blocked result",
+                "assignedTo": "@worker-a:example.test",
+                "dependsOn": [],
+            }],
+        },
+    })
+    payload("taskflow", {
+        "role": "leader",
+        "action": "delegate_task",
+        "payload": {
+            "projectId": alias_blocked_project_id,
+            "taskId": alias_blocked_task_id,
+            "roomId": "room:!team:example.test",
+            "spec": "Submit a blocked result.",
+        },
+    })
+    payload("taskflow", {
+        "role": "worker",
+        "action": "ack_task",
+        "payload": {"taskId": alias_blocked_task_id},
+    })
+    blocked_result = payload("taskflow", {
+        "role": "worker",
+        "action": "submit_task",
+        "status": "BLOCKED",
+        "result_status": "BLOCKED",
+        "payload": {
+            "taskId": alias_blocked_task_id,
+            "resultStatus": "BLOCKED",
+            "summary": "Blocked by an external dependency.",
+            "deliverables": [],
+        },
+    })
+    if not blocked_result.get("ok") or blocked_result["task"].get("result_status") != "BLOCKED":
+        raise AssertionError(f"submit_task must preserve result_status alias: {blocked_result!r}")
+    blocked_checked = payload("taskflow", {
+        "role": "leader",
+        "action": "check_task",
+        "payload": {"taskId": alias_blocked_task_id},
+    })
+    if blocked_checked.get("result", {}).get("status") != "BLOCKED" or not blocked_checked.get("effective"):
+        raise AssertionError(f"blocked result status was not structurally preserved: {blocked_checked!r}")
+
+    missing_status_project_id = "structured-status-missing-project"
+    missing_status_task_id = "structured-status-missing-task"
+    payload("projectflow", {
+        "action": "create_project",
+        "payload": {"projectId": missing_status_project_id, "title": "Missing structured status"},
+    })
+    payload("projectflow", {
+        "action": "plan_dag",
+        "payload": {
+            "projectId": missing_status_project_id,
+            "tasks": [{
+                "taskId": missing_status_task_id,
+                "title": "Missing status",
+                "assignedTo": "@worker-a:example.test",
+                "dependsOn": [],
+            }],
+        },
+    })
+    payload("taskflow", {
+        "role": "leader",
+        "action": "delegate_task",
+        "payload": {
+            "projectId": missing_status_project_id,
+            "taskId": missing_status_task_id,
+            "roomId": "room:!team:example.test",
+            "spec": "Require a structured status.",
+        },
+    })
+    payload("taskflow", {
+        "role": "worker",
+        "action": "ack_task",
+        "payload": {"taskId": missing_status_task_id},
+    })
+    missing_status = payload("taskflow", {
+        "role": "worker",
+        "action": "submit_task",
+        "payload": {
+            "taskId": missing_status_task_id,
+            "summary": "BLOCKED in prose only.",
+            "deliverables": [],
+        },
+    })
+    if missing_status.get("ok") or "status is required" not in str(missing_status.get("error", "")):
+        raise AssertionError(f"submit_task must reject missing structured status: {missing_status!r}")
+    conflicting_status = payload("taskflow", {
+        "role": "worker",
+        "action": "submit_task",
+        "payload": {
+            "taskId": missing_status_task_id,
+            "status": "BLOCKED",
+            "resultStatus": "REVISION_NEEDED",
+            "summary": "Conflicting structured statuses.",
+            "deliverables": [],
+        },
+    })
+    if conflicting_status.get("ok") or "conflicting result status" not in str(conflicting_status.get("error", "")):
+        raise AssertionError(f"submit_task must reject conflicting status aliases: {conflicting_status!r}")
+    invalid_status = payload("taskflow", {
+        "role": "worker",
+        "action": "submit_task",
+        "payload": {
+            "taskId": missing_status_task_id,
+            "result_status": "NOT_A_RESULT",
+            "summary": "Invalid structured status.",
+            "deliverables": [],
+        },
+    })
+    if invalid_status.get("ok") or "invalid result status" not in str(invalid_status.get("error", "")):
+        raise AssertionError(f"submit_task must reject invalid status aliases: {invalid_status!r}")
+    missing_status_meta = json.loads((pathlib.Path("#{workspace}") / f"shared/tasks/{missing_status_task_id}/meta.json").read_text(encoding="utf-8"))
+    if missing_status_meta.get("status") != "in_progress" or "result_status" in missing_status_meta:
+        raise AssertionError(f"missing status must not mutate task metadata: {missing_status_meta!r}")
+
     published = submitted.get("publishedArtifacts") or []
     published_by_source = {item.get("sourcePath"): item for item in published}
     for source, filename in {
