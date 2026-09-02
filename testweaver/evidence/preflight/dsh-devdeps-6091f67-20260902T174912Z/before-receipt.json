@@ -1,0 +1,81 @@
+{
+  "schema_version": "testweaver.dsh-worker-update/v1",
+  "run_id": "dsh-devdeps-6091f67-20260902T174912Z",
+  "phase": "BEFORE_IMAGE_UPDATE",
+  "captured_at": "2026-09-02T17:49:12Z",
+  "source": {
+    "source_commit": "6091f67d21d6dcd416bd69883434597e0e4add02",
+    "build_entrypoint": "testweaver/adapters/build-qwenpaw-native-extension.sh",
+    "candidate_image": "agentteams/qwenpaw-worker:dsh-devdeps-6091f67",
+    "candidate_image_id": "sha256:8052e59bd52dfdf4016d970ada4952c70875d2a774925af109656beb6dffe3ac",
+    "candidate_image_digest": "agentteams/qwenpaw-worker@sha256:8052e59bd52dfdf4016d970ada4952c70875d2a774925af109656beb6dffe3ac",
+    "dsh_package_sha256": "5e8f2e8f9e4ac0247a724e8a82859d16440f66911fd62543285a14dc923193a0",
+    "base_image": "agentteams/qwenpaw-worker:be10aaf",
+    "base_image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb"
+  },
+  "team": {
+    "name": "native-m0-clean-team",
+    "phase": "Active",
+    "leader": "native-m0-clean-leader",
+    "team_room_id": "!NbRmgvdkZMdRcCvLg4:matrix-native-m0-20260901.agentteams.local:28080",
+    "leader_dm_room_id": "!Ypl073FDlR3fHMbFWW:matrix-native-m0-20260901.agentteams.local:28080",
+    "worker_names": [
+      "native-m0-clean-worker",
+      "native-m0-boundary-oracle",
+      "native-m0-clean-dsh-worker"
+    ],
+    "ready_workers": 3,
+    "total_workers": 3
+  },
+  "worker": {
+    "name": "native-m0-clean-dsh-worker",
+    "phase": "Running",
+    "state": "Running",
+    "container_state": "running",
+    "container_managed": true,
+    "runtime": "qwenpaw",
+    "model": "deepseek-v4-flash",
+    "model_provider": "testweaver-bailian",
+    "image": "agentteams/qwenpaw-worker:dsh-home-runtime-8cec101",
+    "image_id": "sha256:8350724041493b7f8ca87ae2865e85e09faf0e0be6eba1aa41837ce5a6472a13",
+    "container_id": "6fbe12b44d60ac4a00f2e27589e4115a71b53eab6cc74e6da6eb395b332f7e37",
+    "matrix_user_id": "@native-m0-clean-dsh-worker:matrix-native-m0-20260901.agentteams.local:28080",
+    "room_id": "!t8ycL6WDpsGf9D0mGo:matrix-native-m0-20260901.agentteams.local:28080",
+    "host_port": 10565,
+    "container_port": 8088,
+    "health_http": 200,
+    "version_http": 200,
+    "runtime_generation": 23,
+    "runtime_observed_generation": null
+  },
+  "planned_update": {
+    "official_entrypoint": "docker exec agentteams-native-m0-20260901-manager agt update worker --name native-m0-clean-dsh-worker --image agentteams/qwenpaw-worker:dsh-devdeps-6091f67",
+    "changed_field": "spec.image",
+    "preserved_fields": [
+      "spec.modelProvider",
+      "spec.model",
+      "spec.runtime",
+      "identity",
+      "team",
+      "room",
+      "Matrix identity",
+      "containerManaged",
+      "package",
+      "protected configuration references"
+    ]
+  },
+  "rollback": {
+    "official_entrypoint": "docker exec agentteams-native-m0-20260901-manager agt update worker --name native-m0-clean-dsh-worker --image agentteams/qwenpaw-worker:dsh-home-runtime-8cec101",
+    "old_image_id": "sha256:8350724041493b7f8ca87ae2865e85e09faf0e0be6eba1aa41837ce5a6472a13",
+    "old_container_id": "6fbe12b44d60ac4a00f2e27589e4115a71b53eab6cc74e6da6eb395b332f7e37"
+  },
+  "provider_probe": "NOT_ATTEMPTED_BEFORE_UPDATE",
+  "secret_policy": {
+    "values_read": false,
+    "values_written": false,
+    "values_logged": false,
+    "values_hashed": false,
+    "argv_secret": false,
+    "receipt_secret": false
+  }
+}

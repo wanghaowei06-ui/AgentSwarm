@@ -1,0 +1,23 @@
+{
+  "schema_version": "testweaver.evidence-manifest/v1",
+  "run_id": "dsh-devdeps-6091f67-20260902T174912Z",
+  "classification": "NOT_LIVE_PROVIDER_PROBE_FAIL",
+  "source_commit": "6091f67d21d6dcd416bd69883434597e0e4add02",
+  "evidence_scope": "DSH package regression, one official image update, one bounded native provider probe",
+  "files": [
+    {
+      "path": "before-receipt.json",
+      "sha256": "47811b4e36719148288fd3d13884da8f5a3db3561177e30e0c583cd8778d0ea4"
+    },
+    {
+      "path": "receipt.json",
+      "sha256": "8b07a981bed72dd28eddb9b39997e2f028b904655f90ac1e9de2799b0344cd11"
+    },
+    {
+      "path": "SHA256SUMS",
+      "sha256": "398acbf8cdf0253d025b4ecaf7a5ebb367668a1dc60e452ceb2b182933daf494"
+    }
+  ],
+  "manifest_self_hash": "excluded_from_SHA256SUMS",
+  "secret_scan": "PASS_NO_SECRET_VALUES"
+}

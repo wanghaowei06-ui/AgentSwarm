@@ -1,0 +1,114 @@
+{
+  "schema_version": "testweaver.dsh-worker-update/v1",
+  "run_id": "dsh-devdeps-6091f67-20260902T174912Z",
+  "status": "FAIL",
+  "classification": "NOT_LIVE_PROVIDER_PROBE_FAIL",
+  "source": {
+    "source_commit": "6091f67d21d6dcd416bd69883434597e0e4add02",
+    "cached_allowlist_verified": true,
+    "cached_allowlist": [
+      "testweaver/adapters/scripts/package_dsh.py",
+      "testweaver/adapters/tests/test_package.py"
+    ],
+    "focused_tests": {
+      "package_regression": "PASS",
+      "adapter_suite": "PASS",
+      "test_count": 58,
+      "py_compile": "PASS",
+      "diff_check": "PASS",
+      "secret_scan": "PASS"
+    }
+  },
+  "build": {
+    "official_entrypoint": "testweaver/adapters/build-qwenpaw-native-extension.sh",
+    "exit_code": 0,
+    "image": "agentteams/qwenpaw-worker:dsh-devdeps-6091f67",
+    "image_id": "sha256:8052e59bd52dfdf4016d970ada4952c70875d2a774925af109656beb6dffe3ac",
+    "image_digest": "agentteams/qwenpaw-worker@sha256:8052e59bd52dfdf4016d970ada4952c70875d2a774925af109656beb6dffe3ac",
+    "base_image": "agentteams/qwenpaw-worker:be10aaf",
+    "base_image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+    "dsh_package_sha256": "5e8f2e8f9e4ac0247a724e8a82859d16440f66911fd62543285a14dc923193a0",
+    "pnpm_instances": 770,
+    "root_packages": 40,
+    "node_modules_source_copied": false,
+    "skipped_unresolved": [
+      "@deepseek-ai/dsh-client-ui-agent-preset",
+      "@deepseek-ai/dsh-client-ui-cordis",
+      "@deepseek-ai/dsh-cordis-client-runner",
+      "@types/js-yaml"
+    ]
+  },
+  "worker_update": {
+    "official_entrypoint": "docker exec agentteams-native-m0-20260901-manager agt update worker --name native-m0-clean-dsh-worker --image agentteams/qwenpaw-worker:dsh-devdeps-6091f67",
+    "exit_code": 0,
+    "changed_field": "spec.image",
+    "worker_name": "native-m0-clean-dsh-worker",
+    "old_image": "agentteams/qwenpaw-worker:dsh-home-runtime-8cec101",
+    "old_image_id": "sha256:8350724041493b7f8ca87ae2865e85e09faf0e0be6eba1aa41837ce5a6472a13",
+    "old_container_id": "6fbe12b44d60ac4a00f2e27589e4115a71b53eab6cc74e6da6eb395b332f7e37",
+    "new_image": "agentteams/qwenpaw-worker:dsh-devdeps-6091f67",
+    "new_image_id": "sha256:8052e59bd52dfdf4016d970ada4952c70875d2a774925af109656beb6dffe3ac",
+    "new_container_id": "4080cd24687efeb4e74c03fc427d72a0f21158cffb9385ca7734a9673970cb0d",
+    "new_container_created_at": "2026-09-02T17:49:50.816564551Z",
+    "new_container_started_at": "2026-09-02T17:50:20.426616188Z",
+    "container_state": "running",
+    "host_port": 15522,
+    "health_http": 200,
+    "version_http": 200,
+    "preserved": {
+      "team": "native-m0-clean-team",
+      "team_leader": "native-m0-clean-leader",
+      "team_room_id": "!NbRmgvdkZMdRcCvLg4:matrix-native-m0-20260901.agentteams.local:28080",
+      "worker_room_id": "!t8ycL6WDpsGf9D0mGo:matrix-native-m0-20260901.agentteams.local:28080",
+      "matrix_user_id": "@native-m0-clean-dsh-worker:matrix-native-m0-20260901.agentteams.local:28080",
+      "runtime": "qwenpaw",
+      "model": "deepseek-v4-flash",
+      "model_provider": "testweaver-bailian",
+      "runtime_generation": 23,
+      "runtime_observed_generation": "NOT_EXPOSED"
+    },
+    "rollback": {
+      "available": true,
+      "official_entrypoint": "docker exec agentteams-native-m0-20260901-manager agt update worker --name native-m0-clean-dsh-worker --image agentteams/qwenpaw-worker:dsh-home-runtime-8cec101",
+      "not_executed": true
+    }
+  },
+  "provider_probe": {
+    "attempts": 1,
+    "retry": false,
+    "adapter_entrypoint": "native_worker_execute",
+    "profile": "aliyun-bailian",
+    "provider": "aliyun-bailian",
+    "logical_model": "deepseek-v4-flash",
+    "model_ref": "TESTWEAVER_BAILIAN_MODEL",
+    "protected_refs": [
+      "TESTWEAVER_BAILIAN_ENDPOINT",
+      "TESTWEAVER_BAILIAN_MODEL",
+      "TESTWEAVER_BAILIAN_CREDENTIAL"
+    ],
+    "runtime": "qwenpaw/dsh-headless",
+    "status": "FAILED",
+    "error_class": "adapter_or_provider_error",
+    "provider_call": "NOT_OBSERVED",
+    "usage": "UPSTREAM_NOT_OBSERVED",
+    "latency_ms": 1701.203,
+    "request_sha256": "f43d9ac166e7628a2e4d84ecd0d55570a808f33a37907c9dd5d373c0c87e59aa",
+    "adapter_response_sha256": "0a09d3bc2c4dcb9ebfcf65853b88114244a144351dd8ae89c383f8673d68afc1",
+    "mcp_exit_code": 0,
+    "mcp_stdout_bytes": 150,
+    "response_body_recorded": false,
+    "secret_values_recorded": false,
+    "native_state_mutation": false,
+    "native_result_submission": false,
+    "root_cause": "The single bounded native adapter/provider boundary returned no structured provider metadata; provider success and usage cannot be attested.",
+    "stop_condition": "No retry; LIVE not established."
+  },
+  "secret_policy": {
+    "values_read": false,
+    "values_written": false,
+    "values_logged": false,
+    "values_hashed": false,
+    "argv_secret": false,
+    "receipt_secret": false
+  }
+}
