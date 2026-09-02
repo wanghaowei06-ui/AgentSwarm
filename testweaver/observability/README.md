@@ -1,7 +1,7 @@
 # AgentLoop / OTel trace and SLS readback
 
 This directory contains the thinnest trace-export and query-side preparation
-for a real TestWeaver run. `otlp_genai.py` emits a standard OTLP/HTTP GenAI
+for a real TestWeaver run. `otlp_genai.py` emits a standard OTLP/HTTP protobuf GenAI
 span from caller-supplied run facts; it does not create or update AgentLoop
 resources, start containers, control an AgentTeams run, or make an Oracle
 decision.
@@ -17,7 +17,11 @@ reached AgentSpace or that an evaluation was queryable.
 
 One response is `VERIFIED` only when a successful JSON readback contains all
 four run anchors: `campaign_id`, `run_id`, PostgreSQL revision, and the exact
-content hash. An OTel readback must also contain the requested trace ID.
+content hash in one row. The matcher accepts both native `testweaver.*` keys
+and standard `gen_ai.session.id`/`gen_ai.conversation.id` aliases. AgentSpace
+is supplied by the verified binding/logstore and is not required to be
+repeated in every row. An OTel readback must also contain the requested trace
+ID.
 Transport/auth/permission/endpoint failures return `BLOCKED`; a successful
 readback without complete correlation returns `NOT_VERIFIED`. Local injected
 transports in the focused tests are contract tests, not LIVE evidence.

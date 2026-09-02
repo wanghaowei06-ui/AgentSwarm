@@ -1,0 +1,492 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentteams.example/testweaver/skillops/v1",
+  "title": "TestWeaver Skill evolution governance records",
+  "description": "Reference-only, fail-closed records. AgentTeams owns runtime Skill loading and execution.",
+  "oneOf": [
+    { "$ref": "#/$defs/Baseline" },
+    { "$ref": "#/$defs/Attribution" },
+    { "$ref": "#/$defs/Proposal" },
+    { "$ref": "#/$defs/HumanDecision" },
+    { "$ref": "#/$defs/HumanDecisionVerification" },
+    { "$ref": "#/$defs/Canary" },
+    { "$ref": "#/$defs/Reevaluation" },
+    { "$ref": "#/$defs/Receipt" },
+    { "$ref": "#/$defs/State" }
+  ],
+  "$defs": {
+    "Hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "Ref": {
+      "type": "string",
+      "pattern": "^\\S{1,2048}$"
+    },
+    "Name": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "Version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$"
+    },
+    "ArtifactRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "ref",
+        "content_hash",
+        "source_kind",
+        "provenance",
+        "classification",
+        "attestation_ref",
+        "attested",
+        "run_id"
+      ],
+      "properties": {
+        "kind": {
+          "enum": ["dataset", "evaluation", "trace", "evidence", "result"]
+        },
+        "ref": { "$ref": "#/$defs/Ref" },
+        "content_hash": { "$ref": "#/$defs/Hash" },
+        "source_kind": {
+          "enum": [
+            "agentteams-native",
+            "otel-genai",
+            "agentloop-sls",
+            "evaluation-export",
+            "frozen-dataset"
+          ]
+        },
+        "provenance": {
+          "enum": ["LIVE", "FROZEN", "FIXTURE", "SYNTHETIC", "REPLAY"]
+        },
+        "classification": {
+          "enum": ["LIVE_ATTESTED", "NON_LIVE"]
+        },
+        "attestation_ref": { "$ref": "#/$defs/Ref" },
+        "attested": { "type": "boolean" },
+        "run_id": {
+          "type": ["string", "null"],
+          "pattern": "^\\S{1,2048}$"
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "provenance": { "const": "LIVE" } } },
+          "then": { "properties": { "classification": { "const": "LIVE_ATTESTED" } } }
+        },
+        {
+          "if": {
+            "properties": {
+              "provenance": { "enum": ["FROZEN", "FIXTURE", "SYNTHETIC", "REPLAY"] }
+            }
+          },
+          "then": { "properties": { "classification": { "const": "NON_LIVE" } } }
+        }
+      ]
+    },
+    "DatasetRef": {
+      "allOf": [
+        { "$ref": "#/$defs/ArtifactRef" },
+        {
+          "properties": {
+            "kind": { "const": "dataset" },
+            "source_kind": { "enum": ["frozen-dataset", "evaluation-export"] },
+            "run_id": { "type": ["string", "null"] }
+          }
+        }
+      ]
+    },
+    "EvaluationRef": {
+      "allOf": [
+        { "$ref": "#/$defs/ArtifactRef" },
+        {
+          "properties": {
+            "kind": { "const": "evaluation" },
+            "source_kind": { "enum": ["evaluation-export", "agentloop-sls"] },
+            "run_id": { "type": ["string", "null"] }
+          }
+        }
+      ]
+    },
+    "ObservationRef": {
+      "allOf": [
+        { "$ref": "#/$defs/ArtifactRef" },
+        {
+          "properties": {
+            "kind": { "enum": ["trace", "evidence", "result"] },
+            "source_kind": {
+              "enum": [
+                "agentteams-native",
+                "otel-genai",
+                "agentloop-sls",
+                "evaluation-export"
+              ]
+            },
+            "run_id": { "$ref": "#/$defs/Ref" }
+          }
+        }
+      ]
+    },
+    "ResultRef": {
+      "allOf": [
+        { "$ref": "#/$defs/ObservationRef" },
+        { "properties": { "kind": { "const": "result" } } }
+      ]
+    },
+    "Baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_type",
+        "baseline_id",
+        "dataset_ref",
+        "evaluation_ref",
+        "run_id",
+        "trace_refs",
+        "evidence_refs",
+        "record_hash"
+      ],
+      "properties": {
+        "artifact_type": { "const": "skillops.baseline/v1" },
+        "baseline_id": { "$ref": "#/$defs/Ref" },
+        "dataset_ref": { "$ref": "#/$defs/DatasetRef" },
+        "evaluation_ref": { "$ref": "#/$defs/EvaluationRef" },
+        "run_id": { "$ref": "#/$defs/Ref" },
+        "trace_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/ObservationRef" }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/ObservationRef" }
+        },
+        "record_hash": { "$ref": "#/$defs/Hash" }
+      }
+    },
+    "Attribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_type",
+        "attribution_id",
+        "skill_name",
+        "base_version",
+        "baseline_ref",
+        "baseline_hash",
+        "baseline_run_id",
+        "trace_refs",
+        "evidence_refs",
+        "record_hash"
+      ],
+      "properties": {
+        "artifact_type": { "const": "skillops.attribution/v1" },
+        "attribution_id": { "$ref": "#/$defs/Ref" },
+        "skill_name": { "$ref": "#/$defs/Name" },
+        "base_version": { "$ref": "#/$defs/Version" },
+        "baseline_ref": { "$ref": "#/$defs/Ref" },
+        "baseline_hash": { "$ref": "#/$defs/Hash" },
+        "baseline_run_id": { "$ref": "#/$defs/Ref" },
+        "trace_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/ObservationRef" }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/ObservationRef" }
+        },
+        "record_hash": { "$ref": "#/$defs/Hash" }
+      }
+    },
+    "Proposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_type",
+        "proposal_id",
+        "skill_name",
+        "base_version",
+        "candidate_version",
+        "content_hash",
+        "rollback_ref",
+        "baseline_ref",
+        "baseline_hash",
+        "attribution_ref",
+        "attribution_hash",
+        "record_hash"
+      ],
+      "properties": {
+        "artifact_type": { "const": "skillops.proposal/v1" },
+        "proposal_id": { "$ref": "#/$defs/Ref" },
+        "skill_name": { "$ref": "#/$defs/Name" },
+        "base_version": { "$ref": "#/$defs/Version" },
+        "candidate_version": { "$ref": "#/$defs/Version" },
+        "content_hash": { "$ref": "#/$defs/Hash" },
+        "rollback_ref": { "$ref": "#/$defs/Ref" },
+        "baseline_ref": { "$ref": "#/$defs/Ref" },
+        "baseline_hash": { "$ref": "#/$defs/Hash" },
+        "attribution_ref": { "$ref": "#/$defs/Ref" },
+        "attribution_hash": { "$ref": "#/$defs/Hash" },
+        "record_hash": { "$ref": "#/$defs/Hash" }
+      }
+    },
+    "HumanDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_type",
+        "decision_id",
+        "decision_revision",
+        "proposal_ref",
+        "proposal_hash",
+        "actor_ref",
+        "identity_ref",
+        "attestation_ref",
+        "actor_kind",
+        "decision",
+        "decided_at",
+        "record_hash"
+      ],
+      "properties": {
+        "artifact_type": { "const": "skillops.human-decision/v1" },
+        "decision_id": { "$ref": "#/$defs/Ref" },
+        "decision_revision": { "type": "integer", "minimum": 1 },
+        "proposal_ref": { "$ref": "#/$defs/Ref" },
+        "proposal_hash": { "$ref": "#/$defs/Hash" },
+        "actor_ref": { "$ref": "#/$defs/Ref" },
+        "identity_ref": { "$ref": "#/$defs/Ref" },
+        "attestation_ref": { "$ref": "#/$defs/Ref" },
+        "actor_kind": { "const": "external-human" },
+        "decision": { "enum": ["APPROVE", "REJECT"] },
+        "decided_at": { "$ref": "#/$defs/Ref" },
+        "record_hash": { "$ref": "#/$defs/Hash" }
+      }
+    },
+    "HumanDecisionVerification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_type",
+        "verification_ref",
+        "source",
+        "event_ref",
+        "event_hash",
+        "sender",
+        "identity_ref",
+        "decision_ref",
+        "decision_hash",
+        "proposal_ref",
+        "proposal_hash",
+        "decision_revision",
+        "decision",
+        "baseline_ref",
+        "baseline_hash",
+        "run_id",
+        "verified_at",
+        "record_hash"
+      ],
+      "properties": {
+        "artifact_type": { "const": "skillops.human-decision-verification/v1" },
+        "verification_ref": { "$ref": "#/$defs/Ref" },
+        "source": { "const": "matrix-live-readback" },
+        "event_ref": { "$ref": "#/$defs/Ref" },
+        "event_hash": { "$ref": "#/$defs/Hash" },
+        "sender": { "$ref": "#/$defs/Ref" },
+        "identity_ref": { "$ref": "#/$defs/Ref" },
+        "decision_ref": { "$ref": "#/$defs/Ref" },
+        "decision_hash": { "$ref": "#/$defs/Hash" },
+        "proposal_ref": { "$ref": "#/$defs/Ref" },
+        "proposal_hash": { "$ref": "#/$defs/Hash" },
+        "decision_revision": { "type": "integer", "minimum": 1 },
+        "decision": { "enum": ["APPROVE", "REJECT"] },
+        "baseline_ref": { "$ref": "#/$defs/Ref" },
+        "baseline_hash": { "$ref": "#/$defs/Hash" },
+        "run_id": { "$ref": "#/$defs/Ref" },
+        "verified_at": { "$ref": "#/$defs/Ref" },
+        "record_hash": { "$ref": "#/$defs/Hash" }
+      }
+    },
+    "EvaluationStage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_type",
+        "observation_id",
+        "proposal_ref",
+        "proposal_hash",
+        "candidate_version",
+        "dataset_ref",
+        "evaluation_ref",
+        "result_ref",
+        "trace_refs",
+        "evidence_refs",
+        "status",
+        "record_hash"
+      ],
+      "properties": {
+        "artifact_type": {
+          "enum": ["skillops.canary/v1", "skillops.reevaluation/v1"]
+        },
+        "observation_id": { "$ref": "#/$defs/Ref" },
+        "proposal_ref": { "$ref": "#/$defs/Ref" },
+        "proposal_hash": { "$ref": "#/$defs/Hash" },
+        "candidate_version": { "$ref": "#/$defs/Version" },
+        "dataset_ref": { "$ref": "#/$defs/DatasetRef" },
+        "evaluation_ref": { "$ref": "#/$defs/EvaluationRef" },
+        "result_ref": { "$ref": "#/$defs/ResultRef" },
+        "trace_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/ObservationRef" }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/ObservationRef" }
+        },
+        "status": { "enum": ["PASS", "FAIL", "BLOCKED", "NOT_AVAILABLE"] },
+        "record_hash": { "$ref": "#/$defs/Hash" }
+      }
+    },
+    "Canary": {
+      "allOf": [
+        { "$ref": "#/$defs/EvaluationStage" },
+        { "properties": { "artifact_type": { "const": "skillops.canary/v1" } } }
+      ]
+    },
+    "Reevaluation": {
+      "allOf": [
+        { "$ref": "#/$defs/EvaluationStage" },
+        { "properties": { "artifact_type": { "const": "skillops.reevaluation/v1" } } }
+      ]
+    },
+    "Receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_type",
+        "receipt_id",
+        "proposal_ref",
+        "proposal_hash",
+        "action",
+        "base_version",
+        "candidate_version",
+        "active_version",
+        "rollback_ref",
+        "baseline_hash",
+        "canary_ref",
+        "canary_hash",
+        "reevaluation_ref",
+        "reevaluation_hash",
+        "human_decision_ref",
+        "human_decision_hash",
+        "human_verification_ref",
+        "human_verification_hash",
+        "record_hash"
+      ],
+      "properties": {
+        "artifact_type": { "const": "skillops.receipt/v1" },
+        "receipt_id": { "$ref": "#/$defs/Ref" },
+        "proposal_ref": { "$ref": "#/$defs/Ref" },
+        "proposal_hash": { "$ref": "#/$defs/Hash" },
+        "action": { "enum": ["PROMOTE", "ROLLBACK"] },
+        "base_version": { "$ref": "#/$defs/Version" },
+        "candidate_version": { "$ref": "#/$defs/Version" },
+        "active_version": { "$ref": "#/$defs/Version" },
+        "rollback_ref": { "$ref": "#/$defs/Ref" },
+        "baseline_hash": { "$ref": "#/$defs/Hash" },
+        "canary_ref": { "$ref": "#/$defs/Ref" },
+        "canary_hash": { "$ref": "#/$defs/Hash" },
+        "reevaluation_ref": { "$ref": "#/$defs/Ref" },
+        "reevaluation_hash": { "$ref": "#/$defs/Hash" },
+        "human_decision_ref": { "$ref": "#/$defs/Ref" },
+        "human_decision_hash": { "$ref": "#/$defs/Hash" },
+        "human_verification_ref": { "$ref": "#/$defs/Ref" },
+        "human_verification_hash": { "$ref": "#/$defs/Hash" },
+        "record_hash": { "$ref": "#/$defs/Hash" }
+      }
+    },
+    "State": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_type",
+        "skill_name",
+        "state",
+        "baseline_ref",
+        "baseline_hash",
+        "attribution_ref",
+        "attribution_hash",
+        "proposal_ref",
+        "proposal_hash",
+        "human_decision_ref",
+        "human_decision_hash",
+        "human_verification_ref",
+        "human_verification_hash",
+        "canary_ref",
+        "reevaluation_ref",
+        "receipt_ref"
+      ],
+      "properties": {
+        "artifact_type": { "const": "skillops.state/v1" },
+        "skill_name": { "$ref": "#/$defs/Name" },
+        "state": {
+          "enum": [
+            "EMPTY",
+            "BASELINE_FROZEN",
+            "ATTRIBUTED",
+            "PROPOSED",
+            "HUMAN_APPROVED",
+            "REJECTED",
+            "CANARY_RECORDED",
+            "REEVALUATED",
+            "PROMOTED",
+            "ROLLED_BACK"
+          ]
+        },
+        "baseline_ref": {
+          "anyOf": [{ "$ref": "#/$defs/Ref" }, { "type": "null" }]
+        },
+        "baseline_hash": { "anyOf": [{ "$ref": "#/$defs/Hash" }, { "type": "null" }] },
+        "attribution_ref": {
+          "anyOf": [{ "$ref": "#/$defs/Ref" }, { "type": "null" }]
+        },
+        "attribution_hash": {
+          "anyOf": [{ "$ref": "#/$defs/Hash" }, { "type": "null" }]
+        },
+        "proposal_ref": {
+          "anyOf": [{ "$ref": "#/$defs/Ref" }, { "type": "null" }]
+        },
+        "proposal_hash": { "anyOf": [{ "$ref": "#/$defs/Hash" }, { "type": "null" }] },
+        "human_decision_ref": {
+          "anyOf": [{ "$ref": "#/$defs/Ref" }, { "type": "null" }]
+        },
+        "human_decision_hash": {
+          "anyOf": [{ "$ref": "#/$defs/Hash" }, { "type": "null" }]
+        },
+        "human_verification_ref": {
+          "anyOf": [{ "$ref": "#/$defs/Ref" }, { "type": "null" }]
+        },
+        "human_verification_hash": {
+          "anyOf": [{ "$ref": "#/$defs/Hash" }, { "type": "null" }]
+        },
+        "canary_ref": {
+          "anyOf": [{ "$ref": "#/$defs/Ref" }, { "type": "null" }]
+        },
+        "reevaluation_ref": {
+          "anyOf": [{ "$ref": "#/$defs/Ref" }, { "type": "null" }]
+        },
+        "receipt_ref": {
+          "anyOf": [{ "$ref": "#/$defs/Ref" }, { "type": "null" }]
+        }
+      }
+    }
+  }
+}

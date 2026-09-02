@@ -265,6 +265,79 @@ def build_otlp_payload(
     return payload, trace_id, span_id
 
 
+def _proto_value(target: object, value: object) -> None:
+    """Populate an official OTLP ``AnyValue`` without JSON intermediates."""
+
+    if isinstance(value, bool):
+        target.bool_value = value  # type: ignore[attr-defined]
+    elif isinstance(value, int):
+        target.int_value = value  # type: ignore[attr-defined]
+    elif isinstance(value, float):
+        target.double_value = value  # type: ignore[attr-defined]
+    elif isinstance(value, str):
+        target.string_value = value  # type: ignore[attr-defined]
+    elif isinstance(value, Sequence) and not isinstance(value, (bytes, bytearray, str)):
+        for item in value:
+            child = target.array_value.values.add()  # type: ignore[attr-defined]
+            _proto_value(child, item)
+    else:
+        raise OtlpContractError("OTLP attribute has unsupported value type")
+
+
+def build_otlp_protobuf(
+    context: GenAIContext,
+    *,
+    trace_id: str | None = None,
+    span_id: str | None = None,
+    started_ns: int | None = None,
+    ended_ns: int | None = None,
+) -> tuple[bytes, str, str]:
+    """Build one official OTLP ``ExportTraceServiceRequest`` protobuf."""
+
+    try:
+        from opentelemetry.proto.collector.trace.v1.trace_service_pb2 import (
+            ExportTraceServiceRequest,
+        )
+        from opentelemetry.proto.trace.v1.trace_pb2 import Span, Status
+    except ImportError as error:  # pragma: no cover - deployment dependency
+        raise OtlpContractError("OTLP protobuf support is unavailable") from error
+
+    trace_id = trace_id or secrets.token_hex(16)
+    span_id = span_id or secrets.token_hex(8)
+    if not re.fullmatch(r"[0-9a-f]{32}", trace_id) or not re.fullmatch(r"[0-9a-f]{16}", span_id):
+        raise OtlpContractError("trace_id or span_id has invalid format")
+    started_ns = started_ns or time_ns()
+    ended_ns = ended_ns or max(started_ns, time_ns())
+    if started_ns <= 0 or ended_ns < started_ns:
+        raise OtlpContractError("OTLP span time window is invalid")
+
+    request = ExportTraceServiceRequest()
+    resource_spans = request.resource_spans.add()
+    for key, value in {
+        "service.name": "testweaver",
+        "service.version": "observability-v1",
+    }.items():
+        attribute = resource_spans.resource.attributes.add()
+        attribute.key = key
+        _proto_value(attribute.value, value)
+    scope_spans = resource_spans.scope_spans.add()
+    scope_spans.scope.name = "testweaver.observability"
+    scope_spans.scope.version = "1"
+    span = scope_spans.spans.add()
+    span.trace_id = bytes.fromhex(trace_id)
+    span.span_id = bytes.fromhex(span_id)
+    span.name = "testweaver.agent.turn"
+    span.kind = Span.SPAN_KIND_INTERNAL
+    span.start_time_unix_nano = started_ns
+    span.end_time_unix_nano = ended_ns
+    span.status.code = Status.STATUS_CODE_OK
+    for key, value in context.attributes().items():
+        attribute = span.attributes.add()
+        attribute.key = key
+        _proto_value(attribute.value, value)
+    return request.SerializeToString(), trace_id, span_id
+
+
 def _urllib_post(url: str, headers: Mapping[str, str], body: bytes, timeout: float) -> OtlpResponse:
     request = Request(url, data=body, headers=dict(headers), method="POST")
     try:
@@ -289,14 +362,13 @@ def emit_genai_span(
     if timeout_seconds <= 0 or timeout_seconds > 60:
         raise OtlpContractError("timeout_seconds must be between 0 and 60")
     safe_endpoint = _endpoint(endpoint)
-    payload, trace_id, span_id = build_otlp_payload(context)
-    body = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    body, trace_id, span_id = build_otlp_protobuf(context)
     if len(body) > _MAX_REQUEST_BYTES:
         raise OtlpContractError("OTLP request exceeds the bounded size")
     request_hash = "sha256:" + hashlib.sha256(body).hexdigest()
     headers: dict[str, str] = {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
+        "Accept": "application/x-protobuf",
+        "Content-Type": "application/x-protobuf",
     }
     if header_provider is not None:
         try:

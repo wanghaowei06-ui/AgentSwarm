@@ -9,9 +9,12 @@ in a receipt.
 from __future__ import annotations
 
 import base64
+import csv
 import hashlib
 import hmac
+import io
 import json
+import os
 import re
 import stat
 from collections.abc import Callable, Mapping
@@ -19,7 +22,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote, urlencode, urlsplit, urlunsplit
+from urllib.parse import parse_qsl, quote, urlencode, urlsplit, urlunsplit
 from urllib.request import Request, urlopen
 
 from .readonly_query import Correlation, ConfigReferenceStatus, ProtectedConfigRef
@@ -29,9 +32,11 @@ SlsStatus = str
 _HASH = re.compile(r"^sha256:[0-9a-f]{64}$")
 _IDENTIFIER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:@/-]{0,255}$")
 _NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+_VARIABLE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 _DNS_LABEL = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$")
 _MAX_RESPONSE_BYTES = 4 * 1024 * 1024
 _MAX_QUERY_ROWS = 100
+_MAX_CREDENTIAL_FILE_BYTES = 64 * 1024
 EVALUATION_DETAIL_LOGSTORE = "evaluation_detail"
 
 
@@ -74,6 +79,155 @@ class SlsCredentials:
         return "SlsCredentials(access_key_id_present=True, secret_present=True, token_present=%s)" % (
             self.security_token is not None,
         )
+
+
+CredentialProvider = Callable[[], SlsCredentials]
+
+
+def _read_protected_text(path: Path) -> str:
+    """Read one bounded owner-only file without exposing its contents."""
+
+    if not path.is_absolute():
+        raise SlsContractError("protected credential path must be absolute")
+    flags = os.O_RDONLY | getattr(os, "O_CLOEXEC", 0) | getattr(os, "O_NOFOLLOW", 0)
+    descriptor: int | None = None
+    try:
+        descriptor = os.open(path, flags)
+        metadata = os.fstat(descriptor)
+        if not stat.S_ISREG(metadata.st_mode) or stat.S_IMODE(metadata.st_mode) & 0o077:
+            raise SlsContractError("protected credential file must be owner-only regular file")
+        if metadata.st_size < 0 or metadata.st_size > _MAX_CREDENTIAL_FILE_BYTES:
+            raise SlsContractError("protected credential file is too large")
+        with os.fdopen(descriptor, "rb", closefd=True) as stream:
+            descriptor = None
+            raw = stream.read(_MAX_CREDENTIAL_FILE_BYTES + 1)
+    except SlsContractError:
+        raise
+    except (OSError, ValueError) as error:
+        raise SlsContractError("protected credential file is unavailable") from error
+    finally:
+        if descriptor is not None:
+            try:
+                os.close(descriptor)
+            except OSError:
+                pass
+    if len(raw) > _MAX_CREDENTIAL_FILE_BYTES:
+        raise SlsContractError("protected credential file is too large")
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError as error:
+        raise SlsContractError("protected credential file is not UTF-8") from error
+    if any(ord(character) < 32 and character not in "\n\r\t" for character in text):
+        raise SlsContractError("protected credential file contains control data")
+    return text
+
+
+def _credential_names(
+    access_key_id_name: str,
+    access_key_secret_name: str,
+    security_token_name: str | None,
+) -> tuple[str, str, str | None]:
+    names = (access_key_id_name, access_key_secret_name, security_token_name)
+    for name in names:
+        if name is not None and not _VARIABLE.fullmatch(name):
+            raise SlsContractError("credential variable name is invalid")
+    if access_key_id_name == access_key_secret_name or (
+        security_token_name is not None
+        and security_token_name in {access_key_id_name, access_key_secret_name}
+    ):
+        raise SlsContractError("credential variable names must be distinct")
+    return names
+
+
+def _parse_env_credentials(
+    text: str,
+    *,
+    access_key_id_name: str,
+    access_key_secret_name: str,
+    security_token_name: str | None,
+) -> SlsCredentials:
+    values: dict[str, str] = {}
+    wanted = {access_key_id_name, access_key_secret_name}
+    if security_token_name is not None:
+        wanted.add(security_token_name)
+    for line in text.splitlines():
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        name, separator, value = line.partition("=")
+        if not separator or name != name.strip() or not _VARIABLE.fullmatch(name):
+            raise SlsContractError("protected env file has an invalid assignment")
+        if name in values:
+            raise SlsContractError("protected env file has a duplicate assignment")
+        if name in wanted:
+            values[name] = value
+    missing = {access_key_id_name, access_key_secret_name}.difference(values)
+    if missing:
+        raise SlsContractError("protected env file is missing required credentials")
+    return SlsCredentials(
+        values[access_key_id_name],
+        values[access_key_secret_name],
+        (values.get(security_token_name) or None) if security_token_name is not None else None,
+    )
+
+
+def protected_env_credential_provider(
+    path: Path,
+    *,
+    access_key_id_name: str = "ALIBABA_CLOUD_ACCESS_KEY_ID",
+    access_key_secret_name: str = "ALIBABA_CLOUD_ACCESS_KEY_SECRET",
+    security_token_name: str | None = "ALIBABA_CLOUD_SECURITY_TOKEN",
+) -> CredentialProvider:
+    """Return a provider that loads selected credentials into memory on demand."""
+
+    _credential_names(access_key_id_name, access_key_secret_name, security_token_name)
+
+    def provider() -> SlsCredentials:
+        return _parse_env_credentials(
+            _read_protected_text(path),
+            access_key_id_name=access_key_id_name,
+            access_key_secret_name=access_key_secret_name,
+            security_token_name=security_token_name,
+        )
+
+    return provider
+
+
+def protected_csv_credential_provider(
+    path: Path,
+    *,
+    access_key_id_column: str = "AccessKey ID",
+    access_key_secret_column: str = "AccessKey Secret",
+) -> CredentialProvider:
+    """Return a provider for one owner-only AccessKey CSV row."""
+
+    if (
+        not access_key_id_column
+        or not access_key_secret_column
+        or access_key_id_column == access_key_secret_column
+        or any(char in access_key_id_column + access_key_secret_column for char in "\r\n")
+    ):
+        raise SlsContractError("credential CSV columns are invalid")
+
+    def provider() -> SlsCredentials:
+        try:
+            rows = list(csv.reader(io.StringIO(_read_protected_text(path))))
+        except csv.Error as error:
+            raise SlsContractError("protected credential CSV is invalid") from error
+        if not rows:
+            raise SlsContractError("protected credential CSV is empty")
+        header = rows[0]
+        if len(header) != len(set(header)):
+            raise SlsContractError("protected credential CSV has duplicate columns")
+        required = {access_key_id_column, access_key_secret_column}
+        if not required.issubset(header):
+            raise SlsContractError("protected credential CSV is missing required columns")
+        data_rows = [row for row in rows[1:] if any(cell != "" for cell in row)]
+        if len(data_rows) != 1 or len(data_rows[0]) != len(header):
+            raise SlsContractError("protected credential CSV must contain one complete row")
+        row = dict(zip(header, data_rows[0]))
+        return SlsCredentials(row[access_key_id_column], row[access_key_secret_column])
+
+    return provider
 
 
 @dataclass(frozen=True)
@@ -154,7 +308,6 @@ def load_sls_binding(
     path: Path,
     *,
     agent_space: str | None = None,
-    evaluation_logstore: str = EVALUATION_DETAIL_LOGSTORE,
 ) -> SlsBinding:
     """Load SLS identifiers from an owner-only LoongSuite config in memory."""
 
@@ -177,13 +330,14 @@ def load_sls_binding(
         raise SlsContractError("SLS config has no SLS section")
     endpoint = section.get("endpoint")
     project = section.get("project")
-    if not all(isinstance(item, str) and item for item in (endpoint, project)):
-        raise SlsContractError("SLS endpoint/project is incomplete")
+    logstore = section.get("logstore")
+    if not all(isinstance(item, str) and item for item in (endpoint, project, logstore)):
+        raise SlsContractError("SLS endpoint/project/logstore is incomplete")
     endpoint = _normalize_endpoint(endpoint)
     return SlsBinding(
         endpoint=endpoint,
         project=project,
-        logstore=evaluation_logstore,
+        logstore=logstore,
         agent_space=agent_space,
     )
 
@@ -254,7 +408,6 @@ class SlsQueryReceipt:
         }
 
 
-CredentialProvider = Callable[[], SlsCredentials]
 SlsTransport = Callable[[str, Mapping[str, str], float], SlsHttpResponse]
 
 
@@ -342,8 +495,6 @@ class SlsReadOnlyQueryClient:
             return self._blocked(operation, logstore, correlation, "time_window_invalid")
         if trace_id is not None and not re.fullmatch(r"[0-9a-f]{32}", trace_id):
             return self._blocked(operation, logstore, correlation, "trace_id_invalid")
-        if self.binding.agent_space is None:
-            return self._blocked(operation, logstore, correlation, "agent_space_identifier_missing")
         credential_status = self.credential_ref.inspect() if self.credential_ref else None
         reason = self._preflight_reason(credential_status)
         if reason:
@@ -441,8 +592,6 @@ class SlsReadOnlyQueryClient:
         )
 
     def _preflight_reason(self, credential: ConfigReferenceStatus | None) -> str | None:
-        if self.binding.agent_space is None:
-            return "agent_space_identifier_missing"
         if credential is None:
             return "sls_ram_credential_reference_missing"
         if not credential.usable:
@@ -487,23 +636,24 @@ class SlsReadOnlyQueryClient:
         )
 
 
-def _query_text(correlation: Correlation, agent_space: str, trace_id: str | None) -> str:
+def _query_text(correlation: Correlation, agent_space: str | None, trace_id: str | None) -> str:
     anchors = [
         ("run_id", correlation.run_id),
         ("campaign_id", correlation.campaign_id),
         ("pg_revision", correlation.pg_revision),
         ("content_hash", correlation.content_hash),
-        ("agentSpace", agent_space),
     ]
+    if agent_space is not None:
+        anchors.append(("agentSpace", agent_space))
     if trace_id is not None:
         anchors.append(("trace_id", trace_id))
     for name, value in anchors:
         _opaque(name, "query field", _NAME)
         _opaque(value, "query anchor")
-    # Keep one SQL statement, one row source, and an explicit bound.  The
-    # values are restricted opaque identifiers before they enter SQL.
-    predicates = " AND ".join(f"{name} = '{value}'" for name, value in anchors)
-    return f"* | SELECT * FROM log WHERE {predicates} LIMIT {_MAX_QUERY_ROWS}"
+    # Keep the server-side expression to the known-valid SLS form.  Some
+    # tenants reject field predicates when those fields are not indexed; the
+    # bounded result is still checked locally against every anchor in one row.
+    return f"* | SELECT * LIMIT {_MAX_QUERY_ROWS}"
 
 
 def _logs_url(binding: SlsBinding, logstore: str, params: Mapping[str, str]) -> str:
@@ -514,8 +664,21 @@ def _logs_url(binding: SlsBinding, logstore: str, params: Mapping[str, str]) -> 
     return f"{binding.safe_endpoint}{path}?{query}"
 
 
-def _signed_headers(method: str, url: str, credentials: SlsCredentials) -> dict[str, str]:
+def _canonical_resource(url: str) -> str:
+    """Build SLS's canonical resource from decoded, sorted query parameters."""
+
     parsed = urlsplit(url)
+    try:
+        pairs = parse_qsl(parsed.query, keep_blank_values=True, strict_parsing=True)
+    except ValueError as error:
+        raise SlsContractError("SLS query parameters are malformed") from error
+    canonical_query = "&".join(
+        f"{key}={value}" for key, value in sorted(pairs, key=lambda pair: (pair[0], pair[1]))
+    )
+    return parsed.path + (f"?{canonical_query}" if canonical_query else "")
+
+
+def _signed_headers(method: str, url: str, credentials: SlsCredentials) -> dict[str, str]:
     date = datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT")
     headers = {
         "Accept": "application/json",
@@ -534,7 +697,7 @@ def _signed_headers(method: str, url: str, credentials: SlsCredentials) -> dict[
             if key.lower().startswith("x-log-") or key.lower().startswith("x-acs-")
         )
     )
-    canonical_resource = parsed.path + ("?" + parsed.query if parsed.query else "")
+    canonical_resource = _canonical_resource(url)
     string_to_sign = f"{method}\n\n\n{date}\n{canonical_headers}{canonical_resource}"
     signature = base64.b64encode(
         hmac.new(credentials.access_key_secret.encode(), string_to_sign.encode(), "sha1").digest()
@@ -589,16 +752,35 @@ def _rows(payload: object) -> list[Mapping[str, object]]:
 def _row_matches(
     row: Mapping[str, object],
     correlation: Correlation,
-    agent_space: str,
+    agent_space: str | None,
     trace_id: str | None,
 ) -> bool:
     expected: dict[tuple[str, ...], str] = {
-        ("run_id", "runId", "testweaver.run_id"): correlation.run_id,
-        ("campaign_id", "campaignId", "testweaver.campaign_id"): correlation.campaign_id,
-        ("pg_revision", "pgRevision", "testweaver.pg_revision"): correlation.pg_revision,
-        ("content_hash", "contentHash", "testweaver.content_hash"): correlation.content_hash,
-        ("agentSpace", "agent_space", "agentSpaceName"): agent_space,
+        (
+            "run_id",
+            "runId",
+            "testweaver.run_id",
+            "gen_ai.session.id",
+        ): correlation.run_id,
+        (
+            "campaign_id",
+            "campaignId",
+            "testweaver.campaign_id",
+            "gen_ai.conversation.id",
+        ): correlation.campaign_id,
+        (
+            "pg_revision",
+            "pgRevision",
+            "testweaver.pg_revision",
+            "testweaver.pg.revision",
+        ): correlation.pg_revision,
+        (
+            "content_hash",
+            "contentHash",
+            "testweaver.content_hash",
+            "testweaver.content.hash",
+        ): correlation.content_hash,
     }
     if trace_id is not None:
-        expected[("trace_id", "traceId", "trace.id")] = trace_id
+        expected[("trace_id", "traceId", "trace.id", "testweaver.trace_id")] = trace_id
     return all(any(row.get(name) == value for name in aliases) for aliases, value in expected.items())

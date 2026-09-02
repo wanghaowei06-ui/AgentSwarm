@@ -7,6 +7,7 @@ from .otlp_genai import (
     OtlpReceipt,
     OtlpResponse,
     build_otlp_payload,
+    build_otlp_protobuf,
     emit_genai_span,
     load_loongsuite_otlp_binding,
 )
@@ -27,6 +28,8 @@ from .sls_query import (
     SlsQueryReceipt,
     SlsReadOnlyQueryClient,
     load_sls_binding,
+    protected_csv_credential_provider,
+    protected_env_credential_provider,
 )
 
 __all__ = [
@@ -43,6 +46,7 @@ __all__ = [
     "OtlpReceipt",
     "OtlpResponse",
     "build_otlp_payload",
+    "build_otlp_protobuf",
     "emit_genai_span",
     "load_loongsuite_otlp_binding",
     "EVALUATION_DETAIL_LOGSTORE",
@@ -52,4 +56,6 @@ __all__ = [
     "SlsQueryReceipt",
     "SlsReadOnlyQueryClient",
     "load_sls_binding",
+    "protected_csv_credential_provider",
+    "protected_env_credential_provider",
 ]

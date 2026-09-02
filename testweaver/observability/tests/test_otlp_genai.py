@@ -6,6 +6,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from opentelemetry.proto.collector.trace.v1.trace_service_pb2 import (
+    ExportTraceServiceRequest,
+)
+
 from testweaver.observability.otlp_genai import (
     EvidenceRef,
     GenAIContext,
@@ -72,7 +76,17 @@ class OtlpGenAIContractTests(unittest.TestCase):
         self.assertFalse(receipt.live_claim)
         self.assertEqual(receipt.response_status, 200)
         self.assertEqual(requests[0][0], "http://127.0.0.1:4318/v1/traces")
-        self.assertEqual(requests[0][1]["Content-Type"], "application/json")
+        self.assertEqual(requests[0][1]["Content-Type"], "application/x-protobuf")
+        decoded = ExportTraceServiceRequest()
+        decoded.ParseFromString(requests[0][2])
+        self.assertEqual(
+            decoded.resource_spans[0].scope_spans[0].spans[0].trace_id.hex(),
+            receipt.trace_id,
+        )
+        self.assertEqual(
+            decoded.resource_spans[0].scope_spans[0].spans[0].attributes[0].key,
+            "gen_ai.conversation.id",
+        )
         self.assertNotIn("body", receipt.as_dict())
         self.assertNotIn("Authorization", receipt.as_dict())
 
