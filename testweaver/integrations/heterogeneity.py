@@ -2,16 +2,20 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import InitVar, dataclass, field
 from typing import Any
 
 from testweaver.authority import (
     AuthorityError,
+    AuthorityEvent,
     safe_metadata,
     validate_hash,
     validate_ref,
 )
 from testweaver.contracts.validator import canonical_hash
+from testweaver.integrations.projector import LIVE_SOURCE_ATTESTED, UNATTESTED_PARTIAL
+
+_ATTESTED_FACT_TOKEN = object()
 
 
 @dataclass(frozen=True, slots=True)
@@ -76,19 +80,129 @@ class HeterogeneityPolicyFact:
     request_hash: str
     response_hash: str
     observed_at: str
+    projection_classification: str
+    manager_source_attestation_ref: str | None
+    manager_source_attestation_hash: str | None
+    runtime_source_attestation_ref: str | None
+    runtime_source_attestation_hash: str | None
     content_hash: str
+    _trust_token: InitVar[object] = None
+    _trust_seal: object = field(default=None, init=False, repr=False, compare=False)
 
-    def __post_init__(self) -> None:
+    def __post_init__(self, _trust_token: object) -> None:
+        if _trust_token is _ATTESTED_FACT_TOKEN:
+            object.__setattr__(self, "_trust_seal", _ATTESTED_FACT_TOKEN)
         self.validate()
 
     @classmethod
     def create(cls, **values: Any) -> HeterogeneityPolicyFact:
+        forbidden = {
+            "projection_classification",
+            "manager_source_attestation_ref",
+            "manager_source_attestation_hash",
+            "runtime_source_attestation_ref",
+            "runtime_source_attestation_hash",
+        }
+        if forbidden.intersection(values):
+            raise AuthorityError("caller cannot self-assert heterogeneity source trust")
+        return cls._create_with_trust(
+            values,
+            projection_classification=UNATTESTED_PARTIAL,
+            manager_source_attestation_ref=None,
+            manager_source_attestation_hash=None,
+            runtime_source_attestation_ref=None,
+            runtime_source_attestation_hash=None,
+            trust_token=None,
+        )
+
+    @classmethod
+    def create_attested(
+        cls,
+        *,
+        manager_projection: AuthorityEvent,
+        runtime_projection: AuthorityEvent,
+        **values: Any,
+    ) -> HeterogeneityPolicyFact:
+        """Seal a fact only after two independently source-attested projections."""
+
+        _attested_projection(manager_projection, "manager_choice")
+        _attested_projection(runtime_projection, "dsh_call")
+        if (
+            manager_projection.run_id != values.get("run_id")
+            or runtime_projection.run_id != values.get("run_id")
+            or manager_projection.campaign_id != values.get("campaign_id")
+            or runtime_projection.campaign_id != values.get("campaign_id")
+        ):
+            raise AuthorityError("heterogeneity projections cross their run lineage")
+        if (
+            values.get("manager_choice_ref") != manager_projection.provenance
+            or values.get("manager_choice_hash") != manager_projection.request_hash
+        ):
+            raise AuthorityError("Manager choice does not match its attested projection")
+        runtime_payload = runtime_projection.payload
+        for field in (
+            "actual_runtime",
+            "actual_provider",
+            "actual_model",
+            "input_tokens",
+            "output_tokens",
+            "latency_ms",
+            "request_hash",
+            "response_hash",
+        ):
+            projected_field = field.removeprefix("actual_")
+            if values.get(field) != runtime_payload.get(projected_field):
+                raise AuthorityError("runtime observation differs from its attested projection")
+        return cls._create_with_trust(
+            values,
+            projection_classification=LIVE_SOURCE_ATTESTED,
+            manager_source_attestation_ref=manager_projection.payload[
+                "collector_attestation_ref"
+            ],
+            manager_source_attestation_hash=manager_projection.payload[
+                "collector_attestation_hash"
+            ],
+            runtime_source_attestation_ref=runtime_projection.payload[
+                "collector_attestation_ref"
+            ],
+            runtime_source_attestation_hash=runtime_projection.payload[
+                "collector_attestation_hash"
+            ],
+            trust_token=_ATTESTED_FACT_TOKEN,
+        )
+
+    @classmethod
+    def _create_with_trust(
+        cls,
+        values: dict[str, Any],
+        *,
+        projection_classification: str,
+        manager_source_attestation_ref: str | None,
+        manager_source_attestation_hash: str | None,
+        runtime_source_attestation_ref: str | None,
+        runtime_source_attestation_hash: str | None,
+        trust_token: object,
+    ) -> HeterogeneityPolicyFact:
         draft = {
             **values,
             "candidates": [item.as_dict() for item in values["candidates"]],
+            "projection_classification": projection_classification,
+            "manager_source_attestation_ref": manager_source_attestation_ref,
+            "manager_source_attestation_hash": manager_source_attestation_hash,
+            "runtime_source_attestation_ref": runtime_source_attestation_ref,
+            "runtime_source_attestation_hash": runtime_source_attestation_hash,
         }
         safe_metadata(draft, "heterogeneity_policy_fact")
-        return cls(**values, content_hash=canonical_hash(draft))
+        return cls(
+            **values,
+            projection_classification=projection_classification,
+            manager_source_attestation_ref=manager_source_attestation_ref,
+            manager_source_attestation_hash=manager_source_attestation_hash,
+            runtime_source_attestation_ref=runtime_source_attestation_ref,
+            runtime_source_attestation_hash=runtime_source_attestation_hash,
+            content_hash=canonical_hash(draft),
+            _trust_token=trust_token,
+        )
 
     def validate(self) -> None:
         for field in (
@@ -112,6 +226,34 @@ class HeterogeneityPolicyFact:
             "content_hash",
         ):
             validate_hash(getattr(self, field), field)
+        if self.projection_classification not in {
+            UNATTESTED_PARTIAL,
+            LIVE_SOURCE_ATTESTED,
+        }:
+            raise AuthorityError("heterogeneity projection classification is invalid")
+        attestation_fields = (
+            self.manager_source_attestation_ref,
+            self.manager_source_attestation_hash,
+            self.runtime_source_attestation_ref,
+            self.runtime_source_attestation_hash,
+        )
+        if self.projection_classification == LIVE_SOURCE_ATTESTED:
+            if self._trust_seal is not _ATTESTED_FACT_TOKEN:
+                raise AuthorityError("caller cannot self-assert heterogeneity source trust")
+            if any(value is None for value in attestation_fields):
+                raise AuthorityError("attested heterogeneity fact lacks source attestations")
+            validate_ref(self.manager_source_attestation_ref, "manager_source_attestation_ref")
+            validate_hash(
+                self.manager_source_attestation_hash,
+                "manager_source_attestation_hash",
+            )
+            validate_ref(self.runtime_source_attestation_ref, "runtime_source_attestation_ref")
+            validate_hash(
+                self.runtime_source_attestation_hash,
+                "runtime_source_attestation_hash",
+            )
+        elif any(value is not None for value in attestation_fields):
+            raise AuthorityError("partial heterogeneity fact cannot retain trusted attestations")
         if type(self.revision) is not int or self.revision < 1:
             raise AuthorityError("revision must be positive")
         for field in ("input_tokens", "output_tokens", "latency_ms"):
@@ -176,7 +318,23 @@ class HeterogeneityPolicyFact:
             "request_hash": self.request_hash,
             "response_hash": self.response_hash,
             "observed_at": self.observed_at,
+            "projection_classification": self.projection_classification,
+            "manager_source_attestation_ref": self.manager_source_attestation_ref,
+            "manager_source_attestation_hash": self.manager_source_attestation_hash,
+            "runtime_source_attestation_ref": self.runtime_source_attestation_ref,
+            "runtime_source_attestation_hash": self.runtime_source_attestation_hash,
         }
         if include_hash:
             value["content_hash"] = self.content_hash
         return value
+
+
+def _attested_projection(event: AuthorityEvent, event_type: str) -> None:
+    event.validate()
+    if event.event_type != event_type:
+        raise AuthorityError(f"expected an attested {event_type} projection")
+    if event.payload.get("projection_classification") != LIVE_SOURCE_ATTESTED:
+        raise AuthorityError(f"{event_type} projection is not externally attested")
+    for suffix in ("ref", "hash"):
+        if not event.payload.get(f"collector_attestation_{suffix}"):
+            raise AuthorityError(f"{event_type} projection lacks collector attestation")

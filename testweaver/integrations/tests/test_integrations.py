@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 
-from testweaver.authority import AuthorityError, AuthorityStore
+from testweaver.authority import AuthorityError, AuthorityStore, OracleResult, digest_bytes
 from testweaver.integrations import (
     AgentLoopClient,
     AgentLoopCredentialLease,
@@ -19,6 +19,12 @@ from testweaver.integrations import (
     MatrixHumanReadbackVerifier,
     NativeEventProjector,
     ProjectionError,
+)
+from testweaver.integrations.matrix_readback import MatrixAuthenticatedEvent
+from testweaver.integrations.projector import (
+    LIVE_SOURCE_ATTESTED,
+    UNATTESTED_PARTIAL,
+    NativeCollectorAttestation,
 )
 
 HASH_A = "sha256:" + "a" * 64
@@ -58,6 +64,15 @@ def test_projector_accepts_all_finished_native_fact_types_and_only_appends() -> 
                 "team_ref": "team:e",
                 "leader_ref": "leader:e",
                 "evidence_refs": ["evidence:1"],
+                "runtime": "qwenpaw",
+                "provider": "agentteams-gateway",
+                "model": "qwen",
+                "call_count": 1,
+                "input_tokens": 11,
+                "output_tokens": 7,
+                "latency_ms": 123,
+                "request_hash": HASH_A,
+                "response_hash": HASH_B,
             },
         ),
         (
@@ -67,6 +82,7 @@ def test_projector_accepts_all_finished_native_fact_types_and_only_appends() -> 
                 "worker_ref": "worker:1",
                 "result_ref": "result:1",
                 "result_hash": HASH_A,
+                "generation": 1,
             },
         ),
         (
@@ -126,8 +142,13 @@ def test_projector_accepts_all_finished_native_fact_types_and_only_appends() -> 
             {
                 "oracle_kind": "OUTCOME",
                 "oracle_identity": "worker:outcome",
+                "oracle_process_ref": "process:outcome",
                 "result_ref": "oracle:1",
                 "result_hash": HASH_A,
+                "evidence_root_ref": "evidence-root:1",
+                "evidence_root_hash": HASH_B,
+                "oracle_attestation_ref": "oracle-result:1",
+                "oracle_attestation_hash": HASH_C,
             },
         ),
         (
@@ -151,6 +172,10 @@ def test_projector_accepts_all_finished_native_fact_types_and_only_appends() -> 
     assert all(
         event.payload["native_source_hash"].startswith("sha256:") for event in events
     )
+    assert all(
+        event.payload["projection_classification"] == UNATTESTED_PARTIAL
+        for event in events
+    )
     assert projector.project(_raw_event(cases[0][0], 1, cases[0][1]))[1] is False
     assert not any(
         hasattr(projector, name) for name in ("create_task", "send_message", "resume")
@@ -163,7 +188,21 @@ def test_projector_rejects_unfinished_unknown_or_body_bearing_facts() -> None:
         _raw_event(
             "manager_choice",
             1,
-            {"choice": "x", "team_ref": "t", "leader_ref": "l", "evidence_refs": ["e"]},
+            {
+                "choice": "x",
+                "team_ref": "t",
+                "leader_ref": "l",
+                "evidence_refs": ["e"],
+                "runtime": "qwenpaw",
+                "provider": "gateway",
+                "model": "qwen",
+                "call_count": 1,
+                "input_tokens": 1,
+                "output_tokens": 1,
+                "latency_ms": 1,
+                "request_hash": HASH_A,
+                "response_hash": HASH_B,
+            },
         )
     )
     unfinished["lifecycle_state"] = "RUNNING"
@@ -179,10 +218,153 @@ def test_projector_rejects_unfinished_unknown_or_body_bearing_facts() -> None:
                     "team_ref": "t",
                     "leader_ref": "l",
                     "evidence_refs": ["e"],
+                    "runtime": "qwenpaw",
+                    "provider": "gateway",
+                    "model": "qwen",
+                    "call_count": 1,
+                    "input_tokens": 1,
+                    "output_tokens": 1,
+                    "latency_ms": 1,
+                    "request_hash": HASH_A,
+                    "response_hash": HASH_B,
                     "output": "forbidden",
                 },
             )
         )
+
+
+def _manager_facts() -> dict[str, Any]:
+    return {
+        "choice": "exploration",
+        "team_ref": "team:e",
+        "leader_ref": "leader:e",
+        "evidence_refs": ["evidence:1"],
+        "runtime": "qwenpaw",
+        "provider": "agentteams-gateway",
+        "model": "qwen",
+        "call_count": 1,
+        "input_tokens": 11,
+        "output_tokens": 7,
+        "latency_ms": 123,
+        "request_hash": HASH_A,
+        "response_hash": HASH_B,
+    }
+
+
+def _collector_attestation(raw: bytes, *, source_ref: str, exact_get_ref: str):
+    return NativeCollectorAttestation.create(
+        attestation_ref=f"attestation:{exact_get_ref}",
+        collector_ref="collector:native",
+        collector_identity_ref="service:native-reader",
+        source_ref=source_ref,
+        exact_get_ref=exact_get_ref,
+        raw_bytes=raw,
+        observed_at="2026-09-03T01:00:01Z",
+    )
+
+
+def test_projector_requires_allowlisted_exact_get_before_source_is_live() -> None:
+    raw = _raw_event("manager_choice", 1, _manager_facts())
+    source_ref = "matrix:event-1"
+    exact_get_ref = "matrix-get:event-1"
+    attestation = _collector_attestation(
+        raw, source_ref=source_ref, exact_get_ref=exact_get_ref
+    )
+    projector = NativeEventProjector(
+        AuthorityStore.from_sqlite_memory(),
+        get_source=lambda reference: attestation if reference == exact_get_ref else None,
+        collector_identities={"collector:native": "service:native-reader"},
+    )
+    event, inserted = projector.project(raw, attestation=attestation)
+    assert inserted is True
+    assert event.payload["projection_classification"] == LIVE_SOURCE_ATTESTED
+    assert event.payload["collector_attestation_hash"] == attestation.record_hash
+
+    forged = NativeCollectorAttestation.create(
+        attestation_ref=attestation.attestation_ref,
+        collector_ref=attestation.collector_ref,
+        collector_identity_ref="service:forged",
+        source_ref=attestation.source_ref,
+        exact_get_ref=attestation.exact_get_ref,
+        raw_bytes=raw,
+        observed_at=attestation.observed_at,
+    )
+    with pytest.raises(ProjectionError, match="allowlist"):
+        projector.materialize(raw, attestation=forged)
+    changed = raw.replace(b'"choice":"exploration"', b'"choice":"convergence"')
+    with pytest.raises(ProjectionError, match="bytes differ"):
+        projector.materialize(changed, attestation=attestation)
+
+
+def test_projector_requires_manager_usage_generation_and_full_oracle_readback() -> None:
+    projector = NativeEventProjector(AuthorityStore.from_sqlite_memory())
+    manager = _manager_facts()
+    manager.pop("provider")
+    with pytest.raises(ProjectionError, match="missing fact"):
+        projector.materialize(_raw_event("manager_choice", 1, manager))
+    with pytest.raises(ProjectionError, match="missing fact"):
+        projector.materialize(
+            _raw_event(
+                "accepted_result",
+                1,
+                {
+                    "task_ref": "task:1",
+                    "worker_ref": "worker:1",
+                    "result_ref": "result:1",
+                    "result_hash": HASH_A,
+                },
+            )
+        )
+
+    oracle = OracleResult.create(
+        result_id="oracle-result:1",
+        oracle_kind="outcome",
+        run_id="run-1",
+        campaign_id="campaign-1",
+        trace_id="trace-1",
+        identity_ref="worker:outcome",
+        process_ref="process:outcome",
+        result_ref="oracle:1",
+        result_hash=HASH_A,
+        evidence_root_ref="evidence-root:1",
+        evidence_root_hash=HASH_B,
+        evidence_refs=[{"ref": "evidence:1", "content_hash": HASH_A}],
+        gold_ref="gold:sealed",
+        source_ref="worker-result:outcome",
+        status="PASS",
+        provenance="agentteams:worker:outcome",
+    )
+    facts = {
+        "oracle_kind": "OUTCOME",
+        "oracle_identity": oracle.identity_ref,
+        "oracle_process_ref": oracle.process_ref,
+        "result_ref": oracle.result_ref,
+        "result_hash": oracle.result_hash,
+        "evidence_root_ref": oracle.evidence_root_ref,
+        "evidence_root_hash": oracle.evidence_root_hash,
+        "oracle_attestation_ref": oracle.result_id,
+        "oracle_attestation_hash": oracle.content_hash,
+    }
+    raw = _raw_event("oracle_ref", 1, facts)
+    attestation = _collector_attestation(
+        raw, source_ref="matrix:event-1", exact_get_ref="matrix-get:oracle-1"
+    )
+    linked = NativeEventProjector(
+        AuthorityStore.from_sqlite_memory(),
+        get_source=lambda _reference: attestation,
+        collector_identities={"collector:native": "service:native-reader"},
+        oracle_lookup=lambda ref: oracle if ref == oracle.result_id else None,
+    ).materialize(raw, attestation=attestation)
+    assert linked.payload["oracle_readback_verified"] is True
+    assert linked.payload["projection_classification"] == LIVE_SOURCE_ATTESTED
+
+    unlinked = NativeEventProjector(
+        AuthorityStore.from_sqlite_memory(),
+        get_source=lambda _reference: attestation,
+        collector_identities={"collector:native": "service:native-reader"},
+    ).materialize(raw, attestation=attestation)
+    assert unlinked.payload["oracle_readback_verified"] is False
+    assert unlinked.payload["projection_classification"] == UNATTESTED_PARTIAL
 
 
 def _matrix_expectation() -> MatrixDecisionExpectation:
@@ -208,9 +390,11 @@ def _matrix_expectation() -> MatrixDecisionExpectation:
 def _matrix_raw(expected: MatrixDecisionExpectation) -> bytes:
     return json.dumps(
         {
+            "type": "m.room.message",
             "room_id": expected.room_id,
             "event_id": expected.event_id,
             "sender": expected.sender,
+            "origin_server_ts": 1788406920000,
             "content": {
                 "msgtype": "m.notice",
                 "body": "human-readable copy is not authoritative",
@@ -233,20 +417,58 @@ def _matrix_raw(expected: MatrixDecisionExpectation) -> bytes:
     ).encode()
 
 
+def _matrix_readback(
+    expected: MatrixDecisionExpectation, raw: bytes | None = None
+) -> MatrixAuthenticatedEvent:
+    return MatrixAuthenticatedEvent.create(
+        raw_bytes=raw or _matrix_raw(expected),
+        homeserver_ref="matrix-homeserver:native",
+        reader_identity_ref="service:matrix-readback",
+        request_ref=f"matrix-get:{expected.event_id}",
+        room_id=expected.room_id,
+        event_id=expected.event_id,
+    )
+
+
+def _matrix_verifier(
+    expected: MatrixDecisionExpectation,
+    *,
+    raw: bytes | None = None,
+    identity: str = "human:operator-1",
+    protected_identity: str = "human:operator-1",
+) -> MatrixHumanReadbackVerifier:
+    return MatrixHumanReadbackVerifier(
+        get_event=lambda _room, _event: _matrix_readback(expected, raw),
+        get_identity=lambda _sender: identity,
+        human_identities={expected.sender: protected_identity},
+        get_pending_approval=lambda _approval_id: expected,
+        trusted_homeserver_ref="matrix-homeserver:native",
+        trusted_reader_identity_ref="service:matrix-readback",
+        clock=lambda: "2026-09-03T01:05:00Z",
+    )
+
+
 def test_matrix_exact_get_produces_sealed_external_human_attestation() -> None:
     expected = _matrix_expectation()
     calls: list[tuple[str, str]] = []
 
-    def get_event(room: str, event: str) -> bytes:
+    def get_event(room: str, event: str) -> MatrixAuthenticatedEvent:
         calls.append((room, event))
-        return _matrix_raw(expected)
+        return _matrix_readback(expected)
 
     attestation = MatrixHumanReadbackVerifier(
-        get_event, lambda _sender: "human:operator-1"
+        get_event=get_event,
+        get_identity=lambda _sender: "human:operator-1",
+        human_identities={expected.sender: "human:operator-1"},
+        get_pending_approval=lambda _approval_id: expected,
+        trusted_homeserver_ref="matrix-homeserver:native",
+        trusted_reader_identity_ref="service:matrix-readback",
+        clock=lambda: "2026-09-03T01:05:00Z",
     ).verify(expected)
     assert calls == [(expected.room_id, expected.event_id)]
     assert attestation.source == "matrix-live-readback"
     assert attestation.event_hash.startswith("sha256:")
+    assert attestation.verified_at == "2026-09-03T01:05:00Z"
     attestation.validate()
 
 
@@ -255,19 +477,48 @@ def test_matrix_readback_rejects_sender_or_action_substitution() -> None:
     value = json.loads(_matrix_raw(expected))
     value["sender"] = "@agent:matrix.local"
     with pytest.raises(AuthorityError, match="sender"):
-        MatrixHumanReadbackVerifier(
-            lambda _r, _e: json.dumps(value).encode(),
-            lambda _sender: "human:operator-1",
-        ).verify(expected)
+        _matrix_verifier(expected, raw=json.dumps(value).encode()).verify(expected)
     with pytest.raises(AuthorityError, match="identity_ref"):
-        MatrixHumanReadbackVerifier(
-            lambda _r, _e: _matrix_raw(expected),
-            lambda _sender: "human:someone-else",
-        ).verify(expected)
+        _matrix_verifier(expected, identity="human:someone-else").verify(expected)
     with pytest.raises(AuthorityError, match="fingerprint"):
         MatrixDecisionExpectation.create(
             **{**asdict(expected), "action_fingerprint": HASH_C}
         )
+
+
+def test_matrix_readback_requires_authenticated_get_allowlist_and_pending_authority() -> None:
+    expected = _matrix_expectation()
+    with pytest.raises(AuthorityError, match="trust configuration"):
+        MatrixHumanReadbackVerifier(
+            lambda _r, _e: _matrix_raw(expected),
+            lambda _sender: expected.identity_ref,
+        ).verify(expected)
+    with pytest.raises(AuthorityError, match="protected identity"):
+        _matrix_verifier(expected, protected_identity="human:someone-else").verify(expected)
+    changed = replace(expected, action_ref="action:other")
+    with pytest.raises(AuthorityError, match="pending approval"):
+        MatrixHumanReadbackVerifier(
+            get_event=lambda _r, _e: _matrix_readback(expected),
+            get_identity=lambda _sender: expected.identity_ref,
+            human_identities={expected.sender: expected.identity_ref},
+            get_pending_approval=lambda _approval_id: changed,
+            trusted_homeserver_ref="matrix-homeserver:native",
+            trusted_reader_identity_ref="service:matrix-readback",
+        ).verify(expected)
+
+
+@pytest.mark.parametrize("mutation", ["type", "msgtype", "redacted"])
+def test_matrix_readback_rejects_non_message_or_redacted_event(mutation: str) -> None:
+    expected = _matrix_expectation()
+    value = json.loads(_matrix_raw(expected))
+    if mutation == "type":
+        value["type"] = "m.room.member"
+    elif mutation == "msgtype":
+        value["content"]["msgtype"] = "m.image"
+    else:
+        value["unsigned"] = {"redacted_because": {"event_id": "$redaction"}}
+    with pytest.raises(AuthorityError):
+        _matrix_verifier(expected, raw=json.dumps(value).encode()).verify(expected)
 
 
 def _candidate(
@@ -312,9 +563,88 @@ def test_heterogeneity_fact_seals_actual_manager_choice_without_selecting() -> N
     )
     fact.validate()
     assert fact.content_hash.startswith("sha256:")
+    assert fact.projection_classification == UNATTESTED_PARTIAL
     assert not any(hasattr(fact, method) for method in ("choose", "dispatch", "rank"))
     with pytest.raises(AuthorityError, match="actual runtime identity"):
         replace(fact, actual_provider="other")
+
+
+def test_heterogeneity_live_source_requires_attested_manager_and_runtime() -> None:
+    manager_raw = _raw_event("manager_choice", 1, _manager_facts())
+    runtime_facts = {
+        "worker_ref": "worker:dsh",
+        "runtime": "deepseek-harness",
+        "provider": "bailian",
+        "model": "deepseek-v4-flash",
+        "input_tokens": 20,
+        "output_tokens": 10,
+        "latency_ms": 250,
+        "request_hash": HASH_A,
+        "response_hash": HASH_B,
+    }
+    runtime_raw = _raw_event("dsh_call", 2, runtime_facts)
+    manager_attestation = _collector_attestation(
+        manager_raw,
+        source_ref="matrix:event-1",
+        exact_get_ref="matrix-get:manager",
+    )
+    runtime_attestation = _collector_attestation(
+        runtime_raw,
+        source_ref="matrix:event-2",
+        exact_get_ref="matrix-get:runtime",
+    )
+    exact = {
+        "matrix-get:manager": manager_attestation,
+        "matrix-get:runtime": runtime_attestation,
+    }
+    projector = NativeEventProjector(
+        AuthorityStore.from_sqlite_memory(),
+        get_source=exact.__getitem__,
+        collector_identities={"collector:native": "service:native-reader"},
+    )
+    manager, _ = projector.project(
+        manager_raw,
+        attestation=manager_attestation,
+    )
+    runtime, _ = projector.project(
+        runtime_raw,
+        attestation=runtime_attestation,
+    )
+    candidates = (
+        _candidate("worker:qwen", "qwenpaw", "agentteams-gateway", "qwen"),
+        _candidate("worker:dsh", "deepseek-harness", "bailian", "deepseek-v4-flash"),
+    )
+    fact = HeterogeneityPolicyFact.create_attested(
+        manager_projection=manager,
+        runtime_projection=runtime,
+        fact_id="heterogeneity:live",
+        campaign_id="campaign-1",
+        run_id="run-1",
+        revision=2,
+        policy_ref="policy:heterogeneity-v1",
+        policy_hash=HASH_A,
+        candidates=candidates,
+        manager_choice_ref=manager.provenance,
+        manager_choice_hash=manager.request_hash,
+        chosen_candidate_ref="worker:dsh",
+        actual_runtime=runtime_facts["runtime"],
+        actual_provider=runtime_facts["provider"],
+        actual_model=runtime_facts["model"],
+        input_tokens=runtime_facts["input_tokens"],
+        output_tokens=runtime_facts["output_tokens"],
+        latency_ms=runtime_facts["latency_ms"],
+        request_hash=runtime_facts["request_hash"],
+        response_hash=runtime_facts["response_hash"],
+        observed_at="2026-09-03T01:03:00Z",
+    )
+    assert fact.projection_classification == LIVE_SOURCE_ATTESTED
+    with pytest.raises(AuthorityError, match="self-assert"):
+        HeterogeneityPolicyFact.create(
+            **{
+                **fact.as_dict(include_hash=False),
+                "candidates": candidates,
+            }
+        )
 
 
 class RecordingTransport:
