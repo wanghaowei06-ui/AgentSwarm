@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 import re
 import signal
+import stat
 import subprocess
 import threading
 import time
@@ -266,15 +267,37 @@ def _run(argv: list[str], payload: bytes, cwd: Path, env: dict[str, str], timeou
 
 def _artifact(cwd: Path, content: bytes) -> tuple[str, EvidenceReference]:
     digest = hashlib.sha256(content).hexdigest()
-    directory = cwd / ARTIFACT_DIRECTORY
-    if directory.is_symlink():
-        raise NativeExecutionError("result directory must not be a symlink")
     try:
+        workspace = cwd.resolve(strict=True)
+        if not workspace.is_dir() or not _inside(workspace, _WORKSPACE_ROOTS):
+            raise NativeExecutionError("result directory is outside approved workspace")
+        directory = workspace / ARTIFACT_DIRECTORY
         directory.mkdir(mode=0o700, exist_ok=True)
-    except OSError as exc:
+        info = os.lstat(directory)
+        resolved = directory.resolve(strict=True)
+    except NativeExecutionError:
+        raise
+    except (OSError, RuntimeError) as exc:
         raise NativeExecutionError("result directory could not be prepared") from exc
-    if directory.stat().st_mode & 0o077:
-        raise NativeExecutionError("result directory must be owner-only")
+    if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
+        raise NativeExecutionError("result directory must be a non-symlink directory")
+    if info.st_uid != os.getuid():
+        raise NativeExecutionError("result directory must be owned by the Worker")
+    try:
+        resolved.relative_to(workspace)
+    except ValueError as exc:
+        raise NativeExecutionError("result directory is outside approved workspace") from exc
+    if stat.S_IMODE(info.st_mode) != 0o700:
+        try:
+            os.chmod(directory, 0o700, follow_symlinks=False)
+        except (OSError, NotImplementedError, TypeError) as exc:
+            raise NativeExecutionError("result directory permissions could not be tightened") from exc
+        try:
+            info = os.lstat(directory)
+        except OSError as exc:
+            raise NativeExecutionError("result directory could not be inspected") from exc
+        if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode) or info.st_uid != os.getuid() or stat.S_IMODE(info.st_mode) != 0o700:
+            raise NativeExecutionError("result directory permissions could not be verified")
     target = directory / f"result-{digest}.txt"
     if target.is_symlink():
         raise NativeExecutionError("result artifact must not be a symlink")

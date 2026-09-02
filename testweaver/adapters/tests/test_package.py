@@ -813,7 +813,8 @@ class PackageWiringTests(unittest.TestCase):
     def test_new_bridge_nonblank_production_code_stays_near_budget(self) -> None:
         paths = (ROOT / "executor.py", ROOT / "mcp_server.py")
         nonblank = sum(1 for path in paths for line in path.read_text(encoding="utf-8").splitlines() if line.strip())
-        self.assertLessEqual(nonblank, 470)
+        # +30 is reserved only for Filesync-restored artifact-directory fail-closed checks.
+        self.assertLessEqual(nonblank, 500)
 
 
 if __name__ == "__main__":

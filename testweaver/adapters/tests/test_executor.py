@@ -111,6 +111,21 @@ def _script(directory: Path, body: str) -> Path:
 
 
 class OneShotExecutorTests(unittest.TestCase):
+    def test_artifact_relocks_filesync_restored_result_directory_without_deleting_files(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory) / "workspace"
+            workspace.mkdir()
+            artifact_directory = workspace / executor.ARTIFACT_DIRECTORY
+            artifact_directory.mkdir()
+            artifact_directory.chmod(0o755)
+            existing = artifact_directory / "prior-result.txt"
+            existing.write_text("keep", encoding="utf-8")
+            with patch.object(executor, "_WORKSPACE_ROOTS", (workspace,)):
+                result_ref, _ = executor._artifact(workspace, b"new-result")
+            self.assertEqual(result_ref, f"{executor.ARTIFACT_DIRECTORY}/result-" + hashlib.sha256(b"new-result").hexdigest() + ".txt")
+            self.assertEqual(artifact_directory.stat().st_mode & 0o777, 0o700)
+            self.assertEqual(existing.read_text(encoding="utf-8"), "keep")
+
     def test_workspace_derives_qwenpaw_default_from_working_dir_when_env_is_missing(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             approved = Path(directory) / "agents"
