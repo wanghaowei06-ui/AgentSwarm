@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any
@@ -21,6 +22,7 @@ from testweaver.integrations.tea_transport import (
     load_protected_csv_credential,
 )
 from testweaver.integrations.xtrace_readback import (
+    TeaXTraceTransport,
     XTraceCorrelation,
     XTraceHTTPResponse,
     XTraceReadbackClient,
@@ -62,6 +64,10 @@ def test_http_response_reprs_do_not_expose_response_bodies() -> None:
     marker = "prompt-response-body-sentinel"
     assert marker not in repr(AgentLoopHTTPResponse(200, marker.encode(), "request-1"))
     assert marker not in repr(XTraceHTTPResponse(200, marker.encode(), "request-1"))
+    with pytest.raises(TypeError):
+        asdict(AgentLoopHTTPResponse(200, marker.encode()))  # type: ignore[arg-type]
+    with pytest.raises(TypeError):
+        asdict(XTraceHTTPResponse(200, marker.encode()))  # type: ignore[arg-type]
 
 
 def test_protected_csv_loader_rejects_unsafe_files(tmp_path: Path) -> None:
@@ -72,6 +78,17 @@ def test_protected_csv_loader_rejects_unsafe_files(tmp_path: Path) -> None:
     assert "id" not in repr(loaded)
     path.chmod(0o644)
     with pytest.raises(AuthorityError, match="owner-only"):
+        load_protected_csv_credential(path)
+
+
+def test_protected_csv_loader_rejects_a_different_runtime_owner(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    path = tmp_path / "AccessKey.csv"
+    path.write_text("AccessKey ID,AccessKey Secret\nid,secret\n", encoding="utf-8")
+    path.chmod(0o600)
+    monkeypatch.setattr(os, "geteuid", lambda: path.stat().st_uid + 1)
+    with pytest.raises(AuthorityError, match="current runtime user"):
         load_protected_csv_credential(path)
 
 
@@ -134,6 +151,32 @@ def test_tea_transport_uses_roa_shape_without_exposing_credential() -> None:
         {key: value for key, value in calls[0].items() if key != "credential"},
         default=str,
     )
+
+
+def test_transports_hashable_request_id_can_come_from_transient_body() -> None:
+    def agentloop_caller(**_: Any) -> dict[str, Any]:
+        return {"status_code": 200, "headers": {}, "body": {"requestId": "agent-1"}}
+
+    agentloop = TeaAgentLoopTransport("cn-beijing", caller=agentloop_caller).request(
+        operation="GetDataset",
+        method="GET",
+        endpoint="https://agentloop.cn-beijing.aliyuncs.com",
+        path="/agentspace/space/dataset/dataset",
+        query={},
+        body=None,
+        credential=_lease().material,
+    )
+    assert agentloop.request_id == "agent-1"
+
+    def xtrace_caller(**_: Any) -> dict[str, Any]:
+        return {"status_code": 200, "headers": {}, "body": {"RequestId": "trace-1"}}
+
+    xtrace = TeaXTraceTransport(caller=xtrace_caller).get_trace(
+        region="cn-beijing",
+        trace_id="0123456789abcdef0123456789abcdef",
+        credential=_lease().material,
+    )
+    assert xtrace.request_id == "trace-1"
 
 
 def test_evaluation_query_requires_ownership_scope_terminal_and_nonempty_result() -> (

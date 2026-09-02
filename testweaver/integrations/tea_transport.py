@@ -73,6 +73,10 @@ def load_protected_csv_credential(path: Path) -> AlibabaCloudCredential:
         metadata = os.fstat(descriptor)
         if not stat.S_ISREG(metadata.st_mode) or stat.S_IMODE(metadata.st_mode) & 0o077:
             raise AuthorityError("credential file must be an owner-only regular file")
+        if metadata.st_uid != os.geteuid():
+            raise AuthorityError(
+                "credential file must be owned by the current runtime user"
+            )
         if metadata.st_size < 1 or metadata.st_size > _MAX_CREDENTIAL_BYTES:
             raise AuthorityError("credential file size is outside the bounded limit")
         with os.fdopen(descriptor, "rb", closefd=True) as stream:
@@ -179,7 +183,7 @@ class TeaAgentLoopTransport:
         return AgentLoopHTTPResponse(
             status_code,
             response_body,
-            request_id=_request_id(headers),
+            request_id=_request_id(headers) or _request_id_from_body(response_body),
             error_code=None,
         )
 
@@ -251,6 +255,26 @@ def _request_id(headers: Mapping[str, Any]) -> str | None:
         ):
             return value
     return None
+
+
+def _request_id_from_body(body: bytes) -> str | None:
+    """Extract only a bounded request identifier from a transient JSON body."""
+
+    try:
+        value = json.loads(body)
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return None
+    if not isinstance(value, Mapping):
+        return None
+    candidate = value.get("requestId", value.get("RequestId"))
+    if (
+        not isinstance(candidate, str)
+        or not candidate
+        or len(candidate) > 1024
+        or any(ord(character) < 32 for character in candidate)
+    ):
+        return None
+    return candidate
 
 
 def _call_with_tea(**request: Any) -> Mapping[str, Any]:

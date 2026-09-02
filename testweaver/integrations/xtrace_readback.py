@@ -24,6 +24,7 @@ from .tea_transport import (
     _call_with_tea,
     _normalize_response,
     _request_id,
+    _request_id_from_body,
     _validate_endpoint,
     _validate_region,
 )
@@ -51,12 +52,25 @@ class XTraceCorrelation:
         validate_hash(self.content_hash, "content_hash")
 
 
-@dataclass(frozen=True, slots=True, repr=False)
 class XTraceHTTPResponse:
+    __slots__ = ("body", "error_code", "request_id", "status_code")
+
     status_code: int
     body: bytes
-    request_id: str | None = None
-    error_code: str | None = None
+    request_id: str | None
+    error_code: str | None
+
+    def __init__(
+        self,
+        status_code: int,
+        body: bytes,
+        request_id: str | None = None,
+        error_code: str | None = None,
+    ) -> None:
+        self.status_code = status_code
+        self.body = body
+        self.request_id = request_id
+        self.error_code = error_code
 
     def __repr__(self) -> str:
         return (
@@ -127,7 +141,11 @@ class TeaXTraceTransport:
                 error_code=exc.error_code,
             )
         status_code, headers, body = _normalize_response(response)
-        return XTraceHTTPResponse(status_code, body, _request_id(headers))
+        return XTraceHTTPResponse(
+            status_code,
+            body,
+            _request_id(headers) or _request_id_from_body(body),
+        )
 
 
 @dataclass(frozen=True, slots=True)

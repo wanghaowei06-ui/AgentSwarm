@@ -41,12 +41,25 @@ class AgentLoopCredentialLease:
 CredentialCallback = Callable[[], AgentLoopCredentialLease]
 
 
-@dataclass(frozen=True, slots=True, repr=False)
 class AgentLoopHTTPResponse:
+    __slots__ = ("body", "error_code", "request_id", "status_code")
+
     status_code: int
     body: bytes
-    request_id: str | None = None
-    error_code: str | None = None
+    request_id: str | None
+    error_code: str | None
+
+    def __init__(
+        self,
+        status_code: int,
+        body: bytes,
+        request_id: str | None = None,
+        error_code: str | None = None,
+    ) -> None:
+        self.status_code = status_code
+        self.body = body
+        self.request_id = request_id
+        self.error_code = error_code
 
     def __repr__(self) -> str:
         return (
