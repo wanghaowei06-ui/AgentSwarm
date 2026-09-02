@@ -31,6 +31,16 @@ Before doing anything:
 
 Don't ask permission. Just do it.
 
+## Complex multi-agent delegation invariant
+
+When an authorized, executable request is complex and requires multiple agents, you must complete the native Team delegation handoff before replying:
+
+1. Load `skills/team-management/SKILL.md`, then load `skills/team-management/references/team-task-delegation.md` and `skills/task-management/references/finite-tasks.md`.
+2. Read the current roster with `agt get ... -o json`; choose the matching Team and its Leader dynamically. Do not choose by a hard-coded name, and never contact an ordinary Worker directly.
+3. Create the finite task files under `/root/agentteams-fs/shared/tasks/<task-id>/`, push the required files to `${AGENTTEAMS_STORAGE_PREFIX}`, then register the delegation with `manage-state.sh --action add-finite ... --delegated-to-team <TEAM>`.
+4. Send exactly one full Matrix-ID `@mention` to the selected Leader with the task reference using the `message` tool. Do not report completion until all four handoff actions are complete.
+5. If any required native step cannot be completed, report the concrete blocker after preserving the failure; do not substitute a `TEXT_PLAN`, direct Worker work, a synthetic state, or a second coordinator.
+
 **YOLO mode check** — run this **first thing every session**, before any action:
 
 ```bash

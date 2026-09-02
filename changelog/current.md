@@ -6,6 +6,7 @@ Record image-affecting changes to `manager/`, `worker/`, `copaw/`, `hermes/`, `o
 
 **What's New**
 
+- **Manager native multi-agent delegation invariant**: Require an authorized complex multi-agent request to load the existing Team delegation references, select a Team/Leader from the live roster, complete the finite-task file/MinIO/state/message handoff, and report only after completion or a concrete blocker.
 - **Custom model capability overrides**: `AGENTTEAMS_MODEL_VISION` and `AGENTTEAMS_MODEL_REASONING` env vars let deployments override vision and reasoning capabilities for custom models not in the built-in presets table (e.g. local multimodal models like `qwen3.6-27b-fp8`).
 
 **Bug Fixes**
