@@ -1,0 +1,74 @@
+{
+  "schema_version": "testweaver.dsh-worker-update/v1",
+  "run_id": "dsh-forest-e64e7c8-20260902T182846Z",
+  "source_commit": "e64e7c8",
+  "status": "FAIL",
+  "classification": "DSH_WORKER_CREATE_FAILED",
+  "source": {
+    "source_dir": "/root/projects/muti-agent/.testweaver/cache/g13-deepseek-runtime/dsh-package",
+    "canonical_lock": "/root/projects/muti-agent/artifacts/verification/g13/deepseek-harness-official-cache/pnpm-lock.yaml",
+    "provenance": "/root/projects/muti-agent/artifacts/verification/g13/deepseek-harness-provenance.json",
+    "package_validation": "PASS",
+    "package_tar_sha256": "sha256:b26896bfe08f21ee27fda514cb185a989a533c78843e747a4df3093f013911d7"
+  },
+  "build": {
+    "official_entrypoint": "testweaver/adapters/build-qwenpaw-native-extension.sh",
+    "base_image": "agentteams/qwenpaw-worker:be10aaf",
+    "base_image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+    "candidate_image": "agentteams/qwenpaw-worker:dsh-forest-e64e7c8",
+    "candidate_image_id": "sha256:222a8dd1d02e74aad7b9ad2bf13d01dd29287dee211bf129337d57802ac0849c",
+    "candidate_image_digest": "agentteams/qwenpaw-worker@sha256:222a8dd1d02e74aad7b9ad2bf13d01dd29287dee211bf129337d57802ac0849c",
+    "exit_code": 0,
+    "dsh_version_help": "PASS",
+    "forest_links_copied": 720,
+    "forest_links_skipped": 110
+  },
+  "worker_update": {
+    "official_entrypoint": "docker exec agentteams-native-m0-20260901-manager agt update worker --name native-m0-clean-dsh-worker --image agentteams/qwenpaw-worker:dsh-forest-e64e7c8",
+    "exit_code": 0,
+    "configured": true,
+    "worker": "native-m0-clean-dsh-worker",
+    "desired_image": "agentteams/qwenpaw-worker:dsh-forest-e64e7c8",
+    "old_container_id": "4080cd24687efeb4e74c03fc427d72a0f21158cffb9385ca7734a9673970cb0d",
+    "old_image": "agentteams/qwenpaw-worker:dsh-devdeps-6091f67",
+    "old_container_state": "stopped_during_reconcile",
+    "readback": {
+      "phase": "Pending",
+      "container_state": "create_failed",
+      "container_managed": true,
+      "identity": "Provider-neutral DSH heterogeneous Worker; gateway credential rotated; built-in tools disabled; DeepSeek path ready",
+      "matrix_user_id": "@native-m0-clean-dsh-worker:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!t8ycL6WDpsGf9D0mGo:matrix-native-m0-20260901.agentteams.local:28080",
+      "team": "native-m0-clean-team",
+      "runtime": "qwenpaw",
+      "model": "deepseek-v4-flash",
+      "health": "NOT_OBSERVED",
+      "new_container_id": null
+    },
+    "failure": "Controller readback reported create_failed after the old container stopped; no stable new Worker was available."
+  },
+  "provider_probe": {
+    "status": "NOT_ATTEMPTED",
+    "reason": "worker_create_failed",
+    "profile": "aliyun-bailian",
+    "adapter_entrypoint": "native_worker_execute",
+    "provider_call": "NOT_OBSERVED",
+    "usage": "NOT_OBSERVED",
+    "latency_ms": null,
+    "request_response_hash": null
+  },
+  "rollback": {
+    "official_entrypoint": "docker exec agentteams-native-m0-20260901-manager agt update worker --name native-m0-clean-dsh-worker --image agentteams/qwenpaw-worker:dsh-devdeps-6091f67",
+    "available": true,
+    "executed": false
+  },
+  "verification": {
+    "focused_package_tests": "15/15 PASS",
+    "focused_adapters_tests": "59/59 PASS",
+    "py_compile": "PASS",
+    "diff_check": "PASS",
+    "secret_scan": "PASS_NO_SECRET_VALUES",
+    "secret_values_recorded": false,
+    "provider_response_recorded": false
+  }
+}

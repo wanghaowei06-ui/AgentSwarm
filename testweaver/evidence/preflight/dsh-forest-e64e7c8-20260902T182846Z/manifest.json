@@ -1,0 +1,19 @@
+{
+  "schema_version": "testweaver.evidence-manifest/v1",
+  "run_id": "dsh-forest-e64e7c8-20260902T182846Z",
+  "source_commit": "e64e7c8",
+  "classification": "DSH_WORKER_CREATE_FAILED",
+  "evidence_scope": "one pinned DSH package build, one official same-Worker image update, no provider probe after Worker create failure",
+  "files": [
+    {
+      "path": "receipt.json",
+      "sha256": "5714b7b9e0a343f0279ae19d8063eaf426afa3be918a5f6635c4c3448fd1dbd3"
+    },
+    {
+      "path": "SHA256SUMS",
+      "sha256": "47a9805e8221303c97688aa1bd9d51d97a3dc4f7b4ab20fa9df399b41b928db1"
+    }
+  ],
+  "manifest_self_hash": "excluded_from_SHA256SUMS",
+  "secret_scan": "PASS_NO_SECRET_VALUES"
+}
