@@ -20,6 +20,7 @@ COPY __init__.py codex_cli.py config.py native_worker.py result.py executor.py m
     /opt/agentteams/testweaver-native-worker/testweaver/adapters/
 COPY qwenpaw-package/ /opt/agentteams/testweaver-native-worker/package/
 COPY dsh-launcher.mjs /opt/agentteams/testweaver-native-worker/bin/dsh-launcher.mjs
+COPY dsh-headless-max-tokens.patch.yml /opt/agentteams/testweaver-native-worker/dsh-headless-max-tokens.patch.yml
 COPY node-runtime /opt/agentteams/testweaver-native-worker/bin/node
 COPY ${TESTWEAVER_DSH_PACKAGE} /tmp/dsh-runtime.tar.gz
 COPY ${TESTWEAVER_DSH_PACKAGE_SHA256} /tmp/dsh-runtime.tar.gz.sha256
@@ -43,6 +44,9 @@ RUN cd /tmp \
     && cp /opt/agentteams/testweaver-native-worker/bin/dsh-launcher.mjs \
         /opt/agentteams/testweaver-native-worker/bin/dsh \
     && chmod 0755 /opt/agentteams/testweaver-native-worker/bin/dsh \
+    && chmod 0444 /opt/agentteams/testweaver-native-worker/dsh-headless-max-tokens.patch.yml \
+    && test -f /opt/agentteams/testweaver-native-worker/dsh-headless-max-tokens.patch.yml \
+    && test ! -L /opt/agentteams/testweaver-native-worker/dsh-headless-max-tokens.patch.yml \
     && npm install --prefix /opt/agentteams/testweaver-native-worker/codex-cli \
         --ignore-scripts --no-save --no-package-lock --no-audit --no-fund \
         "@openai/codex@0.152.0" \
@@ -61,6 +65,11 @@ RUN cd /tmp \
         /opt/agentteams/testweaver-native-worker/bin/dsh --profile headless --version \
     && HOME=/tmp/testweaver-dsh-home \
         /opt/agentteams/testweaver-native-worker/bin/dsh --profile headless --help >/dev/null \
+    && HOME=/tmp/testweaver-dsh-home \
+        /opt/agentteams/testweaver-native-worker/bin/dsh --profile headless \
+        --patch /opt/agentteams/testweaver-native-worker/dsh-headless-max-tokens.patch.yml \
+        --dump-config \
+        | node -e 'let text=""; process.stdin.setEncoding("utf8"); process.stdin.on("data", chunk => text += chunk); process.stdin.on("end", () => { let active = false; let seen = 0; let maxTokens; for (const line of text.split(/\r?\n/)) { if (line.startsWith("- id: ")) { active = line === "- id: llm-deepseek"; if (active) { seen += 1; maxTokens = undefined; } } else if (active) { const match = line.match(/^\s+maxTokens:\s+(\d+)\s*$/); if (match) maxTokens = match[1]; } } if (seen !== 1 || maxTokens !== "131072") process.exit(1); });' \
     && test "$(readlink -- /tmp/testweaver-dsh-home/.dsh/profiles/headless/node_modules)" \
         = "/opt/agentteams/testweaver-native-worker/dsh-runtime/node_modules" \
     && /opt/agentteams/testweaver-native-worker/bin/codex-cc --version >/dev/null

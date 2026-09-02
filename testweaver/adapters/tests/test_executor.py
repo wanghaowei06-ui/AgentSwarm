@@ -18,6 +18,11 @@ from testweaver.adapters.mcp_server import call_tool, handle_request, list_tools
 from testweaver.adapters.native_worker import NativeWorkerAssignment
 from testweaver.adapters.result import Provenance
 
+ADAPTER_ROOT = Path(__file__).resolve().parents[1]
+PATCH_ASSET = ADAPTER_ROOT / "dsh-headless-max-tokens.patch.yml"
+DOCKERFILE = ADAPTER_ROOT / "Dockerfile.qwenpaw"
+BUILD_SCRIPT = ADAPTER_ROOT / "build-qwenpaw-native-extension.sh"
+
 
 def _limits(timeout: float = 2.0) -> dict[str, int | float]:
     return {
@@ -166,8 +171,17 @@ class OneShotExecutorTests(unittest.TestCase):
                 self.assertTrue(metadata["external_process_started"])
                 self.assertFalse(metadata["native_state_mutation"])
                 self.assertFalse(metadata["native_result_submission"])
-                self.assertEqual(metadata["argv"][1:4], ["--profile", "headless", "--"])
-                self.assertEqual(metadata["argv"][4], "[PROMPT_REDACTED]")
+                self.assertEqual(
+                    metadata["argv"][1:6],
+                    [
+                        "--profile",
+                        "headless",
+                        "--patch",
+                        "/opt/agentteams/testweaver-native-worker/dsh-headless-max-tokens.patch.yml",
+                        "--",
+                    ],
+                )
+                self.assertEqual(metadata["argv"][6], "[PROMPT_REDACTED]")
                 self.assertNotIn("read the assigned source", repr(metadata))
                 self.assertEqual(metadata["prompt_bytes"], len("read the assigned source".encode()))
                 self.assertEqual(
@@ -179,8 +193,41 @@ class OneShotExecutorTests(unittest.TestCase):
     def test_dsh_leading_dash_prompt_is_positional(self) -> None:
         self.assertEqual(
             executor._argv(_config("deepseek"), "-do not parse as an option")[1:],
-            ["--profile", "headless", "--", "-do not parse as an option"],
+            [
+                "--profile",
+                "headless",
+                "--patch",
+                "/opt/agentteams/testweaver-native-worker/dsh-headless-max-tokens.patch.yml",
+                "--",
+                "-do not parse as an option",
+            ],
         )
+
+    def test_dsh_patch_asset_is_one_max_tokens_overlay(self) -> None:
+        self.assertEqual(
+            PATCH_ASSET.read_text(encoding="utf-8"),
+            "- id: llm-deepseek\n"
+            "  config:\n"
+            "    maxTokens: 131072\n",
+        )
+
+    def test_dsh_build_wires_immutable_patch_and_dump_config_guard(self) -> None:
+        dockerfile = " ".join(DOCKERFILE.read_text(encoding="utf-8").split())
+        build_script = BUILD_SCRIPT.read_text(encoding="utf-8")
+        self.assertIn(
+            "COPY dsh-headless-max-tokens.patch.yml /opt/agentteams/testweaver-native-worker/dsh-headless-max-tokens.patch.yml",
+            dockerfile,
+        )
+        self.assertIn(
+            'cp "${adapter_root}/dsh-headless-max-tokens.patch.yml" "${build_context}/dsh-headless-max-tokens.patch.yml"',
+            build_script,
+        )
+        self.assertIn(
+            "--patch /opt/agentteams/testweaver-native-worker/dsh-headless-max-tokens.patch.yml",
+            dockerfile,
+        )
+        self.assertIn("maxTokens", dockerfile)
+        self.assertIn("131072", dockerfile)
 
     def test_dsh_nonzero_exit_is_provider_failure(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

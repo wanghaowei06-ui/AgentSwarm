@@ -99,6 +99,7 @@ main() {
   done
   cp "${adapter_root}/Dockerfile.qwenpaw" "${build_context}/Dockerfile.qwenpaw"
   cp "${adapter_root}/dsh-launcher.mjs" "${build_context}/dsh-launcher.mjs"
+  cp "${adapter_root}/dsh-headless-max-tokens.patch.yml" "${build_context}/dsh-headless-max-tokens.patch.yml"
   cp -a "${adapter_root}/qwenpaw-package" "${build_context}/qwenpaw-package"
 
   docker build --pull=false \

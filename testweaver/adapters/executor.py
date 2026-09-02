@@ -40,6 +40,7 @@ NATIVE_EXECUTION_PROTOCOL = "testweaver.native-external/v1"
 NATIVE_EXECUTION_TOOL = "native_worker_execute"
 PRODUCTION_ROOT = Path("/opt/agentteams/testweaver-native-worker")
 PRODUCTION_DSH_EXECUTABLE = PRODUCTION_ROOT / "bin" / "dsh"
+PRODUCTION_DSH_PATCH = PRODUCTION_ROOT / "dsh-headless-max-tokens.patch.yml"
 PRODUCTION_CODEX_EXECUTABLE = PRODUCTION_ROOT / "bin" / "codex-cc"
 WORKSPACE_ENVIRONMENT = "AGENT_WORKSPACE"
 ARTIFACT_DIRECTORY = ".testweaver-native-results"
@@ -144,7 +145,7 @@ def _validate(assignment: NativeWorkerAssignment, config: AdapterConfig, provena
 
 def _argv(config: AdapterConfig, prompt: str) -> list[str]:
     if config.adapter_kind == "dsh":
-        return [str(PRODUCTION_DSH_EXECUTABLE), "--profile", "headless", "--", prompt]
+        return [str(PRODUCTION_DSH_EXECUTABLE), "--profile", "headless", "--patch", str(PRODUCTION_DSH_PATCH), "--", prompt]
     launch = build_codex_cli_launch()
     return [str(PRODUCTION_CODEX_EXECUTABLE), *launch.command[1:]]
 
