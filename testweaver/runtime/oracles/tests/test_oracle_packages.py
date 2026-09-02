@@ -11,6 +11,7 @@ from pathlib import Path
 ORACLES = Path(__file__).resolve().parents[1]
 BOUNDARY = ORACLES / "boundary"
 OUTCOME = ORACLES / "outcome"
+MANAGER_OVERLAY = ORACLES.parents[0] / "manager" / "AGENTS.overlay.md"
 PINNED_COMMIT = "4fb580c8da24b880f054246cb9273341940b92f7"
 PINNED_VERIFIER_SHA256 = "896ea473e5a7fddae905aee3e697c8b99a5cea94ed749918969437fe176db2aa"
 PRIVATE_FIELDS = {
@@ -114,6 +115,15 @@ class OracleAgentSpecPackageTests(unittest.TestCase):
         self.assertIn("永远禁止读取 Gold", boundary_soul)
         self.assertIn("只有在 Team Leader 原生分配明确的 Outcome Oracle Task 后", outcome_soul)
         self.assertIn("不与 Boundary Oracle 通信", outcome_soul)
+
+    def test_manager_preserves_outcome_oracle_role_boundary(self) -> None:
+        manager_policy = " ".join(MANAGER_OVERLAY.read_text(encoding="utf-8").split())
+        self.assertIn("candidate inputs and Boundary Oracle assignments", manager_policy)
+        self.assertIn("Do not propagate that restriction into an Outcome Oracle", manager_policy)
+        self.assertIn("Leader has natively assigned an explicit Outcome verification task", manager_policy)
+        self.assertIn("must follow its sealed role policy, including reading its own private Gold", manager_policy)
+        self.assertIn("must return only versioned result, metric, and hash/reference", manager_policy)
+        self.assertIn("Never relay Gold contents or derivations", manager_policy)
 
 
 if __name__ == "__main__":
