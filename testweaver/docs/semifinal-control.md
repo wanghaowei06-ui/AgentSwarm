@@ -1,10 +1,10 @@
 # TestWeaver 复赛唯一总控
 
-更新时间：2026-09-02（Asia/Shanghai）
+更新时间：2026-09-03（Asia/Shanghai）
 
-状态：`M2-G_CORE_INTEGRATION / M0-M1_NATIVE_CHAIN_PASS / M2-D_HITL_RECOVERY_PASS / CURRENT_HERO_NOT_STARTED`
+状态：`M2-G_HERO_RUNTIME_PREFLIGHT / M0-M1_NATIVE_CHAIN_PASS / M2-D_HITL_RECOVERY_PASS / CURRENT_HERO_NOT_STARTED`
 
-唯一当前里程碑：冻结已通过的 AgentTeams 原生 Manager→Leader→Worker 主链，不再逐缺口构建和短跑。先把异构 Worker、双 Oracle、AgentLoop 观测评估、Skill/Context/Evidence/Handoff 进化机制四块既有资产一次性完成薄接线、静态测试、运行配置和安全预检；汇总缺口后一次修复、一次镜像构建，再运行完整 Hero。`6fee879` 的严格 DSH MCP schema 已进入镜像 `dsh-headless-6fee879`；尚未发送 `-09`，不得称 LIVE。
+唯一当前里程碑：冻结已通过的 AgentTeams 原生 Manager→Leader→Worker 主链和已提交的差异薄层，不再新增 Gate 或协调协议。当前只完成 DSH 候选镜像的真实百炼调用预检、两个原生 Oracle 的隔离回读和运行角色策略冻结；随即启动一个新 Hero。AgentLoop 云权限若仍不通，保留真实 `BLOCKED`，不阻塞 AgentTeams 主链，但同 Run 的标准 OTel 投影、查询尝试和离线证据必须完成。
 
 ## 0. 今晚批量收口策略（最高优先级，覆盖后文的逐小步运行措辞）
 
@@ -27,8 +27,8 @@
 - 现有 API Key、AgentLoop、LoongSuite、OTel 和 Nacos 配置必须复用，不要求用户重新填写。只引用 `/etc` 下受保护文件或受控挂载，不读取到输出、不复制或提交密钥值。
 - 当前原生基线继续使用已验证的 `agentteams-gateway/deepseek-v4-flash`，直到 M1 原生稳定性收口；异构资产接入前不得为了提前展示而修改在途 Run 的模型、账号、推理强度或 service tier。
 - 异构阶段的 DSH 是 provider-agnostic Harness，不得只用 DeepSeek 形成“异构”结论；必须复用现有受保护配置，让至少一个真实 DSH Worker 调用阿里云百炼模型，并把 provider/model/usage/延迟和结果证据与 DeepSeek 路径分开记录。
-- 首个真实 Hero 的 DSH 百炼接线采用风险分层：P0 允许把现有百炼凭据以只读容器 Secret 仅挂载给目标 DSH adapter，先直连百炼跑通真实调用；Secret 不得进入镜像、仓库、Prompt、任务产物、日志或 receipt，运行后必须做 names-only readback 与泄密扫描。即使暂时绕过统一网关，adapter 仍必须记录同一 Run 的 provider/model、usage、延迟、HTTP/退出状态、request/response hash 和 Worker/Task 身份。该路径只证明真实异构调用，不得宣称已完成网关级统一限流、计费、轮换或消费者鉴权。
-- P1 在首个 Hero 冻结后把 DSH 切回现有 AgentTeams Provider/Route 和 Worker consumer credential；沿用同一统计/receipt schema，不重写上层任务链。网关化不得重新成为首次闭环前置条件。
+- 首个真实 Hero 的 DSH→百炼接线优先复用目标 Worker 已由 AgentTeams 注入的 `AGENTTEAMS_AI_GATEWAY_URL` 与 `AGENTTEAMS_WORKER_GATEWAY_KEY`，仅补非密钥模型引用并实测现有 `testweaver-bailian-route` 的 Worker consumer 权限；这比新增宿主密钥投影更符合原生边界。只有真实预检证明该网关路径不能安全提供百炼调用时，才允许把现有百炼凭据以只读容器 Secret 仅挂载给目标 DSH adapter。两种路径都不得让 Secret 进入镜像、仓库、Prompt、任务产物、日志或 receipt，并必须记录同一 Run 的 provider/model、usage、延迟、HTTP/退出状态、request/response hash 和 Worker/Task 身份。
+- 统一网关的完整限流、计费和轮换属于 P1；首个 Hero 只要求当前 Worker consumer 鉴权和一次真实百炼调用成立。不得为此重写上层任务链或增加第二路由层。
 - Codex CLI 外部 Worker 必须由 `codex-cc` 启动，不使用裸 `codex`；计划模型固定为 `gpt-5.6-luna`、推理强度 `max`。首跑复用当前已登录的受保护 `CODEX_HOME`，只挂载到目标 Codex Worker，不复制认证缓存；M4 稳定复跑可把同一 CLI adapter 改为 API Key 登录。完整 Responses API adapter 属于 P1，不阻塞首次闭环。
 - Codex Worker 不再扩写第二套 runtime：优先复用旧资产树 `AgentTeams-pr1139/plugins/teamharness/remote/codex-cli/` 在提交 `071ae6e` 的原生 TeamHarness remote-member、Codex app-server、Matrix assignment、taskflow 和安全隔离能力；当前新仓库 `testweaver/adapters/codex_cli.py` 只保留固定 `codex-cc` 启动约束与 TestWeaver result/receipt 映射。旧资产树的未提交修改不直接复制，必须先证明相对 `071ae6e` 的必要性并独立复核。
 - 当前协作在同一工作区完成；按文件范围并行，不再为小任务创建大量 worktree。
@@ -50,6 +50,7 @@ AgentTeams 原生负责最复杂的通用协议：Manager、Team、Leader、Work
 TestWeaver 只做产品差异：
 
 - 3–5 个领域 Skill 及 Nacos/SkillOps 治理；
+- Failure/Process Capsule 领域资产：把真实故障或低效过程的指纹、环境、触发条件、证据、根因、修复和回归引用做成不可变 revision/hash；PostgreSQL 只保存 append-only 事件与可检索索引，正文进入受控 artifact store。Leader 在同类任务执行前检索并引用命中项，验证结果回流 Golden Dataset/Skill Candidate。它不拥有 Project/Task 调度权，也不得承诺“永不再犯”；只能以重复命中、阻断或后续同条件复跑证明复发控制有效。
 - 最薄的跨 Team Context/Claim/Evidence/Provenance/Handoff；
 - 业务 Policy 与真实 HITL 审批事实；
 - Outcome/Boundary 双 Oracle；
@@ -75,6 +76,14 @@ TestWeaver 只做产品差异：
 
 每个实现 Step 开始前必须先搜索当前仓库、24 项资产清单和对应供体路径；已有能力只能复用、配置或做薄映射，不得重新实现。当前继承优先级保持为：五个领域 Skill 与 Context/Evidence/Handoff（已迁入，待 LIVE）→ DSH 与 PR1139 Codex Worker（正在 LIVE）→ HITL/恢复/双 Oracle（已有真实 PARTIAL/PASS 资产，补同 Hero 关联）→ AgentLoop/OTel 与 PostgreSQL 证据关联 → Golden/E0–E3 → 离线包与开源材料。历史 receipt 只作来源线索，不替代新运行。
 
+2026-09-02 最终财产扫尾将原 24 项清单与旧 `quality_domain/heterogeneity_policy.py`、`skillops/{nacos.py,agentloop_release.py}`、`benchmarking/agentloop_evolution.py`、`agentteams_adapter/hero_run_bundle.py` 和 `release/bundle.py` 再次交叉核对。新增可取部分只有三类薄能力：异构选择的可审计 Policy fact、Nacos `nacos://` Skill candidate 发布/回读、同 Run LIVE 离线包关联；不得迁入其中任何调度、Worker 生命周期或 replay 驱动逻辑。当前批次完成后差异化资产代码面冻结，后续只修静态验收或真实 Hero 暴露的通用缺陷。
+
+2026-09-03 又完成一次旧仓库→新仓库只读缺口审计。DSH、Context/Claim/Evidence/Handoff、PG authority/Failure Capsule/HITL/Oracle/side-effect、SkillOps/Nacos、OTLP protobuf/SLS、Golden/paired metrics 和 offline bundle 的核心代码均已存在，不再回灌旧大模块。完整 Hero 前只允许补六个运行接线：原生事件→同 Run PG 只读投影（含 recovery/generation/late-reject 引用）、Matrix 原始事件→HITL verifier、Outcome/Boundary 纯 verifier 分模式并由两个现有原生 Oracle Worker 独立运行、异构选择 sealed fact、AgentLoop Dataset/EvaluationTask 最薄写入/回读、真实采集与独立离线复跑 CLI。这些模块只投影或验证已发生事实，不创建 Project/Task、不发 Matrix 调度消息、不代替 Manager/Leader/Worker 作决策。
+
+当前 8 小时时间盒顺序固定为：①收口上述薄接线与 DSH→百炼、Nacos、AgentLoop 非 Hero 真传输预检；②只构建/更新一次候选运行态；③发送一条正常业务目标，运行原生 Manager→双 Team/Leader→QwenPaw+DSH/百炼 Worker→结构化 handoff→真实 HITL/恢复→双 Oracle→Manager 二次决策；④将同 Run 原始 Matrix/AgentTeams、provider/tool/Skill、PG、AgentLoop/SLS 事实与复跑脚本打包；⑤只修真实运行暴露的最小通用根因并复跑。HA/PITR/RAG/高并发、Codex 第二外部 Worker、完整 E0–E3 统计与长期 AgentLoop 资源治理都不阻塞首个纵向闭环。
+
+本轮并行边界固定为两条且互不改同一文件：`testweaver/authority/` 收口 PostgreSQL append-only 质量事件、Failure/Process Capsule、HITL authority、双 Oracle 和 side-effect ledger；`testweaver/{skillops,observability,integrations,evaluation,adapters}/` 收口真实 Matrix Human verification、AgentLoop/SLS trace/evaluation 回读、Nacos Skill 发布回读、DSH→百炼受保护调用和 LIVE 离线包。二者通过稳定 `campaign_id/run_id/trace_id/pg_revision/content_hash` 合约连接，不互相调用调度接口。
+
 ## 5. 当前事实
 
 - 新仓库基线提交：`f2b57d4`，此前工作树干净。
@@ -99,19 +108,26 @@ TestWeaver 只做产品差异：
 - fresh retry `m2f-oracle-retry-20260902T030843Z` 已在不重建两个现有 Oracle Worker、无中途补通知的前提下收口：同一冻结 evidence bytes/hash、`gold_ref=null`、一次 Human initial；两个既有 Team/Leader 分别原生创建 fresh Project/Task/room 并 delegate。Boundary Task 的 Worker ack→result→submit、Leader check/accept 与 TeamHarness completed metadata 均已观察；Outcome Task 的实际 Leader-created Task 为 `m2f-oracle-retry-20260902-030843-01`（初始 global projection `task-20260902-030843-outcome-oracle` 保持未修改），同样观察到 Worker ack→result→submit、Leader check/accept 与 completed metadata。两个 Oracle 的独立容器/PID/identity/session、usage 与结果 hash 已脱敏记录；Task room 未观察到跨 Oracle 引用。Manager 在 Human room 的最终汇总未观察到，故 fresh retry 整体仍为 `PARTIAL`，不得升级为双 Oracle PASS。receipt/manifest 位于 `testweaver/evidence/m2f/m2f-20260902T012601Z/oracle-retry-20260902T030843Z/`，manifest sha256 为 `56c515f5c04279000a6dd381616b5f46e8e8abcbb667d157b4c16b703f12d4eb`。
 - `83f502f` 独立 reviewer 发现 Outcome lifecycle 的 `assignment_event` 与 `worker_ack_event` 两个引用未进入原始 event-index；两项 exact Matrix 回读均为 `NOT_FOUND`。两支功能 lifecycle 虽观察到结果与 Leader accept，但原始索引未闭合，整体继续为 `PARTIAL`，不得称双 Oracle 已独立 PASS。
 - 异构 Worker 最薄适配已由 `2e1ef40` source-only 完成：DSH 显式支持 DeepSeek 与阿里云百炼，Codex 使用 `codex-cc`、`gpt-5.6-luna`、`max`；尚未 LIVE，不得替代原生 Leader 分配或回收结果。
-- 观测基座现状（仅服务 readiness，不代表任何 Hero）：LoongSuite Pilot 与 OTel Collector 已按现有官方入口启动并 READY；CMS export target 仅完成 DNS/TCP/TLS 可达性，未发送真实 span，故为 `NOT_VERIFIED`。旧审计把“缺少独立 AgentLoop query endpoint”直接记为 `BLOCKED`，该假设待按官方 AgentSpace→Trace/Trajectory→Dataset/Evaluation 数据链纠正：独立 query endpoint 不是预设必需条件，必须先辨认现有 AgentSpace/SLS 绑定和官方可回读入口，再给出 `PASS/BLOCKED`。
+- 观测基座现状（不代表任何 Hero）：LoongSuite Pilot 与 OTel Collector 已 READY；SLS 签名/只读查询已真实返回 HTTP 200，但当前 Trace logstore 的 100 行中没有完整同 Run 关联，`evaluation_detail` 尚不存在并返回 404。现有 Collector 只有本地 file exporter，Manager/Worker 也未消费官方 CMS OTLP 配置，因此云写链仍为 `NOT_VERIFIED`。下一步是发送明确标为 `NOT_LIVE_PROBE` 的真实 OTLP/protobuf 探针并从绑定 SLS 回读，随后才由 Hero 的真实 provider turn 产生 LIVE Trace；不得把本地文件、readiness 或旧 span 升级为 LIVE。
 - AgentLoop 旧资产目前只可称合同/replay/历史受限证据；本批次复用现有 LoongSuite、OTel、AgentLoop 与受保护配置，补真实 span、同 Run 关联和权威回读。若现有账号确实缺 AgentSpace/SLS 查询权限，保留原始鉴权失败并诚实标记外部 `BLOCKED`，不得以 synthetic 数据补 LIVE。
 - M2-G Stage B run `m2g-stageb-20260902T041117Z-container` 已收口为 `PARTIAL/NOT_OBSERVED`：Human initial 与 Manager 原生响应事件回读 PASS；未观察到新的原生 Project、Task 对象或 Task room，也未观察到 Leader assignment、Worker ack、DSH provider/model/tool call、submit/check/accept 或 Manager 二次决策。唯一 Manager 响应中的 task reference 不足以证明原生 Task；不得补消息、代行或升级为 LIVE。脱敏 receipt/manifest/hash 位于 `testweaver/evidence/m2g/m2g-stageb-20260902T041117Z-container/`。
 - M2-G Stage B2 run `m2g-stageb2-20260902T044457Z-container` 同样诚实收口为 `PARTIAL/NOT_OBSERVED`：新的 Human initial 与 Manager 响应已回读；Manager 真实 model turn、`agt get` roster 查询、task directory（`meta.json`/`spec.md`）和 MinIO `mc` 准备动作已观察，但未观察到原生 Project/Task state、Leader room assignment、Worker ack、DSH provider/tool call 或 submit/check/accept。无补消息、无脚本代建 Task、无 Worker 指定；不得升级为 LIVE。脱敏 receipt/manifest/hash 位于 `testweaver/evidence/m2g/m2g-stageb2-20260902T044457Z-container/`。
 - M2-G Stage B3 run `m2g-stageb3-20260902T050009Z-container` 在 Manager `AGENTS.md` 通用委派规则提交 `10cb365` 并通过现有 builtin merge 精确同步后执行；Human initial 单次发送/回读 PASS。3 分钟窄观察只见文件层 `task-20260902-050009-m2g-stageb3` 的 `meta.json`/`spec.md`，未观察到精确 run 的 Manager session/model 响应、state 注册、原生 Project/Task 对象或 Task room、Leader assignment、Worker ack、DSH provider/tool call、submit/check/accept 或 Manager 二次决策。文件准备不等于原生委派；无补消息、无脚本代建、无 Worker 指定，整体继续 `PARTIAL/NOT_OBSERVED`。脱敏 receipt/manifest/hash 位于 `testweaver/evidence/m2g/m2g-stageb3-20260902T050009Z-container/`。
 - 对 B3 的后续独立精确回读不改写 `3b701ac` 或其冻结收据：原始“未观察”结论由观测面缺陷造成（Manager 容器无 `rg` 且 stderr 被吞掉；Matrix `/messages` 返回事件缺少 `.room_id`，旧过滤器因此丢弃全部事件）。回读实际找到 B3 的 Manager session/model、文件/MinIO/manage-state 准备、Manager→Leader 真实 assignment 与 Leader 原生委派，故不能再把 B3 说成没有进入 Leader；功能结论仍保持 `PARTIAL`。同时，B2/B3 都复用了 `agent:main:main` 的 session `72f72165-65e6-4911-95d4-415b63ffac21`，而 `10cb365` workspace builtin 同步发生在复用期间；OpenClaw 的 bootstrap snapshot 按 `sessionKey` 缓存，未轮换 session 时不能证明新 builtin 进入系统上下文。
 - 按官方 `sessions.reset` 路径将同一 Manager/room 的 main session 轮换为 `6db603cd-7097-4be7-b900-462df3aacbd5`，workspace `AGENTS.md` 已经由现有 builtin merge 同步并在新 session 的 system-prompt report 中 readback（source `10cb365`、workspace hash 已收据化）；模型、镜像、账号、Team 与 room 未改变。fresh Stage C `m2g-stagec-20260902T052613Z-container` 的唯一 Human initial 回读 PASS，Manager→Leader 原生 Project/Task/delegate、Worker 真实 model/tool/Skill turn 与 `ack_task(in_progress)` 已观察；但 run-scoped DSH/百炼 provider call、usage/latency、result、submit/check/accept 和 Manager 二次决策均未观察到，Task room wire 仅见 create 且无 `m.room.message`，所以 Stage C 诚实收口为 `PARTIAL/NOT_OBSERVED`，不再补消息、轮询或修运行态。脱敏 receipt/manifest/hash 位于 `testweaver/evidence/m2g/m2g-stagec-20260902T052613Z-container/`。
+- 2026-09-03 Hero 前薄接线已提交：双 Oracle 分模式与外部密封离线证明 `4fb580c`；只读原生采集器 `92314b6`、生命周期加固 `52cd73a`、真实 Skill API 兼容 `0855fbd`；Oracle 隔离 AgentSpec 包 `abfd7f7`；AgentLoop signed transport/XTrace 回读 `0855fbd` + `5d0562c`；原生事实 exact-GET/Actor/HITL/Oracle 可信化 `8994b8d`。采集器已在当前两 Team/七 Agent 栈做临时真实只读演练，最终 checksum PASS，未发送消息或调用模型。
+- 两个现有 Oracle 已通过原生 AgentSpec desired-state 应用隔离配置：Boundary 只有公开输入/Policy 与 `verify_boundary`；Outcome 独占私有 Gold 与 `verify_outcome`。普通 Worker、两名 Leader、DSH、Boundary、Manager mirror 与共享对象存储均回读为无 Gold；Outcome 私有文件只在自身容器存在。真实 verdict 仍须由新 Hero 中两个原生 Task/两个身份/进程产生，当前仅为配置预检。
+- DSH 首次运行已将失败从凭据/路由收窄为官方 package 构建链缺根 `@deepseek-ai/dsh-llm` 链接；失败收据 `357903c`、`2c106f3`、`355b47d` 保留。通用修复为可解析 root runtime devDependencies `8e6c15f` 与 root manifest 遮蔽修复 `6091f67`；候选镜像已产出，只有一次真实百炼探针成功后才可升级 DSH LIVE。
+- AgentLoop 真回读层已恢复 Dataset/EvaluationTask 的严格 scope/hidden-gold/终态/非空结果门槛，并实现 XTrace `GetTrace` 最多三次、90 秒的 hash-only 回读。现有历史权限为 403，所以云端 Gate 当前仍是 `BLOCKED/UNKNOWN`；Hero 后先做基于真实 native provider/session/Task facts 的 `PROJECTED_LIVE_TRACE`，只有 LoongSuite 原生 span 云端同一行完整回读才称 `NATIVE_LIVE_TRACE`。
 
 ## 6. 实施顺序与完成条件
 
 ### 2026-09-02 核心批量收口顺序（supersedes 本节中更严格的首次闭环前置）
 
 - 当前失败 Run 已冻结，不再继续或补造事件。先收口它揭示的 DSH 受保护凭据投影根因，再与 AgentLoop 真接入、Skill 进化最小闭环一起完成统一静态验证和一次候选构建；之后才启动新的完整 Hero。
+- 本批次提交后的下一唯一验收是一个新的、同一权威 `run_id/campaign_id/trace_id` 的真实 Hero。Human 只提供业务目标，不指定 Team、Worker、分支、审批结果或 Oracle 结论；系统必须自主完成 Manager 动态选择 Team/Leader → Leader 原生拆解与委派 → QwenPaw 与 DSH/百炼异构 Worker 真实执行及领域 Skill 真实调用 → 证据驱动的结构化 handoff → Policy 触发真实 Human PAUSE/外部决定/new revision resume → 两个独立身份/进程的 Outcome/Boundary Oracle → Leader 汇总 → Manager 读取新证据并作第二次真实决策。同时必须把该 Run 的 OTel GenAI Trace 经 LoongSuite/Collector 写入 AgentLoop/AgentSpace 绑定的 SLS 并按同一关联键查询回读；随后至少选择一次本 Run 暴露的真实问题，经冻结 dataset/evaluation、归因、版本化 Skill proposal、外部 Human approval、canary、同集复评和 promote/rollback 形成可审计 Skill 进化收据。
+- 同一真实问题还必须生成持久化 Failure Capsule，并在下一次复跑前由 Leader 按指纹检索/readback；复跑收据记录是否命中、采用了哪条证据/修复/回归引用以及问题是否复发。这一证明并入 Skill 进化闭环，不新增调度状态机。当前新仓库只有方案与诊断 Skill 引用，旧仓库的 `capsule_event/capsule_projection` 是待薄迁移供体；在真实 PostgreSQL 写入、重启后回读及复跑命中之前保持 `NOT_VERIFIED`。
+- 上述各项必须由同一 Run 的原始 AgentTeams、provider/tool/Skill、Matrix、PostgreSQL/Event Store 与 AgentLoop/SLS 事实互相对账。缺项即按 `PARTIAL/NOT_OBSERVED/BLOCKED` 诚实分类；禁止用此前分散 Run、静态合同、fixture、synthetic span、提示词自述或脚本注入补齐。首次执行只修真实运行揭示的最小通用根因并复跑，不把案例改造成预定成功路径。
 - 今晚 P0 是同一真实输入完成：Manager 动态选择 Team/Leader → Leader 原生委派 → QwenPaw 与 DSH 两种真实运行时 → 真实模型/工具/领域 Skill → Context/Evidence/Claim 约束与结构化 handoff → 真实 HITL → Outcome Oracle 与 Boundary Oracle 两个独立身份/进程实际执行 → Leader 汇总 → Manager 二次决策，并保留同一 run 的原始身份、来源、hash 与生命周期证据。不得为凑项修改案例或结果。
 - 今晚闭环若使用 DSH+DeepSeek，只证明“AgentTeams 原生协作 + DSH 异构运行时”，不声称不同模型供应商异构；分类必须诚实。M2-D/M2-F 的既有 HITL/恢复证据保留，但不能冒充在今晚同一 run 内发生。
 - DSH→百炼真实调用、双 Oracle、AgentLoop 同 Run 真回读以及至少一项 Skill 的版本化改进循环属于作品核心，不得后置；`codex-cc` 第二外部 Worker、恢复同 Run 重演、完整 E0–E3 三轮统计和材料打包在首个完整 Hero 后连续完成。
