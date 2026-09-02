@@ -1,0 +1,95 @@
+{
+  "schema": "testweaver.dsh-preflight/v1",
+  "classification": "NOT_LIVE_PROVIDER_PROBE_FAIL",
+  "run_id": "dsh-live-7f3d0c8",
+  "source_commit": "7f3d0c890f64beab6872acff2263630555c912c9",
+  "scope": {
+    "claim": "one bounded native_worker_execute provider preflight",
+    "hero_run": false,
+    "live_agentteams_claim": false,
+    "synthetic_or_replay": false,
+    "attempts": 1,
+    "retry": false
+  },
+  "build": {
+    "tag": "agentteams/qwenpaw-worker:dsh-live-7f3d0c8",
+    "image_id": "sha256:af37edc33e4a59fbdfc375e2123faf37d992ca38f4c1e434fadec4aab1d72440",
+    "manifest_digest": "sha256:af37edc33e4a59fbdfc375e2123faf37d992ca38f4c1e434fadec4aab1d72440",
+    "config_digest": "sha256:3da7f02a2d495ab178dd92aa65f49300c4df33fe40d57a82a16e8301c4230654",
+    "base_image": "agentteams/qwenpaw-worker:be10aaf",
+    "base_image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+    "node_version": "v22.23.1",
+    "node_runtime_sha256": "93956de2e59480474a7b46571da1651180b1a050cdf32641ebec4ce6e478e068",
+    "dsh_package_sha256": "fd54754810da76671128e0fe83ea946faf98b112adacb6cb8a4654a0fa265664"
+  },
+  "worker_update": {
+    "official_command": "agt update worker --name native-m0-clean-dsh-worker --image agentteams/qwenpaw-worker:dsh-live-7f3d0c8",
+    "resource": "native-m0-clean-dsh-worker",
+    "old_image": "agentteams/qwenpaw-worker:dsh-forest-e64e7c8",
+    "old_container_id": "9b639c05c6660527aefc56663888297ab908970e1f437c27224a86a95a6dbc29",
+    "new_container_id": "67679db5b7449bab0a266dae18841fd3cd2d70a6475fb47ce514b504280b740a",
+    "new_container_created_at": "2026-09-02T19:22:31.739787538Z",
+    "new_container_started_at": "2026-09-02T19:23:01.160785043Z",
+    "old_container_present_after_update": false,
+    "readback": {
+      "phase": "Running",
+      "state": "Running",
+      "container_state": "running",
+      "identity": "Provider-neutral DSH heterogeneous Worker; gateway credential rotated; built-in tools disabled; DeepSeek path ready",
+      "matrix_user_id": "@native-m0-clean-dsh-worker:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!t8ycL6WDpsGf9D0mGo:matrix-native-m0-20260901.agentteams.local:28080",
+      "team": "native-m0-clean-team",
+      "runtime": "qwenpaw",
+      "model": "deepseek-v4-flash",
+      "health_http": 200,
+      "version_http": 200,
+      "team_phase": "Active",
+      "mcp_http": 200,
+      "mcp_surface_count": 4,
+      "docker_healthcheck": "none"
+    }
+  },
+  "preflight": {
+    "entrypoint": "native_worker_execute via testweaver.adapters.mcp_server",
+    "profile": "aliyun-bailian",
+    "logical_model": "deepseek-v4-flash",
+    "route_path": "/v1/testweaver-bailian/v1/chat/completions",
+    "protected_refs": {
+      "endpoint": "TESTWEAVER_BAILIAN_ENDPOINT",
+      "model": "TESTWEAVER_BAILIAN_MODEL",
+      "credential": "TESTWEAVER_BAILIAN_CREDENTIAL"
+    },
+    "status": "FAIL",
+    "first_error_class": "ERR_MODULE_NOT_FOUND",
+    "dsh_process_started": true,
+    "dsh_process_exit_code": 1,
+    "mcp_response_count": 0,
+    "native_worker_execute_result": "NOT_OBSERVED",
+    "provider_called": "NOT_OBSERVED",
+    "provider": "aliyun-bailian",
+    "provider_http_status": "NOT_OBSERVED",
+    "usage": "NOT_OBSERVED",
+    "latency_ms": "NOT_OBSERVED",
+    "result": "NOT_OBSERVED",
+    "submit": "NOT_OBSERVED",
+    "check": "NOT_OBSERVED",
+    "accept": "NOT_OBSERVED",
+    "request_sha256": "NOT_OBSERVED",
+    "response_sha256": "NOT_OBSERVED",
+    "failure_artifact": {
+      "path": "/root/agentteams-fs/agents/native-m0-clean-dsh-worker/.qwenpaw/workspaces/default/.testweaver-native-results/result-ea20b67748a4df53bfffe1b1755be879a7b256ea13c5af7d9713b39e9946ad97.txt",
+      "content_sha256": "ea20b67748a4df53bfffe1b1755be879a7b256ea13c5af7d9713b39e9946ad97",
+      "stderr_sha256": "00511c11590c17164984a007d2eda97d7b65d8f8f5102267f38d8dfa4923b050",
+      "stdout_bytes": 0,
+      "stderr_bytes": 8192
+    }
+  },
+  "safety": {
+    "native_task_state_mutated": false,
+    "native_result_submission": false,
+    "prompt_recorded": false,
+    "response_recorded": false,
+    "secret_values_recorded": false,
+    "old_failure_receipt_preserved": "testweaver/evidence/preflight/dsh-live-3eb5875-20260902T191255Z/receipt.json"
+  }
+}

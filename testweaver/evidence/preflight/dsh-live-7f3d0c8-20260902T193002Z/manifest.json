@@ -1,0 +1,20 @@
+{
+  "schema": "testweaver.dsh-preflight-manifest/v1",
+  "run_id": "dsh-live-7f3d0c8",
+  "source_commit": "7f3d0c890f64beab6872acff2263630555c912c9",
+  "classification": "NOT_LIVE_PROVIDER_PROBE_FAIL",
+  "manifest_hash_scope": "receipt-only; manifest and SHA256SUMS are self-describing and excluded from the receipt hash",
+  "files": [
+    {
+      "path": "receipt.json",
+      "sha256": "585c5e327e1db8380f67038e740e573fbca8cadd43278e9afe757e4df7442ecd"
+    }
+  ],
+  "hash_list": "SHA256SUMS",
+  "old_failure_receipt": "testweaver/evidence/preflight/dsh-live-3eb5875-20260902T191255Z/receipt.json",
+  "secrets": {
+    "values_present": false,
+    "assignment_pattern_matches": 0,
+    "plaintext_prompt_or_response": false
+  }
+}
