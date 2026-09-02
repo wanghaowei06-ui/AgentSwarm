@@ -1,0 +1,13 @@
+{
+  "schema": "testweaver.preflight-manifest/v1",
+  "run_id": "dsh-bailian-20260902T162959Z",
+  "classification": "BLOCKED",
+  "authority": "AgentTeams-native-readback",
+  "receipt": "receipt.json",
+  "receipt_sha256": "2c50d6a0f7e697018dedc0a8554a13f3b599414490f9726ac9eaeffca82a0e95",
+  "files": ["receipt.json", "manifest.json", "SHA256SUMS"],
+  "sha256sums_covers": ["receipt.json", "manifest.json"],
+  "provider_probe": "NOT_RUN",
+  "live_claim": false,
+  "runtime_mutation": false
+}

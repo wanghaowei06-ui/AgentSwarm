@@ -1,0 +1,152 @@
+{
+  "schema": "testweaver.dsh-bailian-preflight/v1",
+  "run_id": "dsh-bailian-20260902T162959Z",
+  "captured_at": "2026-09-02T16:29:59Z",
+  "classification": "BLOCKED",
+  "live_claim": false,
+  "runtime_mutation": false,
+  "provider_called": false,
+  "before": {
+    "controller": {
+      "container_id": "cc5c2f91197b544c721f1c303fcdf5a3091b0dc7d6aafa5e8f9cb15d51ee7fdc",
+      "image_id": "sha256:3966dc000f20f98033b15fba897f257186653ef8600e760c1cc55aa620b42bd6",
+      "status": "running"
+    },
+    "team": {
+      "name": "native-m0-clean-team",
+      "phase": "Active",
+      "team_room_id": "!NbRmgvdkZMdRcCvLg4:matrix-native-m0-20260901.agentteams.local:28080",
+      "leader_name": "native-m0-clean-leader",
+      "leader_dm_room_id": "!Ypl073FDlR3fHMbFWW:matrix-native-m0-20260901.agentteams.local:28080",
+      "leader_ready": true,
+      "total_workers": 3,
+      "ready_workers": 3,
+      "worker_names": [
+        "native-m0-boundary-oracle",
+        "native-m0-clean-dsh-worker",
+        "native-m0-clean-worker"
+      ],
+      "worker_members": [
+        {"name": "native-m0-clean-leader", "role": "team_leader"},
+        {"name": "native-m0-clean-worker", "role": "worker"},
+        {"name": "native-m0-boundary-oracle", "role": "worker"},
+        {"name": "native-m0-clean-dsh-worker", "role": "worker"}
+      ]
+    },
+    "worker": {
+      "name": "native-m0-clean-dsh-worker",
+      "phase": "Running",
+      "state": "Running",
+      "runtime": "qwenpaw",
+      "model": "deepseek-v4-flash",
+      "model_provider": "openai-compat",
+      "image": "agentteams/qwenpaw-worker:dsh-headless-6fee879",
+      "image_id": "sha256:84788af57ad896dc52d40bffc16bc7e623c82060552d7d149d273935b66aa39b",
+      "container_id": "9831fb3884532b6ce37ab10e9df7758c272c50a68be4d9c5adf4bef4981dec87",
+      "container_started_at": "2026-09-02T11:00:15.115829785Z",
+      "container_managed": true,
+      "container_state": "running",
+      "matrix_user_id": "@native-m0-clean-dsh-worker:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!t8ycL6WDpsGf9D0mGo:matrix-native-m0-20260901.agentteams.local:28080",
+      "spec_env_names": [],
+      "spec_mcp_server_names": [],
+      "runtime_env_presence": {
+        "AGENTTEAMS_AI_GATEWAY_URL": true,
+        "AGENTTEAMS_WORKER_GATEWAY_KEY": true,
+        "TESTWEAVER_BAILIAN_MODEL": false,
+        "DEEPSEEK_BASE_URL": false,
+        "DEEPSEEK_API_KEY": false,
+        "DEEPSEEK_MODEL": false
+      },
+      "resource_generation": 21
+    },
+    "runtime_package": {
+      "root": "/opt/agentteams/testweaver-native-worker",
+      "dsh_executable": "/opt/agentteams/testweaver-native-worker/bin/dsh",
+      "dsh_executable_mode": "0755",
+      "manifest_present": true,
+      "mcp_config_present": true
+    },
+    "health": {
+      "container_port": 10227,
+      "health_http_status": 200,
+      "version_http_status": 200
+    },
+    "routes": {
+      "testweaver_bailian": {
+        "name": "testweaver-bailian-route",
+        "configmap_sha256": "836ed3ff63315fa3216a64d4fec5b65c1fba42426e0af00b828cccd785132d4e",
+        "path": "/v1/testweaver-bailian",
+        "domains": [],
+        "provider": "testweaver-bailian",
+        "model_mapping": {"deepseek-v4-flash": "qwen3.7-flash"},
+        "auth_enabled": true,
+        "allowed_credential_types": ["key-auth"],
+        "allowed_consumers": ["manager"]
+      },
+      "default": {
+        "name": "default-ai-route",
+        "configmap_sha256": "eabf8b2760c91821d9e36d74745ae566f8865c73a391668a72879db458d2e210",
+        "path": "/v1",
+        "domains": [],
+        "provider": "openai-compat",
+        "model_mapping_keys": [],
+        "auth_enabled": true,
+        "allowed_credential_types": ["key-auth"],
+        "allowed_consumers": [
+          "manager",
+          "worker-native-m0-clean-leader",
+          "worker-native-m0-clean-worker",
+          "worker-native-m1-verify-worker",
+          "worker-native-m1-verify-leader",
+          "worker-native-m0-boundary-oracle",
+          "worker-native-m1-outcome-oracle",
+          "worker-native-m0-clean-dsh-worker"
+        ]
+      }
+    }
+  },
+  "requested_native_update": {
+    "worker": "native-m0-clean-dsh-worker",
+    "model_provider": "testweaver-bailian",
+    "logical_model": "deepseek-v4-flash",
+    "non_secret_env_name": "TESTWEAVER_BAILIAN_MODEL",
+    "non_secret_env_value": "deepseek-v4-flash"
+  },
+  "native_update_capability": {
+    "agt_update_help_has_model_provider_flag": false,
+    "agt_update_help_has_env_flag": false,
+    "declarative_apply_path": "/api/v1/workers/<name>",
+    "request_type_supports_model_provider": true,
+    "request_type_supports_env": false,
+    "source_refs": [
+      "agentteams-controller/internal/server/types.go:32-53",
+      "agentteams-controller/api/v1beta1/types.go:237"
+    ],
+    "decision": "BLOCKED_WITHOUT_MUTATION",
+    "reason": "current official Worker update seam cannot atomically and verifiably set spec.env TESTWEAVER_BAILIAN_MODEL; an apply env field would be ignored by the current request type"
+  },
+  "probe": {
+    "status": "NOT_RUN",
+    "reason": "native_worker_update_does_not_support_required_non_secret_env",
+    "provider": "testweaver-bailian",
+    "model": "deepseek-v4-flash",
+    "http_status": null,
+    "exit_code": null,
+    "usage": null,
+    "latency_ms": null,
+    "request_sha256": null,
+    "response_sha256": null
+  },
+  "rollback": {
+    "status": "NOT_APPLICABLE_NO_MUTATION",
+    "previous_model_provider": "openai-compat",
+    "previous_worker_image_id": "sha256:84788af57ad896dc52d40bffc16bc7e623c82060552d7d149d273935b66aa39b"
+  },
+  "secret_policy": {
+    "secret_values_recorded": false,
+    "secret_values_output": false,
+    "secret_values_copied": false,
+    "key_names_only": true
+  }
+}
