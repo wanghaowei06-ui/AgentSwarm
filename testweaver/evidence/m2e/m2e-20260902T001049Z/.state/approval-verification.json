@@ -1,0 +1,11 @@
+{
+  "schema": "testweaver.m2e.human-approval-verification/v1",
+  "event_id": "$tFQwaj9AM6E2kXIKGNABvf_A-QGMvLQ_AS_kbgvgo2U",
+  "room_id": "!PuS2LqxxnIcKgYMEwo:matrix-native-m0-20260901.agentteams.local:28080",
+  "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+  "readback_body_sha256": "79b41c02cd440a064d367b13ddc3f785417016bc2458807c2050f8faf0758ce7",
+  "input_body_sha256": "79b41c02cd440a064d367b13ddc3f785417016bc2458807c2050f8faf0758ce7",
+  "match": true,
+  "send_count": 1,
+  "values_persisted": false
+}

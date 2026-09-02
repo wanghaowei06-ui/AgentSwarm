@@ -1,0 +1,28 @@
+{
+  "schema": "testweaver.m2e.recovery-team-agt/v1",
+  "teams": [
+    {
+      "teamName": "native-m0-clean-team",
+      "phase": "Active",
+      "leaderName": "native-m0-clean-leader",
+      "leaderReady": true,
+      "readyWorkers": 1,
+      "totalWorkers": 1,
+      "workerNames": [
+        "native-m0-clean-worker"
+      ],
+      "workerMembers": [
+        {
+          "name": "native-m0-clean-leader",
+          "role": "team_leader"
+        },
+        {
+          "name": "native-m0-clean-worker",
+          "role": "worker"
+        }
+      ],
+      "teamRoomID": "!NbRmgvdkZMdRcCvLg4:matrix-native-m0-20260901.agentteams.local:28080",
+      "leaderDMRoomID": "!Ypl073FDlR3fHMbFWW:matrix-native-m0-20260901.agentteams.local:28080"
+    }
+  ]
+}

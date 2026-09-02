@@ -1,0 +1,19 @@
+{
+  "schema": "testweaver.m2e.fault-pre-execution/v1",
+  "observed_at": "2026-09-02T00:29:43Z",
+  "approval_event_id": "$tFQwaj9AM6E2kXIKGNABvf_A-QGMvLQ_AS_kbgvgo2U",
+  "worker_cr": "native-m0-clean-worker",
+  "project_id": "m2e-recovery-20260902-002008",
+  "task_id": "task-20260902-002008",
+  "approved_container_id": "20736420e86f27a080b73b8425aca0730c45fc1c805324b99cd8e693ec25ebd8",
+  "current_container_id": "20736420e86f27a080b73b8425aca0730c45fc1c805324b99cd8e693ec25ebd8",
+  "identity_match": true,
+  "container_running": true,
+  "container_ps_line": "20736420e86f27a080b73b8425aca0730c45fc1c805324b99cd8e693ec25ebd8\tagentteams-native-m0-20260901-worker-native-m0-clean-worker\tagentteams/qwenpaw-worker:be10aaf\tUp 2 hours\t0.0.0.0:14153->8088/tcp, [::]:14153->8088/tcp",
+  "health": {
+    "port": "14153",
+    "http_status": "200"
+  },
+  "native_state_path": ".state/fault-pre-execution-native-state.txt",
+  "values_persisted": false
+}

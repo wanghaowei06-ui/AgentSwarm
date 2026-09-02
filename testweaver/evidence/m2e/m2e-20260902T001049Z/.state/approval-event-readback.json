@@ -1,0 +1,11 @@
+{
+  "schema": "testweaver.m2e.human-approval-event/v1",
+  "event_id": "$tFQwaj9AM6E2kXIKGNABvf_A-QGMvLQ_AS_kbgvgo2U",
+  "room_id": "!PuS2LqxxnIcKgYMEwo:matrix-native-m0-20260901.agentteams.local:28080",
+  "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+  "origin_server_ts": 1788308923033,
+  "content": {
+    "body": "M2-E 一次性 Human 审批（窄范围、可逆边界）\n\nRun: m2e-20260902T001049Z\nProject: m2e-recovery-20260902-002008\nTask: task-20260902-002008\n选定 Worker CR: native-m0-clean-worker\nWorker Matrix identity: @native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080\n\n我仅授权外部 operator 对上述同一 Worker 当前这一枚已 fresh-read 容器执行一次且仅一次：\ndocker rm -f 20736420e86f27a080b73b8425aca0730c45fc1c805324b99cd8e693ec25ebd8\n\n授权边界：禁止 -v；禁止删除或触碰任何卷；禁止修改 CR、配置、模型、provider、账号或凭据；禁止触碰其他容器；禁止额外 restart/recreate/exec 或任何其他故障动作。Controller 后续按同一 Worker CR 原生重建属于系统恢复观察，不是 operator 的额外授权。此次批准不改变 Project/Task 状态，也不授权任何 submit/check/accept/cancel/delegate/create 操作。\n\n执行后只经原生 Human→Manager→Leader 路径转交真实事实（旧/新 container ID、同一 Matrix identity、health、Team Ready）；Manager 不代行任何任务状态动作，Leader 按既有 M2-E 任务规范自行处理后续原生恢复链。\n",
+    "msgtype": "m.text"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "project_id": "m1-phase2-verify-20260901-153942",
+  "status": "active",
+  "team_id": "native-m1-verify-team",
+  "title": "M1 Leg 2: independent convergence/cross-validation (native-m1-verify-team)",
+  "plan_type": "dag",
+  "mode": "",
+  "nodes": [
+    {
+      "id": "task-20260901-153942",
+      "name": "M1 Leg 2: independent convergence/cross-validation (native-m1-verify-team)",
+      "status": "completed",
+      "assignee": "native-m1-verify-worker"
+    }
+  ]
+}

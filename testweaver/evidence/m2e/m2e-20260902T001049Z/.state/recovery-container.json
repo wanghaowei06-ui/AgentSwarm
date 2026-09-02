@@ -1,0 +1,55 @@
+{
+  "schema": "testweaver.m2e.recovery-container/v1",
+  "observed_at": "2026-09-02T00:36:32Z",
+  "worker_cr": "native-m0-clean-worker",
+  "old_container_id": "20736420e86f27a080b73b8425aca0730c45fc1c805324b99cd8e693ec25ebd8",
+  "new_container_id": "9727ed45c40a8c6efd74c9f2bd822b14d6fe979bc468be0e65391f6b86ed5631",
+  "new_container_differs": true,
+  "old_image_tag": "agentteams/qwenpaw-worker:be10aaf",
+  "new_image_tag": "agentteams/qwenpaw-worker:be10aaf",
+  "new_image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+  "image_id_by_tag": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+  "image_id_match": true,
+  "state": {
+    "Status": "running",
+    "Running": true,
+    "StartedAt": "2026-09-02T00:33:01.458097371Z",
+    "Health": null
+  },
+  "health": {
+    "port": "19253",
+    "http_status": "200"
+  },
+  "env_names_hash_before": "474b80e83594b3ec0d503660ceb8ab4d36a61aab1681ac077207452a7e8b4b9d",
+  "env_names_hash_after": "474b80e83594b3ec0d503660ceb8ab4d36a61aab1681ac077207452a7e8b4b9d",
+  "env_names_unchanged": true,
+  "mounts_before": [
+    {
+      "Source": "/var/lib/docker/volumes/agentteams-native-m0-20260901-worker-native-m0-clean-worker-auth/_data",
+      "Destination": "/var/run/secrets/agentteams",
+      "Mode": "z"
+    }
+  ],
+  "mounts_after": [
+    {
+      "Source": "/var/lib/docker/volumes/agentteams-native-m0-20260901-worker-native-m0-clean-worker-auth/_data",
+      "Destination": "/var/run/secrets/agentteams",
+      "Mode": "z"
+    }
+  ],
+  "volume_mount_unchanged": true,
+  "identity_env_names": [
+    "AGENTTEAMS_AI_GATEWAY_URL",
+    "AGENTTEAMS_CONSOLE_PORT",
+    "AGENTTEAMS_CONTROLLER_URL",
+    "AGENTTEAMS_FS_BUCKET",
+    "AGENTTEAMS_FS_ENDPOINT",
+    "AGENTTEAMS_MATRIX_DOMAIN",
+    "AGENTTEAMS_MATRIX_URL",
+    "AGENTTEAMS_STORAGE_PROVIDER",
+    "AGENTTEAMS_WORKER_CR_NAME",
+    "AGENTTEAMS_WORKER_NAME",
+    "AGENTTEAMS_WORKER_ROLE"
+  ],
+  "values_persisted": false
+}

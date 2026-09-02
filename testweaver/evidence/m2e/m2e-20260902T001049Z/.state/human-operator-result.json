@@ -1,0 +1,19 @@
+{
+  "room": {
+    "room_id": "!PuS2LqxxnIcKgYMEwo:matrix-native-m0-20260901.agentteams.local:28080",
+    "manager_id": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+    "manager_membership": "join",
+    "human_user_id": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080"
+  },
+  "event": {
+    "content": {
+      "body": "这是一次全新、唯一的 M2-E 原生 AgentTeams 真实恢复运行。请将本 Run 与所有旧 M0、M1、M1+、M2-C、M2-D 的 room、Project、Task、session 和 evidence 隔离，不复用旧 Project 或 Task；保持当前模型、provider、账号、推理设置和凭据引用不变。\n\n先由 Manager fresh-read 当前官方 roster、Team/Leader/Worker 状态和 TeamHarness 状态，再由真实 provider 动态选择一个当前可用的 Team 及其 Leader；只选择其 Worker 没有非终态旧 Task 的 Team。不得由 Human、脚本、提示文本或固定名称预定 Team、Leader、Worker 或 choice。Manager 只协调 Team/Leader，不代替 Leader 建 Project/Task，不代替 Leader 执行 taskflow/projectflow，不代替 Worker 工作。\n\n被选 Leader 必须只使用官方 TeamHarness 的 roomflow、projectflow、taskflow 创建本 Run 的一个全新 Project 和一个短小、真实可中断的初始 Task，并通过原生 taskflow delegate_task 委派一个真实 Worker。delegate_task 成功后，必须按当前 TeamHarness team-delegation/notificationNeeded 契约向 notificationNeeded.targetRoom 发送一次跨房间 assignment，消息中使用从真实 roster 读取的完整 Worker Matrix ID，然后结束当前 turn。不得由 Human 或脚本代 Leader 建 Task、发 assignment、改状态、轮询或 sleep 驱动 Agent。\n\n初始 Task 的唯一工作是：真实 Worker 收到 assignment 后先原生执行 ack_task；随后读取运行态可见的、非敏感的真实源码或配置，调用真实只读工具，并通过官方 TeamHarness filesync 在任务/项目范围写入一份 partial artifact。artifact 必须引用实际来源路径、内容 hash、工具/观察时间和 provenance；不得读取、写入或输出任何密钥值、凭据内容或生产资源，也不得用 fixture、synthetic、复制旧结果或脚本代写。\n\npartial artifact 写入成功后，Worker 只发送一次真实 FAULT_READY 状态/事件，明确包含本 Run 的实际 Project/Task/Worker/container 与 artifact 引用，并结束 turn。到故障前，Worker 严禁调用 submit_task；Leader 严禁调用 check_task、accept_task_result 或让 Task 进入终态；Project/Task 必须保持真实 in_progress。Leader/Manager 必须让外部只读回读证明这一状态，并经 Human→Manager→Leader 原生路径提出窄范围审批请求，内容使用实际 ID、Worker、旧 container、影响范围和恢复方式；不得自行批准或执行故障。\n\n看到真实 FAULT_READY 且外部回读确认 Task/Project 仍为 in_progress 后，等待本 Human 在权威 Human→Manager room 发出的唯一一次窄范围批准。批准仅允许外部 operator 对该真实选定 Worker 的当前单个 container 执行一次 `docker rm -f`；严禁 `-v`、删除卷、修改 CR/config、触碰任何其他容器或资源。Manager 只能认证并转交该决定，不得代行任何 Project/Task 状态动作。\n\n故障执行后，只等待 Controller 以同一 Worker CR、同一 Matrix identity 重建新的 container，并由只读证据确认新 ID、health 和 Team Ready 恢复。随后本 Human 只在同一 Human→Manager room 转交真实故障/恢复事实一次；Manager 必须将事实完整转交 Leader，不得代行任务状态或伪造结果。\n\n收到真实恢复事实后，Leader 必须原生规划一个新的 replacement Task ID，在同一 Project 内执行 `cancel_task(old, replacementTaskId=new)`，再按 TeamHarness 原生路径 delegate replacement；assignment 必须发送到真实 notificationNeeded.targetRoom 并使用完整 Worker Matrix ID。replacement Worker 必须真实调用模型/工具完成独立恢复验证并 submit；Leader 原生 check/accept。不得硬编码 replacement ID、输出、结论或状态。\n\nreplacement 被真实 accept 后，Leader 必须让同一恢复后的 Worker 在原 old Task 的真实上下文中尝试提交已经写入的 partial artifact；只记录原生终态 cancelled 下的真实提交结果。若上下文无法真实续接，必须记录 `NOT_OBSERVED`，不得伪造迟到提交或拒绝。\n\n最终由 Manager 读取真实 handoff、状态和 provider 结果完成后续判断。全程只允许上述初始输入、审批决定和恢复事实转交；脚本只能配置、观测、脱敏和生成收据，不能创建/取消/分派/提交任务或注入 Agent 输出。保留本 Run 的原始 Matrix、TeamHarness、Project/Task、container、session、provider、usage 和脱敏日志证据。\n",
+      "msgtype": "m.text"
+    },
+    "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+    "event_id": "$tXhmPynCuZnD_TkheT4HFZI72C85re9U7BYBZp7I9LM",
+    "origin_server_ts": 1788308372355,
+    "room_id": "!PuS2LqxxnIcKgYMEwo:matrix-native-m0-20260901.agentteams.local:28080",
+    "type": "m.room.message"
+  }
+}

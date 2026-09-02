@@ -1,0 +1,928 @@
+{
+  "schema": "testweaver.m2e.evidence-manifest/v1",
+  "status": "PARTIAL",
+  "run_root": "testweaver/evidence/m2e/m2e-20260902T001049Z",
+  "baseline_head": "ef20ec3",
+  "generated_at": "2026-09-02T00:55:40Z",
+  "frozen_run": {
+    "project_id": "m2e-recovery-20260902-002008",
+    "old_task_id": "task-20260902-002008",
+    "replacement_task_id": "task-20260902-002008-r1",
+    "human_room_id": "!PuS2LqxxnIcKgYMEwo:matrix-native-m0-20260901.agentteams.local:28080",
+    "task_room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080"
+  },
+  "human_input": {
+    "event_id": "$tXhmPynCuZnD_TkheT4HFZI72C85re9U7BYBZp7I9LM",
+    "body_sha256": "f1268f8e56b29aa5b4d7c34cda438f6ae99a0f07e2296e6ee360e8d5d93cfcf3",
+    "send_count": 1
+  },
+  "approval": {
+    "event_id": "$tFQwaj9AM6E2kXIKGNABvf_A-QGMvLQ_AS_kbgvgo2U",
+    "input_body_sha256": "79b41c02cd440a064d367b13ddc3f785417016bc2458807c2050f8faf0758ce7",
+    "send_count": 1,
+    "action": "docker rm -f <fresh-read selected Worker container>",
+    "volume_flag": false,
+    "other_container_targets": []
+  },
+  "recovery_facts": {
+    "empty_event_id": "$-Gc6b3oLTP4QqrgLyKZl3aW9dIQ0CyQYPkx1YqCHM0o",
+    "factual_event_id": "$WvKEPR9KnypSnZFCipSiD9kKYRhqjK-XkNLQYfQGucU",
+    "readback_body_sha256": "d10a415ed8317c4e9070d487d151027ac3c8b439c40df935effc7aa85d925278",
+    "valid_factual_event_count": 1
+  },
+  "recovery": {
+    "worker_cr": "native-m0-clean-worker",
+    "old_container_id": "20736420e86f27a080b73b8425aca0730c45fc1c805324b99cd8e693ec25ebd8",
+    "new_container_id": "9727ed45c40a8c6efd74c9f2bd822b14d6fe979bc468be0e65391f6b86ed5631",
+    "new_image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+    "health_http_status": 200,
+    "team_ready": "1/1",
+    "same_identity": true,
+    "env_names_unchanged": true,
+    "volume_mount_unchanged": true
+  },
+  "action_audit": {
+    "schema": "testweaver.m2e.final-action-audit/v1",
+    "project_id": "m2e-recovery-20260902-002008",
+    "old_task_id": "task-20260902-002008",
+    "replacement_task_id": "task-20260902-002008-r1",
+    "fault_ready_event": [
+      {
+        "event_id": "$ZFZs4yK00sr9QTw-PXdrpwm7AykeY5MO-Zb1tZO1IcM",
+        "sender": "@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788308537523
+      }
+    ],
+    "actions": {
+      "cancel_task": [
+        {
+          "event_id": "$gGDrONGMq4vZLmjXyMEPBk2Xd3Up-6iWQ_uoFjcZ5zE",
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+          "origin_server_ts": 1788309726995
+        }
+      ],
+      "replacement_delegate_task": [
+        {
+          "event_id": "$pi3vlMbWhzfMbGhd66ap-sjRayNCqj6idI0Isqe12F0",
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+          "origin_server_ts": 1788309748243
+        }
+      ],
+      "replacement_worker_ack_task": [
+        {
+          "event_id": "$3zTfA_hba1NuUOYyj7ZB1KlT-fe6bLaat1qbp19hnC8",
+          "sender": "@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080",
+          "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+          "origin_server_ts": 1788309758476
+        }
+      ],
+      "replacement_worker_submit_task": [
+        {
+          "event_id": "$IV2On5R_55jsmDlSMkFYzDmu8GzfqkYm4jbBsYYbzQY",
+          "sender": "@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080",
+          "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+          "origin_server_ts": 1788309790557
+        }
+      ],
+      "leader_check_task": [
+        {
+          "event_id": "$pH9Qbt9dTbEDVjAE93URayFLEqTMlXVqi8IN3YiUbgA",
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+          "origin_server_ts": 1788309808447
+        }
+      ],
+      "leader_accept_task_result": [
+        {
+          "event_id": "$tI5GncFaxbmqSgJsvvtPH7MTu38bQ2_jOSt9S88DOnA",
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+          "origin_server_ts": 1788309816870
+        }
+      ],
+      "old_submit_before_fault": [],
+      "old_submit_after_cancel": []
+    },
+    "factual_handoff": [
+      {
+        "event_id": "$oETceBzx9AEKxeoFmPQKwDykkwn5R4PB18ZSneeP5p0",
+        "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788309690080
+      },
+      {
+        "event_id": "$EgzO_pCwNCZSAEXWhCjUi-YAu2xSX-JYL-4skDgwFyE",
+        "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788309701496
+      }
+    ],
+    "route_failure": [
+      {
+        "event_id": "$kDKfbypRnRwEa8k6yNbMKA9vDTzW-i4ug_HeNzBDRPw",
+        "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788309852960
+      },
+      {
+        "event_id": "$8c8wdgvbF_f6lgGJKMUckphs7KaXFtaMq9daBQ7VQEc",
+        "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788309863554
+      },
+      {
+        "event_id": "$NZvJtehi3svmNyoZnVBVFSHY0_iYK5YJwHthu5BCFkA",
+        "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788309864726
+      },
+      {
+        "event_id": "$LfHpZix1PgUp8TgvTOiT4dHQ_g1PVTk_q_Q09D-2vXU",
+        "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788309877173
+      },
+      {
+        "event_id": "$tUt8jiS1-iiDYq8HrmwmBSGin6qOKOaYaGl_oTPEZE8",
+        "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788309878074
+      },
+      {
+        "event_id": "$6_RqkqqFwe5KCCiP1OzEwZqNeST-Cj2ZUIbtfYgfTzQ",
+        "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788309882072
+      },
+      {
+        "event_id": "$rlZXyp16Nx1Y3hG1EQ5DdDWVFr8nfhSJJOy6k-KrgwA",
+        "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788309886310
+      },
+      {
+        "event_id": "$G3RUo8708pQH94wUcyX7zyZ93ai-YzZiyfombChK4Qs",
+        "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788309893054
+      },
+      {
+        "event_id": "$OcUoKgHmveeo7weBVSFL5fnlmD0GvFcD9oALk6FJrnE",
+        "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788309894261
+      }
+    ],
+    "boundaries": {
+      "fault_ready_ts": 1788308537523,
+      "cancel_task_ts": 1788309726995,
+      "accept_task_result_ts": 1788309816870
+    },
+    "old_late_submit": {
+      "status": "NOT_OBSERVED",
+      "reason": "No exact native submit_task action with taskId equal to the cancelled old task after cancel_task; no synthetic attempt was created."
+    },
+    "values_persisted": false
+  },
+  "native_final_state": {
+    "schema": "testweaver.m2e.native-final-state/v1",
+    "observed_at": "2026-09-02T00:47:18Z",
+    "leader_view": {
+      "project": {
+        "project_id": "m2e-recovery-20260902-002008",
+        "status": "completed",
+        "tasks": [
+          {
+            "task_id": "task-20260902-002008",
+            "status": "cancelled",
+            "depends_on": [],
+            "source_room_id": null
+          },
+          {
+            "task_id": "task-20260902-002008-r1",
+            "status": "completed",
+            "depends_on": [
+              "task-20260902-002008"
+            ],
+            "source_room_id": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080"
+          }
+        ]
+      },
+      "old_task": {
+        "task_id": "task-20260902-002008",
+        "status": "cancelled",
+        "result_status": null,
+        "submitted_by_role": null,
+        "accepted_by_role": null,
+        "replacement_task_id": "task-20260902-002008-r1",
+        "deliverables": null
+      },
+      "replacement_task": {
+        "task_id": "task-20260902-002008-r1",
+        "status": "submitted",
+        "result_status": "SUCCESS",
+        "submitted_by_role": "worker",
+        "accepted_by_role": null,
+        "replacement_task_id": null,
+        "deliverables": [
+          "shared/tasks/task-20260902-002008-r1/workspace/recovery-verification.json"
+        ]
+      }
+    },
+    "worker_view": {
+      "old_task": {
+        "task_id": "task-20260902-002008",
+        "status": "in_progress",
+        "result_status": null,
+        "submitted_by_role": null,
+        "accepted_by_role": null,
+        "replacement_task_id": null,
+        "deliverables": null
+      },
+      "replacement_task": {
+        "task_id": "task-20260902-002008-r1",
+        "status": "submitted",
+        "result_status": "SUCCESS",
+        "submitted_by_role": "worker",
+        "accepted_by_role": null,
+        "replacement_task_id": null,
+        "deliverables": [
+          "shared/tasks/task-20260902-002008-r1/workspace/recovery-verification.json"
+        ]
+      }
+    },
+    "interpretation": "Leader view is authoritative for project/task transition; worker old-task metadata is retained as a runtime projection discrepancy."
+  },
+  "outcome": {
+    "status": "PARTIAL",
+    "completed": [
+      "fresh Human input",
+      "dynamic Manager Team/Leader selection",
+      "native Leader Project/Task/delegate",
+      "Worker ack and real partial artifact",
+      "single FAULT_READY",
+      "single approved docker rm -f",
+      "Controller same-CR rebuild",
+      "Human→Manager→Leader factual handoff",
+      "native cancel/replacement delegate",
+      "replacement real Worker artifact and submit",
+      "Leader check/accept",
+      "Project completion"
+    ],
+    "not_observed": [
+      "same recovered Worker late submit in old cancelled Task context"
+    ],
+    "blocker": "The old Worker context was lost with the approved container removal; no exact native submit_task(taskId=old) was observed after cancellation, so no rejection is claimed."
+  },
+  "integrity": {
+    "secret_scan": ".state/secret-scan.json",
+    "path_check": ".state/path-check.json",
+    "collector_stop": ".state/collector-stop.json",
+    "file_list_excludes": [
+      "m2e-manifest.json",
+      "m2e-manifest.sha256"
+    ],
+    "values_emitted": false,
+    "values_persisted": false
+  },
+  "files": [
+    {
+      "path": ".state/api-native-m0-clean-leader.json",
+      "bytes": 368,
+      "sha256": "98834f4355408194550c43c72bbd9a43250a206f13182a6b70a7702c74ac4f56"
+    },
+    {
+      "path": ".state/api-native-m0-clean-worker.json",
+      "bytes": 368,
+      "sha256": "98834f4355408194550c43c72bbd9a43250a206f13182a6b70a7702c74ac4f56"
+    },
+    {
+      "path": ".state/api-native-m1-verify-leader.json",
+      "bytes": 368,
+      "sha256": "98834f4355408194550c43c72bbd9a43250a206f13182a6b70a7702c74ac4f56"
+    },
+    {
+      "path": ".state/api-native-m1-verify-worker.json",
+      "bytes": 368,
+      "sha256": "98834f4355408194550c43c72bbd9a43250a206f13182a6b70a7702c74ac4f56"
+    },
+    {
+      "path": ".state/api-states.tsv",
+      "bytes": 158,
+      "sha256": "c2353479c1743e7b012854f81ed1d6edba6d8d1a347d75e1fdbff18989dc30f6"
+    },
+    {
+      "path": ".state/approval-event-readback.json",
+      "bytes": 1581,
+      "sha256": "94398597ccd556aebe79d3fd8a86125de71472ea88dcd1d76d6a61e9b60b37b6"
+    },
+    {
+      "path": ".state/approval-send-result.json",
+      "bytes": 408,
+      "sha256": "3cefb29703563c0ca7d0124486a91caff4174ed0d76bf9271a189966786caa4d"
+    },
+    {
+      "path": ".state/approval-verification.json",
+      "bytes": 538,
+      "sha256": "a121487b229ef2bc2cfe02fbfaa932c9db4ce7da38ba560be0d27029838d750b"
+    },
+    {
+      "path": ".state/collector-stop.json",
+      "bytes": 964,
+      "sha256": "af93765f8bf88d95813fca0df2da7f84467dd9da2f5682ffaabcc7c82ad4c962"
+    },
+    {
+      "path": ".state/collectors.tsv",
+      "bytes": 1347,
+      "sha256": "3ba95bfa25700d81e8971fbe87907ccc0777e95396c64749c6f73983022fb06b"
+    },
+    {
+      "path": ".state/container-controller.json",
+      "bytes": 518,
+      "sha256": "44da1e65585679c74a8d93b282469c1fa067e45e89bf7aa7d5ca4f72075b05db"
+    },
+    {
+      "path": ".state/container-manager.json",
+      "bytes": 401,
+      "sha256": "08db87a4f901b513ffefc8e2c2b8fc22ccd212d52032592d26e0b8b76ffaf07a"
+    },
+    {
+      "path": ".state/container-worker-native-m0-clean-leader.json",
+      "bytes": 423,
+      "sha256": "52a9486033aa2d8e79725eb71759918b9cb19aa9d06679a920e2bb40573d7bc6"
+    },
+    {
+      "path": ".state/container-worker-native-m0-clean-worker.json",
+      "bytes": 423,
+      "sha256": "a0c01080138981d14170ae5f58d2ffb3d03b6433418071d7deb49730fbf706ae"
+    },
+    {
+      "path": ".state/container-worker-native-m1-verify-leader.json",
+      "bytes": 424,
+      "sha256": "55eb586e101e9395c12c08d05b24e955c6bed72c4d24545225c60745994d1b00"
+    },
+    {
+      "path": ".state/container-worker-native-m1-verify-worker.json",
+      "bytes": 424,
+      "sha256": "8dc6a06ddff28379b82dfc37bd1d9402f6905c2d80487ce6b3997d2806c6bfb9"
+    },
+    {
+      "path": ".state/fault-execution.json",
+      "bytes": 497,
+      "sha256": "322d1205493b89e09eb08662691b20e3b1ff5d48b31a41fa8d05f916512541ca"
+    },
+    {
+      "path": ".state/fault-pre-execution-container.json",
+      "bytes": 1363,
+      "sha256": "bd70e4750a3b8791764fafdf0cdb7d33b546d130d0efd5cffbca55a02a4dee4c"
+    },
+    {
+      "path": ".state/fault-pre-execution-native-state.txt",
+      "bytes": 1478,
+      "sha256": "a8f67cf4ce043cb09aa4c1da77acf924680ef52fd88cde9d0dc699c923a1a375"
+    },
+    {
+      "path": ".state/fault-pre-execution.json",
+      "bytes": 948,
+      "sha256": "a049f288b1d57ffa085afc72f5b88056ada51a803c60e5097e62caeb5a3fa7be"
+    },
+    {
+      "path": ".state/final-action-audit.json",
+      "bytes": 6429,
+      "sha256": "93e684632bf6645eebf16714f1bac419428e53d250cf9c7f4305a0799069f7a4"
+    },
+    {
+      "path": ".state/human-operator-result.json",
+      "bytes": 5249,
+      "sha256": "69ba7d11793dc3bf198d4296323acf4f199414410e4a139cf3a8615b4084a60d"
+    },
+    {
+      "path": ".state/joined-manager.json",
+      "bytes": 515,
+      "sha256": "ebe27a9c386300387e270521bccd6e022821dcb4f1dbcaaf06588b1590ee874c"
+    },
+    {
+      "path": ".state/joined-native-m0-clean-leader.json",
+      "bytes": 657,
+      "sha256": "03d1e0c7a2f483132307208c79dfdce5b05c47b93ccfb3f08324472f0a1ac2c9"
+    },
+    {
+      "path": ".state/joined-native-m0-clean-worker.json",
+      "bytes": 586,
+      "sha256": "711ad535259f58ce31364c4b6047082192251973425206404adc759f327b6121"
+    },
+    {
+      "path": ".state/joined-native-m1-verify-leader.json",
+      "bytes": 515,
+      "sha256": "df36ba4e166e56085f96700b3e32143dd278c7943f9bf31c1a29dfb8dfa5d22f"
+    },
+    {
+      "path": ".state/joined-native-m1-verify-worker.json",
+      "bytes": 444,
+      "sha256": "4732919f89a69224a2e6633494add0072735f60c9a821627ad04d3d120382e80"
+    },
+    {
+      "path": ".state/managers.json",
+      "bytes": 268,
+      "sha256": "43d121d2bdc304c4a084d2a93fe75fe8f277b00a33e3c124aa93052a4e041418"
+    },
+    {
+      "path": ".state/matrix-seen-event-ids",
+      "bytes": 17055,
+      "sha256": "a3c5afb5fcfbaefc2c5ff342de2a2ea46eb0ccf788448e658694e667157da547"
+    },
+    {
+      "path": ".state/messages-manager-1.json",
+      "bytes": 166675,
+      "sha256": "a29ccc0039723f063171b023c2e5e39f184e2a897ccbff17e05606c89487fb2f"
+    },
+    {
+      "path": ".state/messages-manager-2.json",
+      "bytes": 281262,
+      "sha256": "78860efb312864392de6641ebc9f9a1e3247d4e76522b5534639eb1eeec280f5"
+    },
+    {
+      "path": ".state/messages-manager-3.json",
+      "bytes": 255987,
+      "sha256": "f8b3f15209e1d41df1f95de04050e75e368501f77f81359982b61d99fe091c44"
+    },
+    {
+      "path": ".state/messages-manager-4.json",
+      "bytes": 244201,
+      "sha256": "ed1aff5c605d970914b518a2509d453e1be7bf1c93f59aaded7cea16d4f6f0fa"
+    },
+    {
+      "path": ".state/messages-manager-5.json",
+      "bytes": 252328,
+      "sha256": "1ba426fd5aa52f3b10632938b6215c68d041e2bd12e85bc2ced38d7124f22d5a"
+    },
+    {
+      "path": ".state/messages-manager-6.json",
+      "bytes": 110647,
+      "sha256": "a9f6c8f9c5a4cff62f95567264fac65d039a1d7e223cf48c75c116d4c53427fb"
+    },
+    {
+      "path": ".state/messages-manager-7.json",
+      "bytes": 239597,
+      "sha256": "ccc023a2c722ede84bf77b50663346c5e4ce1f86665652f17f7cd2309492d640"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-1.json",
+      "bytes": 280226,
+      "sha256": "a21cd1ab7996fb39f138dc158d8789760ccbb6482b1e314effe6cffe0513d3be"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-2.json",
+      "bytes": 261305,
+      "sha256": "75e894c9da4d826a03c6370a615e98bb19446cfc7c91e2e8783690d74ef361ee"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-3.json",
+      "bytes": 100788,
+      "sha256": "292cdcf4c8e33b6095f1ab691277291b9bc43eccca520aab67b51b530aa33583"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-4.json",
+      "bytes": 131641,
+      "sha256": "578edbef574b20026eb50db2c3c80df1e9e955c5ee19aa48e09283d79eb79a19"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-5.json",
+      "bytes": 387460,
+      "sha256": "cb8a488ae1220d11fef22cb6900512cf61fd9d91a08269ed452eeddb4b3284e4"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-6.json",
+      "bytes": 103388,
+      "sha256": "bf9a7d5b9d60676238d919132a08e7b953123ecec94a6494e634b34be5a6cc37"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-7.json",
+      "bytes": 184202,
+      "sha256": "4fa7a5871a569b786c514086b4960d2db509ede5b6e303b606ab8a1bb56399af"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-8.json",
+      "bytes": 182361,
+      "sha256": "3cadae8f9997f191245cada5eb53a664d78e8f6e3702355899ab1993346c168c"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-9.json",
+      "bytes": 167195,
+      "sha256": "1c886b899a7f53c991255489ce998c29bb939a1fd78391ca476b7a4aacaa9287"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-worker-1.json",
+      "bytes": 280960,
+      "sha256": "a254c63e47a35b2f70644cc8e5017b1c85e1f484f1e58d20847d30c72eb3d439"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-worker-2.json",
+      "bytes": 100788,
+      "sha256": "2f3c31a90dc7032565a5c9fcb7c2a03d22a3fab057c898530c87bdc91df98f06"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-worker-3.json",
+      "bytes": 131287,
+      "sha256": "6357e8efb4488965288d20e0c2c6aaaf31dbaea27f9c1e576e822922460d8b16"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-worker-4.json",
+      "bytes": 387908,
+      "sha256": "7576cc66aabbed7ee25142ae21f4fc90442daeffe9d704c632e4b38be8915a9d"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-worker-5.json",
+      "bytes": 184775,
+      "sha256": "bc59c84d918a605252619780c5a7719133378c409acd71d5a66a553e557026fd"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-worker-6.json",
+      "bytes": 8066,
+      "sha256": "7fe2782272a2aba81781a7790c3652cd0d8efb9879902385bcddda23af8f76ba"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-worker-7.json",
+      "bytes": 177728,
+      "sha256": "2738608592ee7ff60ab5075f1b0c0a312ca9d898fe64346dd0dfcfe46d37b4d4"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-worker-8.json",
+      "bytes": 167457,
+      "sha256": "6fe6d7fd025be9c855c51909355cc3d6b8539444b00540f8c62e4d0f4f29700b"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-leader-1.json",
+      "bytes": 177321,
+      "sha256": "2f0f66e394da727689c62455ddfbe6243e82fae60f67542de026dbe69ef6ae73"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-leader-2.json",
+      "bytes": 171799,
+      "sha256": "9616cd64084a5f3d54b1f8017a0312e0c43c6827bb46a3f9971d89a21aefcadf"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-leader-3.json",
+      "bytes": 292873,
+      "sha256": "fb7053c0a5e2e0d6ecb9e60a136d0e2f2da27334d29f5e863b8540b731a1901d"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-leader-4.json",
+      "bytes": 165266,
+      "sha256": "4ed6fa85aefb61cd09f4555c0fdd43b76acde15a97b2d80cac40d96207ee2f7f"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-leader-5.json",
+      "bytes": 104209,
+      "sha256": "c30d9dfe5bc6cb50067513385e76bbec89b666270bb938ad2f907cf77cdfa2ab"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-leader-6.json",
+      "bytes": 101409,
+      "sha256": "375371fa7b3f6b12447903cf39b0f24a28b5a795d2a97a8f0756e39d120dbddc"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-leader-7.json",
+      "bytes": 258680,
+      "sha256": "a2c2f5ca825d76719ae555f4599a9b154ae2c838b64683c33a70a36812ca3a36"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-worker-1.json",
+      "bytes": 175193,
+      "sha256": "912c1aa242ed1e7752d936da6fbee04ff93a65f664ec630a92c5f8ffaf340115"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-worker-2.json",
+      "bytes": 293789,
+      "sha256": "918cbae4a115a1894d4c10a5ec7593f27bd814057940c07d49b51e6ae0901b2d"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-worker-3.json",
+      "bytes": 164751,
+      "sha256": "fcb71e8652ebad4033e99adde33a6e385a25cb80d942c3705ce3f976a1434135"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-worker-4.json",
+      "bytes": 8080,
+      "sha256": "4ab77051dae551b0fda952275c808860de3962a32737811aff5716c920a70d0d"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-worker-5.json",
+      "bytes": 101409,
+      "sha256": "c747cfccb39e880aec5f6dda11ca448bfe13f0d76f2de338b19fc19cc93e93e5"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-worker-6.json",
+      "bytes": 257045,
+      "sha256": "d270ed22f93ccae560d1c4e6a0c56626baf8634195159062550d163e894ed1e0"
+    },
+    {
+      "path": ".state/native-final-state.json",
+      "bytes": 2106,
+      "sha256": "a8598a4612a2f43ae979bc28e54d448b5c9813807d299afe5c59ee7da10212b0"
+    },
+    {
+      "path": ".state/path-check.json",
+      "bytes": 241,
+      "sha256": "36a1532b0bd0711ffbab7122c32eaf0c3c417a52ec77dfb0698c02c0f4b38484"
+    },
+    {
+      "path": ".state/post-fault-docker-ps-a.tsv",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".state/post-fault-worker-agt.json",
+      "bytes": 617,
+      "sha256": "a489e39a35fe69b6d5d86b1393ef446b9e956eba79d42d34790b7898707728e8"
+    },
+    {
+      "path": ".state/post-recovery-native-state.txt",
+      "bytes": 2263,
+      "sha256": "ab9333d166595cbc5c3baeb25a16b452aed08b22e0f9d7721b546bf4ca0cb9e9"
+    },
+    {
+      "path": ".state/post-recovery-new-worker-log-tail.txt",
+      "bytes": 24618,
+      "sha256": "4c6853e7850410c482040c6cdc84aa209bf06bf05259cbfd1ce0de413b47f76c"
+    },
+    {
+      "path": ".state/post-remove-immediate-ps.tsv",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".state/post-remove-worker-agt.json",
+      "bytes": 618,
+      "sha256": "0ffcfddf137cf1f62b2770a8e87f14836f3c6f007763742d2e28d65fcd09cf90"
+    },
+    {
+      "path": ".state/pre-fault-agt-project-readback.txt",
+      "bytes": 313,
+      "sha256": "2b033f5aa56aadf897ccc02c1870f1db2c40b76f9133641295191b08ae15300e"
+    },
+    {
+      "path": ".state/pre-fault-container.json",
+      "bytes": 1430,
+      "sha256": "30ea44ab5cef916ec42b60fb4b8e4352ecee78faed307d60c5a4a8947f23e8d2"
+    },
+    {
+      "path": ".state/pre-fault-event-audit.json",
+      "bytes": 682,
+      "sha256": "989a4d3aed631a0ee464b2b94567c9a0f0a392faf8e4bd6f8a968de7092d8910"
+    },
+    {
+      "path": ".state/pre-fault-health.txt",
+      "bytes": 32,
+      "sha256": "b892bd8d69023e4f1a62a18b68fd5ce2eae3d954f9dcf75a26a74bf021d1db5e"
+    },
+    {
+      "path": ".state/pre-fault-native-state.txt",
+      "bytes": 1478,
+      "sha256": "a8f67cf4ce043cb09aa4c1da77acf924680ef52fd88cde9d0dc699c923a1a375"
+    },
+    {
+      "path": ".state/pre-fault-target.json",
+      "bytes": 951,
+      "sha256": "a7b34780c5f53ac8c806560f9a64349d1c6fc9e769fba9a635c7c38823ed6a67"
+    },
+    {
+      "path": ".state/pre-fault-teams.json",
+      "bytes": 1430,
+      "sha256": "f5aed3840cc402ccb0ab022d1a3c252960c5fd580964b6d9f054f2c5c2ded52b"
+    },
+    {
+      "path": ".state/pre-fault-worker-agt.json",
+      "bytes": 610,
+      "sha256": "cac43e9d7670669e9728cacf9b6577d9773e9e57b03d4fcf204388a60ce24a55"
+    },
+    {
+      "path": ".state/project-factcheck-20260901-144228.json",
+      "bytes": 425,
+      "sha256": "55105b67722d8ece21285b3a4632110eaf5739dc502dee26b9c1697f7819c348"
+    },
+    {
+      "path": ".state/project-m1-phase2-verify-20260901-151200.json",
+      "bytes": 468,
+      "sha256": "2a633a0a59fb266b56eb6f8dca5be22c5122fc5b2f9104b31e258ec95b260ec9"
+    },
+    {
+      "path": ".state/project-m1-phase2-verify-20260901-153942.json",
+      "bytes": 471,
+      "sha256": "32eb4719b3442cef2e3beb746ce317f02cdb4a863b3386507e908fcc55671bc0"
+    },
+    {
+      "path": ".state/project-m1-phase2-verify-20260901-194103.json",
+      "bytes": 471,
+      "sha256": "afb010d75a317a2ab3309aef1c85b059a3d805e3b978f74afef5293d854f4a56"
+    },
+    {
+      "path": ".state/projects.json",
+      "bytes": 2341,
+      "sha256": "3a0c62d9b9206e7ae0a7618d1c2e89c36cdb3c069d1ffd63ed1e7a8b2d428801"
+    },
+    {
+      "path": ".state/recovery-connectivity.txt",
+      "bytes": 158,
+      "sha256": "8d2701c0f0c82a2ab3ab300bdd12ab80402a4d85101352822d97c33e8f357bec"
+    },
+    {
+      "path": ".state/recovery-container.json",
+      "bytes": 1976,
+      "sha256": "dab5f6c8e51a948103c9eeb66bb84102d378d36aad9749e129ed98b71755037a"
+    },
+    {
+      "path": ".state/recovery-docker-events.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": ".state/recovery-new-worker-log-tail.txt",
+      "bytes": 12467,
+      "sha256": "d8637f64fc40e389d6dd8c251f2179c02fc667df0e75329a5e556e6bc77aef6d"
+    },
+    {
+      "path": ".state/recovery-team-agt-final.json",
+      "bytes": 754,
+      "sha256": "979276afe8e15a3a2fe2870e81e002c979e2e9fbe07dc00e0b9b9d90bce16d0d"
+    },
+    {
+      "path": ".state/recovery-team-agt.json",
+      "bytes": 748,
+      "sha256": "d257ed8546e0f230f7043efd6dac01779d4ad79794965ae77cf29a2c69ead293"
+    },
+    {
+      "path": ".state/recovery-watch-window.txt",
+      "bytes": 54,
+      "sha256": "8673ff81b07b3579a0eac5403f25559297cd2cacc695bd75830145fd23eda38b"
+    },
+    {
+      "path": ".state/recovery-worker-agt-final.json",
+      "bytes": 616,
+      "sha256": "f8642e6c3d92bf3139ab9b96c50f90e0e3ba08bfcdd0cc4366770f38a52427a6"
+    },
+    {
+      "path": ".state/recovery-worker-agt.json",
+      "bytes": 610,
+      "sha256": "b48793458de8cd5f5e66016702b2f902072832bc74358a34ae5a2f357f0af71a"
+    },
+    {
+      "path": ".state/rooms.tsv",
+      "bytes": 9628,
+      "sha256": "c454af16198b1ea3ad2fe89db58c7461a1161394511ebda4e2d863cd9d2c329c"
+    },
+    {
+      "path": ".state/secret-scan.json",
+      "bytes": 643,
+      "sha256": "4540f4205b7a1506e8304869b408fa72c5ede7f353dff178081bdce837b861c3"
+    },
+    {
+      "path": ".state/skills.tsv",
+      "bytes": 4690,
+      "sha256": "261ddadb5a5c4e755adef4e20a5b857d385ae57d4dfd07bb877c571f864b0ae7"
+    },
+    {
+      "path": ".state/teams.json",
+      "bytes": 967,
+      "sha256": "15a2596dff80a4cbf3523cd3de299da26a7113c545d6c0ee58ce3862266697d8"
+    },
+    {
+      "path": ".state/workers.json",
+      "bytes": 1061,
+      "sha256": "f16617c6093706884e9be91c4d431834aff4a7cf589efc654ba71fe233f33137"
+    },
+    {
+      "path": "approval-event.json",
+      "bytes": 59,
+      "sha256": "93f84ce24688b1afa0810481bbd59acd5e6e3c36b52f2e2d7d09d7892b91c2f9"
+    },
+    {
+      "path": "approval-input.txt",
+      "bytes": 1189,
+      "sha256": "79b41c02cd440a064d367b13ddc3f785417016bc2458807c2050f8faf0758ce7"
+    },
+    {
+      "path": "arm-evidence.sh",
+      "bytes": 16018,
+      "sha256": "ff0190640d03494dd8720fd366c1fe9407266d5fc44998c1cc1d2ff04abcf3d2"
+    },
+    {
+      "path": "baseline-manifest.json",
+      "bytes": 23489,
+      "sha256": "ff38a047b02a956a817d2c69c67caa0b3218db5c9959ff65873de67ed4aaabd0"
+    },
+    {
+      "path": "collect-matrix-readback.sh",
+      "bytes": 11788,
+      "sha256": "eaeb5f77bf7386da7934ae408c8d5e819d05e6a82ebf70d6e8f948836a7a7ea5"
+    },
+    {
+      "path": "human-event-hash.json",
+      "bytes": 660,
+      "sha256": "edfed21bebb1d32f1b4f80371818aeefa27932dc7a6988d2eebff180bb019c73"
+    },
+    {
+      "path": "human-event.json",
+      "bytes": 4912,
+      "sha256": "94e129f30b6842c6b8f471ebc0e052e1e1c801d7df7c4bc9d8c2f7dd438f2347"
+    },
+    {
+      "path": "human-input.txt",
+      "bytes": 4541,
+      "sha256": "f1268f8e56b29aa5b4d7c34cda438f6ae99a0f07e2296e6ee360e8d5d93cfcf3"
+    },
+    {
+      "path": "human-room-create.json",
+      "bytes": 281,
+      "sha256": "8082b10ef343b84c526cee60bd330ff26183c2ba33484683a0a3de919566a450"
+    },
+    {
+      "path": "human-room-members.json",
+      "bytes": 281,
+      "sha256": "8082b10ef343b84c526cee60bd330ff26183c2ba33484683a0a3de919566a450"
+    },
+    {
+      "path": "human-send-result.json",
+      "bytes": 377,
+      "sha256": "ce12f7875e7f04e7d6764d8e32850955a4afdaee34d57982ff8b0177f1338a10"
+    },
+    {
+      "path": "logs/arm-m2e-20260902T001049Z/controller.docker.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/arm-m2e-20260902T001049Z/manager.docker.log",
+      "bytes": 2234442,
+      "sha256": "81784b58a1bae5650f4fcc836151307ad84ef72267ce6608ad1b47d16f3c4fc0"
+    },
+    {
+      "path": "logs/arm-m2e-20260902T001049Z/worker-native-m0-clean-leader.docker.log",
+      "bytes": 321003,
+      "sha256": "5b002bde2725d8d94df3f6fcf330cdefb49af670d6530e1b78f6659b55c97a37"
+    },
+    {
+      "path": "logs/arm-m2e-20260902T001049Z/worker-native-m0-clean-worker.docker.log",
+      "bytes": 114777,
+      "sha256": "d002def44f08f45f9184316097fc74f7087a4c975247d17ac06b5d4cdc48b355"
+    },
+    {
+      "path": "logs/arm-m2e-20260902T001049Z/worker-native-m1-verify-leader.docker.log",
+      "bytes": 201807,
+      "sha256": "f14f332c16e879e60e0658a2daca34d0cb94c2f63d2d256f987bbb0165f35938"
+    },
+    {
+      "path": "logs/arm-m2e-20260902T001049Z/worker-native-m1-verify-worker.docker.log",
+      "bytes": 202072,
+      "sha256": "54a93b50db0e8901ccb0790b3d6f4f7b4b82bb2c81952daf665709f7a9944dfc"
+    },
+    {
+      "path": "m2e-receipt.txt",
+      "bytes": 6227,
+      "sha256": "12b97f76ab269c195f6b4f998f89747a005dc2379ced0f994fe3d34ff57bb8ba"
+    },
+    {
+      "path": "matrix-collector-status.json",
+      "bytes": 1087,
+      "sha256": "e68772c9fdac1870e65c717d13ba7316cb86d1be70f0e59c8487ee4e64138a4a"
+    },
+    {
+      "path": "matrix-event-index.jsonl",
+      "bytes": 220279,
+      "sha256": "5574434b8d308c3d29ea9f5f1b4dbbdc13e2312ea41b34f7788c882f36773231"
+    },
+    {
+      "path": "matrix-events.jsonl",
+      "bytes": 679178,
+      "sha256": "006ab6294b94490d10ff9990d1d2905a270d0d2e4010f682e6bb5e728c1cf93e"
+    },
+    {
+      "path": "matrix-stage-observations.jsonl",
+      "bytes": 171672,
+      "sha256": "2a4818153e2b98336303b4cf6b065e04abab2e3622762153cf8213f7eddb18fb"
+    },
+    {
+      "path": "recovery-facts-correction-event.json",
+      "bytes": 65,
+      "sha256": "2569b6a1c876f7ac2e78fa3a3eaadab791dd205a7a46bef28babe12894cee992"
+    },
+    {
+      "path": "recovery-facts-event.json",
+      "bytes": 65,
+      "sha256": "5079afff2fff2c3a545ea128fbf64d57904dc903f28b395491ca10f800a4cfe2"
+    },
+    {
+      "path": "recovery-facts-input.txt",
+      "bytes": 1850,
+      "sha256": "490b4aac9529a9b25cf337c617bbb7bfdf524bc6562b90f39a5332641f37840c"
+    },
+    {
+      "path": "redact-docker-log.pl",
+      "bytes": 877,
+      "sha256": "c576943601ed9da90721dd77bebbec7aa7a09e3b9edf7052eec9f669a1e09393"
+    }
+  ]
+}

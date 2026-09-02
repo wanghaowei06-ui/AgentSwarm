@@ -1,0 +1,36 @@
+FILE=/root/agentteams-fs/teams/native-m0-clean-team/shared/projects/m2e-recovery-20260902-002008/meta.json
+{
+  "plan_type": "dag",
+  "project_id": "m2e-recovery-20260902-002008",
+  "reply_route": {
+    "channel": "matrix",
+    "target_session": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080"
+  },
+  "requester": "",
+  "source": "",
+  "source_room_id": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+  "status": "active",
+  "tasks": [
+    {
+      "assigned_to": "native-m0-clean-worker",
+      "depends_on": [],
+      "source_room_id": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+      "status": "assigned",
+      "task_id": "task-20260902-002008",
+      "title": "M2-E: read-only baseline + partial artifact + FAULT_READY"
+    }
+  ],
+  "title": "M2-E recovery run: initial interruptible task"
+}
+FILE=/root/agentteams-fs/teams/native-m0-clean-team/shared/tasks/task-20260902-002008/meta.json
+{
+  "assigned_at": "2026-09-02T00:21:13Z",
+  "assigned_to": "native-m0-clean-worker",
+  "project_id": "m2e-recovery-20260902-002008",
+  "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+  "source_room_id": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+  "spec_path": "shared/tasks/task-20260902-002008/spec.md",
+  "status": "assigned",
+  "task_id": "task-20260902-002008",
+  "task_title": "M2-E: read-only baseline + partial artifact + FAULT_READY"
+}

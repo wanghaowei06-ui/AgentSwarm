@@ -1,0 +1,9 @@
+{
+  "schema": "testweaver.m2e.human-approval/v1",
+  "room_id": "!PuS2LqxxnIcKgYMEwo:matrix-native-m0-20260901.agentteams.local:28080",
+  "event_id": "$tFQwaj9AM6E2kXIKGNABvf_A-QGMvLQ_AS_kbgvgo2U",
+  "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+  "body_sha256": "79b41c02cd440a064d367b13ddc3f785417016bc2458807c2050f8faf0758ce7",
+  "values_persisted": false,
+  "send_count": 1
+}

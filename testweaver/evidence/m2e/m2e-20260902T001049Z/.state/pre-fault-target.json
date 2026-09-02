@@ -1,0 +1,18 @@
+{
+  "schema": "testweaver.m2e.pre-fault-target/v1",
+  "observed_at": "2026-09-02T00:27:43Z",
+  "fault_event_id": "$ZFZs4yK00sr9QTw-PXdrpwm7AykeY5MO-Zb1tZO1IcM",
+  "fault_room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+  "project_id": "m2e-recovery-20260902-002008",
+  "task_id": "task-20260902-002008",
+  "worker_matrix_id": "@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080",
+  "worker_cr_name": "native-m0-clean-worker",
+  "container_id": "20736420e86f27a080b73b8425aca0730c45fc1c805324b99cd8e693ec25ebd8",
+  "container_id_in_fault": "20736420e86f",
+  "health": {
+    "port": "14153",
+    "http_status": "200"
+  },
+  "values_persisted": false,
+  "container_ps_line": "20736420e86f27a080b73b8425aca0730c45fc1c805324b99cd8e693ec25ebd8\tagentteams-native-m0-20260901-worker-native-m0-clean-worker\tagentteams/qwenpaw-worker:be10aaf\tUp 2 hours\t0.0.0.0:14153->8088/tcp, [::]:14153->8088/tcp"
+}

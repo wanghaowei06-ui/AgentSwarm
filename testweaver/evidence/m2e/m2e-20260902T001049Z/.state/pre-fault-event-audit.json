@@ -1,0 +1,18 @@
+{
+  "schema": "testweaver.m2e.pre-fault-event-audit/v1",
+  "project_id": "m2e-recovery-20260902-002008",
+  "task_id": "task-20260902-002008",
+  "fault_ready_event_id": "$ZFZs4yK00sr9QTw-PXdrpwm7AykeY5MO-Zb1tZO1IcM",
+  "fault_ready_origin_server_ts": 1788308537523,
+  "fault_ready_count": 1,
+  "ack_task_events": [
+    {
+      "event_id": "$ujIwl-UpzY7fqeCQNu1Dx5M_Yeazmt5bDn-jvl88hI4",
+      "sender": "@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+      "origin_server_ts": 1788308479355
+    }
+  ],
+  "prohibited_action_events": [],
+  "values_persisted": false
+}

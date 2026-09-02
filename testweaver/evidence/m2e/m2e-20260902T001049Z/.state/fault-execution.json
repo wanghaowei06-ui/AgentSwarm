@@ -1,0 +1,12 @@
+{
+  "schema": "testweaver.m2e.fault-execution/v1",
+  "executed_at": "2026-09-02T00:29:43Z",
+  "approval_event_id": "$tFQwaj9AM6E2kXIKGNABvf_A-QGMvLQ_AS_kbgvgo2U",
+  "worker_cr": "native-m0-clean-worker",
+  "container_id": "20736420e86f27a080b73b8425aca0730c45fc1c805324b99cd8e693ec25ebd8",
+  "command": "docker rm -f 20736420e86f27a080b73b8425aca0730c45fc1c805324b99cd8e693ec25ebd8",
+  "exit_code": 0,
+  "volume_flag_present": false,
+  "other_container_targets": [],
+  "values_persisted": false
+}

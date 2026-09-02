@@ -1,0 +1,4 @@
+new_worker_health_http_status=200
+new_worker_matrix_versions_http_status=200
+new_worker_controller_health_http_status=404
+controller_cli_worker_readback=true

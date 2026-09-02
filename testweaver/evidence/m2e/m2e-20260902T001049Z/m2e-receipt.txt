@@ -1,0 +1,73 @@
+M2-E native recovery run receipt
+================================
+
+Run
+---
+- Run root: m2e-20260902T001049Z
+- Baseline head: ef20ec3
+- Outcome: PARTIAL
+- Scope: one fresh M2-E run; M2-D evidence was not modified or replayed.
+- Models/provider/credentials/runtime configuration: unchanged; protected values were not persisted.
+
+Initial native chain
+--------------------
+- Human room: !PuS2LqxxnIcKgYMEwo:matrix-native-m0-20260901.agentteams.local:28080
+- Initial Human event: $tXhmPynCuZnD_TkheT4HFZI72C85re9U7BYBZp7I9LM
+- Initial input SHA256: f1268f8e56b29aa5b4d7c34cda438f6ae99a0f07e2296e6ee360e8d5d93cfcf3
+- Manager dynamically selected native-m0-clean-team / native-m0-clean-leader / native-m0-clean-worker after reading the live roster; the other Team was excluded because its Worker had a non-terminal task.
+- Project: m2e-recovery-20260902-002008
+- Old Task: task-20260902-002008
+- Task room: !iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080
+- Leader created the Project/Task and delegated through native TeamHarness. Worker acked, used real read-only tools, and pushed:
+  shared/tasks/task-20260902-002008/workspace/baseline-partial.json
+  SHA256 223b7898b36958cecbbb5643c58b1c01ffbf23e8962c9eb7b7e863527d91c5b8
+- Unique FAULT_READY event: $ZFZs4yK00sr9QTw-PXdrpwm7AykeY5MO-Zb1tZO1IcM
+- Pre-fault native evidence recorded the Task as in_progress and no submit/check/accept action occurred before the fault.
+
+Human approval and controlled fault
+------------------------------------
+- Approval event: $tFQwaj9AM6E2kXIKGNABvf_A-QGMvLQ_AS_kbgvgo2U
+- Approval input SHA256: 79b41c02cd440a064d367b13ddc3f785417016bc2458807c2050f8faf0758ce7
+- The only approved and executed action was `docker rm -f 20736420e86f27a080b73b8425aca0730c45fc1c805324b99cd8e693ec25ebd8`; exit code 0; no `-v`, volume deletion, CR/config change, or other container target.
+- Executed at 2026-09-02T00:29:43Z. The old container was 20736420e86f27a080b73b8425aca0730c45fc1c805324b99cd8e693ec25ebd8.
+- Controller rebuilt the same Worker CR/name as container 9727ed45c40a8c6efd74c9f2bd822b14d6fe979bc468be0e65391f6b86ed5631.
+- New image remained agentteams/qwenpaw-worker:be10aaf with image ID sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb. Health returned HTTP 200 on host port 19253; Matrix versions returned HTTP 200; official Worker readback was Running with the same Matrix identity, role, Team, model, and runtime; official Team readback was Active with readyWorkers=1/1.
+- Protected environment variable-name hash and authenticated secret-volume mount were unchanged; values are not included.
+
+Human-to-Leader recovery handoff
+---------------------------------
+- The first recovery-facts API call produced an empty event due a local stdin wiring error: $-Gc6b3oLTP4QqrgLyKZl3aW9dIQ0CyQYPkx1YqCHM0o. It contained no task or action instruction and caused no runtime action.
+- One corrective factual event was then sent: $WvKEPR9KnypSnZFCipSiD9kKYRhqjK-XkNLQYfQGucU. Readback body SHA256: d10a415ed8317c4e9070d487d151027ac3c8b439c40df935effc7aa85d925278.
+- Manager consumed the factual handoff and delivered it to Leader: $oETceBzx9AEKxeoFmPQKwDykkwn5R4PB18ZSneeP5p0. Leader acknowledged the facts without a Human/script task-state action: $EgzO_pCwNCZSAEXWhCjUi-YAu2xSX-JYL-4skDgwFyE.
+
+Native replacement chain
+------------------------
+- Leader `cancel_task(old, replacementTaskId=new)`: $gGDrONGMq4vZLmjXyMEPBk2Xd3Up-6iWQ_uoFjcZ5zE.
+- Leader native replacement `delegate_task` and assignment used the real notification target and full Worker Matrix identity: $pi3vlMbWhzfMbGhd66ap-sjRayNCqj6idI0Isqe12F0.
+- Replacement Task planned by Leader: task-20260902-002008-r1.
+- Rebuilt Worker native `ack_task`: $3zTfA_hba1NuUOYyj7ZB1KlT-fe6bLaat1qbp19hnC8.
+- Replacement Worker performed a real independent read-only verification and pushed `shared/tasks/task-20260902-002008-r1/workspace/recovery-verification.json`, 3618 bytes, SHA256 970840c138b03b7d800550edb8d33252769aa6dde859426b8896e3c43c5a59f3, then submitted the replacement Task: $IV2On5R_55jsmDlSMkFYzDmu8GzfqkYm4jbBsYYbzQY.
+- Leader native `check_task`: $pH9Qbt9dTbEDVjAE93URayFLEqTMlXVqi8IN3YiUbgA. Leader native `accept_task_result` with SUCCESS: $tI5GncFaxbmqSgJsvvtPH7MTu38bQ2_jOSt9S88DOnA.
+- Leader view ended with Project=completed, old Task=cancelled, replacement Task=completed. Worker-side old-task metadata remained a stale `in_progress` projection; it is retained as an observed discrepancy and was not manually repaired.
+
+Required late-submit boundary
+-----------------------------
+- Status: NOT_OBSERVED.
+- A precise raw Matrix/action audit found no native `submit_task` whose `taskId` exactly equaled the cancelled old Task after the Leader cancel event. No synthetic late submission or fabricated rejection was created.
+- The old Worker context was destroyed by the approved container removal and the recovered Worker proceeded only under the replacement Task. This is the unique functional gap in this Run.
+
+Other native runtime boundary
+----------------------------
+- The Leader's normal requester-report route was the historical room !Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080. Native communication returned membership=leave/HTTP 403 for that destination. The Leader did not guess or repair that route; it used the observed official fallback to its personal room and completed the Project report there (event $E1f7qSGkow2LWiTqvHjCCDh2_ddVqwOkEniNcQsgOxk).
+- This route issue is recorded as runtime evidence, not treated as a reason to add a scheduler, bridge, or alternate coordinator.
+
+Evidence and integrity
+----------------------
+- Raw Matrix streams, container/controller/TeamHarness observations, redacted logs, scripts, and machine audits are under this run root.
+- Final manifest: m2e-manifest.json
+- Manifest hash record: m2e-manifest.sha256
+- Secret scan: .state/secret-scan.json
+- Path integrity: .state/path-check.json
+- Final action audit: .state/final-action-audit.json
+- Collector stop record: .state/collector-stop.json; only evidence collector processes were stopped, runtime containers were untouched.
+- All retained evidence is scoped to this M2-E root. No M2-D file was overwritten.

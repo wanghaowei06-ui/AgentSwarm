@@ -1,0 +1,14 @@
+Error: unknown shorthand flag: 'o' in -o
+Usage:
+  agt get [command]
+
+Available Commands:
+  humans      Display Humans
+  managers    Display Managers
+  teams       Display Teams
+  workers     Display Workers
+
+Flags:
+  -h, --help   help for get
+
+Use "agt get [command] --help" for more information about a command.

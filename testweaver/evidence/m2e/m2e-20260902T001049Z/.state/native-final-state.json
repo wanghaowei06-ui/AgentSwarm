@@ -1,0 +1,69 @@
+{
+  "schema": "testweaver.m2e.native-final-state/v1",
+  "observed_at": "2026-09-02T00:47:18Z",
+  "leader_view": {
+    "project": {
+      "project_id": "m2e-recovery-20260902-002008",
+      "status": "completed",
+      "tasks": [
+        {
+          "task_id": "task-20260902-002008",
+          "status": "cancelled",
+          "depends_on": [],
+          "source_room_id": null
+        },
+        {
+          "task_id": "task-20260902-002008-r1",
+          "status": "completed",
+          "depends_on": [
+            "task-20260902-002008"
+          ],
+          "source_room_id": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080"
+        }
+      ]
+    },
+    "old_task": {
+      "task_id": "task-20260902-002008",
+      "status": "cancelled",
+      "result_status": null,
+      "submitted_by_role": null,
+      "accepted_by_role": null,
+      "replacement_task_id": "task-20260902-002008-r1",
+      "deliverables": null
+    },
+    "replacement_task": {
+      "task_id": "task-20260902-002008-r1",
+      "status": "submitted",
+      "result_status": "SUCCESS",
+      "submitted_by_role": "worker",
+      "accepted_by_role": null,
+      "replacement_task_id": null,
+      "deliverables": [
+        "shared/tasks/task-20260902-002008-r1/workspace/recovery-verification.json"
+      ]
+    }
+  },
+  "worker_view": {
+    "old_task": {
+      "task_id": "task-20260902-002008",
+      "status": "in_progress",
+      "result_status": null,
+      "submitted_by_role": null,
+      "accepted_by_role": null,
+      "replacement_task_id": null,
+      "deliverables": null
+    },
+    "replacement_task": {
+      "task_id": "task-20260902-002008-r1",
+      "status": "submitted",
+      "result_status": "SUCCESS",
+      "submitted_by_role": "worker",
+      "accepted_by_role": null,
+      "replacement_task_id": null,
+      "deliverables": [
+        "shared/tasks/task-20260902-002008-r1/workspace/recovery-verification.json"
+      ]
+    }
+  },
+  "interpretation": "Leader view is authoritative for project/task transition; worker old-task metadata is retained as a runtime projection discrepancy."
+}

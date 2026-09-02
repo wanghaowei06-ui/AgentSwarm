@@ -1,0 +1,146 @@
+{
+  "schema": "testweaver.m2e.final-action-audit/v1",
+  "project_id": "m2e-recovery-20260902-002008",
+  "old_task_id": "task-20260902-002008",
+  "replacement_task_id": "task-20260902-002008-r1",
+  "fault_ready_event": [
+    {
+      "event_id": "$ZFZs4yK00sr9QTw-PXdrpwm7AykeY5MO-Zb1tZO1IcM",
+      "sender": "@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+      "origin_server_ts": 1788308537523
+    }
+  ],
+  "actions": {
+    "cancel_task": [
+      {
+        "event_id": "$gGDrONGMq4vZLmjXyMEPBk2Xd3Up-6iWQ_uoFjcZ5zE",
+        "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788309726995
+      }
+    ],
+    "replacement_delegate_task": [
+      {
+        "event_id": "$pi3vlMbWhzfMbGhd66ap-sjRayNCqj6idI0Isqe12F0",
+        "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788309748243
+      }
+    ],
+    "replacement_worker_ack_task": [
+      {
+        "event_id": "$3zTfA_hba1NuUOYyj7ZB1KlT-fe6bLaat1qbp19hnC8",
+        "sender": "@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788309758476
+      }
+    ],
+    "replacement_worker_submit_task": [
+      {
+        "event_id": "$IV2On5R_55jsmDlSMkFYzDmu8GzfqkYm4jbBsYYbzQY",
+        "sender": "@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788309790557
+      }
+    ],
+    "leader_check_task": [
+      {
+        "event_id": "$pH9Qbt9dTbEDVjAE93URayFLEqTMlXVqi8IN3YiUbgA",
+        "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788309808447
+      }
+    ],
+    "leader_accept_task_result": [
+      {
+        "event_id": "$tI5GncFaxbmqSgJsvvtPH7MTu38bQ2_jOSt9S88DOnA",
+        "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+        "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+        "origin_server_ts": 1788309816870
+      }
+    ],
+    "old_submit_before_fault": [],
+    "old_submit_after_cancel": []
+  },
+  "factual_handoff": [
+    {
+      "event_id": "$oETceBzx9AEKxeoFmPQKwDykkwn5R4PB18ZSneeP5p0",
+      "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+      "origin_server_ts": 1788309690080
+    },
+    {
+      "event_id": "$EgzO_pCwNCZSAEXWhCjUi-YAu2xSX-JYL-4skDgwFyE",
+      "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+      "origin_server_ts": 1788309701496
+    }
+  ],
+  "route_failure": [
+    {
+      "event_id": "$kDKfbypRnRwEa8k6yNbMKA9vDTzW-i4ug_HeNzBDRPw",
+      "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+      "origin_server_ts": 1788309852960
+    },
+    {
+      "event_id": "$8c8wdgvbF_f6lgGJKMUckphs7KaXFtaMq9daBQ7VQEc",
+      "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+      "origin_server_ts": 1788309863554
+    },
+    {
+      "event_id": "$NZvJtehi3svmNyoZnVBVFSHY0_iYK5YJwHthu5BCFkA",
+      "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+      "origin_server_ts": 1788309864726
+    },
+    {
+      "event_id": "$LfHpZix1PgUp8TgvTOiT4dHQ_g1PVTk_q_Q09D-2vXU",
+      "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+      "origin_server_ts": 1788309877173
+    },
+    {
+      "event_id": "$tUt8jiS1-iiDYq8HrmwmBSGin6qOKOaYaGl_oTPEZE8",
+      "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+      "origin_server_ts": 1788309878074
+    },
+    {
+      "event_id": "$6_RqkqqFwe5KCCiP1OzEwZqNeST-Cj2ZUIbtfYgfTzQ",
+      "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+      "origin_server_ts": 1788309882072
+    },
+    {
+      "event_id": "$rlZXyp16Nx1Y3hG1EQ5DdDWVFr8nfhSJJOy6k-KrgwA",
+      "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+      "origin_server_ts": 1788309886310
+    },
+    {
+      "event_id": "$G3RUo8708pQH94wUcyX7zyZ93ai-YzZiyfombChK4Qs",
+      "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+      "origin_server_ts": 1788309893054
+    },
+    {
+      "event_id": "$OcUoKgHmveeo7weBVSFL5fnlmD0GvFcD9oALk6FJrnE",
+      "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!iq26BR3qyzCopjJYrK:matrix-native-m0-20260901.agentteams.local:28080",
+      "origin_server_ts": 1788309894261
+    }
+  ],
+  "boundaries": {
+    "fault_ready_ts": 1788308537523,
+    "cancel_task_ts": 1788309726995,
+    "accept_task_result_ts": 1788309816870
+  },
+  "old_late_submit": {
+    "status": "NOT_OBSERVED",
+    "reason": "No exact native submit_task action with taskId equal to the cancelled old task after cancel_task; no synthetic attempt was created."
+  },
+  "values_persisted": false
+}

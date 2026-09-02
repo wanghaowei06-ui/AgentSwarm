@@ -1,0 +1,19 @@
+{
+  "schema": "testweaver.m2e.post-remove-worker-readback/v1",
+  "workers": [
+    {
+      "name": "native-m0-clean-worker",
+      "phase": "Running",
+      "state": "Running",
+      "containerManaged": true,
+      "containerState": "running",
+      "image": "agentteams/qwenpaw-worker:be10aaf",
+      "model": "deepseek-v4-flash",
+      "runtime": "qwenpaw",
+      "matrixUserID": "@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080",
+      "roomID": "!htUIJW5HXUYvFSIFW6:matrix-native-m0-20260901.agentteams.local:28080",
+      "team": "native-m0-clean-team",
+      "role": "worker"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "project_id": "factcheck-20260901-144228",
+  "status": "active",
+  "team_id": "native-m0-clean-team",
+  "title": "M0 Bounded Runtime-Fact Verification",
+  "plan_type": "dag",
+  "mode": "",
+  "nodes": [
+    {
+      "id": "task-20260901-144228",
+      "name": "Runtime fact verification",
+      "status": "completed",
+      "assignee": "@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080"
+    }
+  ]
+}

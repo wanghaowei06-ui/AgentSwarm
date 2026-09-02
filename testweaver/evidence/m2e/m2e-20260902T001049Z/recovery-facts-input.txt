@@ -1,0 +1,15 @@
+M2-E observed recovery facts only; this is not a new task or status instruction.
+
+Run: m2e-20260902T001049Z
+Project: m2e-recovery-20260902-002008
+Initial Task: task-20260902-002008
+Worker CR: native-m0-clean-worker
+Worker Matrix identity: @native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080
+
+The approved Human event was $tFQwaj9AM6E2kXIKGNABvf_A-QGMvLQ_AS_kbgvgo2U. At 2026-09-02T00:29:43Z the approved, single external action was exactly `docker rm -f 20736420e86f27a080b73b8425aca0730c45fc1c805324b99cd8e693ec25ebd8`; it exited 0, used no `-v`, and targeted no other container.
+
+The Controller later recreated the same Worker CR/name with a new container ID `9727ed45c40a8c6efd74c9f2bd822b14d6fe979bc468be0e65391f6b86ed5631`. The old container ID was `20736420e86f27a080b73b8425aca0730c45fc1c805324b99cd8e693ec25ebd8`. The new container uses image `agentteams/qwenpaw-worker:be10aaf`, image ID `sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb`, and its host health endpoint returned HTTP 200 on port 19253. The official worker readback reported the same Matrix identity, role `worker`, team `native-m0-clean-team`, model `deepseek-v4-flash`, runtime `qwenpaw`, and state `Running`.
+
+The official Team readback reported `native-m0-clean-team` `Active`, leaderReady true, readyWorkers 1, totalWorkers 1. The recovered Worker Matrix versions endpoint returned HTTP 200. Controller CLI Worker readback succeeded. The protected environment variable-name hash remained `474b80e83594b3ec0d503660ceb8ab4d36a61aab1681ac077207452a7e8b4b9d`, and the authenticated secret-volume mount was unchanged; no credential value is included here.
+
+These facts are transferred through the existing Human→Manager path for native runtime observation only. No Project/Task state action or result is asserted by this message.

@@ -1,0 +1,77 @@
+{
+  "total": 9,
+  "projects": [
+    {
+      "project_id": "factcheck-20260901-144228",
+      "status": "active",
+      "team_id": "native-m0-clean-team",
+      "title": "M0 Bounded Runtime-Fact Verification",
+      "plan_type": "dag",
+      "mode": ""
+    },
+    {
+      "project_id": "m1-leg1-20260901-153651",
+      "status": "completed",
+      "team_id": "native-m0-clean-team",
+      "title": "M1 Leg 1: Bounded Runtime/Provenance Inventory",
+      "plan_type": "dag",
+      "mode": ""
+    },
+    {
+      "project_id": "m1-leg1-20260901-193754",
+      "status": "completed",
+      "team_id": "native-m0-clean-team",
+      "title": "M1 Leg 1: Bounded Runtime/Provenance Inventory",
+      "plan_type": "dag",
+      "mode": ""
+    },
+    {
+      "project_id": "m1-phase1-20260901-150850",
+      "status": "completed",
+      "team_id": "native-m0-clean-team",
+      "title": "M1 Phase 1: Bounded Runtime/Provenance Inventory",
+      "plan_type": "dag",
+      "mode": ""
+    },
+    {
+      "project_id": "m1-phase2-verify-20260901-151200",
+      "status": "active",
+      "team_id": "native-m1-verify-team",
+      "title": "M1 Phase 2: independent convergence/cross-validation (native-m1-verify-team)",
+      "plan_type": "dag",
+      "mode": ""
+    },
+    {
+      "project_id": "m1-phase2-verify-20260901-153942",
+      "status": "active",
+      "team_id": "native-m1-verify-team",
+      "title": "M1 Leg 2: independent convergence/cross-validation (native-m1-verify-team)",
+      "plan_type": "dag",
+      "mode": ""
+    },
+    {
+      "project_id": "m1-phase2-verify-20260901-194103",
+      "status": "active",
+      "team_id": "native-m1-verify-team",
+      "title": "M1 Leg 2: independent convergence/cross-validation (native-m1-verify-team)",
+      "plan_type": "dag",
+      "mode": ""
+    },
+    {
+      "project_id": "m2c-recovery-20260901-212347",
+      "status": "paused",
+      "team_id": "native-m0-clean-team",
+      "title": "M2-C: Non-destructive Recovery Audit & Reversible Worker-Container Failure-Drill Plan",
+      "plan_type": "dag",
+      "mode": ""
+    },
+    {
+      "project_id": "m2c-recovery-20260901-212347",
+      "status": "paused",
+      "team_id": "",
+      "title": "M2-C: Non-destructive Recovery Audit & Reversible Worker-Container Failure-Drill Plan",
+      "plan_type": "dag",
+      "mode": ""
+    }
+  ]
+}
