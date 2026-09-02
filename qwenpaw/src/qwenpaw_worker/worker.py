@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
 import hashlib
 import logging
 import os
@@ -12,10 +13,11 @@ import subprocess
 import sys
 import time
 import tempfile
+import urllib.error
 import zipfile
 from typing import Optional
 
-from qwenpaw_worker.api import QwenPawApiClient
+from qwenpaw_worker.api import QwenPawApiClient, QwenPawApiError
 from qwenpaw_worker.config import WorkerConfig, _relative_storage_prefix
 from qwenpaw_worker.heartbeat import WorkerHeartbeat, run_worker_heartbeat_loop
 from qwenpaw_worker.sync import FileSync, push_loop
@@ -26,6 +28,9 @@ logger = logging.getLogger(__name__)
 DEFAULT_AGENT_ID = "default"
 DEFAULT_BUILTIN_QWENPAW_PLUGINS_DIR = Path("/opt/agentteams/qwenpaw-builtin/plugins")
 BUILTIN_QWENPAW_PLUGIN_MARKER = ".agentteams-builtin-plugin.sha256"
+BUILTIN_MCP_READY_TIMEOUT_SECONDS = 60.0
+BUILTIN_MCP_RETRY_INITIAL_DELAY_SECONDS = 0.25
+BUILTIN_MCP_RETRY_MAX_DELAY_SECONDS = 5.0
 SESSION_FILE_PROMPT_POLICY = """Do not read, list, grep, glob, summarize, copy, or expose files under sessions/.
 Session files are runtime-private state and may contain private conversation history.
 This rule applies to all channels, users, and sessions, not only DingTalk."""
@@ -59,6 +64,56 @@ def _safe_error_code(exc: Exception) -> str:
     if "agent package" in message:
         return "agent_package_failed"
     return type(exc).__name__
+
+
+def _is_transient_builtin_mcp_error(exc: Exception) -> bool:
+    """Return whether a QwenPaw MCP configuration error may be retried."""
+
+    if isinstance(exc, QwenPawApiError):
+        cause = exc.__cause__
+        return cause is not None and _is_transient_builtin_mcp_error(cause)
+    if isinstance(exc, urllib.error.HTTPError):
+        return exc.code in {408, 425, 429} or 500 <= exc.code < 600
+    return isinstance(exc, (TimeoutError, ConnectionError, OSError, urllib.error.URLError))
+
+
+def _retry_builtin_mcp_configuration(
+    operation: Callable[[], None],
+    *,
+    timeout: float = BUILTIN_MCP_READY_TIMEOUT_SECONDS,
+    initial_delay: float = BUILTIN_MCP_RETRY_INITIAL_DELAY_SECONDS,
+    max_delay: float = BUILTIN_MCP_RETRY_MAX_DELAY_SECONDS,
+    monotonic: Callable[[], float] | None = None,
+    sleep: Callable[[float], None] | None = None,
+) -> None:
+    """Retry only transient MCP readiness failures within a bounded window."""
+
+    clock = monotonic or time.monotonic
+    pause = sleep or time.sleep
+    deadline = clock() + max(0.0, timeout)
+    delay = max(0.0, initial_delay)
+
+    while True:
+        try:
+            operation()
+            return
+        except Exception as exc:
+            if not _is_transient_builtin_mcp_error(exc):
+                raise
+            remaining = deadline - clock()
+            if remaining <= 0 or delay <= 0:
+                raise
+            retry_delay = min(delay, max(0.0, max_delay), remaining)
+            if retry_delay <= 0:
+                raise
+            logger.warning(
+                "QwenPaw builtin MCP API not ready; retrying component=worker "
+                "error_type=%s retry_delay_seconds=%.3f",
+                type(exc).__name__,
+                retry_delay,
+            )
+            pause(retry_delay)
+            delay = min(max(0.0, max_delay), delay * 2)
 
 
 class Worker:
@@ -732,6 +787,9 @@ class Worker:
         raise RuntimeError(f"qwenpaw API did not become ready: {last_error}")
 
     def _configure_builtin_plugin_mcp_clients(self) -> None:
+        _retry_builtin_mcp_configuration(self._configure_builtin_plugin_mcp_clients_once)
+
+    def _configure_builtin_plugin_mcp_clients_once(self) -> None:
         existing = {str(item.get("key")) for item in self.api_client.list_mcp()}
         for plugin_id in ("teamharness", "workerflow"):
             plugin_dir = self.config.qwenpaw_working_dir / "plugins" / plugin_id
