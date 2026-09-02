@@ -1,0 +1,16 @@
+status=NOT_LIVE
+scope=collector-only
+
+input_contract=external completed native-run exports; no default case, run, identity, result, or run count
+sample_read=QwenPaw .qwenpaw/token_usage.json and session JSONL were inspected read-only; only key names/types were retained
+qwenpaw_token_usage_keys=call_count,completion_tokens,model_name,prompt_tokens,provider_id
+qwenpaw_session_usage_keys=input_tokens,output_tokens
+sample_redaction=no secret, prompt, message body, or usage value is recorded here
+
+normalization=public/budget hashes, E0-E3 profile, positive repetition, fresh native IDs, actor, Oracle/evidence refs, usage, cost, latency
+missing_observation=NOT_AVAILABLE
+paired_metrics=rows use the 33ebd28 paired_metrics field contract; manifests are content-hash sealed
+fail_closed=gold, fixture, synthetic, runner, scheduler, observer, taskrun, prompt, and credential/body fields
+authority=the implementation has no file, Matrix, Docker, provider, AgentLoop, task, room, or orchestration side effect
+
+validation=focused RED then GREEN; fake dictionaries only, not LIVE evidence
