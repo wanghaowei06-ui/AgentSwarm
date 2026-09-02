@@ -219,6 +219,97 @@ def preflight_plugin_tree(output: Path, package: dict[str, Any] | None = None) -
         raise PackageError("packaged plugin-tree preflight failed")
 
 
+def _root_export_targets(exports: Any) -> list[str]:
+    if isinstance(exports, str):
+        return [exports]
+    if isinstance(exports, list):
+        targets: list[str] = []
+        for value in exports:
+            targets.extend(_root_export_targets(value))
+        return targets
+    if not isinstance(exports, dict):
+        return []
+    if "." in exports:
+        return _root_export_targets(exports["."])
+    if any(isinstance(key, str) and key.startswith(".") for key in exports):
+        return []
+    targets = []
+    for value in exports.values():
+        targets.extend(_root_export_targets(value))
+    return targets
+
+
+def _declared_entrypoints(package: dict[str, Any]) -> list[str]:
+    targets: list[str] = []
+    main = package.get("main")
+    if isinstance(main, str):
+        targets.append(main)
+    targets.extend(_root_export_targets(package.get("exports")))
+    return targets
+
+
+def _entrypoints_exist(package_dir: Path, package: dict[str, Any]) -> bool:
+    targets = _declared_entrypoints(package)
+    if not targets:
+        return True
+    package_root = package_dir.resolve()
+    for target in targets:
+        if not target or "\x00" in target or os.path.isabs(target):
+            return False
+        entrypoint = (package_dir / target).resolve()
+        try:
+            entrypoint.relative_to(package_root)
+        except ValueError:
+            return False
+        if not entrypoint.is_file():
+            return False
+    return True
+
+
+def _root_physical_package(source: Path, package: dict[str, Any]) -> Path | None:
+    name = package.get("name")
+    if not isinstance(name, str) or "\\" in name:
+        return None
+    parts = name.split("/")
+    if len(parts) not in (1, 2) or any(not part or part in (".", "..") for part in parts):
+        return None
+    node_modules = (source / "node_modules").resolve()
+    candidate = source / "node_modules" / Path(*parts)
+    if candidate.is_symlink() or not candidate.is_dir():
+        return None
+    try:
+        candidate.resolve().relative_to(node_modules)
+    except ValueError:
+        return None
+    package_json = candidate / "package.json"
+    if not package_json.is_file() or package_json.is_symlink():
+        return None
+    return candidate
+
+
+def _materialization_source(
+    source: Path,
+    package_dir: Path,
+    package: dict[str, Any],
+) -> Path:
+    if _entrypoints_exist(package_dir, package):
+        return package_dir
+    pnpm_root = (source / "node_modules" / ".pnpm").resolve()
+    try:
+        package_dir.resolve().relative_to(pnpm_root)
+    except ValueError:
+        return package_dir
+    candidate = _root_physical_package(source, package)
+    if candidate is None:
+        return package_dir
+    try:
+        if manifest(candidate / "package.json") != package:
+            return package_dir
+    except PackageError:
+        return package_dir
+    return candidate if _entrypoints_exist(candidate, package) else package_dir
+
+
 def remove_broken_symlinks(root: Path) -> None:
     root = root.resolve()
     for directory, names, files in os.walk(root, followlinks=False):
@@ -327,6 +418,8 @@ def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) ->
     seen, missing = collect(source, set(skipped_unresolved))
     pnpm_root = source / "node_modules" / ".pnpm"
     instances: dict[str, Path] = {}
+    instance_package_dirs: dict[str, Path] = {}
+    instance_manifests: dict[str, dict[str, Any]] = {}
     root_packages: dict[str, Path] = {}
     for (directory, _name), (_path, dependency_manifest) in seen.items():
         package_dir = Path(directory)
@@ -335,6 +428,8 @@ def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) ->
         instance = instance_root(package_dir, pnpm_root)
         if instance is not None:
             instances[instance.name] = instance
+            instance_package_dirs[instance.name] = package_dir
+            instance_manifests[instance.name] = dependency_manifest
         else:
             root_packages[str(dependency_manifest["name"])] = package_dir
 
@@ -345,8 +440,22 @@ def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) ->
     target_node_modules = output / "node_modules"
     target_pnpm = target_node_modules / ".pnpm"
     target_pnpm.mkdir(parents=True)
-    for name, package_dir in sorted(instances.items()):
-        shutil.copytree(package_dir, target_pnpm / name, symlinks=True)
+    root_physical_fallbacks = 0
+    for name, instance_root_dir in sorted(instances.items()):
+        destination = target_pnpm / name
+        shutil.copytree(instance_root_dir, destination, symlinks=True)
+        package_dir = instance_package_dirs[name]
+        package_manifest = instance_manifests[name]
+        materialization = _materialization_source(source, package_dir, package_manifest)
+        if materialization != package_dir:
+            root_physical_fallbacks += 1
+            relative_package = package_dir.relative_to(instance_root_dir)
+            materialized_destination = destination / relative_package
+            if materialized_destination.is_symlink():
+                materialized_destination.unlink()
+            elif materialized_destination.exists():
+                shutil.rmtree(materialized_destination)
+            shutil.copytree(materialization, materialized_destination, symlinks=True)
     for name, package_dir in sorted(root_packages.items()):
         destination = target_node_modules / name
         destination.parent.mkdir(parents=True, exist_ok=True)
@@ -391,6 +500,7 @@ def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) ->
         "node_modules_source_copied": forest_links > 0,
         "pnpm_forest_links_copied": forest_links,
         "pnpm_forest_links_skipped": forest_skipped,
+        "root_physical_fallbacks": root_physical_fallbacks,
     }
 
 

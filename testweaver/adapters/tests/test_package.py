@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -275,6 +276,171 @@ class PackageWiringTests(unittest.TestCase):
             self.assertEqual(run_import(output).returncode, 0)
             forest_link.unlink()
             self.assertNotEqual(run_import(output).returncode, 0)
+
+    def test_cordis_loader_materializes_matching_root_package_for_partial_instance(self) -> None:
+        source = ROOT / "scripts/package_dsh.py"
+        spec = importlib.util.spec_from_file_location("package_dsh", source)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        with tempfile.TemporaryDirectory() as temporary:
+            source_root = Path(temporary) / "source"
+            output = Path(temporary) / "output"
+            packages = {
+                "loader": (
+                    "@deepseek-ai+cordis-plugin-loader@fixture",
+                    "@deepseek-ai/cordis-plugin-loader",
+                ),
+                "llm": (
+                    "@deepseek-ai+dsh-llm@fixture",
+                    "@deepseek-ai/dsh-llm",
+                ),
+                "registry": (
+                    "@deepseek-ai+dsh-typert-registry@fixture",
+                    "@deepseek-ai/dsh-typert-registry",
+                ),
+                "gateway": (
+                    "@deepseek-ai+dsh-api-gateway@fixture",
+                    "@deepseek-ai/dsh-api-gateway",
+                ),
+            }
+
+            def package_dir(instance_name: str, package_name: str) -> Path:
+                return (
+                    source_root
+                    / "node_modules/.pnpm"
+                    / instance_name
+                    / "node_modules"
+                    / Path(*package_name.split("/"))
+                )
+
+            package_manifests = {}
+            for key, (instance_name, package_name) in packages.items():
+                directory = package_dir(instance_name, package_name)
+                directory.joinpath("lib").mkdir(parents=True)
+                if key in ("registry", "gateway"):
+                    package_manifests[key] = {
+                        "name": package_name,
+                        "version": "fixture",
+                        "main": "lib/index.js",
+                        "exports": {".": {"default": "./lib/index.js"}},
+                    }
+                    (directory / "lib/types").mkdir()
+                    (directory / "lib/types/index.js").write_text(
+                        f'module.exports = "partial-{key}";\n', encoding="utf-8"
+                    )
+                else:
+                    package_manifests[key] = {
+                        "name": package_name,
+                        "version": "fixture",
+                        "type": "module",
+                        "exports": "./lib/index.mjs",
+                    }
+                    (directory / "lib/index.mjs").write_text(
+                        f'export const marker = "{key}";\n', encoding="utf-8"
+                    )
+                (directory / "package.json").write_text(
+                    json.dumps(package_manifests[key]), encoding="utf-8"
+                )
+
+            loader_dir = package_dir(*packages["loader"])
+            package_manifests["loader"]["dependencies"] = {
+                "@deepseek-ai/dsh-typert-registry": "workspace:^",
+                "@deepseek-ai/dsh-api-gateway": "workspace:^",
+            }
+            (loader_dir / "package.json").write_text(
+                json.dumps(package_manifests["loader"]), encoding="utf-8"
+            )
+            (loader_dir / "lib/index.mjs").write_text(
+                "export async function boot() {\n"
+                '  const registry = await import("@deepseek-ai/dsh-typert-registry");\n'
+                '  const gateway = await import("@deepseek-ai/dsh-api-gateway");\n'
+                '  const llm = await import("@deepseek-ai/dsh-llm");\n'
+                "  return [registry.marker, gateway.marker, llm.marker].join(\":\");\n"
+                "}\n",
+                encoding="utf-8",
+            )
+
+            for key in ("registry", "gateway"):
+                instance_name, package_name = packages[key]
+                partial = package_dir(instance_name, package_name)
+                physical = source_root / "node_modules" / Path(*package_name.split("/"))
+                physical.joinpath("lib").mkdir(parents=True)
+                (physical / "package.json").write_text(
+                    json.dumps(package_manifests[key]), encoding="utf-8"
+                )
+                (physical / "lib/index.js").write_text(
+                    f'exports.marker = "complete-{key}";\n', encoding="utf-8"
+                )
+                nested = loader_dir / "node_modules" / Path(*package_name.split("/"))
+                nested.parent.mkdir(parents=True, exist_ok=True)
+                nested.symlink_to(
+                    Path(os.path.relpath(partial, nested.parent)), target_is_directory=True
+                )
+
+            root_scope = source_root / "node_modules/@deepseek-ai"
+            root_scope.mkdir(parents=True, exist_ok=True)
+            for key in ("loader", "llm"):
+                instance_name, package_name = packages[key]
+                (root_scope / package_name.rsplit("/", 1)[1]).symlink_to(
+                    f"../.pnpm/{instance_name}/node_modules/{package_name}",
+                    target_is_directory=True,
+                )
+            forest_scope = source_root / "node_modules/.pnpm/node_modules/@deepseek-ai"
+            forest_scope.mkdir(parents=True)
+            for instance_name, package_name in packages.values():
+                (forest_scope / package_name.rsplit("/", 1)[1]).symlink_to(
+                    f"../../{instance_name}/node_modules/{package_name}",
+                    target_is_directory=True,
+                )
+            (source_root / "package.json").write_text(
+                json.dumps(
+                    {
+                        "name": "@deepseek-ai/dsh",
+                        "devDependencies": {
+                            "@deepseek-ai/cordis-plugin-loader": "workspace:^",
+                            "@deepseek-ai/dsh-llm": "workspace:^",
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (source_root / "lib").mkdir()
+            (source_root / "lib/bin.js").write_text("export {};\n", encoding="utf-8")
+            (source_root / "config").mkdir()
+            with mock.patch.object(module, "validate_inputs", return_value={}):
+                module.build(
+                    source_root, output, Path("/unused/lock"), Path("/unused/provenance")
+                )
+
+            for key in ("registry", "gateway"):
+                _, package_name = packages[key]
+                materialized = output / "node_modules/.pnpm" / packages[key][0] / "node_modules" / Path(*package_name.split("/"))
+                self.assertTrue((materialized / "lib/index.js").is_file())
+
+            loader_path = loader_dir.relative_to(source_root)
+            script = (
+                "import { pathToFileURL } from 'node:url';"
+                "const loader = await import(pathToFileURL(process.argv[1]).href);"
+                "const result = await loader.boot();"
+                "if (result !== 'complete-registry:complete-gateway:llm') process.exit(3);"
+            )
+            (output / "node_modules/@deepseek-ai/dsh-llm").unlink()
+            completed = subprocess.run(
+                [
+                    "node",
+                    "--input-type=module",
+                    "-e",
+                    script,
+                    str(output / loader_path / "lib/index.mjs"),
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=5,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
 
     def test_noncritical_unresolved_root_dependency_is_skipped_and_reported(self) -> None:
         source = ROOT / "scripts/package_dsh.py"
