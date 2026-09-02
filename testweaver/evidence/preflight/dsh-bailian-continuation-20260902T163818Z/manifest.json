@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "run_id": "dsh-bailian-continuation-20260902T163818Z",
+  "status": "FAIL",
+  "classification": "NOT_LIVE_PROVIDER_PROBE_FAIL",
+  "files": ["before-receipt.json", "receipt.json", "manifest.json", "SHA256SUMS"],
+  "predecessor": "9689672d94f417c1553374d6a8f7812dcd50f82c",
+  "secret_scan": "PASS_NO_SECRET_VALUES",
+  "update": "PASS_MODEL_PROVIDER_ONLY",
+  "route_auth": "PASS_CONTROLLER_RECONCILED",
+  "provider_probe": "FAIL_NONZERO_NO_STRUCTURED_METADATA",
+  "sha256": {
+    "before-receipt.json": "4d6beeb293dfdb70133b348799c678df3a8f7521c742cd79972f1890ddde36fe",
+    "receipt.json": "3dea3bc96ef4aab1d0ace007d622375e448e6b939acacfafe7cc9b4a5608c573",
+    "manifest.json": "SELF_EXCLUDED",
+    "SHA256SUMS": "SELF_EXCLUDED"
+  }
+}
