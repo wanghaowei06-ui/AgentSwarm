@@ -1,0 +1,19 @@
+{
+  "schema": "testweaver.m2g.stageb3.manifest.v1",
+  "run_id": "m2g-stageb3-20260902T050009Z-container",
+  "classification": "PARTIAL",
+  "source_commit": "10cb365",
+  "files": [
+    {
+      "path": "receipt.json",
+      "sha256": "61913561449241edc25a7bd8a5ac5ef8c74db8bc4ade6716189dead714a8bfa5"
+    },
+    {
+      "path": "manifest.json",
+      "self_hash": "excluded; listed in SHA256SUMS after finalization"
+    }
+  ],
+  "hash_algorithm": "sha256",
+  "secret_values": "NOT_READ_OR_STORED",
+  "body_content": "NOT_STORED"
+}

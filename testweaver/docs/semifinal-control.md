@@ -85,6 +85,7 @@ TestWeaver 只做产品差异：
 - AgentLoop 旧资产目前只可称合同/replay/历史受限证据；必须等待同一真实 M0/Hero 后完成真实查询回读。
 - M2-G Stage B run `m2g-stageb-20260902T041117Z-container` 已收口为 `PARTIAL/NOT_OBSERVED`：Human initial 与 Manager 原生响应事件回读 PASS；未观察到新的原生 Project、Task 对象或 Task room，也未观察到 Leader assignment、Worker ack、DSH provider/model/tool call、submit/check/accept 或 Manager 二次决策。唯一 Manager 响应中的 task reference 不足以证明原生 Task；不得补消息、代行或升级为 LIVE。脱敏 receipt/manifest/hash 位于 `testweaver/evidence/m2g/m2g-stageb-20260902T041117Z-container/`。
 - M2-G Stage B2 run `m2g-stageb2-20260902T044457Z-container` 同样诚实收口为 `PARTIAL/NOT_OBSERVED`：新的 Human initial 与 Manager 响应已回读；Manager 真实 model turn、`agt get` roster 查询、task directory（`meta.json`/`spec.md`）和 MinIO `mc` 准备动作已观察，但未观察到原生 Project/Task state、Leader room assignment、Worker ack、DSH provider/tool call 或 submit/check/accept。无补消息、无脚本代建 Task、无 Worker 指定；不得升级为 LIVE。脱敏 receipt/manifest/hash 位于 `testweaver/evidence/m2g/m2g-stageb2-20260902T044457Z-container/`。
+- M2-G Stage B3 run `m2g-stageb3-20260902T050009Z-container` 在 Manager `AGENTS.md` 通用委派规则提交 `10cb365` 并通过现有 builtin merge 精确同步后执行；Human initial 单次发送/回读 PASS。3 分钟窄观察只见文件层 `task-20260902-050009-m2g-stageb3` 的 `meta.json`/`spec.md`，未观察到精确 run 的 Manager session/model 响应、state 注册、原生 Project/Task 对象或 Task room、Leader assignment、Worker ack、DSH provider/tool call、submit/check/accept 或 Manager 二次决策。文件准备不等于原生委派；无补消息、无脚本代建、无 Worker 指定，整体继续 `PARTIAL/NOT_OBSERVED`。脱敏 receipt/manifest/hash 位于 `testweaver/evidence/m2g/m2g-stageb3-20260902T050009Z-container/`。
 
 ## 6. 实施顺序与完成条件
 

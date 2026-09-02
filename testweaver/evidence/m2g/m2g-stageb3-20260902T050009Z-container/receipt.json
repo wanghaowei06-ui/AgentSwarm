@@ -1,0 +1,107 @@
+{
+  "schema": "testweaver.m2g.stageb3.observation.v1",
+  "run_id": "m2g-stageb3-20260902T050009Z-container",
+  "source_commit": "10cb365",
+  "classification": "PARTIAL",
+  "status": "NOT_OBSERVED",
+  "scope": {
+    "input_lineage": "exact B Stage B Human event, fresh run_id substitution only",
+    "source_event_id": "$X9UCes2aMcQAQ0EIkI8_SjPXMDo_zaMKUD9VZHiHC5k",
+    "b2_policy_repeated": false,
+    "observation_window_seconds": 180,
+    "observation_mode": "exact run filter; read-only after single Human send"
+  },
+  "human_initial": {
+    "status": "PASS",
+    "event_id": "$dvyInZpRieHN-l9luxDVf2o3OsFD0W7MAh7-RaTWD8o",
+    "room_id": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+    "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+    "origin_server_ts": 1788325209307,
+    "type": "m.room.message",
+    "body_length": 2440,
+    "body_sha256": "fb56e65f1e2373b6011bc911485179e967e3249b2608d0301be2e4123e87b8e7",
+    "body_stored": false,
+    "send_path": "Manager container injected login; agt get managers default -o json .status.roomID; direct Matrix send"
+  },
+  "manager": {
+    "response_event": "NOT_OBSERVED",
+    "model_turn": "NOT_OBSERVED",
+    "provider": "NOT_OBSERVED",
+    "model": "NOT_OBSERVED",
+    "usage": "NOT_OBSERVED",
+    "latency": "NOT_OBSERVED",
+    "exact_run_session_match": "NOT_OBSERVED",
+    "native_tool_calls": {
+      "agt_get": "NOT_OBSERVED",
+      "team_task_reference_read": "NOT_OBSERVED",
+      "finite_tasks_reference_read": "NOT_OBSERVED",
+      "create_project": "NOT_OBSERVED",
+      "manage_state_delegated_to_team": "NOT_OBSERVED",
+      "message_leader": "NOT_OBSERVED"
+    },
+    "reply_class": "NOT_OBSERVED"
+  },
+  "file_preparation": {
+    "status": "OBSERVED",
+    "path": "/root/agentteams-fs/shared/tasks/task-20260902-050009-m2g-stageb3",
+    "is_native_task_object": "NOT_OBSERVED",
+    "children": ["meta.json", "spec.md"],
+    "files": {
+      "meta.json": {
+        "mode": "644",
+        "size": 469,
+        "sha256": "0fadd0f9e97721b3f033814552de0c90560e7fc4478c0cd0e97782b5c154b183"
+      },
+      "spec.md": {
+        "mode": "644",
+        "size": 2237,
+        "sha256": "79bec8644b64d14a24e1c4595780ef977b1f05bdadb5a72a6b65cf2bf277723"
+      }
+    },
+    "state_registration": "NOT_OBSERVED",
+    "interpretation": "file preparation is not evidence of native Project/Task/delegation"
+  },
+  "native_lifecycle": {
+    "manager_dynamic_team_choice": "NOT_OBSERVED",
+    "project": "NOT_OBSERVED",
+    "task_object": "NOT_OBSERVED",
+    "task_room": "NOT_OBSERVED",
+    "leader_assignment": "NOT_OBSERVED",
+    "worker_ack": "NOT_OBSERVED",
+    "worker_skill_or_tool": "NOT_OBSERVED",
+    "dsh_provider_call": "NOT_OBSERVED",
+    "submit": "NOT_OBSERVED",
+    "check": "NOT_OBSERVED",
+    "accept": "NOT_OBSERVED",
+    "manager_second_decision": "NOT_OBSERVED"
+  },
+  "readback": {
+    "manager_room_source": "agt get managers default -o json .status.roomID",
+    "manager_room": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+    "team_room_checked": "!NbRmgvdkZMdRcCvLg4:matrix-native-m0-20260901.agentteams.local:28080",
+    "matrix_login_http": 200,
+    "new_run_events_after_initial": 0,
+    "leader_assignment_events": 0,
+    "worker_ack_events": 0,
+    "dsh_calls": 0,
+    "state_run_hits": 0,
+    "bounded_polls": 12,
+    "no_supplement_message": true
+  },
+  "persistent_rule": {
+    "source_path": "manager/agent/AGENTS.md",
+    "source_sha256": "4862c12b3b6d226e6cc4bf23c857ccd25f2a10ec1de879feccfbdaa49ebba311",
+    "workspace_path": "/root/manager-workspace/AGENTS.md",
+    "workspace_builtin_sha256": "4862c12b3b6d226e6cc4bf23c857ccd25f2a10ec1de879feccfbdaa49ebba311",
+    "workspace_markers": "1/1",
+    "user_suffix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sync_status": "PASS"
+  },
+  "security": {
+    "secret_values": "NOT_READ_OR_STORED",
+    "message_bodies": "NOT_STORED",
+    "prompts_and_results": "NOT_STORED",
+    "observation_commands": "read-only after Human send"
+  },
+  "unique_gap": "persistent Manager rule did not yield an observed native Project/Task/Leader assignment within the bounded window"
+}
