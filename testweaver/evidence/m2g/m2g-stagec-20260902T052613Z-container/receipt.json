@@ -1,0 +1,309 @@
+{
+  "schema": "testweaver.m2g.stagec.receipt.v1",
+  "run_id": "m2g-stagec-20260902T052613Z-container",
+  "classification": "PARTIAL",
+  "status": "bounded_observation_closed",
+  "repo_head_before_commit": "4e075b9b5ec543c7d401395742b3aea4676b314c",
+  "source": {
+    "b1_run_id": "m2g-stageb-20260902T041117Z-container",
+    "builtin_source_commit": "10cb365",
+    "human_input_reused_in_memory": true,
+    "gold_free": true,
+    "model_or_prompt_changed": false
+  },
+  "root_cause": {
+    "stale_session_proven": true,
+    "session_key": "agent:main:main",
+    "b2_session_id": "72f72165-65e6-4911-95d4-415b63ffac21",
+    "b3_session_id": "72f72165-65e6-4911-95d4-415b63ffac21",
+    "b2_and_b3_reused_same_session": true,
+    "builtin_sync_preceded_b3_without_session_rotation": true,
+    "official_reload": "openclaw gateway call sessions.reset --params '{\"key\":\"agent:main:main\"}' --json",
+    "new_session_id": "6db603cd-7097-4be7-b900-462df3aacbd5",
+    "bootstrap_cache_keyed_by": "sessionKey",
+    "bootstrap_cache_effect": "The existing session could retain its bootstrap snapshot after workspace AGENTS.md changed.",
+    "observer_false_negative": {
+      "manager_container_rg_available": false,
+      "stderr_suppression_masked_observer_error": true,
+      "messages_endpoint_room_id_filter_dropped_events": true,
+      "corrected_readback_found_b3_manager_and_leader_activity": true
+    },
+    "runtime_correction": "B3 did reach file/MinIO/manage-state preparation and a real Manager-to-Leader assignment; the earlier no-session/no-Leader statement was an observer error, not a runtime absence."
+  },
+  "manager": {
+    "container": "agentteams-native-m0-20260901-manager",
+    "container_id": "cbc6432f0e51df3c491514c146d31704afe64a5d61bc3acf81fe42698b85e50e",
+    "matrix_identity": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+    "room_id": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+    "image": "agentteams/manager:m1plus-15b7b14",
+    "runtime": "openclaw",
+    "provider": "agentteams-gateway",
+    "model": "deepseek-v4-flash",
+    "session_file": "/root/manager-workspace/.openclaw/agents/main/sessions/72f72165-65e6-4911-95d4-415b63ffac21.jsonl",
+    "session_file_header_after_reset": "6db603cd-7097-4be7-b900-462df3aacbd5",
+    "system_prompt_report": {
+      "present": true,
+      "session_id": "6db603cd-7097-4be7-b900-462df3aacbd5",
+      "session_key": "agent:main:main",
+      "workspace_agents_path": "/root/manager-workspace/AGENTS.md",
+      "workspace_agents_missing": false,
+      "workspace_agents_raw_chars": 16914,
+      "workspace_agents_injected_chars": 16914,
+      "workspace_agents_truncated": false,
+      "skill_entry_count": 16,
+      "tool_entry_count": 23,
+      "system_sent": true
+    },
+    "workspace_agents": {
+      "source_path": "manager/agent/AGENTS.md",
+      "source_commit": "10cb365",
+      "source_sha256": "4862c12b3b6d226e6cc4bf23c857ccd25f2a10ec1de879feccfbdaa49ebba311",
+      "workspace_sha256": "92b437984b2d19202b6856e3a7d2463b5e8bdbce0467cceacf6cf93a2ab9d886",
+      "workspace_mode": "0644",
+      "workspace_owner": "0:0",
+      "builtin_merge_markers": {
+        "begin_count": 1,
+        "end_count": 1,
+        "user_suffix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "readback": "workspace builtin section matched source after official builtin-merge; user suffix was unchanged"
+    },
+    "model_records": [
+      {
+        "record_id": "35470fa9",
+        "created_at": "2026-09-02T05:26:45.359Z",
+        "stop_reason": "toolUse",
+        "usage": {
+          "input": 228,
+          "output": 1971,
+          "cache_read": 32512,
+          "total": 34711
+        },
+        "tool_name": "exec"
+      },
+      {
+        "record_id": "ae0988ad",
+        "created_at": "2026-09-02T05:26:48.638Z",
+        "stop_reason": "toolUse",
+        "usage": {
+          "input": 53,
+          "output": 395,
+          "cache_read": 33792,
+          "total": 34240
+        },
+        "tool_name": "write"
+      },
+      {
+        "record_id": "4eb2e85b",
+        "created_at": "2026-09-02T05:26:56.622Z",
+        "stop_reason": "toolUse",
+        "usage": {
+          "input": 86,
+          "output": 945,
+          "cache_read": 34176,
+          "total": 35207
+        },
+        "tool_name": "write"
+      },
+      {
+        "record_id": "0b24f576",
+        "created_at": "2026-09-02T05:27:09.904Z",
+        "stop_reason": "toolUse",
+        "usage": {
+          "input": 280,
+          "output": 844,
+          "cache_read": 36352,
+          "total": 37476
+        },
+        "tool_name": "exec"
+      },
+      {
+        "record_id": "b9b6f5ca",
+        "created_at": "2026-09-02T05:27:14.792Z",
+        "stop_reason": "stop",
+        "usage": {
+          "input": 28,
+          "output": 368,
+          "cache_read": 37248,
+          "total": 37644
+        }
+      }
+    ],
+    "trace_summary": {
+      "assistant_record_count": 5,
+      "tool_use_record_count": 4,
+      "observed_tool_names": {
+        "exec": 2,
+        "write": 2
+      },
+      "task_file_preparation": "observed",
+      "create_project_reference": "observed",
+      "minio_preparation": "observed",
+      "manage_state_literal_in_session_trace": "not_observed",
+      "message_tool_literal_in_session_trace": "not_observed",
+      "dynamic_roster_query_literal_in_session_trace": "not_observed",
+      "task_metadata_delegated_to_team": "observed"
+    }
+  },
+  "human_initial": {
+    "event_id": "$MG9TDEG5oAWNs60sn4p_bGTjK7qiyfj6YUqjHLfOc-o",
+    "room_id": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+    "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+    "origin_server_ts": 1788326773250,
+    "type": "m.room.message",
+    "body_length": 2435,
+    "body_sha256": "0c5672afaa0dde9dc58db41c7ba6351cdc9cf1ce23abf4423a120c2e0e474c6e",
+    "sent_once": true,
+    "readback": "200"
+  },
+  "task": {
+    "task_id": "m2g-stagec-20260902T052645Z",
+    "project_id": "m2g-stagec-20260902T052645Z",
+    "run_id": "m2g-stagec-20260902T052613Z-container",
+    "path": "/root/agentteams-fs/shared/tasks/m2g-stagec-20260902T052645Z",
+    "meta_sha256": "7e3b54ff2732fc04ec7b914707e3b5c9c9a66a4bb585750f27a41e9884c42821",
+    "meta_size": 802,
+    "spec_sha256": "50d75584483e395eaa12ae7c0497f37aa36a8dbd711004edbd37d12fc0fd7d18",
+    "spec_size": 3551,
+    "status": "assigned",
+    "type": "finite",
+    "team": "native-m0-clean-team",
+    "assigned_to": "native-m0-clean-leader",
+    "delegated_to_team": "native-m0-clean-team",
+    "leader_room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+    "worker_task_room_id": "!AtNkhJbKQQwVVjrCkS:matrix-native-m0-20260901.agentteams.local:28080",
+    "gold_free": true,
+    "sandboxed": true
+  },
+  "leader": {
+    "container": "agentteams-native-m0-20260901-worker-native-m0-clean-leader",
+    "image": "agentteams/qwenpaw-worker:be10aaf",
+    "roster_room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+    "history_session_id": "matrix:!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+    "history_model_turn_seq": 645,
+    "history_model_turn_at": "2026-09-02T05:27:11.269885",
+    "native_delegate_task": "observed",
+    "tool_call_counts": {
+      "teamharness__filesync": 3,
+      "read_file": 2,
+      "recall_history": 3,
+      "Skill": 2,
+      "teamharness__roomflow": 1,
+      "teamharness__projectflow": 2,
+      "teamharness__taskflow": 1,
+      "teamharness__message": 1
+    },
+    "task_action": "delegate_task",
+    "matrix_event": {
+      "event_id": "$vcCAxriCAQgkv7X_yc3ERMQiXKL9f0U2_pgRL2lrfQM",
+      "origin_server_ts": 1788326878678,
+      "body_length": 242,
+      "body_sha256": "948070b9c5d83e411c142e53a2ed15cc2b0c663873a5ce7f1c2c7b3ff0d5b6bb",
+      "body_saved": false
+    }
+  },
+  "worker": {
+    "container": "agentteams-native-m0-20260901-worker-native-m0-clean-dsh-worker",
+    "image": "agentteams/qwenpaw-worker:m1plus-ae2d696-dsh-v2",
+    "roster_room_id": "not_recorded_in_safe_receipt",
+    "task_room_id": "!AtNkhJbKQQwVVjrCkS:matrix-native-m0-20260901.agentteams.local:28080",
+    "history_session_id": "matrix:!AtNkhJbKQQwVVjrCkS:matrix-native-m0-20260901.agentteams.local:28080",
+    "context_record_seq": 249,
+    "context_record_at": "2026-09-02T05:28:12.388625",
+    "model_turn_seq": 250,
+    "model_turn_at": "2026-09-02T05:28:18.624877",
+    "skill_names": [
+      "teamharness-task-execution",
+      "mcporter"
+    ],
+    "tool_call_counts": {
+      "Skill": 2,
+      "execute_shell_command": 30,
+      "teamharness__health": 1,
+      "read_file": 1,
+      "recall_history": 2,
+      "teamharness__roomflow": 1,
+      "teamharness__filesync": 2,
+      "teamharness__taskflow": 1,
+      "write_file": 1
+    },
+    "tool_result_states": {
+      "teamharness__roomflow": "success",
+      "teamharness__filesync": "success",
+      "execute_shell_command": "success",
+      "teamharness__taskflow": "success",
+      "write_file": "success"
+    },
+    "ack": {
+      "record_seq": 288,
+      "action": "ack_task",
+      "status": "in_progress",
+      "task_id": "m2g-stagec-20260902T052645Z",
+      "project_id": "m2g-stagec-20260902T052645Z",
+      "room_id": "room:!AtNkhJbKQQwVVjrCkS:matrix-native-m0-20260901.agentteams.local:28080",
+      "ok": true
+    },
+    "provider_call": "not_observed",
+    "run_scoped_usage": "not_observed",
+    "aggregate_usage_not_run_scoped": {
+      "profile": "agentteams-gateway:deepseek-v4-flash",
+      "call_count": 190,
+      "prompt_tokens": 12850317,
+      "completion_tokens": 150159,
+      "source": "/root/agentteams-fs/agents/native-m0-clean-dsh-worker/.qwenpaw/token_usage.json"
+    },
+    "submit": "not_observed"
+  },
+  "matrix_readback": {
+    "leader_room": {
+      "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+      "run_task_matching_leader_event_id": "$vcCAxriCAQgkv7X_yc3ERMQiXKL9f0U2_pgRL2lrfQM",
+      "leader_assignment_message": "observed"
+    },
+    "worker_task_room": {
+      "room_id": "!AtNkhJbKQQwVVjrCkS:matrix-native-m0-20260901.agentteams.local:28080",
+      "create_event_id": "$7OFWeZydqRLNeJdMwm6ApCZO4jF2x62SQZuYtYrlvYo",
+      "create_event_origin_server_ts": 1788326865433,
+      "m_room_message_count": 0,
+      "worker_message_observed": false
+    },
+    "worker_roster_room": {
+      "room_id": "not_recorded_in_safe_receipt",
+      "m_room_message_count": 0
+    }
+  },
+  "outcome": {
+    "manager_dynamic_choice": "partially_observed_from_task_metadata",
+    "manager_model_and_session": "observed",
+    "manager_to_leader_native_path": "observed",
+    "leader_native_project_task_delegate": "observed",
+    "worker_ack_and_in_progress": "observed",
+    "worker_skill_and_tool_turn": "observed",
+    "dsh_provider_call": "not_observed",
+    "dsh_provider_model_usage_latency": "not_observed",
+    "worker_result": "not_observed",
+    "submit": "not_observed",
+    "leader_check": "not_observed",
+    "leader_accept": "not_observed",
+    "manager_secondary_decision": "not_observed",
+    "next_action": "No further message, polling, repair, or runtime intervention."
+  },
+  "secrets_and_integrity": {
+    "human_body_saved": false,
+    "manager_prompt_saved": false,
+    "worker_prompt_or_result_saved": false,
+    "credential_values_saved": false,
+    "credential_values_output": false,
+    "raw_logs_saved": false,
+    "synthetic_or_fixture_events_used": false,
+    "script_created_task_or_injected_state": false,
+    "observation_window_closed": true
+  },
+  "official_source_refs": [
+    "/opt/openclaw/src/agents/bootstrap-cache.ts (sessionKey cache and clearBootstrapSnapshot)",
+    "/opt/openclaw/src/agents/bootstrap-files.ts (resolveBootstrapFilesForRun/getOrLoadBootstrapFiles)",
+    "/opt/openclaw/src/gateway/server-methods/sessions.ts (sessions.reset RPC)",
+    "/opt/openclaw/src/gateway/session-reset-service.ts (bootstrap cleanup and new session ID)",
+    "/opt/agentteams/scripts/lib/builtin-merge.sh (update_builtin_section)"
+  ]
+}

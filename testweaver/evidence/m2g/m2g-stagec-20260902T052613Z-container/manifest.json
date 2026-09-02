@@ -1,0 +1,54 @@
+{
+  "schema": "testweaver.evidence.manifest.v1",
+  "run_id": "m2g-stagec-20260902T052613Z-container",
+  "classification": "PARTIAL",
+  "receipt": "receipt.json",
+  "receipt_sha256": "6b37bd38d0849817c9db0a983ba8f74e03189c6175d06e86d97d11fba68df466",
+  "source_commit": "10cb365",
+  "repo_head_before_commit": "4e075b9b5ec543c7d401395742b3aea4676b314c",
+  "evidence_policy": {
+    "raw_event_bodies_saved": false,
+    "prompts_saved": false,
+    "credentials_saved": false,
+    "raw_logs_saved": false,
+    "task_files_copied": false,
+    "only_metadata_and_hashes": true
+  },
+  "references": [
+    {
+      "kind": "human_event",
+      "event_id": "$MG9TDEG5oAWNs60sn4p_bGTjK7qiyfj6YUqjHLfOc-o",
+      "room_id": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+      "body_sha256": "0c5672afaa0dde9dc58db41c7ba6351cdc9cf1ce23abf4423a120c2e0e474c6e"
+    },
+    {
+      "kind": "task_meta",
+      "path": "/root/agentteams-fs/shared/tasks/m2g-stagec-20260902T052645Z/meta.json",
+      "sha256": "7e3b54ff2732fc04ec7b914707e3b5c9c9a66a4bb585750f27a41e9884c42821"
+    },
+    {
+      "kind": "task_spec",
+      "path": "/root/agentteams-fs/shared/tasks/m2g-stagec-20260902T052645Z/spec.md",
+      "sha256": "50d75584483e395eaa12ae7c0497f37aa36a8dbd711004edbd37d12fc0fd7d18"
+    },
+    {
+      "kind": "leader_matrix_event",
+      "event_id": "$vcCAxriCAQgkv7X_yc3ERMQiXKL9f0U2_pgRL2lrfQM",
+      "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080"
+    },
+    {
+      "kind": "worker_task_room_create",
+      "event_id": "$7OFWeZydqRLNeJdMwm6ApCZO4jF2x62SQZuYtYrlvYo",
+      "room_id": "!AtNkhJbKQQwVVjrCkS:matrix-native-m0-20260901.agentteams.local:28080"
+    }
+  ],
+  "not_observed": [
+    "DSH or Alibaba provider call",
+    "run-scoped DSH provider/model/usage/latency",
+    "Worker result artifact",
+    "submit_task",
+    "Leader check_task",
+    "Leader accept_task",
+    "Manager secondary decision"
+  ]
+}
