@@ -1,0 +1,98 @@
+{
+  "schema": "testweaver.m2f.dual-oracle-input/v1",
+  "freeze_id": "m2f-dual-oracle-20260902T022530Z",
+  "frozen_at": "2026-09-02T02:25:30Z",
+  "source_commit": "e55d45500134816765c3bd807029b86f973bc2fc",
+  "parent_run_id": "m2f-20260902T012601Z",
+  "project_id": "m2f-recovery-20260902-013636",
+  "continuation_id": "continuation-20260902T020051Z",
+  "parent_manifest": {
+    "path": "testweaver/evidence/m2f/m2f-20260902T012601Z/m2f-manifest.json",
+    "sha256": "48d4097db2f52d18077934578855690b59dab849ec5e4b8fe12794088caf59d2"
+  },
+  "continuation_manifest": {
+    "path": "testweaver/evidence/m2f/m2f-20260902T012601Z/continuation-20260902T020051Z/continuation-manifest.json",
+    "sha256": "5565468d1d113ceb4662759b6343d32f933a06b6ab74104eb736f6d6a8f33741"
+  },
+  "evidence_root": "testweaver/evidence/m2f/m2f-20260902T012601Z/continuation-20260902T020051Z",
+  "content_hash": "recorded in oracle-input-bundle.sha256",
+  "gold_ref": null,
+  "candidate_output": "not included",
+  "shared_evidence_refs": [
+    {
+      "ref": "continuation-manifest.json",
+      "sha256": "5565468d1d113ceb4662759b6343d32f933a06b6ab74104eb736f6d6a8f33741",
+      "read_mode": "metadata and hashes only"
+    },
+    {
+      "ref": "native-chain-observation.json",
+      "sha256": "a863c5d8cd191161846258ddfc68cec4fb02aabf67c729d968fbfefb4915a8a8",
+      "read_mode": "scoped JSON pointers only"
+    },
+    {
+      "ref": "recovery-readback.json",
+      "sha256": "300b96b760545ef5148134d2216ec90525b695fdf820683c0fa16e71710973d8",
+      "read_mode": "scoped JSON pointers only"
+    },
+    {
+      "ref": "superseding-receipt.txt",
+      "sha256": "ba516893eb3b6ff89e2ce9de9fd05294f7e904cb0f8ea872a6adf1b032738edd",
+      "read_mode": "fact references only"
+    }
+  ],
+  "oracle_scopes": {
+    "boundary": {
+      "team": "native-m0-clean-team",
+      "worker": "native-m0-boundary-oracle",
+      "scope": "Human authorization, the single approved fault and its side effects, restored identity/health/Team readiness, terminal-task fencing, and duplicate wakeup/exactly-once boundary",
+      "allowed_refs": [
+        "native-chain-observation.json#/native_event_refs/human_recovery_fact",
+        "native-chain-observation.json#/native_event_refs/manager_to_leader_fact",
+        "native-chain-observation.json#/native_event_refs/cancel_old_result",
+        "native-chain-observation.json#/native_event_refs/late_probe_message_tool_displays",
+        "native-chain-observation.json#/recovery",
+        "native-chain-observation.json#/late_submit",
+        "native-chain-observation.json#/boundary",
+        "recovery-readback.json#/worker",
+        "recovery-readback.json#/identity_and_team",
+        "recovery-readback.json#/parent_observation_window"
+      ],
+      "forbidden_refs": [
+        "the Outcome Oracle Task room, artifact, session, or conclusion",
+        "any gold/reference answer"
+      ],
+      "must_return": "facts, unknowns, evidence refs, and an independently reasoned boundary result only"
+    },
+    "outcome": {
+      "team": "native-m1-verify-team",
+      "worker": "native-m1-outcome-oracle",
+      "scope": "Replacement business result, recovery artifact and hash, native submit/check/accept, and whether the original task objective was achieved",
+      "allowed_refs": [
+        "native-chain-observation.json#/native_event_refs/replacement_delegate_result",
+        "native-chain-observation.json#/native_event_refs/replacement_check_result",
+        "native-chain-observation.json#/native_event_refs/replacement_accept_result",
+        "native-chain-observation.json#/replacement",
+        "recovery-readback.json#/original_task/project_id",
+        "recovery-readback.json#/original_task/task_id",
+        "recovery-readback.json#/original_task/pre_fault_partial_artifact"
+      ],
+      "forbidden_refs": [
+        "the Boundary Oracle Task room, artifact, session, or conclusion",
+        "fault authorization details outside the minimum task reference",
+        "any gold/reference answer"
+      ],
+      "must_return": "facts, unknowns, evidence refs, and an independently reasoned outcome result only"
+    }
+  },
+  "isolation": {
+    "same_bundle_for_both": true,
+    "different_teams": true,
+    "different_workers_containers_pids_rooms_sessions": true,
+    "worker_role": "worker",
+    "manager_aggregation": "only after both Leaders accept",
+    "oracle_to_oracle_communication": "forbidden",
+    "scripts_may_create_or_mutate_tasks": false,
+    "scripts_may_inject_results": false,
+    "secret_values_read_or_recorded": false
+  }
+}

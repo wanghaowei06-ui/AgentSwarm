@@ -1,0 +1,108 @@
+{
+  "schema": "testweaver.m2f.oracle-notification-gap.v1",
+  "run_id": "m2f-20260902T012601Z",
+  "oracle_run_id": "oracle-dual-20260902T022530Z",
+  "source_commit": "e55d45500134816765c3bd807029b86f973bc2fc",
+  "evidence_publication": {
+    "source_event_id": "$-dUpZKYrNgOe3UPNw58sVSHqus5mFPp4Go3yCrQDiOk",
+    "origin_server_ts": 1788317021920,
+    "room_id": "!sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080",
+    "evidence_root": "global-shared/testweaver/evidence/m2f/m2f-20260902T012601Z/continuation-20260902T020051Z",
+    "published_files": [
+      {
+        "name": "continuation-manifest.json",
+        "sha256": "5565468d1d113ceb4662759b6343d32f933a06b6ab74104eb736f6d6a8f33741"
+      },
+      {
+        "name": "native-chain-observation.json",
+        "sha256": "a863c5d8cd191161846258ddfc68cec4fb02aabf67c729d968fbfefb4915a8a8"
+      },
+      {
+        "name": "recovery-readback.json",
+        "sha256": "300b96b760545ef5148134d2216ec90525b695fdf820683c0fa16e71710973d8"
+      },
+      {
+        "name": "superseding-receipt.txt",
+        "sha256": "ba516893eb3b6ff89e2ce9de9fd05294f7e904cb0f8ea872a6adf1b032738edd"
+      }
+    ]
+  },
+  "notification_check": {
+    "checked_with": "each Oracle Worker room-scoped read credential; credential values omitted",
+    "boundary": {
+      "task_room_id": "!xkVyy8CHre5dJ7hnZJ:matrix-native-m0-20260901.agentteams.local:28080",
+      "leader_sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "leader_task_room_event_id": "$qIMYEQNWO6uH9XfsUaCrkP7K2M-N2MSde-6sgAa3n6M",
+      "origin_server_ts": 1788317665206,
+      "run_scoped_path_present": true,
+      "frozen_hash_match_count": 4,
+      "message_body_sha256": "738e59782413301b69d6b5e87f644dda86d7d561715d462577d02988f029c74e",
+      "worker_lifecycle_after_notice": "NOT_RESPONDED"
+    },
+    "outcome": {
+      "task_room_id": "!BU45EtmYe4ieVgl4pe:matrix-native-m0-20260901.agentteams.local:28080",
+      "leader_sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+      "leader_task_room_event_id": "$b1phnxc_1KD5QdKA9sWK8c5xJqAQ9rCac1s0FcJGm0M",
+      "origin_server_ts": 1788317665438,
+      "run_scoped_path_present": true,
+      "frozen_hash_match_count": 4,
+      "message_body_sha256": "b8ef33033d0dc4acb863bbe2e17a1e09cef428fdf9dc496554d1c245360ff3f3",
+      "worker_lifecycle_after_notice": "NOT_RESPONDED"
+    }
+  },
+  "human_operation_request": {
+    "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+    "room_id": "!sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080",
+    "event_id": "$G3ZtyE7B5N_6sScKzHzSQrZLDHzHmjgZgV4d8ZNCzk4",
+    "origin_server_ts": 1788317651837,
+    "body_sha256": "8c8f933a72bed5fee84a32d2fd8e04ba3af242e1e7d8ea7866cc9b3ad6ab113a",
+    "body_length": 135
+  },
+  "native_forwarding": {
+    "manager_to_boundary_leader": {
+      "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+      "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+      "event_id": "$AlRat0lZkSdN3a4EkG6w0s9Jm4rksMN7KhrPPlLLEQA",
+      "origin_server_ts": 1788317660521,
+      "frozen_hash_match_count": 4
+    },
+    "manager_to_outcome_leader": {
+      "room_id": "!IrR5zoeSGDaTVw4Ple:matrix-native-m0-20260901.agentteams.local:28080",
+      "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+      "event_id": "$bDENdaMnEofmub2VQF1rPY7D2N5wmyUSNposFpp7xQI",
+      "origin_server_ts": 1788317660589,
+      "frozen_hash_match_count": 4
+    }
+  },
+  "worker_observation": {
+    "boundary": {
+      "last_observed_event_id": "$Ptgrcqqo1GEN2Vb52cf33VoELGFr_g4T6WJpR9A0Lko",
+      "last_observed_origin_server_ts": 1788317732340,
+      "native_lifecycle_actions_after_notice": [],
+      "submit_task_observed": false,
+      "script_substitution_or_submit": false
+    },
+    "outcome": {
+      "last_observed_event_id": "$jz5YU5EBrRHT6c16_Xa3dHhx6YJY7kw6IxvAe-4f3BM",
+      "last_observed_origin_server_ts": 1788317740877,
+      "native_lifecycle_actions_after_notice": [],
+      "submit_task_observed": false,
+      "script_substitution_or_submit": false
+    }
+  },
+  "preserved_prior_event": {
+    "event_id": "$CsQ7Ce_6djnP9SOLfJK_DJZA3gR_2yENu14zj19rVJA",
+    "origin_server_ts": 1788316762131,
+    "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+    "room_id": "!sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080",
+    "body_sha256": "a53100a9efe062f89124872fa1895cbf76b906c6d63e68b45f6af0d63ef8e3c0",
+    "preserved_without_delete_or_overwrite": true
+  },
+  "operator_boundary": {
+    "direct_task_room_send": false,
+    "task_or_result_mutation": false,
+    "forced_submission": false,
+    "additional_human_message_after_operation_request": false,
+    "secrets_or_credential_values_recorded": false
+  }
+}

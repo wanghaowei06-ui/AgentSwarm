@@ -1,0 +1,79 @@
+{
+  "schema": "testweaver.m2f.oracle-dual-manifest.v1",
+  "oracle_run_id": "oracle-dual-20260902T022530Z",
+  "parent_run_id": "m2f-20260902T012601Z",
+  "frozen_input_bundle": "oracle-input-bundle.json",
+  "frozen_input_bundle_sha256": "e17cd27d96a2bce2e6e1dde9e983a2a948ed5432ecab9c91b16d302ca450d24e",
+  "gold_ref": null,
+  "source_freeze_commit": "e55d45500134816765c3bd807029b86f973bc2fc",
+  "repository_head_at_close": "6c9a00220615da39da90e8b5e2fd8d16764c4c30",
+  "result": "PARTIAL",
+  "conclusion": {
+    "independent_roster_project_task_delegate_initial_ack": "PASS",
+    "initial_evidence_delivery": "MISSING",
+    "evidence_publish_hash_readback_human_manager_leader_task_room_notification": "PASS",
+    "boundary_worker_lifecycle_after_notification": "NOT_RESPONDED",
+    "outcome_worker_lifecycle_after_notification": "NOT_RESPONDED",
+    "boundary_oracle_verdict_submit_check_accept": "NOT_OBSERVED",
+    "outcome_oracle_verdict_submit_check_accept": "NOT_OBSERVED",
+    "dual_oracle_pass": false
+  },
+  "retained_assets": {
+    "input": "oracle-input-bundle.json",
+    "provisioning": "oracle-provisioning-receipt.txt",
+    "notification": "notification-gap-receipt.json",
+    "raw_event_ids": "oracle-dual-event-index.json",
+    "closeout": "oracle-dual-receipt.txt",
+    "prior_manager_event_retained": true,
+    "failed_send_attempt_retained": true,
+    "payloads_recorded": false,
+    "credential_values_recorded": false
+  },
+  "files": [
+    {
+      "path": "oracle-input-bundle.json",
+      "size": 4560,
+      "mode": "0644",
+      "sha256": "e17cd27d96a2bce2e6e1dde9e983a2a948ed5432ecab9c91b16d302ca450d24e"
+    },
+    {
+      "path": "oracle-input-bundle.sha256",
+      "size": 91,
+      "mode": "0644",
+      "sha256": "b8a2b5ac4b3549ea90744b3cbb3373df7412b9a575b76ed7ceee3676f709a70e"
+    },
+    {
+      "path": "oracle-provisioning-receipt.txt",
+      "size": 4567,
+      "mode": "0644",
+      "sha256": "4090fd83702661662383fc0272bc235f5b12eaef7b9d7b37583c957b3ef4433d"
+    },
+    {
+      "path": "notification-gap-receipt.json",
+      "size": 4882,
+      "mode": "0644",
+      "sha256": "85b9121031dca151946a196a399d0e9edce782901073cb9d637735002f35739f"
+    },
+    {
+      "path": "oracle-dual-event-index.json",
+      "size": 222454,
+      "mode": "0644",
+      "sha256": "9da9024c2a299889af0647847f1424ba5bab8767450322683490a9d8a18fa11b"
+    },
+    {
+      "path": "oracle-dual-receipt.txt",
+      "size": 2748,
+      "mode": "0644",
+      "sha256": "11ab5b45c9f15675a380775b4eab5c5e2311a8a67344946b148401526f8aa0ec"
+    }
+  ],
+  "file_count": 6,
+  "hash_index": "oracle-dual-files.sha256",
+  "manifest_hash": "oracle-dual-manifest.sha256",
+  "hash_index_excludes": [
+    "oracle-dual-files.sha256",
+    "oracle-dual-manifest.sha256"
+  ],
+  "values_redacted": true,
+  "external_state_changed_during_closeout": false
+}

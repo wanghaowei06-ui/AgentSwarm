@@ -1,0 +1,37 @@
+TestWeaver M2-F dual-oracle closeout
+
+oracle_run_id: oracle-dual-20260902T022530Z
+parent_run_id: m2f-20260902T012601Z
+frozen_input_bundle: oracle-input-bundle.json
+frozen_input_bundle_sha256: e17cd27d96a2bce2e6e1dde9e983a2a948ed5432ecab9c91b16d302ca450d24e
+gold_ref: null
+source_freeze_commit: e55d45500134816765c3bd807029b86f973bc2fc
+
+Scope and resource facts
+- The two new resources remained ordinary Worker resources in the existing product Teams.
+- The boundary and outcome rosters, independent Worker identities/containers, native Project/Task creation, plan/delegate sequence, and initial native ack were observed.
+- Project/Task/room identifiers and all raw event identifiers observed in the run are retained in oracle-dual-event-index.json; message payloads and credential values are not recorded here.
+- The provisioning receipt is retained unchanged: oracle-provisioning-receipt.txt.
+
+Evidence delivery and notification chain
+- Initial Task-room evidence delivery was missing because the frozen bundle contained references and hashes, not payload bytes.
+- The four already-frozen files were published byte-for-byte to the run-scoped read-only global-shared location; the bundle hashes and both Worker readbacks matched 4/4.
+- The prior nativeadmin send attempt that failed before reaching Matrix is retained as a no-event attempt in notification-gap-receipt.json.
+- The prior Manager-authored message sent to the Human room is retained as raw event reference in notification-gap-receipt.json; it is not a Human decision and was not deleted or overwritten.
+- After the one operational Human request, Manager forwarded the frozen location/hash to both existing Leaders, and each Leader sent one evidence location/hash message to its existing Task room. No script sent directly to either Task room.
+
+Conclusion
+- Independent roster/Project/Task/delegate/initial ack: PASS.
+- Initial evidence delivery: missing.
+- Evidence publish/hash/readback and Human -> Manager -> Leader -> Task-room supplementary notification: PASS.
+- After supplementary notification, boundary Worker lifecycle: NOT_RESPONDED.
+- After supplementary notification, outcome Worker lifecycle: NOT_RESPONDED.
+- Oracle verdict, submit, Leader check, and accept: NOT_OBSERVED for both Oracle tasks.
+- Overall: PARTIAL.
+- This run is not a dual-Oracle PASS and no Oracle conclusion was forced or substituted.
+
+Operator boundary
+- No model was invoked by the observer.
+- No Task/Project state was created, changed, or submitted by script after the native run started.
+- No direct Task-room message was sent by script; no result was fabricated or prewritten.
+- No secret, token, password, API key, or protected configuration value is present in this receipt or the event index.

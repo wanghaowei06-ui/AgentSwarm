@@ -1,0 +1,87 @@
+M2-F dual Oracle provisioning receipt
+
+schema: testweaver.m2f.dual-oracle-provisioning/v1
+freeze_id: m2f-dual-oracle-20260902T022530Z
+source_commit: e55d45500134816765c3bd807029b86f973bc2fc
+input_bundle: oracle-input-bundle.json
+input_bundle_sha256: e17cd27d96a2bce2e6e1dde9e983a2a948ed5432ecab9c91b16d302ca450d24e
+observed_at: 2026-09-02T02:28:01Z
+
+Pre-change roster (read-only)
+- native-m0-clean-team: Active; leader native-m0-clean-leader; leaderReady=true;
+  readyWorkers/totalWorkers=1/1; workers=native-m0-clean-worker.
+- native-m1-verify-team: Active; leader native-m1-verify-leader; leaderReady=true;
+  readyWorkers/totalWorkers=1/1; workers=native-m1-verify-worker.
+- Existing production Worker resources and Leaders were not renamed or deleted.
+
+Official create commands
+- `agt create worker --name native-m0-boundary-oracle --no-wait
+  --model deepseek-v4-flash --runtime qwenpaw
+  --image agentteams/qwenpaw-worker:be10aaf --identity "Independent
+  boundary-scope evidence reviewer; normal Worker; no Oracle-to-Oracle
+  communication." --soul <inline role/security policy> -o json`
+- `agt create worker --name native-m1-outcome-oracle --no-wait
+  --model deepseek-v4-flash --runtime qwenpaw
+  --image agentteams/qwenpaw-worker:be10aaf --identity "Independent
+  outcome-scope evidence reviewer; normal Worker; no Oracle-to-Oracle
+  communication." --soul <inline role/security policy> -o json`
+- Both creates were accepted by the official controller path and reached
+  Running; no direct Docker create/run or controller API was used.
+
+New Worker identity and process facts
+- native-m0-boundary-oracle:
+  CR phase/state/containerState=Running/Running/running;
+  role=worker; runtime=qwenpaw; model=deepseek-v4-flash;
+  Matrix user=@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080;
+  room=!iEirWTQL9ft7JywW83:matrix-native-m0-20260901.agentteams.local:28080;
+  container=agentteams-native-m0-20260901-worker-native-m0-boundary-oracle;
+  container_id=66973bbec61b715b2083187120cfeafe30d8bdd89b87e59144d7b5e9740fc96b;
+  pid=1460891; created=2026-09-02T02:26:40.587611246Z;
+  started=2026-09-02T02:26:40.671578794Z; application_health=HTTP 200.
+- native-m1-outcome-oracle:
+  CR phase/state/containerState=Running/Running/running;
+  role=worker; runtime=qwenpaw; model=deepseek-v4-flash;
+  Matrix user=@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080;
+  room=!vFh96Fsqf9fu5GbvV2:matrix-native-m0-20260901.agentteams.local:28080;
+  container=agentteams-native-m0-20260901-worker-native-m1-outcome-oracle;
+  container_id=97ad3445817374e31637bc574b2799a508d7322ceb3b5c3192eabc10d35f1feb;
+  pid=1462641; created=2026-09-02T02:26:49.588277757Z;
+  started=2026-09-02T02:26:49.700385274Z; application_health=HTTP 200.
+- Both use image agentteams/qwenpaw-worker:be10aaf and independent auth volumes;
+  no protected values were read or recorded.
+
+Official team update commands
+- `agt update team --name native-m0-clean-team
+  --leader-name native-m0-clean-leader
+  --workers native-m0-clean-worker,native-m0-boundary-oracle`
+- `agt update team --name native-m1-verify-team
+  --leader-name native-m1-verify-leader
+  --workers native-m1-verify-worker,native-m1-outcome-oracle`
+
+Post-change roster (read-only)
+- native-m0-clean-team: Active; original leader unchanged;
+  leaderReady=true; readyWorkers/totalWorkers=2/2;
+  workers=native-m0-clean-worker,native-m0-boundary-oracle;
+  new CR role=worker and team=native-m0-clean-team.
+- native-m1-verify-team: Active; original leader unchanged;
+  leaderReady=true; readyWorkers/totalWorkers=2/2;
+  workers=native-m1-verify-worker,native-m1-outcome-oracle;
+  new CR role=worker and team=native-m1-verify-team.
+
+Exact rollback (not executed)
+- `agt update team --name native-m0-clean-team
+  --leader-name native-m0-clean-leader --workers native-m0-clean-worker`
+- `agt update team --name native-m1-verify-team
+  --leader-name native-m1-verify-leader --workers native-m1-verify-worker`
+- After both Team readbacks show the original roster, execute
+  `agt delete worker native-m0-boundary-oracle` and
+  `agt delete worker native-m1-outcome-oracle`.
+- Rollback must use the Manager-container `agt` CLI only; do not use Docker
+  run/rm, direct REST, CR edits, or volume deletion.
+
+Provisioning scope
+- No Team was renamed to an Oracle Team.
+- No existing production Worker was selected for self-evaluation.
+- No Project/Task was created by this provisioning step.
+- No model was called by the external operator during provisioning.
+- Secret values were neither read nor recorded.
