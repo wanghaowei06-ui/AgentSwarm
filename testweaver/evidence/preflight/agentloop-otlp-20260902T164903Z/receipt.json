@@ -1,0 +1,71 @@
+{
+  "schema_version": "testweaver.agentloop-otlp-infra-probe/v1",
+  "classification": "NOT_LIVE_PROBE",
+  "outcome": "NOT_VERIFIED",
+  "source_commit": "ef352e93513929caa5d23d6c02437c9610e1bf9f",
+  "probe": {
+    "run_id": "agentloop-otlp-probe-20260902-01",
+    "campaign_id": "agentloop-infra-probe-20260902",
+    "pg_revision": "probe-revision-1",
+    "content_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "body_persisted": false,
+    "live_claim": false
+  },
+  "collector": {
+    "config_shape": "file-only",
+    "endpoint_path": "/v1/traces",
+    "status": "BLOCKED",
+    "reason": "otlp_transport_failed",
+    "response_status": null,
+    "response_bytes": 0,
+    "response_sha256": null,
+    "request_sha256": "sha256:39d2b4ab1ec769513a400f15ecde7e262cc2ae76e22cdf0591af705c5dcb908e",
+    "trace_id": "ed6cbb1c3ced985669f4e6fda62e91f3",
+    "span_id": "147385478eb39ece",
+    "accepted_means_cloud_write": false
+  },
+  "cms_otlp": {
+    "endpoint_path": "/apm/trace/opentelemetry/v1/traces",
+    "status": "EXPORT_ACCEPTED",
+    "response_status": 200,
+    "response_bytes": 0,
+    "response_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "request_sha256": "sha256:4b71ac297a358d1f0a5c467a1d3699f80f69036873314b88b892e5a34005d8ae",
+    "trace_id": "5c2714c1c349185979d9ddbb77282f1c",
+    "span_id": "1d34eb22a5c37c87",
+    "license_key_present": true,
+    "live_claim": false
+  },
+  "sls": {
+    "credential_reference": {
+      "path": "/root/projects/muti-agent/AccessKey.csv",
+      "exists": true,
+      "usable": true,
+      "mode": "0600",
+      "owner_uid": 0,
+      "owner_gid": 0,
+      "value_persisted": false
+    },
+    "endpoint_path": "/logstores/pilot-audit-log",
+    "query_operation": "trace_readback",
+    "query_status": "NOT_VERIFIED",
+    "http_status": 200,
+    "request_id_present": true,
+    "auth_attempted": true,
+    "response_bytes": 264857,
+    "response_sha256": "sha256:a19740311cd06ee3ef404eb870f7c826afa78fde3b42fe684b8304b734985531",
+    "query_sha256": "sha256:3f80fd64a3c39b4d453a9f0695d9aaefab5dd91d06c4beac32b035f19e0cc8ff",
+    "row_count": 100,
+    "matched_row_count": 0,
+    "reason": "correlation_not_found_in_one_row",
+    "live_claim": false
+  },
+  "safety": {
+    "request_bodies_persisted": false,
+    "response_bodies_persisted": false,
+    "credentials_persisted": false,
+    "dataset_mutation": false,
+    "provider_or_model_invocation": false,
+    "note": "HTTP 200 from CMS export and SLS query is not a same-row verification; no Hero or LIVE classification is asserted."
+  }
+}

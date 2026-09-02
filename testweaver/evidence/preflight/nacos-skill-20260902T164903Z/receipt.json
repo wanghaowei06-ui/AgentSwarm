@@ -1,0 +1,78 @@
+{
+  "schema_version": "testweaver.nacos-infra-probe/v1",
+  "classification": "NOT_LIVE_INFRA_PROBE",
+  "outcome": "PASS",
+  "source_commit": "ef352e93513929caa5d23d6c02437c9610e1bf9f",
+  "container": {
+    "name": "tw-g8-nacos",
+    "status": "running",
+    "container_id": "bf9aa917311bf39bec07368e9d67d08128dac9dfd8e198b3598ac7b1b2171f25",
+    "image_digest": "sha256:059ca6313125c9ec43854d87d10b0d52fbbe86e595afad89b04da3ad5e2a3fde",
+    "base_url_host": "127.0.0.1:58848",
+    "base_path": "/nacos"
+  },
+  "skill": {
+    "name": "approval-intent-boundary-check",
+    "version": "0.0.2",
+    "source_path": "testweaver/skills/approval-intent-boundary-check/SKILL.md",
+    "source_sha256": "sha256:9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66",
+    "local_package_bytes": 1220,
+    "local_package_sha256": "sha256:464f37924a1341d037cb610e7c9d70d309abcb9365cc7152bc5d320f53c68354",
+    "registry_package_bytes": 1298,
+    "registry_package_sha256": "sha256:a1ab2d6f5d01d60aa3de34267faf14e71e6411f363d2f6bad21bd23e6be0c219",
+    "registry_entry": "approval-intent-boundary-check/SKILL.md",
+    "registry_entry_bytes": 2322,
+    "registry_entry_sha256": "sha256:7aede4f35abb45fd2765298f2e2996312ab6f47be5e14bac8951d3b0e44bc0a8",
+    "raw_archive_hash_equal": false,
+    "registry_normalization_observed": true,
+    "exact_version_readback": true,
+    "registry_status": "online",
+    "scope": "PRIVATE"
+  },
+  "pipeline": {
+    "upload": {
+      "method": "POST",
+      "path": "/nacos/v3/admin/ai/skills/upload",
+      "status": 200,
+      "response_bytes": 70,
+      "response_sha256": "sha256:09b479e6141eb835f32b2a96a75cccd0753770957c6963020e2b254284c5996c",
+      "field_shape": ["namespaceId", "overwrite", "skillName", "version", "commitMsg"]
+    },
+    "submit": {
+      "method": "POST",
+      "path": "/nacos/v3/admin/ai/skills/submit",
+      "status": 200,
+      "response_bytes": 45,
+      "response_sha256": "sha256:b75803949a86920d6fedb5617190ea601d7eafdb3594e9a32d2b8a9d79c67978"
+    },
+    "publish": {
+      "method": "POST",
+      "path": "/nacos/v3/admin/ai/skills/publish",
+      "transient_statuses": [400, 400, 400, 400, 400, 400, 400, 400, 400, 400],
+      "final_status": 200,
+      "final_response_bytes": 42,
+      "final_response_sha256": "sha256:598c931f41447416c26fae86f719364177ed21a7d92d9a6fac14ce69a8b9d3d2"
+    },
+    "download": {
+      "method": "GET",
+      "path": "/nacos/v3/client/ai/skills",
+      "status": 200,
+      "response_bytes": 1298,
+      "response_sha256": "sha256:a1ab2d6f5d01d60aa3de34267faf14e71e6411f363d2f6bad21bd23e6be0c219"
+    },
+    "admin_readback": {
+      "method": "GET",
+      "path": "/nacos/v3/admin/ai/skills",
+      "status": 200,
+      "response_bytes": 2102,
+      "response_sha256": "sha256:d19acd874984e03b1a3e0bcabf7ddcec1bdc73bd9d0c87c87beff0b716a49fcc"
+    }
+  },
+  "safety": {
+    "request_bodies_persisted": false,
+    "response_bodies_persisted": false,
+    "secrets_present_in_receipt": false,
+    "runtime_or_provider_called": false,
+    "note": "Nacos returned a normalized ZIP (skill-name prefix and version metadata); raw archive hashes are retained separately and are not treated as byte identity."
+  }
+}

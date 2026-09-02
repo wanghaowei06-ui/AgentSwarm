@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -297,7 +298,8 @@ class NacosV3Client:
             {
                 "namespaceId": self.namespace,
                 "overwrite": "false",
-                "targetVersion": version,
+                "skillName": name,
+                "version": version,
                 "commitMsg": "TestWeaver SkillOps native package",
             },
             filename=f"{name}-{version}.zip",
@@ -316,16 +318,28 @@ class NacosV3Client:
             "/v3/admin/ai/skills/submit",
             form={"namespaceId": self.namespace, "skillName": name, "version": version},
         )
-        self._json_request(
-            "POST",
-            "/v3/admin/ai/skills/publish",
-            form={
-                "namespaceId": self.namespace,
-                "skillName": name,
-                "version": version,
-                "updateLatestLabel": "false",
-            },
-        )
+        last_publish_error: NacosRegistryError | None = None
+        for attempt in range(20):
+            try:
+                self._json_request(
+                    "POST",
+                    "/v3/admin/ai/skills/publish",
+                    form={
+                        "namespaceId": self.namespace,
+                        "skillName": name,
+                        "version": version,
+                        "updateLatestLabel": "false",
+                    },
+                )
+                break
+            except NacosRegistryError as error:
+                last_publish_error = error
+                if attempt == 19:
+                    raise
+                time.sleep(0.25)
+        else:  # pragma: no cover - the loop either breaks or raises above
+            if last_publish_error is not None:
+                raise last_publish_error
         downloaded = self.download_skill(name, version)
         registry_hash = _digest(downloaded)
         governance = self.read_skill(name, version)

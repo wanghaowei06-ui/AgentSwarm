@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import hashlib
+import re
 import unittest
+from unittest.mock import patch
 
 from testweaver.skillops.nacos import (
     NACOS_CONTAINER,
@@ -62,6 +64,12 @@ class NacosV3ClientTests(unittest.TestCase):
                 "/v3/admin/ai/skills",
             ],
         )
+        upload_body = calls[0][2]
+        self.assertIsNotNone(upload_body)
+        self.assertIn(b'name="skillName"', upload_body)
+        self.assertIn(b'name="version"', upload_body)
+        self.assertNotIn(b'name="targetVersion"', upload_body)
+        self.assertRegex(upload_body.decode("utf-8"), re.escape("boundary-skill"))
 
     def test_config_publish_and_client_readback_are_hashable(self) -> None:
         calls: list[str] = []
@@ -90,6 +98,49 @@ class NacosV3ClientTests(unittest.TestCase):
         self.assertTrue(result["exact_content_readback"])
         self.assertEqual(result["content_md5"], "abc123")
         self.assertEqual(len(calls), 2)
+
+    def test_publish_retries_transient_review_state(self) -> None:
+        package = b"deterministic skill zip bytes"
+        package_hash = "sha256:" + hashlib.sha256(package).hexdigest()
+        publish_attempts = 0
+
+        def transport(
+            method: str,
+            url: str,
+            headers: dict[str, str],
+            body: bytes | None,
+            timeout: float,
+        ) -> NacosHttpResponse:
+            del headers, body, timeout
+            nonlocal publish_attempts
+            if url.endswith("/v3/admin/ai/skills/upload"):
+                return NacosHttpResponse(200, b'{"code":0,"data":true}')
+            if url.endswith("/v3/admin/ai/skills/submit"):
+                return NacosHttpResponse(200, b'{"code":0,"data":"submitted"}')
+            if url.endswith("/v3/admin/ai/skills/publish"):
+                publish_attempts += 1
+                if publish_attempts == 1:
+                    return NacosHttpResponse(400, b'{"code":20002,"data":"retry"}')
+                return NacosHttpResponse(200, b'{"code":0,"data":"published"}')
+            if "/v3/client/ai/skills?" in url:
+                return NacosHttpResponse(200, package, {"content-type": "application/zip"})
+            if "/v3/admin/ai/skills?" in url:
+                return NacosHttpResponse(
+                    200,
+                    b'{"code":0,"data":{"scope":"private","versions":[{"version":"1.2.3","status":"online"}]}}',
+                )
+            raise AssertionError(url)
+
+        with patch("testweaver.skillops.nacos.time.sleep"):
+            result = NacosV3Client(transport=transport).publish_skill(
+                name="retry-skill",
+                version="1.2.3",
+                zip_bytes=package,
+                package_hash=package_hash,
+            )
+
+        self.assertTrue(result["exact_version_readback"])
+        self.assertEqual(publish_attempts, 2)
 
     def test_credentials_and_package_hashes_fail_closed_without_lifecycle(self) -> None:
         with self.assertRaises(NacosRegistryError):
