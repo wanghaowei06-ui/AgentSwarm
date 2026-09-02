@@ -40,6 +40,7 @@ from testweaver.integrations.agentloop_client import (
 )
 from testweaver.integrations.tea_transport import (
     TeaAgentLoopTransport,
+    assume_role_credential,
     load_protected_csv_credential,
 )
 from testweaver.integrations.xtrace_readback import (
@@ -575,12 +576,38 @@ def _credential_callback(path: Path) -> Callable[[], AgentLoopCredentialLease]:
     return load
 
 
+def _sts_credential_callback(
+    path: Path,
+    *,
+    region: str,
+    role_arn: str,
+    role_session_name: str,
+) -> Callable[[], AgentLoopCredentialLease]:
+    credential: object | None = None
+    protected_ref = f"sts-role:{digest_bytes(role_arn.encode('utf-8'))}"
+
+    def load() -> AgentLoopCredentialLease:
+        nonlocal credential
+        if credential is None:
+            credential = assume_role_credential(
+                load_protected_csv_credential(path),
+                region=region,
+                role_arn=role_arn,
+                role_session_name=role_session_name,
+            )
+        return AgentLoopCredentialLease(protected_ref, credential)
+
+    return load
+
+
 def _agentloop_query_callback(args: argparse.Namespace) -> Callable[[ProviderTurn], AgentLoopQueryVerification] | None:
     values = (
         args.agentloop_endpoint,
         args.agentloop_agent_space,
         args.agentloop_region,
         args.agentloop_task_id,
+        args.agentloop_role_arn,
+        args.agentloop_role_session_name,
     )
     if not any(values):
         return None
@@ -590,7 +617,12 @@ def _agentloop_query_callback(args: argparse.Namespace) -> Callable[[ProviderTur
 
         return unavailable
 
-    credential = _credential_callback(args.credential_ref)
+    credential = _sts_credential_callback(
+        args.credential_ref,
+        region=args.agentloop_region,
+        role_arn=args.agentloop_role_arn,
+        role_session_name=args.agentloop_role_session_name,
+    )
     client = AgentLoopClient(
         AgentLoopEndpoint(args.agentloop_endpoint, args.agentloop_agent_space),
         TeaAgentLoopTransport(args.agentloop_region),
@@ -629,6 +661,8 @@ def _args() -> argparse.Namespace:
     parser.add_argument("--agentloop-agent-space", default=None)
     parser.add_argument("--agentloop-region", default=None)
     parser.add_argument("--agentloop-task-id", default=None)
+    parser.add_argument("--agentloop-role-arn", default=None)
+    parser.add_argument("--agentloop-role-session-name", default=None)
     parser.add_argument("--receipt", type=Path, default=None)
     return parser.parse_args()
 

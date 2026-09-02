@@ -261,6 +261,49 @@ class AgentLoopBridgeTests(unittest.TestCase):
         self.assertEqual(receipt["classification"], "PROJECTED_LIVE_TRACE")
         self.assertEqual(receipt["agentloop"]["successful_result_count"], 1)
 
+    def test_agentloop_cli_requires_sts_role_and_caches_temporary_credential(self) -> None:
+        missing_role = SimpleNamespace(
+            agentloop_endpoint="https://agentloop.cn-beijing.aliyuncs.com",
+            agentloop_agent_space="space-ref",
+            agentloop_region="cn-beijing",
+            agentloop_task_id="evaluation-task-ref",
+            agentloop_role_arn=None,
+            agentloop_role_session_name=None,
+            credential_ref=__import__("pathlib").Path("/protected/AccessKey.csv"),
+        )
+        unavailable = bridge._agentloop_query_callback(missing_role)
+        self.assertIsNotNone(unavailable)
+        with self.assertRaisesRegex(bridge.BridgeInputError, "AGENTLOOP_CONFIG_UNAVAILABLE"):
+            unavailable(bridge.parse_provider_turn(_turn()))  # type: ignore[misc]
+
+        args = SimpleNamespace(
+            agentloop_endpoint="https://agentloop.cn-beijing.aliyuncs.com",
+            agentloop_agent_space="space-ref",
+            agentloop_region="cn-beijing",
+            agentloop_task_id="evaluation-task-ref",
+            agentloop_role_arn="acs:ram::1234567890123456:role/testweaver-readonly",
+            agentloop_role_session_name="testweaver-readback",
+            credential_ref=__import__("pathlib").Path("/protected/AccessKey.csv"),
+        )
+        temporary = object()
+        with (
+            mock.patch.object(bridge, "load_protected_csv_credential", return_value=object()),
+            mock.patch.object(bridge, "assume_role_credential", return_value=temporary) as assume,
+            mock.patch.object(bridge, "AgentLoopClient") as client_type,
+        ):
+            callback = bridge._agentloop_query_callback(args)
+            credential_callback = client_type.call_args.args[2]
+            first = credential_callback()
+            second = credential_callback()
+
+        self.assertIsNotNone(callback)
+        self.assertIs(first.material, temporary)
+        self.assertIs(second.material, temporary)
+        self.assertEqual(first.protected_ref, second.protected_ref)
+        self.assertNotIn(args.agentloop_role_arn, first.protected_ref)
+        self.assertNotIn("AccessKey", first.protected_ref)
+        assume.assert_called_once()
+
     def test_record_hash_and_unknown_content_are_fail_closed(self) -> None:
         raw = json.loads(_turn())
         raw["record_hash"] = HASH_B

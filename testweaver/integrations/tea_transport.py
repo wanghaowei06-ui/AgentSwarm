@@ -11,6 +11,7 @@ import csv
 import io
 import json
 import os
+import re
 import stat
 from collections.abc import Callable, Mapping
 from pathlib import Path
@@ -119,6 +120,86 @@ class TeaCallFailure(RuntimeError):
 
 
 TeaCaller = Callable[..., Mapping[str, Any]]
+STSCaller = Callable[..., Mapping[str, Any]]
+
+_RAM_ROLE_ARN = re.compile(
+    r"^acs:ram::[0-9]{6,32}:role/[A-Za-z0-9][A-Za-z0-9.@_-]{0,63}$"
+)
+_ROLE_SESSION_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9.@_-]{1,63}$")
+_STS_EXPIRATION = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")
+
+
+def assume_role_credential(
+    credential: AlibabaCloudCredential,
+    *,
+    region: str,
+    role_arn: str,
+    role_session_name: str,
+    duration_seconds: int = 900,
+    caller: STSCaller | None = None,
+) -> AlibabaCloudCredential:
+    """Exchange one protected long-term credential for an in-memory STS session."""
+
+    if not isinstance(credential, AlibabaCloudCredential):
+        raise AuthorityError("STS requires a protected Alibaba Cloud credential")
+    _, _, source_security_token = credential._runtime_values()
+    if source_security_token is not None:
+        raise AuthorityError("STS source credential must be long-term")
+    _validate_region(region)
+    if not isinstance(role_arn, str) or not _RAM_ROLE_ARN.fullmatch(role_arn):
+        raise AuthorityError("Alibaba Cloud role ARN is invalid")
+    if (
+        not isinstance(role_session_name, str)
+        or not _ROLE_SESSION_NAME.fullmatch(role_session_name)
+    ):
+        raise AuthorityError("Alibaba Cloud role session name is invalid")
+    if (
+        isinstance(duration_seconds, bool)
+        or not isinstance(duration_seconds, int)
+        or not 900 <= duration_seconds <= 3600
+    ):
+        raise AuthorityError("Alibaba Cloud STS duration is invalid")
+
+    try:
+        response = (caller or _call_sts_with_tea)(
+            product="sts",
+            version="2015-04-01",
+            operation="AssumeRole",
+            hostname=f"sts.{region}.aliyuncs.com",
+            region=region,
+            role_arn=role_arn,
+            role_session_name=role_session_name,
+            duration_seconds=duration_seconds,
+            credential=credential,
+        )
+    except Exception:
+        # The provider exception may contain credential material.  Do not retain it
+        # in the chained exception or surface it through logs/receipts.
+        raise AuthorityError("STS AssumeRole request failed") from None
+
+    if not isinstance(response, Mapping):
+        raise AuthorityError("STS AssumeRole response is invalid")
+    status_code = response.get("status_code", response.get("statusCode"))
+    body = response.get("body")
+    if status_code != 200 or not isinstance(body, Mapping):
+        raise AuthorityError("STS AssumeRole response is invalid")
+    values = body.get("Credentials")
+    if not isinstance(values, Mapping):
+        raise AuthorityError("STS AssumeRole response is invalid")
+    access_key_id = values.get("AccessKeyId")
+    access_key_secret = values.get("AccessKeySecret")
+    security_token = values.get("SecurityToken")
+    expiration = values.get("Expiration")
+    if not isinstance(expiration, str) or not _STS_EXPIRATION.fullmatch(expiration):
+        raise AuthorityError("STS AssumeRole response is invalid")
+    try:
+        return AlibabaCloudCredential(
+            access_key_id,
+            access_key_secret,
+            security_token,
+        )
+    except AuthorityError:
+        raise AuthorityError("STS AssumeRole response is invalid") from None
 
 
 class TeaAgentLoopTransport:
@@ -342,9 +423,62 @@ def _call_with_tea(**request: Any) -> Mapping[str, Any]:
         ) from None
 
 
+def _call_sts_with_tea(**request: Any) -> Mapping[str, Any]:
+    """Call STS lazily; credential values exist only in SDK request memory."""
+
+    try:
+        from alibabacloud_sts20150401 import models as sts_models
+        from alibabacloud_sts20150401.client import Client as StsClient
+        from alibabacloud_tea_openapi import models as openapi_models
+        from alibabacloud_tea_util import models as util_models
+        from Tea.exceptions import TeaException
+    except ImportError as exc:
+        raise AuthorityError("Alibaba Cloud STS dependencies are unavailable") from exc
+    credential = request["credential"]
+    assert isinstance(credential, AlibabaCloudCredential)
+    access_key_id, access_key_secret, security_token = credential._runtime_values()
+    assert security_token is None
+    client = StsClient(
+        openapi_models.Config(
+            access_key_id=access_key_id,
+            access_key_secret=access_key_secret,
+            endpoint=request["hostname"],
+            region_id=request["region"],
+            connect_timeout=3000,
+            read_timeout=10000,
+        )
+    )
+    try:
+        response = client.assume_role_with_options(
+            sts_models.AssumeRoleRequest(
+                role_arn=request["role_arn"],
+                role_session_name=request["role_session_name"],
+                duration_seconds=request["duration_seconds"],
+            ),
+            util_models.RuntimeOptions(
+                autoretry=False,
+                max_attempts=1,
+                connect_timeout=3000,
+                read_timeout=10000,
+            ),
+        )
+    except TeaException:
+        # Tea exceptions may include signed request details.  The public wrapper
+        # deliberately emits only a stable failure category.
+        raise AuthorityError("STS AssumeRole request failed") from None
+    try:
+        value = response.to_map()
+    except (AttributeError, TypeError, ValueError):
+        raise AuthorityError("STS AssumeRole response is invalid") from None
+    if not isinstance(value, Mapping):
+        raise AuthorityError("STS AssumeRole response is invalid")
+    return value
+
+
 __all__ = [
     "AlibabaCloudCredential",
     "TeaAgentLoopTransport",
     "TeaCallFailure",
+    "assume_role_credential",
     "load_protected_csv_credential",
 ]

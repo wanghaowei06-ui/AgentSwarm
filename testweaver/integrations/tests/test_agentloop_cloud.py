@@ -19,6 +19,7 @@ from testweaver.integrations.agentloop_client import (
 from testweaver.integrations.tea_transport import (
     AlibabaCloudCredential,
     TeaAgentLoopTransport,
+    assume_role_credential,
     load_protected_csv_credential,
 )
 from testweaver.integrations.xtrace_readback import (
@@ -90,6 +91,125 @@ def test_protected_csv_loader_rejects_a_different_runtime_owner(
     monkeypatch.setattr(os, "geteuid", lambda: path.stat().st_uid + 1)
     with pytest.raises(AuthorityError, match="current runtime user"):
         load_protected_csv_credential(path)
+
+
+def test_assume_role_returns_temporary_credential_with_security_token() -> None:
+    calls: list[dict[str, Any]] = []
+    long_term = AlibabaCloudCredential("long-id-sentinel", "long-secret-sentinel")
+
+    def caller(**values: Any) -> dict[str, Any]:
+        calls.append(values)
+        return {
+            "status_code": 200,
+            "body": {
+                "RequestId": "request-1",
+                "Credentials": {
+                    "AccessKeyId": "temporary-id-sentinel",
+                    "AccessKeySecret": "temporary-secret-sentinel",
+                    "SecurityToken": "security-token-sentinel",
+                    "Expiration": "2026-09-03T03:00:00Z",
+                },
+            },
+        }
+
+    temporary = assume_role_credential(
+        long_term,
+        region="cn-beijing",
+        role_arn="acs:ram::1234567890123456:role/testweaveragentlooprole",
+        role_session_name="testweaver-hero-readback",
+        duration_seconds=900,
+        caller=caller,
+    )
+
+    assert repr(temporary) == "AlibabaCloudCredential(<redacted>)"
+    assert calls[0]["operation"] == "AssumeRole"
+    assert calls[0]["version"] == "2015-04-01"
+    assert calls[0]["hostname"] == "sts.cn-beijing.aliyuncs.com"
+    assert calls[0]["credential"] is long_term
+    assert calls[0]["duration_seconds"] == 900
+    assert temporary._runtime_values() == (
+        "temporary-id-sentinel",
+        "temporary-secret-sentinel",
+        "security-token-sentinel",
+    )
+
+
+@pytest.mark.parametrize(
+    ("overrides", "message"),
+    [
+        ({"region": "CN-beijing"}, "region"),
+        ({"role_arn": "acs:ram::*:role/admin"}, "role ARN"),
+        ({"role_session_name": "bad session"}, "session name"),
+        ({"duration_seconds": 899}, "duration"),
+        ({"duration_seconds": 3601}, "duration"),
+    ],
+)
+def test_assume_role_rejects_unbounded_authority_inputs_before_call(
+    overrides: dict[str, Any], message: str
+) -> None:
+    called = False
+
+    def caller(**_: Any) -> dict[str, Any]:
+        nonlocal called
+        called = True
+        return {}
+
+    values: dict[str, Any] = {
+        "region": "cn-beijing",
+        "role_arn": "acs:ram::1234567890123456:role/testweaveragentlooprole",
+        "role_session_name": "testweaver-hero-readback",
+        "duration_seconds": 900,
+    }
+    values.update(overrides)
+    with pytest.raises(AuthorityError, match=message):
+        assume_role_credential(
+            AlibabaCloudCredential("id", "secret"), caller=caller, **values
+        )
+    assert not called
+
+
+def test_assume_role_fails_closed_without_leaking_caller_or_response_secrets() -> None:
+    def raising_caller(**_: Any) -> dict[str, Any]:
+        raise RuntimeError("long-secret-sentinel security-token-sentinel")
+
+    with pytest.raises(AuthorityError) as raised:
+        assume_role_credential(
+            AlibabaCloudCredential("long-id-sentinel", "long-secret-sentinel"),
+            region="cn-beijing",
+            role_arn="acs:ram::1234567890123456:role/testweaveragentlooprole",
+            role_session_name="testweaver-hero-readback",
+            caller=raising_caller,
+        )
+    assert "sentinel" not in str(raised.value)
+
+    with pytest.raises(AuthorityError) as malformed:
+        assume_role_credential(
+            AlibabaCloudCredential("long-id-sentinel", "long-secret-sentinel"),
+            region="cn-beijing",
+            role_arn="acs:ram::1234567890123456:role/testweaveragentlooprole",
+            role_session_name="testweaver-hero-readback",
+            caller=lambda **_: {
+                "status_code": 200,
+                "body": {
+                    "Credentials": {
+                        "AccessKeyId": "temporary-id-sentinel",
+                        "AccessKeySecret": "temporary-secret-sentinel",
+                    }
+                },
+            },
+        )
+    assert "sentinel" not in str(malformed.value)
+
+
+def test_assume_role_rejects_temporary_source_credential() -> None:
+    with pytest.raises(AuthorityError, match="long-term"):
+        assume_role_credential(
+            AlibabaCloudCredential("id", "secret", "already-temporary"),
+            region="cn-beijing",
+            role_arn="acs:ram::1234567890123456:role/testweaveragentlooprole",
+            role_session_name="testweaver-hero-readback",
+            caller=lambda **_: {},
+        )
 
 
 @pytest.mark.parametrize(
