@@ -170,6 +170,78 @@ class SlsQueryContractTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "host does not match project"):
                 load_sls_binding(path, agent_space="space-ref")
 
+    def test_regional_sls_endpoint_is_project_qualified_for_getlogs(self) -> None:
+        requests: list[tuple[str, dict[str, str]]] = []
+
+        def transport(url: str, headers: dict[str, str], timeout: float) -> SlsHttpResponse:
+            del timeout
+            requests.append((url, headers))
+            return SlsHttpResponse(
+                200,
+                json.dumps(
+                    [
+                        {
+                            "run_id": "run-ref",
+                            "campaign_id": "campaign-ref",
+                            "pg_revision": "pg-ref",
+                            "content_hash": _HASH,
+                            "agentSpace": "space-ref",
+                        }
+                    ]
+                ).encode(),
+            )
+
+        with tempfile.TemporaryDirectory() as directory:
+            ref_path = Path(directory) / "ram-ref"
+            ref_path.write_text("REFERENCE_ONLY=1\n", encoding="utf-8")
+            os.chmod(ref_path, 0o600)
+            receipt = SlsReadOnlyQueryClient(
+                binding=SlsBinding(
+                    endpoint="https://cn-hangzhou.log.aliyuncs.com",
+                    project="project-ref",
+                    logstore="trace-log",
+                    agent_space="space-ref",
+                ),
+                credential_ref=_ref(ref_path),
+                credential_provider=_credentials,
+                transport=transport,
+            ).query_trace(correlation=_correlation(), start_time_s=100, end_time_s=200)
+
+        self.assertEqual(receipt.status, "VERIFIED")
+        parsed = urlsplit(requests[0][0])
+        self.assertEqual(parsed.netloc, "project-ref.cn-hangzhou.log.aliyuncs.com")
+        self.assertTrue(requests[0][1]["Authorization"].startswith("LOG access-id-fixture:"))
+
+    def test_cms_paths_and_non_sls_hosts_are_rejected(self) -> None:
+        for endpoint in (
+            "https://cn-hangzhou.log.aliyuncs.com/api/cms",
+            "https://project-ref.example.com",
+        ):
+            with self.subTest(endpoint=endpoint):
+                with self.assertRaises(ValueError):
+                    SlsBinding(
+                        endpoint=endpoint,
+                        project="project-ref",
+                        logstore="trace-log",
+                        agent_space="space-ref",
+                    )
+
+    def test_official_https_endpoint_rejects_explicit_port_but_loopback_http_allows_it(self) -> None:
+        with self.assertRaisesRegex(ValueError, "official HTTPS"):
+            SlsBinding(
+                endpoint="https://cn-hangzhou.log.aliyuncs.com:8443",
+                project="project-ref",
+                logstore="trace-log",
+                agent_space="space-ref",
+            )
+        local = SlsBinding(
+            endpoint="http://127.0.0.1:18081",
+            project="project-ref",
+            logstore="trace-log",
+            agent_space="space-ref",
+        )
+        self.assertEqual(local.safe_endpoint, "http://127.0.0.1:18081")
+
     def test_missing_agent_space_or_ram_reference_blocks_before_transport(self) -> None:
         calls: list[bool] = []
 

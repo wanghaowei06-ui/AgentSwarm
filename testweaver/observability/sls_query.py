@@ -29,6 +29,7 @@ SlsStatus = str
 _HASH = re.compile(r"^sha256:[0-9a-f]{64}$")
 _IDENTIFIER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:@/-]{0,255}$")
 _NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+_DNS_LABEL = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?$")
 _MAX_RESPONSE_BYTES = 4 * 1024 * 1024
 _MAX_QUERY_ROWS = 100
 EVALUATION_DETAIL_LOGSTORE = "evaluation_detail"
@@ -87,6 +88,10 @@ class SlsBinding:
     def __post_init__(self) -> None:
         parsed = urlsplit(self.endpoint)
         host = parsed.hostname or ""
+        try:
+            port = parsed.port
+        except ValueError as exc:
+            raise SlsContractError("SLS endpoint has an invalid port") from exc
         if (
             parsed.scheme not in {"https", "http"}
             or not parsed.netloc
@@ -95,21 +100,46 @@ class SlsBinding:
             or parsed.query
             or parsed.fragment
             or parsed.path not in {"", "/"}
+            or (parsed.scheme == "https" and port is not None)
             or (parsed.scheme == "http" and host not in {"127.0.0.1", "::1", "localhost"})
-            or (parsed.scheme == "https" and not host.endswith(".log.aliyuncs.com"))
         ):
             raise SlsContractError("SLS endpoint must be an official HTTPS endpoint")
         _opaque(self.project, "sls.project", _NAME)
         _opaque(self.logstore, "sls.logstore", _NAME)
-        if parsed.scheme == "https" and host.split(".", 1)[0] != self.project:
-            raise SlsContractError("SLS endpoint host does not match project")
+        if parsed.scheme == "https":
+            labels = host.split(".")
+            if (
+                len(labels) < 4
+                or labels[-3:] != ["log", "aliyuncs", "com"]
+                or any(not _DNS_LABEL.fullmatch(label) for label in labels)
+            ):
+                raise SlsContractError("SLS endpoint must be an official HTTPS endpoint")
+            if len(labels) == 4:
+                qualified_labels = [self.project, *labels]
+                if any(not _DNS_LABEL.fullmatch(label) for label in qualified_labels):
+                    raise SlsContractError("SLS project cannot be represented in the SLS host")
+            elif len(labels) == 5:
+                if labels[0] != self.project or labels[-3:] != ["log", "aliyuncs", "com"]:
+                    raise SlsContractError("SLS endpoint host does not match project")
+            else:
+                raise SlsContractError("SLS endpoint host has an unsupported shape")
         if self.agent_space is not None:
             _opaque(self.agent_space, "agent_space", _IDENTIFIER)
 
     @property
     def safe_endpoint(self) -> str:
         parsed = urlsplit(self.endpoint)
-        return urlunsplit((parsed.scheme, parsed.netloc, "", "", ""))
+        host = parsed.hostname or ""
+        if parsed.scheme == "http":
+            netloc = parsed.netloc
+        else:
+            port = parsed.port
+            if len(host.split(".")) == 4:
+                host = f"{self.project}.{host}"
+            if port is not None:
+                host = f"{host}:{port}"
+            netloc = host
+        return urlunsplit((parsed.scheme, netloc, "", "", ""))
 
     def names_only(self) -> dict[str, object]:
         return {
