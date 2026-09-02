@@ -1,0 +1,49 @@
+{
+  "schema_version": "testweaver.dsh-package-build/v1",
+  "run_id": "dsh-devdeps-8e6c15f-20260902T173747Z",
+  "source_commit": "8e6c15f",
+  "source_commit_full": "8e6c15fbd58210d4950611b3f6d324d16a715c84",
+  "prior_failure_commit": "2c106f398cbfb8e072979c592b06868041912b65",
+  "status": "FAIL",
+  "classification": "PACKAGED_PLUGIN_PREFLIGHT_FAILURE",
+  "completed_at": "2026-09-02T17:37:47Z",
+  "operation": "official_qwenpaw_native_extension_build",
+  "candidate": {
+    "image_tag": "agentteams/qwenpaw-worker:dsh-devdeps-8e6c15f",
+    "image_present_after_attempt": false
+  },
+  "build": {
+    "base_image": "agentteams/qwenpaw-worker:be10aaf",
+    "base_image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+    "exit_code": 1,
+    "error_class": "PackageError",
+    "error_summary": "packaged plugin-tree preflight rejected the headless plugin as undeclared"
+  },
+  "root_cause": {
+    "kind": "LOCAL_PACKAGE_MANIFEST_VARIABLE_SHADOWING",
+    "source_refs": [
+      "testweaver/adapters/scripts/package_dsh.py:274",
+      "testweaver/adapters/scripts/package_dsh.py:317"
+    ],
+    "summary": "build() overwrites its root package manifest while collecting non-root packages, then passes the last dependency manifest to preflight_plugin_tree; the packaged root does contain the headless link, but the preflight receives a manifest without @deepseek-ai/dsh-llm.",
+    "next_action": "STOP_PER_RUN_CONSTRAINT; do not amend source or retry this build"
+  },
+  "checks": {
+    "package_focused": "PASS (13 tests)",
+    "adapter_focused": "PASS (57 tests)",
+    "py_compile": "PASS",
+    "diff_check": "PASS",
+    "secret_scan": "PASS; no credential values recorded"
+  },
+  "worker_update": "NOT_ATTEMPTED",
+  "provider_probe": "NOT_ATTEMPTED",
+  "preserved_evidence": [
+    "testweaver/evidence/preflight/dsh-devdeps-3f8f190-20260902T172707Z/",
+    "testweaver/evidence/preflight/dsh-home-runtime-8cec101-20260902T170059Z/"
+  ],
+  "secrets": {
+    "values_recorded": false,
+    "values_read": false,
+    "argv_or_log_exposure": false
+  }
+}

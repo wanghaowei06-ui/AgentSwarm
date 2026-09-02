@@ -1,0 +1,23 @@
+{
+  "schema_version": "testweaver.evidence-manifest/v1",
+  "run_id": "dsh-devdeps-8e6c15f-20260902T173747Z",
+  "source_commit": "8e6c15f",
+  "status": "FAIL",
+  "files": [
+    {
+      "path": "receipt.json",
+      "sha256": "41b822a439dfb1462fddad0e303e7a482d986f624ac281035bd0339979ac4eed"
+    },
+    {
+      "path": "manifest.json",
+      "sha256": "SELF_HASH_EXCLUDED"
+    },
+    {
+      "path": "SHA256SUMS",
+      "sha256": "fb2c732babf51adb393660b13bbb54c33cc7bb4f92c22bca4c0f480d8b2ce549"
+    }
+  ],
+  "raw_payloads": false,
+  "secret_values": false,
+  "manifest_self_hash": "EXCLUDED_FROM_MANIFEST_SELF_REFERENCE"
+}
