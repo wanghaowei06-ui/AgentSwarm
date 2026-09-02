@@ -1,0 +1,58 @@
+{
+  "cleanup": [
+    {
+      "resource": "route",
+      "status": "deleted"
+    },
+    {
+      "resource": "provider",
+      "status": "deleted"
+    }
+  ],
+  "created": [
+    "provider"
+  ],
+  "error": {
+    "http_status": 400,
+    "kind": "console_post"
+  },
+  "path": "/testweaver-bailian/v1",
+  "probes": [],
+  "protected_files": [
+    {
+      "mode": "0600",
+      "owner_uid": 0,
+      "path": "/etc/agentteams/providers.env"
+    },
+    {
+      "mode": "0600",
+      "owner_uid": 0,
+      "path": "/run/agentteams-controller-env.RVhhkA"
+    }
+  ],
+  "provider": "testweaver-bailian",
+  "provider_readback": {
+    "name": "testweaver-bailian",
+    "protocol": "openai/v1",
+    "raw_config_keys": [
+      "agentteamsMode",
+      "apiTokens",
+      "failover",
+      "id",
+      "protocol",
+      "qwenEnableCompatible",
+      "qwenEnableSearch",
+      "qwenFileIds",
+      "retryOnFailure",
+      "type"
+    ],
+    "token_count": 1,
+    "token_present": true,
+    "type": "qwen"
+  },
+  "provider_type": "qwen",
+  "route": "testweaver-bailian-route",
+  "run_id": "bailian-route-f0235ba-controller-env-retry-1",
+  "schema": "testweaver.higress-route/v1",
+  "status": "BLOCKED"
+}

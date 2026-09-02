@@ -1,0 +1,27 @@
+{
+  "created": [],
+  "error": {
+    "http_status": 401,
+    "kind": "console_post"
+  },
+  "path": "/testweaver-bailian/v1",
+  "probes": [],
+  "protected_files": [
+    {
+      "mode": "0600",
+      "owner_uid": 0,
+      "path": "/etc/agentteams/providers.env"
+    },
+    {
+      "mode": "0600",
+      "owner_uid": 0,
+      "path": "/etc/agentteams/agentteams.env"
+    }
+  ],
+  "provider": "testweaver-bailian",
+  "provider_type": "qwen",
+  "route": "testweaver-bailian-route",
+  "run_id": "bailian-route-f0235ba",
+  "schema": "testweaver.higress-route/v1",
+  "status": "BLOCKED"
+}

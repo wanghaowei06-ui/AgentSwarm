@@ -1,0 +1,69 @@
+{
+  "created": [
+    "provider",
+    "route"
+  ],
+  "path": "/v1/testweaver-bailian",
+  "probes": [
+    {
+      "error_class": null,
+      "http_status": 200,
+      "latency_ms": 1048,
+      "model": "deepseek-v4-flash",
+      "provider": "deepseek-existing",
+      "response_sha256": "c60eef855299135d1fdb92fc2abaf8e0bcd3581aae8e74c4ec4964a1f651cab0",
+      "stage": "deepseek_unchanged",
+      "usage": {
+        "completion_tokens": 1,
+        "prompt_tokens": 89,
+        "total_tokens": 90
+      }
+    }
+  ],
+  "protected_files": [
+    {
+      "mode": "0600",
+      "owner_uid": 0,
+      "path": "/etc/agentteams/providers.env"
+    },
+    {
+      "mode": "0600",
+      "owner_uid": 0,
+      "path": "/run/agentteams-formal-route-env.miIkcN"
+    }
+  ],
+  "provider": "testweaver-bailian",
+  "provider_readback": {
+    "name": "testweaver-bailian",
+    "protocol": "openai/v1",
+    "raw_config_keys": [
+      "agentteamsMode",
+      "apiTokens",
+      "failover",
+      "id",
+      "protocol",
+      "qwenEnableCompatible",
+      "qwenEnableSearch",
+      "qwenFileIds",
+      "retryOnFailure",
+      "type"
+    ],
+    "token_count": 1,
+    "token_present": true,
+    "type": "qwen"
+  },
+  "provider_type": "qwen",
+  "route": "testweaver-bailian-route",
+  "route_readback": {
+    "auth_scope": "controller_managed",
+    "model_mapping_keys": [
+      "deepseek-v4-flash"
+    ],
+    "name": "testweaver-bailian-route",
+    "path": "/v1/testweaver-bailian",
+    "provider": "testweaver-bailian"
+  },
+  "run_id": "bailian-route-d28ecbe",
+  "schema": "testweaver.higress-route/v1",
+  "status": "APPLIED"
+}
