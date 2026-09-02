@@ -29,6 +29,7 @@
 - Codex CLI 外部 Worker 必须由 `codex-cc` 启动，不使用裸 `codex`；计划模型固定为 `gpt-5.6-luna`、推理强度 `max`。首跑复用当前已登录的受保护 `CODEX_HOME`，只挂载到目标 Codex Worker，不复制认证缓存；M4 稳定复跑可把同一 CLI adapter 改为 API Key 登录。完整 Responses API adapter 属于 P1，不阻塞首次闭环。
 - Codex Worker 不再扩写第二套 runtime：优先复用旧资产树 `AgentTeams-pr1139/plugins/teamharness/remote/codex-cli/` 在提交 `071ae6e` 的原生 TeamHarness remote-member、Codex app-server、Matrix assignment、taskflow 和安全隔离能力；当前新仓库 `testweaver/adapters/codex_cli.py` 只保留固定 `codex-cc` 启动约束与 TestWeaver result/receipt 映射。旧资产树的未提交修改不直接复制，必须先证明相对 `071ae6e` 的必要性并独立复核。
 - 当前协作在同一工作区完成；按文件范围并行，不再为小任务创建大量 worktree。
+- Element 与演示材料统一使用中文角色显示名，内部 AgentTeams resource name、Matrix ID、Task ID 保持英文稳定标识，避免破坏房间、委派和证据关联。默认映射：Manager=`总控协调者`；`native-m0-clean-leader`=`异构探索团队-组长`；`native-m0-clean-dsh-worker`=`异构探索团队-探索者1（DSH）`；`native-m0-clean-worker`=`异构探索团队-证据分析员`；`native-m0-boundary-oracle`=`异构探索团队-边界验证者`；`native-m1-verify-leader`=`收敛验证团队-组长`；`native-m1-verify-worker`=`收敛验证团队-修复验证者`；`native-m1-outcome-oracle`=`收敛验证团队-结果验证者`。Manager、Leader、Worker 的任务正文和面向 Human 的回报默认使用中文，协议字段、代码、日志键和证据标识保持英文。显示名只在当前 Run 进入终态后统一应用，不在运行中途改身份元数据。
 - 完整目标态以 [`semifinal-complete-project-proposal.md`](semifinal-complete-project-proposal.md) 为准；该方案已按最新复赛五项评分维度、工程安全七个子项和 AgentTeams 原生边界修订。它不承载实时进度，本文件仍是唯一实施总控。
 
 ## 2. 目标、评分与最低交付
