@@ -17,6 +17,7 @@ from .state import (
     SkillEvolution,
     SkillOpsError,
     SkillOpsStateError,
+    SkillOperationVerification,
     SkillProposal,
     SkillReceipt,
 )
@@ -25,6 +26,7 @@ from .publish import (
     NativePackageRef,
     build_native_publish_intent,
     verify_native_package_readback,
+    verify_nacos_candidate_readback,
 )
 from .nacos import (
     NACOS_BASE_URL,
@@ -32,11 +34,17 @@ from .nacos import (
     NACOS_GROUP,
     NACOS_NAMESPACE,
     NacosClient,
+    NacosCandidateReadback,
     NacosHttpResponse,
     NacosNotFound,
     NacosRegistry,
     NacosRegistryError,
     NacosV3Client,
+)
+from .provenance import (
+    agentloop_readback_from_observability,
+    matrix_readback_from_authority,
+    verify_skill_operation_receipt,
 )
 
 __all__ = [
@@ -51,20 +59,26 @@ __all__ = [
     "SkillEvolution",
     "SkillOpsError",
     "SkillOpsStateError",
+    "SkillOperationVerification",
     "SkillProposal",
     "SkillReceipt",
     "NativePackageError",
     "NativePackageRef",
     "build_native_publish_intent",
     "verify_native_package_readback",
+    "verify_nacos_candidate_readback",
     "NACOS_BASE_URL",
     "NACOS_CONTAINER",
     "NACOS_GROUP",
     "NACOS_NAMESPACE",
     "NacosClient",
+    "NacosCandidateReadback",
     "NacosHttpResponse",
     "NacosNotFound",
     "NacosRegistry",
     "NacosRegistryError",
     "NacosV3Client",
+    "agentloop_readback_from_observability",
+    "matrix_readback_from_authority",
+    "verify_skill_operation_receipt",
 ]

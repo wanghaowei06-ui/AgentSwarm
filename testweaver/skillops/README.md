@@ -17,15 +17,18 @@ real baseline dataset/evaluation + same-run trace/evidence refs
   -> external HumanDecision
   -> canary
   -> same dataset/evaluation reevaluation
-  -> explicit PROMOTE or ROLLBACK receipt
+  -> explicit PROMOTE or ROLLBACK intent receipt
+  -> exact native operation readback
+  -> verified PROMOTED or ROLLED_BACK terminal state
 ```
 
 `ArtifactRef` carries only a reference, `sha256:` hash, source kind, explicit
 `provenance`, and explicit `classification`. Observation refs require a run ID,
 `provenance=LIVE`, and `classification=LIVE_ATTESTED`; constructing one also
-requires the opaque `ExternalReadback` token produced after an external
-collector has read and hashed the raw source. `attested=True`, a renamed
-fixture, or a caller-supplied mapping is never sufficient. `FIXTURE`,
+requires an opaque verified `ExternalReadback` token produced from an existing
+authority/observability receipt. `ExternalReadback.from_raw()` explicitly
+returns `UNATTESTED_PARTIAL`; raw bytes, `attested=True`, a renamed fixture, or
+a caller-supplied mapping are never sufficient. `FIXTURE`,
 `SYNTHETIC`, and `REPLAY` remain non-LIVE by explicit classification;
 reference names are never inspected for those meanings.
 
@@ -43,8 +46,10 @@ run.
 
 This module does not send or read Matrix events. The Hero integration layer
 must obtain the authoritative raw homeserver event and provide the verifier
-result plus its readback token. Unit-test fakes exercise only this fail-closed
-contract; they are not LIVE evidence.
+result plus its validated `HumanReadbackAttestation`. AgentLoop input likewise
+requires a `VERIFIED`, read-only observability receipt and an exact verdict
+bound to the frozen dataset/evaluation. Unit-test fakes exercise only this
+fail-closed contract; they are not LIVE evidence.
 
 `publish.py` is only a reference seam for the existing AgentTeams
 `nacos://` AgentSpec/package path. It validates a proposal's immutable package
@@ -53,18 +58,24 @@ names-only fields returned by the official native publish/readback path.
 `nacos.py` contains only the old source's Nacos v3 upload/submit/publish,
 download, config publish, and exact readback calls. It reuses the existing
 `tw-g8-nacos` endpoint name but never starts or inspects a server. The existing
+client's default HTTP transport can issue a candidate readback bound to the
+protected endpoint, namespace, name, version and content hash. An injected
+transport is always `UNATTESTED_PARTIAL` and cannot issue that proof. The
+existing
 `SkillEvolution` object remains responsible for external Human approval,
 canary, reevaluation, promotion, and rollback records; no second runtime is
 implemented.
 
 The state object has no method that signs a decision, changes a Skill, or
-performs a promotion/rollback; `close()` only records an already-created
-receipt. Promotion is blocked unless both external canary and reevaluation
+performs a promotion/rollback; `close()` records only the intent receipt and
+enters `PROMOTION_PENDING` or `ROLLBACK_PENDING`. `verify_close()` reaches a
+terminal state only with an exact result bound to an observed, sealed native
+AgentTeams side-effect receipt. Promotion is blocked unless both external canary and reevaluation
 records say `PASS`, and those observations must point to different result
 references and different result hashes even when they use the identical frozen
 dataset and evaluation. A `FAIL` canary must be closed with the existing
-explicit `ROLLBACK` receipt action (P1 operational requirement); no new
-lifecycle state or scheduler is introduced.
+explicit `ROLLBACK` receipt action; neither pending state introduces a runtime
+or scheduler.
 
 `schema.json` is the strict interchange schema (`additionalProperties: false`)
 for each record. `Proposal.content_hash` is the candidate package/content hash;

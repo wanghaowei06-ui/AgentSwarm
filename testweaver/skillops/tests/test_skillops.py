@@ -7,8 +7,11 @@ The tests do not read Golden data or invoke AgentTeams.
 from __future__ import annotations
 
 import json
+import hashlib
 import unittest
 from pathlib import Path
+
+from testweaver.authority import SideEffectEntry
 
 from testweaver.skillops import (
     ArtifactRef,
@@ -24,12 +27,27 @@ from testweaver.skillops import (
     SkillOpsStateError,
     SkillProposal,
     SkillReceipt,
+    verify_skill_operation_receipt,
 )
+from testweaver.skillops.state import _external_readback
 
 
 HASH = "sha256:" + "0" * 64
 ROOT = Path(__file__).resolve().parents[3]
 SCHEMA = ROOT / "testweaver" / "skillops" / "schema.json"
+
+
+def _trusted_raw(
+    *, source: str, ref: str, raw: bytes, claims: dict[str, str] | None = None
+) -> ExternalReadback:
+    return _external_readback(
+        source=source,
+        ref=ref,
+        raw=raw,
+        classification="AUTHORITY_RECEIPT",
+        claims=tuple(sorted((claims or {}).items())),
+        verified=True,
+    )
 
 
 def _ref(kind: str, name: str, *, run_id: str | None = "run:test") -> ArtifactRef:
@@ -41,7 +59,7 @@ def _ref(kind: str, name: str, *, run_id: str | None = "run:test") -> ArtifactRe
     content_hash = HASH
     verified_readback = None
     if observation:
-        verified_readback = ExternalReadback.from_raw(
+        verified_readback = _trusted_raw(
             source="agentteams",
             ref=f"test:readback:{name}",
             raw=raw,
@@ -169,10 +187,18 @@ def _verification(
     }
     values.update(overrides)
     if "verified_readback" not in values:
-        values["verified_readback"] = ExternalReadback.from_raw(
+        values["verified_readback"] = _trusted_raw(
             source="matrix",
             ref=decision.attestation_ref,
             raw=f"matrix-event:{decision.decision_id}".encode("utf-8"),
+            claims={
+                "sender": decision.actor_ref,
+                "identity_ref": decision.identity_ref,
+                "run_id": baseline.run_id,
+                "approval_id": decision.decision_id,
+                "decision": decision.decision,
+                "decision_revision": str(decision.decision_revision),
+            },
         )
     if "event_hash" not in overrides:
         values["event_hash"] = values["verified_readback"].raw_hash  # type: ignore[union-attr]
@@ -230,6 +256,7 @@ class SkillOpsTests(unittest.TestCase):
             "Canary",
             "Reevaluation",
             "Receipt",
+            "OperationVerification",
             "State",
         }
         self.assertEqual(set(schema["$defs"]).intersection(expected), expected)
@@ -314,7 +341,7 @@ class SkillOpsTests(unittest.TestCase):
             self.assertNotIn(forbidden, source)
         self.assertNotIn("matrix_client", source)
 
-    def test_full_flow_requires_external_human_and_closes_explicitly(self) -> None:
+    def test_full_flow_stays_pending_until_exact_operation_readback(self) -> None:
         evolution, records = _prepared()
         baseline, _, proposal, decision, canary, reevaluation = records
         receipt = SkillReceipt.create(
@@ -337,11 +364,60 @@ class SkillOpsTests(unittest.TestCase):
             human_verification_hash=evolution.human_verification.record_hash,
         )
         evolution.close(receipt)
-        self.assertEqual(evolution.state, "PROMOTED")
+        self.assertEqual(evolution.state, "PROMOTION_PENDING")
         self.assertEqual(evolution.snapshot()["receipt_ref"], receipt.receipt_id)
         self.assertEqual(
             evolution.snapshot()["human_verification_hash"],
             evolution.human_verification.record_hash,
+        )
+
+        result = {
+            "schema_version": "testweaver.skill-operation-result/v1",
+            "status": "APPLIED",
+            "operation_ref": "call:promote",
+            "action": "PROMOTE",
+            "active_version": proposal.candidate_version,
+            "proposal_ref": proposal.proposal_id,
+            "proposal_hash": proposal.record_hash,
+            "receipt_ref": receipt.receipt_id,
+            "receipt_hash": receipt.record_hash,
+            "content_hash": proposal.content_hash,
+            "verified_at": "2026-09-03T00:00:00Z",
+            "authority_scope": {
+                "campaign_id": "campaign:test",
+                "run_id": baseline.run_id,
+                "trace_id": "trace:test",
+                "pg_revision": "pg:1",
+                "content_hash": HASH,
+            },
+        }
+        raw = json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
+        entry = SideEffectEntry.create(
+            entry_id="entry:promote",
+            call_ref="call:promote",
+            run_id=baseline.run_id,
+            campaign_id="campaign:test",
+            trace_id="trace:test",
+            actor_ref="operator:skillops",
+            tool_ref="official-agentspec-agt",
+            operation="skill.promote",
+            target_ref=proposal.proposal_id,
+            decision="allow",
+            effect="write",
+            fencing="passed",
+            occurred_at="2026-09-03T00:00:00Z",
+            request_hash=HASH,
+            result_hash="sha256:" + hashlib.sha256(raw).hexdigest(),
+            provenance="agentteams-native",
+        )
+        verification = verify_skill_operation_receipt(
+            entry, raw=raw, receipt=receipt, proposal=proposal
+        )
+        evolution.verify_close(verification)
+        self.assertEqual(evolution.state, "PROMOTED")
+        self.assertEqual(
+            evolution.snapshot()["operation_verification_hash"],
+            verification.record_hash,
         )
 
         with self.assertRaises(AttributeError):
@@ -407,7 +483,7 @@ class SkillOpsTests(unittest.TestCase):
                 attested=True,
                 run_id="run:test",
             )
-        token = ExternalReadback.from_raw(
+        token = _trusted_raw(
             source="agentteams",
             ref="test:readback:fixture-name",
             raw=b"external event bytes",
@@ -722,7 +798,7 @@ class SkillOpsTests(unittest.TestCase):
             human_verification_hash=evolution2.human_verification.record_hash,
         )
         evolution2.close(rollback)
-        self.assertEqual(evolution2.state, "ROLLED_BACK")
+        self.assertEqual(evolution2.state, "ROLLBACK_PENDING")
 
     def test_state_is_ordered_and_rejected_decision_cannot_enter_canary(self) -> None:
         baseline, attribution, proposal, _, _, _ = _records()

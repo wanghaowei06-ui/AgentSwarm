@@ -15,6 +15,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from urllib.parse import urlsplit
 
+from .nacos import NacosCandidateReadback
 from .state import ExternalReadback
 
 
@@ -104,12 +105,18 @@ def verify_native_package_readback(
     """Verify selected fields from a native AgentSpec/package readback."""
 
     intent = build_native_publish_intent(candidate, action=action)
+    if action != "CANARY":
+        raise NativePackageError(
+            "PROMOTE/ROLLBACK require an exact operation receipt via verify_close"
+        )
     if not isinstance(readback, Mapping):
         raise NativePackageError("native package readback must be an object")
     if readback_token is None or not readback_token.verified:
         raise NativePackageError("native package readback requires an external token")
     if readback_token.source != "nacos":
         raise NativePackageError("native package readback token source is invalid")
+    if readback_token.classification != "NATIVE_TRANSPORT":
+        raise NativePackageError("native package readback is UNATTESTED_PARTIAL")
     required = ("package_uri", "version", "content_hash", "readback_ref")
     if any(field not in readback for field in required):
         raise NativePackageError("native package readback is incomplete")
@@ -126,7 +133,80 @@ def verify_native_package_readback(
         raise NativePackageError("native package readback token does not match readback")
     if values["package_uri"] != intent["package_uri"] or values["version"] != intent["version"] or values["content_hash"] != intent["content_hash"]:
         raise NativePackageError("native package readback does not match candidate")
+    if (
+        readback_token.claim("version") != candidate.version
+        or readback_token.claim("content_hash") != candidate.content_hash
+    ):
+        raise NativePackageError("native transport receipt does not match candidate")
     sealed = dict(values)
+    sealed["record_hash"] = "sha256:" + hashlib.sha256(
+        json.dumps(sealed, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    return sealed
+
+
+def verify_nacos_candidate_readback(
+    candidate: NativePackageRef,
+    *,
+    skill_name: str,
+    readback: NacosCandidateReadback,
+    expected_endpoint: str,
+    expected_namespace: str,
+) -> dict[str, str]:
+    """Reconcile an attested native Nacos publish with the candidate tuple."""
+
+    if not isinstance(candidate, NativePackageRef):
+        raise NativePackageError("candidate must be a NativePackageRef")
+    if not isinstance(readback, NacosCandidateReadback) or not readback.verified:
+        raise NativePackageError("candidate publish requires native Nacos provenance")
+    parsed_endpoint = urlsplit(expected_endpoint)
+    if (
+        parsed_endpoint.scheme not in {"http", "https"}
+        or not parsed_endpoint.netloc
+        or parsed_endpoint.username is not None
+        or parsed_endpoint.password is not None
+        or parsed_endpoint.query
+        or parsed_endpoint.fragment
+    ):
+        raise NativePackageError("expected Nacos endpoint is invalid")
+    endpoint = expected_endpoint.rstrip("/")
+    namespace = _ref(expected_namespace, "expected_namespace")
+    name = _ref(skill_name, "skill_name")
+    package_path = [part for part in urlsplit(candidate.package_uri).path.split("/") if part]
+    if not package_path or package_path[0] != namespace:
+        raise NativePackageError("candidate package URI crosses the Nacos namespace")
+    expected = {
+        "endpoint": endpoint,
+        "namespace_id": namespace,
+        "skill_name": name,
+        "version": candidate.version,
+        "content_hash": candidate.content_hash,
+    }
+    observed = {
+        "endpoint": readback.endpoint,
+        "namespace_id": readback.namespace_id,
+        "skill_name": readback.skill_name,
+        "version": readback.version,
+        "content_hash": readback.registry_package_hash,
+    }
+    if observed != expected or any(
+        readback.token.claim(key) != value for key, value in expected.items()
+    ):
+        raise NativePackageError("native Nacos readback does not match candidate")
+    if (
+        readback.token.claim("admin_response_hash") != readback.admin_response_hash
+        or readback.token.claim("registry_status") != readback.registry_status
+        or readback.registry_status not in {"online", "published"}
+    ):
+        raise NativePackageError("native Nacos governance readback is not publish-complete")
+    sealed = {
+        "schema_version": "testweaver.nacos-candidate-verification/v1",
+        **expected,
+        "registry_status": readback.registry_status,
+        "admin_response_hash": readback.admin_response_hash,
+        "readback_ref": readback.readback_ref,
+        "classification": "LIVE_ATTESTED",
+    }
     sealed["record_hash"] = "sha256:" + hashlib.sha256(
         json.dumps(sealed, sort_keys=True, separators=(",", ":")).encode("utf-8")
     ).hexdigest()

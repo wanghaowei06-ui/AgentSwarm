@@ -53,6 +53,7 @@ class NacosV3ClientTests(unittest.TestCase):
 
         self.assertEqual(NACOS_CONTAINER, "tw-g8-nacos")
         self.assertTrue(result["exact_version_readback"])
+        self.assertEqual(result["classification"], "UNATTESTED_PARTIAL")
         self.assertEqual(result["registry_package_hash"], package_hash)
         self.assertEqual(
             [url.split("/nacos", 1)[1].split("?", 1)[0] for _, url, _ in calls],
@@ -70,6 +71,53 @@ class NacosV3ClientTests(unittest.TestCase):
         self.assertIn(b'name="version"', upload_body)
         self.assertNotIn(b'name="targetVersion"', upload_body)
         self.assertRegex(upload_body.decode("utf-8"), re.escape("boundary-skill"))
+
+    def test_injected_transcript_cannot_issue_exact_candidate_provenance(self) -> None:
+        client = NacosV3Client(transport=lambda *_args: NacosHttpResponse(200, b"{}"))
+        with self.assertRaisesRegex(NacosRegistryError, "UNATTESTED_PARTIAL"):
+            client.publish_skill_exact(
+                name="boundary-skill",
+                version="1.2.3",
+                zip_bytes=b"package",
+                package_hash="sha256:" + hashlib.sha256(b"package").hexdigest(),
+                expected_endpoint=client.base_url,
+                expected_namespace=client.namespace,
+            )
+
+    def test_default_transport_path_issues_endpoint_namespace_bound_readback(self) -> None:
+        package = b"native package"
+        package_hash = "sha256:" + hashlib.sha256(package).hexdigest()
+
+        def native_transport(method, url, headers, body, timeout):
+            del method, headers, body, timeout
+            if url.endswith("/v3/admin/ai/skills/upload"):
+                return NacosHttpResponse(200, b'{"code":0,"data":true}')
+            if url.endswith("/v3/admin/ai/skills/submit"):
+                return NacosHttpResponse(200, b'{"code":0,"data":true}')
+            if url.endswith("/v3/admin/ai/skills/publish"):
+                return NacosHttpResponse(200, b'{"code":0,"data":true}')
+            if "/v3/client/ai/skills?" in url:
+                return NacosHttpResponse(200, package, {"content-type": "application/zip"})
+            if "/v3/admin/ai/skills?" in url:
+                return NacosHttpResponse(
+                    200,
+                    b'{"code":0,"data":{"scope":"private","versions":[{"version":"1.2.3","status":"online"}]}}',
+                )
+            raise AssertionError(url)
+
+        with patch("testweaver.skillops.nacos._urllib_transport", native_transport):
+            client = NacosV3Client()
+            readback = client.publish_skill_exact(
+                name="boundary-skill",
+                version="1.2.3",
+                zip_bytes=package,
+                package_hash=package_hash,
+                expected_endpoint=client.base_url,
+                expected_namespace=client.namespace,
+            )
+        self.assertTrue(readback.verified)
+        self.assertEqual(readback.token.claim("endpoint"), client.base_url)
+        self.assertEqual(readback.token.claim("namespace_id"), client.namespace)
 
     def test_config_publish_and_client_readback_are_hashable(self) -> None:
         calls: list[str] = []

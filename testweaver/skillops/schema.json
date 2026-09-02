@@ -12,6 +12,7 @@
     { "$ref": "#/$defs/Canary" },
     { "$ref": "#/$defs/Reevaluation" },
     { "$ref": "#/$defs/Receipt" },
+    { "$ref": "#/$defs/OperationVerification" },
     { "$ref": "#/$defs/State" }
   ],
   "$defs": {
@@ -413,6 +414,42 @@
         "record_hash": { "$ref": "#/$defs/Hash" }
       }
     },
+    "OperationVerification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_type",
+        "verification_ref",
+        "operation_ref",
+        "operation_hash",
+        "receipt_ref",
+        "receipt_hash",
+        "proposal_ref",
+        "proposal_hash",
+        "run_id",
+        "action",
+        "active_version",
+        "content_hash",
+        "verified_at",
+        "record_hash"
+      ],
+      "properties": {
+        "artifact_type": { "const": "skillops.operation-verification/v1" },
+        "verification_ref": { "$ref": "#/$defs/Ref" },
+        "operation_ref": { "$ref": "#/$defs/Ref" },
+        "operation_hash": { "$ref": "#/$defs/Hash" },
+        "receipt_ref": { "$ref": "#/$defs/Ref" },
+        "receipt_hash": { "$ref": "#/$defs/Hash" },
+        "proposal_ref": { "$ref": "#/$defs/Ref" },
+        "proposal_hash": { "$ref": "#/$defs/Hash" },
+        "run_id": { "$ref": "#/$defs/Ref" },
+        "action": { "enum": ["PROMOTE", "ROLLBACK"] },
+        "active_version": { "$ref": "#/$defs/Version" },
+        "content_hash": { "$ref": "#/$defs/Hash" },
+        "verified_at": { "$ref": "#/$defs/Ref" },
+        "record_hash": { "$ref": "#/$defs/Hash" }
+      }
+    },
     "State": {
       "type": "object",
       "additionalProperties": false,
@@ -432,7 +469,9 @@
         "human_verification_hash",
         "canary_ref",
         "reevaluation_ref",
-        "receipt_ref"
+        "receipt_ref",
+        "operation_verification_ref",
+        "operation_verification_hash"
       ],
       "properties": {
         "artifact_type": { "const": "skillops.state/v1" },
@@ -447,6 +486,8 @@
             "REJECTED",
             "CANARY_RECORDED",
             "REEVALUATED",
+            "PROMOTION_PENDING",
+            "ROLLBACK_PENDING",
             "PROMOTED",
             "ROLLED_BACK"
           ]
@@ -485,6 +526,12 @@
         },
         "receipt_ref": {
           "anyOf": [{ "$ref": "#/$defs/Ref" }, { "type": "null" }]
+        },
+        "operation_verification_ref": {
+          "anyOf": [{ "$ref": "#/$defs/Ref" }, { "type": "null" }]
+        },
+        "operation_verification_hash": {
+          "anyOf": [{ "$ref": "#/$defs/Hash" }, { "type": "null" }]
         }
       }
     }

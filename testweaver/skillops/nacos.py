@@ -20,6 +20,8 @@ from dataclasses import dataclass, field
 from typing import Any
 from urllib.parse import urlsplit, urlunsplit
 
+from .state import ExternalReadback, _external_readback
+
 
 NACOS_CONTAINER = "tw-g8-nacos"
 NACOS_BASE_URL = "http://127.0.0.1:58848/nacos"
@@ -49,6 +51,31 @@ class NacosHttpResponse:
 NacosTransport = Callable[
     [str, str, Mapping[str, str], bytes | None, float], NacosHttpResponse
 ]
+
+
+@dataclass(frozen=True, repr=False)
+class NacosCandidateReadback:
+    """Hash-only proof issued by the client's native HTTP transport path."""
+
+    endpoint: str
+    namespace_id: str
+    skill_name: str
+    version: str
+    registry_package_hash: str
+    registry_status: str
+    admin_response_hash: str
+    readback_ref: str
+    token: ExternalReadback = field(repr=False)
+
+    @property
+    def verified(self) -> bool:
+        return (
+            self.token.verified
+            and self.token.classification == "NATIVE_TRANSPORT"
+            and self.token.source == "nacos"
+            and self.token.ref == self.readback_ref
+            and self.token.raw_hash == self.registry_package_hash
+        )
 
 
 def _digest(data: bytes) -> str:
@@ -173,6 +200,7 @@ class NacosV3Client:
         self.namespace = _text(namespace, "namespace")
         self.group = _text(group, "group")
         self.transport = transport or _urllib_transport
+        self._native_transport = transport is None
         self.timeout_seconds = timeout_seconds
 
     def _request(
@@ -256,11 +284,12 @@ class NacosV3Client:
 
         name = _text(name, "skill name", _NAME)
         version = _text(version, "skill version", _VERSION)
-        data = self._json_request(
+        response = self._request(
             "GET",
             "/v3/admin/ai/skills",
             query={"namespaceId": self.namespace, "skillName": name},
-        ).get("data")
+        )
+        data = _response_json(response.body).get("data")
         if not isinstance(data, Mapping):
             raise NacosRegistryError("Nacos Skill readback is malformed")
         versions = data.get("versions")
@@ -273,6 +302,7 @@ class NacosV3Client:
                     "version": version,
                     "registry_status": item.get("status", "unknown"),
                     "scope": data.get("scope"),
+                    "admin_response_hash": _digest(response.body),
                 }
         raise NacosNotFound("Nacos Skill version was not found")
 
@@ -345,14 +375,92 @@ class NacosV3Client:
         governance = self.read_skill(name, version)
         return {
             "schema_version": "testweaver.nacos-skill-readback/v1",
+            "endpoint": self.base_url,
             "namespace_id": self.namespace,
             "skill_name": name,
             "version": version,
             "local_package_hash": package_hash,
             "registry_package_hash": registry_hash,
             "exact_version_readback": registry_hash == package_hash,
+            "classification": (
+                "NATIVE_TRANSPORT"
+                if self._native_transport and self.transport is _urllib_transport
+                else "UNATTESTED_PARTIAL"
+            ),
             **governance,
         }
+
+    def publish_skill_exact(
+        self,
+        *,
+        name: str,
+        version: str,
+        zip_bytes: bytes,
+        package_hash: str,
+        expected_endpoint: str,
+        expected_namespace: str,
+    ) -> NacosCandidateReadback:
+        """Publish/read back through native HTTP and bind protected provenance."""
+
+        endpoint = _base_url(expected_endpoint)
+        namespace = _text(expected_namespace, "expected_namespace")
+        if endpoint != self.base_url or namespace != self.namespace:
+            raise NacosRegistryError("protected Nacos endpoint/namespace mismatch")
+        if not self._native_transport or self.transport is not _urllib_transport:
+            raise NacosRegistryError(
+                "injected Nacos transcripts are UNATTESTED_PARTIAL"
+            )
+        result = self.publish_skill(
+            name=name,
+            version=version,
+            zip_bytes=zip_bytes,
+            package_hash=package_hash,
+        )
+        if (
+            result.get("classification") != "NATIVE_TRANSPORT"
+            or result.get("exact_version_readback") is not True
+            or result.get("registry_package_hash") != package_hash
+            or result.get("version") != version
+            or result.get("namespace_id") != namespace
+            or result.get("endpoint") != endpoint
+            or result.get("registry_status") not in {"online", "published"}
+        ):
+            raise NacosRegistryError("Nacos candidate exact readback failed")
+        downloaded = self.download_skill(name, version)
+        if _digest(downloaded) != package_hash:
+            raise NacosRegistryError("final Nacos package readback changed after publish")
+        readback_ref = f"nacos:{endpoint}#{namespace}/{name}@{version}"
+        token = _external_readback(
+            source="nacos",
+            ref=readback_ref,
+            raw=downloaded,
+            classification="NATIVE_TRANSPORT",
+            claims=tuple(
+                sorted(
+                    {
+                        "endpoint": endpoint,
+                        "namespace_id": namespace,
+                        "skill_name": name,
+                        "version": version,
+                        "content_hash": package_hash,
+                        "admin_response_hash": str(result["admin_response_hash"]),
+                        "registry_status": str(result["registry_status"]),
+                    }.items()
+                )
+            ),
+            verified=True,
+        )
+        return NacosCandidateReadback(
+            endpoint=endpoint,
+            namespace_id=namespace,
+            skill_name=name,
+            version=version,
+            registry_package_hash=package_hash,
+            registry_status=str(result["registry_status"]),
+            admin_response_hash=str(result["admin_response_hash"]),
+            readback_ref=readback_ref,
+            token=token,
+        )
 
     def read_config(self, data_id: str, *, group: str | None = None) -> tuple[str, str]:
         """Read one config content/md5 pair through the v3 client endpoint."""

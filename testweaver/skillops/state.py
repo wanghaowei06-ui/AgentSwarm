@@ -44,6 +44,9 @@ _CLASSIFICATIONS = frozenset({"LIVE_ATTESTED", "NON_LIVE"})
 _READBACK_SOURCE = re.compile(r"^[a-z][a-z0-9-]{1,63}$")
 _READBACK_TOKEN = object()
 _MAX_READBACK_BYTES = 4 * 1024 * 1024
+_READBACK_CLASSIFICATIONS = frozenset(
+    {"UNATTESTED_PARTIAL", "AUTHORITY_RECEIPT", "NATIVE_TRANSPORT"}
+)
 _ARTIFACT_READBACK_SOURCES = {
     "agentteams-native": "agentteams",
     "otel-genai": "otel",
@@ -92,31 +95,81 @@ class ExternalReadback:
 
     The token deliberately is not part of any serialized record.  A plain
     ``attested=True`` flag or a caller-supplied mapping cannot create one: the
-    only public constructor that seals it requires the raw bytes just read by
-    the external collector.  Integration code remains responsible for doing
-    the real Matrix/AgentTeams/registry/AgentLoop readback; this module only
-    carries the resulting hash across the contract boundary.
+    public ``from_raw`` constructor is deliberately partial.  Only the
+    package's receipt adapters can issue a verified token after validating an
+    authority/observability receipt or a native transport result.
     """
 
     source: str
     ref: str
     raw_hash: str
+    classification: Literal[
+        "UNATTESTED_PARTIAL", "AUTHORITY_RECEIPT", "NATIVE_TRANSPORT"
+    ] = "UNATTESTED_PARTIAL"
+    claims: tuple[tuple[str, str], ...] = ()
     _seal: object = field(default=None, init=False, repr=False, compare=False)
 
     @classmethod
     def from_raw(cls, *, source: str, ref: str, raw: bytes) -> "ExternalReadback":
-        if not isinstance(source, str) or _READBACK_SOURCE.fullmatch(source) is None:
-            raise SkillOpsError("external readback source is invalid")
-        _ref(ref, "external readback ref")
-        if not isinstance(raw, bytes) or not raw or len(raw) > _MAX_READBACK_BYTES:
-            raise SkillOpsError("external readback raw bytes are required")
-        value = cls(source=source, ref=ref, raw_hash=f"sha256:{hashlib.sha256(raw).hexdigest()}")
-        object.__setattr__(value, "_seal", _READBACK_TOKEN)
-        return value
+        """Describe caller-supplied bytes without claiming external provenance."""
+
+        return _external_readback(
+            source=source,
+            ref=ref,
+            raw=raw,
+            classification="UNATTESTED_PARTIAL",
+            claims=(),
+            verified=False,
+        )
 
     @property
     def verified(self) -> bool:
-        return self._seal is _READBACK_TOKEN
+        return (
+            self._seal is _READBACK_TOKEN
+            and self.classification in {"AUTHORITY_RECEIPT", "NATIVE_TRANSPORT"}
+        )
+
+    def claim(self, name: str) -> str | None:
+        return dict(self.claims).get(name)
+
+
+def _external_readback(
+    *,
+    source: str,
+    ref: str,
+    raw: bytes,
+    classification: str,
+    claims: tuple[tuple[str, str], ...],
+    verified: bool,
+) -> ExternalReadback:
+    """Internal issuance point used only after a native receipt is validated."""
+
+    if not isinstance(source, str) or _READBACK_SOURCE.fullmatch(source) is None:
+        raise SkillOpsError("external readback source is invalid")
+    _ref(ref, "external readback ref")
+    if not isinstance(raw, bytes) or not raw or len(raw) > _MAX_READBACK_BYTES:
+        raise SkillOpsError("external readback raw bytes are required")
+    if classification not in _READBACK_CLASSIFICATIONS:
+        raise SkillOpsError("external readback classification is invalid")
+    if not isinstance(claims, tuple) or any(
+        not isinstance(item, tuple)
+        or len(item) != 2
+        or not all(isinstance(child, str) and child for child in item)
+        for item in claims
+    ):
+        raise SkillOpsError("external readback claims are invalid")
+    value = ExternalReadback(
+        source=source,
+        ref=ref,
+        raw_hash=f"sha256:{hashlib.sha256(raw).hexdigest()}",
+        classification=classification,  # type: ignore[arg-type]
+        claims=claims,
+    )
+    if verified:
+        if classification == "UNATTESTED_PARTIAL":
+            raise SkillOpsError("unattested bytes cannot be verified")
+        object.__setattr__(value, "_seal", _READBACK_TOKEN)
+    return value
 
 
 def _artifact(value: object, field: str, kind: str) -> ArtifactRef:
@@ -213,6 +266,9 @@ class ArtifactRef:
                 raise SkillOpsError("external readback source does not match artifact source")
             if verified_readback.raw_hash != self.content_hash:
                 raise SkillOpsError("external readback hash does not match artifact")
+            token_run_id = verified_readback.claim("run_id")
+            if token_run_id is not None and token_run_id != self.run_id:
+                raise SkillOpsError("external readback crosses the artifact run boundary")
             object.__setattr__(self, "_readback_token", verified_readback)
         elif self.attested is True or verified_readback is not None:
             raise SkillOpsError("non-LIVE artifacts cannot carry an attestation")
@@ -483,7 +539,24 @@ class HumanDecisionVerification(_Sealed):
             raise SkillOpsError("verification requires an external readback token")
         if verified_readback.source != "matrix":
             raise SkillOpsError("verification readback source must be Matrix")
-        if verified_readback.raw_hash != self.event_hash:
+        if verified_readback.classification != "AUTHORITY_RECEIPT":
+            raise SkillOpsError("verification requires a Matrix authority receipt")
+        expected_claims = {
+            "sender": self.sender,
+            "identity_ref": self.identity_ref,
+            "run_id": self.run_id,
+            "approval_id": self.decision_ref,
+            "decision": self.decision,
+            "decision_revision": str(self.decision_revision),
+        }
+        if (
+            verified_readback.ref != self.event_ref
+            or verified_readback.raw_hash != self.event_hash
+            or any(
+                verified_readback.claim(name) != value
+                for name, value in expected_claims.items()
+            )
+        ):
             raise SkillOpsError("verification readback hash does not match event_hash")
         object.__setattr__(self, "_readback_token", verified_readback)
         self._check_hash()
@@ -589,10 +662,96 @@ class SkillReceipt(_Sealed):
         self._check_hash()
 
 
+@dataclass(frozen=True, slots=True)
+class SkillOperationVerification(_Sealed):
+    """Exact readback of an already-executed PROMOTE/ROLLBACK operation."""
+
+    artifact_type: ClassVar[str] = "skillops.operation-verification/v1"
+    verification_ref: str
+    operation_ref: str
+    operation_hash: str
+    receipt_ref: str
+    receipt_hash: str
+    proposal_ref: str
+    proposal_hash: str
+    run_id: str
+    action: Literal["PROMOTE", "ROLLBACK"]
+    active_version: str
+    content_hash: str
+    verified_at: str
+    record_hash: str
+    verified_readback: InitVar[ExternalReadback | None] = None
+    _readback_token: object = field(default=None, init=False, repr=False, compare=False)
+
+    @classmethod
+    def create(cls, **values: object) -> "SkillOperationVerification":
+        return _make(cls, values)
+
+    def __post_init__(self, verified_readback: ExternalReadback | None) -> None:
+        for field_name, value in (
+            ("verification_ref", self.verification_ref),
+            ("operation_ref", self.operation_ref),
+            ("receipt_ref", self.receipt_ref),
+            ("proposal_ref", self.proposal_ref),
+            ("run_id", self.run_id),
+            ("verified_at", self.verified_at),
+        ):
+            _ref(value, field_name)
+        for field_name, value in (
+            ("operation_hash", self.operation_hash),
+            ("receipt_hash", self.receipt_hash),
+            ("proposal_hash", self.proposal_hash),
+            ("content_hash", self.content_hash),
+        ):
+            _hash(value, field_name)
+        if self.action not in {"PROMOTE", "ROLLBACK"}:
+            raise SkillOpsError("operation verification action is unsupported")
+        _version(self.active_version, "active_version")
+        if verified_readback is None or not verified_readback.verified:
+            raise SkillOpsError("operation verification requires an attested readback")
+        if verified_readback.source != "agentteams":
+            raise SkillOpsError("operation verification requires AgentTeams provenance")
+        if verified_readback.classification != "AUTHORITY_RECEIPT":
+            raise SkillOpsError("operation verification requires an authority receipt")
+        expected_claims = {
+            "action": self.action,
+            "active_version": self.active_version,
+            "content_hash": self.content_hash,
+            "proposal_ref": self.proposal_ref,
+            "proposal_hash": self.proposal_hash,
+            "run_id": self.run_id,
+            "receipt_ref": self.receipt_ref,
+            "receipt_hash": self.receipt_hash,
+        }
+        if (
+            verified_readback.ref != self.operation_ref
+            or verified_readback.raw_hash != self.operation_hash
+            or any(
+                verified_readback.claim(name) != expected
+                for name, expected in expected_claims.items()
+            )
+        ):
+            raise SkillOpsError("operation readback does not match verified receipt claims")
+        object.__setattr__(self, "_readback_token", verified_readback)
+        self._check_hash()
+
+
 class SkillEvolution:
     """One append-only, generic lifecycle for any declarative Skill."""
 
-    __slots__ = ("skill_name", "_state", "_baseline", "_attribution", "_proposal", "_human_decision", "_human_verification", "_canary", "_reevaluation", "_receipt")
+    __slots__ = (
+        "skill_name",
+        "_state",
+        "_baseline",
+        "_attribution",
+        "_proposal",
+        "_human_decision",
+        "_human_verification",
+        "_canary",
+        "_reevaluation",
+        "_receipt",
+        "_operation_verification",
+    )
 
     def __init__(self, skill_name: str) -> None:
         self.skill_name = _name(skill_name, "skill_name")
@@ -600,6 +759,7 @@ class SkillEvolution:
         self._baseline = self._attribution = self._proposal = None
         self._human_decision = self._human_verification = None
         self._canary = self._reevaluation = self._receipt = None
+        self._operation_verification = None
 
     state = property(lambda self: self._state)
     baseline = property(lambda self: self._baseline)
@@ -610,6 +770,7 @@ class SkillEvolution:
     canary = property(lambda self: self._canary)
     reevaluation = property(lambda self: self._reevaluation)
     receipt = property(lambda self: self._receipt)
+    operation_verification = property(lambda self: self._operation_verification)
 
     def freeze_baseline(self, value: Baseline) -> None:
         if not isinstance(value, Baseline):
@@ -716,6 +877,7 @@ class SkillEvolution:
         if not isinstance(value, SkillReceipt):
             raise SkillOpsStateError("receipt must be a SkillReceipt record")
         self._expect("REEVALUATED")
+        value._check_hash()
         if not all((self._baseline, self._proposal, self._human_decision, self._human_verification, self._canary, self._reevaluation)):
             raise SkillOpsStateError("required evolution facts are missing")
         expected = {
@@ -740,7 +902,40 @@ class SkillEvolution:
             raise SkillOpsStateError("failed canary requires an explicit rollback receipt")
         if value.action == "PROMOTE" and not (self._canary.status == "PASS" and self._reevaluation.status == "PASS"):
             raise SkillOpsStateError("promotion is blocked unless canary and reevaluation both PASS")
-        self._receipt, self._state = value, "PROMOTED" if value.action == "PROMOTE" else "ROLLED_BACK"
+        self._receipt = value
+        self._state = "PROMOTION_PENDING" if value.action == "PROMOTE" else "ROLLBACK_PENDING"
+
+    def verify_close(self, value: SkillOperationVerification) -> None:
+        if not isinstance(value, SkillOperationVerification):
+            raise SkillOpsStateError(
+                "close verification must be a SkillOperationVerification record"
+            )
+        if self._state not in {"PROMOTION_PENDING", "ROLLBACK_PENDING"}:
+            raise SkillOpsStateError(
+                f"state {self._state} cannot verify close; expected a pending operation"
+            )
+        value._check_hash()
+        if self._receipt is None or self._proposal is None:
+            raise SkillOpsStateError("pending receipt or proposal is missing")
+        expected = {
+            "receipt_ref": self._receipt.receipt_id,
+            "receipt_hash": self._receipt.record_hash,
+            "proposal_ref": self._proposal.proposal_id,
+            "proposal_hash": self._proposal.record_hash,
+            "run_id": self._baseline.run_id if self._baseline else None,
+            "action": self._receipt.action,
+            "active_version": self._receipt.active_version,
+            "content_hash": self._proposal.content_hash,
+        }
+        if any(getattr(value, key) != expected_value for key, expected_value in expected.items()):
+            raise SkillOpsStateError("operation verification is not bound to pending close")
+        if (
+            not isinstance(value._readback_token, ExternalReadback)
+            or not value._readback_token.verified
+        ):
+            raise SkillOpsStateError("operation verification lacks an attested readback")
+        self._operation_verification = value
+        self._state = "PROMOTED" if value.action == "PROMOTE" else "ROLLED_BACK"
 
     def snapshot(self) -> dict[str, object]:
         return {
@@ -760,6 +955,16 @@ class SkillEvolution:
             "canary_ref": self._canary.observation_id if self._canary else None,
             "reevaluation_ref": self._reevaluation.observation_id if self._reevaluation else None,
             "receipt_ref": self._receipt.receipt_id if self._receipt else None,
+            "operation_verification_ref": (
+                self._operation_verification.verification_ref
+                if self._operation_verification
+                else None
+            ),
+            "operation_verification_hash": (
+                self._operation_verification.record_hash
+                if self._operation_verification
+                else None
+            ),
         }
 
     def _check_evaluation(self, value: _EvaluationObservation) -> None:

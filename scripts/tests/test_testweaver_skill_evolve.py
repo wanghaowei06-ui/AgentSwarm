@@ -8,8 +8,19 @@ import unittest
 from pathlib import Path
 from typing import Any
 
-from testweaver.authority import digest_bytes
+from testweaver.authority import HumanReadbackAttestation, digest_bytes
 from testweaver.contracts.validator import canonical_hash
+from testweaver.skillops import (
+    ArtifactRef,
+    Attribution,
+    Baseline,
+    ExternalReadback,
+    HumanDecision,
+    HumanDecisionVerification,
+    SkillEvolution,
+    SkillProposal,
+    matrix_readback_from_authority,
+)
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / "testweaver-skill-evolve.py"
@@ -288,39 +299,34 @@ def _reevaluate_oracle(previous: dict[str, Any], *, tamper_result: bool = False)
 
 
 class SkillEvolveOperatorTests(unittest.TestCase):
-    def test_exact_full_flow_promotes_and_retains_raw_readbacks(self) -> None:
-        prepared = _prepare()
-        approved = _approval(prepared)
-        published = _publish(approved)
-        canary = _canary(published)
-        reevaluated = _reevaluate_oracle(canary)
-        closed = evolve.close(_request("close", {"receipt_id": "receipt:hero"}, reevaluated))
+    def test_synthetic_full_flow_is_unattested_partial_and_blocked(self) -> None:
+        token = ExternalReadback.from_raw(
+            source="agentteams", ref="hero:exact", raw=b"caller transcript"
+        )
+        self.assertEqual(token.classification, "UNATTESTED_PARTIAL")
+        self.assertFalse(token.verified)
+        with self.assertRaisesRegex(Exception, "verified external readback"):
+            _prepare()
 
-        self.assertEqual(closed["status"], "PROMOTED")
-        self.assertEqual(closed["records"]["receipt"]["action"], "PROMOTE")
-        self.assertEqual(closed["intents"][0]["action"], "PROMOTE")
-        for item in closed["readbacks"]:
-            self.assertEqual(digest_bytes(base64.b64decode(item["raw_base64"])), item["raw_hash"])
-        self.assertIn("official-agentspec-agt", json.dumps(published["intents"]))
-        self.assertNotIn("Project", json.dumps(closed["intents"]))
+    def test_synthetic_failed_canary_cannot_reach_close(self) -> None:
+        with self.assertRaisesRegex(Exception, "verified external readback"):
+            _canary(_publish(_approval(_prepare())), "FAIL")
 
-    def test_failed_canary_can_only_close_with_rollback(self) -> None:
-        previous = _reevaluate_oracle(_canary(_publish(_approval(_prepare())), "FAIL"))
-        closed = evolve.close(_request("close", {"receipt_id": "receipt:rollback"}, previous))
-        self.assertEqual(closed["status"], "ROLLED_BACK")
-        self.assertEqual(closed["records"]["receipt"]["action"], "ROLLBACK")
-        self.assertEqual(closed["intents"][0]["active_version"], "1.0.0")
-
-    def test_cross_run_self_report_and_unallowlisted_human_fail_closed(self) -> None:
-        prepared = _prepare()
+    def test_cross_run_and_unsealed_self_reports_fail_closed(self) -> None:
+        prepared = evolve._receipt(
+            stage="prepare",
+            authority=AUTHORITY,
+            status="PARTIAL",
+            records=evolve._empty_records(),
+            readbacks=[],
+            intents=[],
+            observations={},
+        )
         crossed = json.loads(_request("verify-approval", {}, prepared))
         crossed["authority"]["run_id"] = "run:other"
         crossed["record_hash"] = canonical_hash({key: value for key, value in crossed.items() if key != "record_hash"})
         with self.assertRaisesRegex(evolve.EvolutionInputError, "authority"):
             evolve.verify_approval(json.dumps(crossed).encode())
-
-        with self.assertRaisesRegex(Exception, "allowlist|identity"):
-            _approval(prepared, sender="@mallory:hs")
 
         tampered = json.loads(_request("prepare", {}, None))
         tampered["payload"] = json.loads(json.dumps({
@@ -330,14 +336,16 @@ class SkillEvolveOperatorTests(unittest.TestCase):
         with self.assertRaisesRegex(evolve.EvolutionInputError, "sealed"):
             evolve.prepare(json.dumps(tampered).encode())
 
-    def test_nacos_and_oracle_hash_self_reports_do_not_become_live(self) -> None:
-        approved = _approval(_prepare())
-        with self.assertRaisesRegex(evolve.EvolutionInputError, "Nacos exact"):
-            _publish(approved, download=b"different package bytes")
-
-        canary = _canary(_publish(approved))
-        with self.assertRaisesRegex(evolve.EvolutionInputError, "self-report"):
-            _reevaluate_oracle(canary, tamper_result=True)
+    def test_nacos_and_oracle_transcripts_remain_unattested_partial(self) -> None:
+        for source, raw in (
+            ("nacos", b'{"code":0,"data":true}'),
+            ("evaluation", b'{"status":"PASS"}'),
+        ):
+            token = ExternalReadback.from_raw(source=source, ref=f"{source}:raw", raw=raw)
+            self.assertEqual(token.classification, "UNATTESTED_PARTIAL")
+            self.assertFalse(token.verified)
+        with self.assertRaisesRegex(Exception, "verified external readback"):
+            _prepare()
 
     def test_source_has_no_native_scheduling_or_signing_path(self) -> None:
         source = SCRIPT.read_text(encoding="utf-8")
@@ -352,8 +360,7 @@ class SkillEvolveOperatorTests(unittest.TestCase):
         ):
             self.assertNotIn(forbidden, source)
 
-    def test_agentloop_exact_results_are_supported_without_network(self) -> None:
-        previous = _canary(_publish(_approval(_prepare())))
+    def test_agentloop_success_counts_are_not_a_quality_verdict(self) -> None:
         task = {
             "taskId": "evaluation-task:hero",
             "agentSpace": "space:hero",
@@ -371,18 +378,136 @@ class SkillEvolveOperatorTests(unittest.TestCase):
                 "failedCount": 0,
             }]
         }
-        payload = {
-            "mode": "agentloop",
-            "endpoint": "https://agentloop.cn-beijing.aliyuncs.com",
-            "agent_space": "space:hero",
-            "task_id": "evaluation-task:hero",
-            "observed_at": "2026-09-03T08:10:00Z",
-            "task_response": _readback("agentloop", "agentloop:task", json.dumps(task).encode()),
-            "runs_response": _readback("agentloop", "agentloop:runs", json.dumps(runs).encode()),
-        }
-        receipt = evolve.reevaluate(_request("reevaluate", payload, previous))
-        self.assertEqual(receipt["records"]["reevaluation"]["status"], "PASS")
-        self.assertEqual(receipt["observations"]["reevaluation"]["mode"], "agentloop")
+        for ref, raw in (
+            ("agentloop:task", json.dumps(task).encode()),
+            ("agentloop:runs", json.dumps(runs).encode()),
+        ):
+            token = ExternalReadback.from_raw(source="agentloop", ref=ref, raw=raw)
+            self.assertEqual(token.classification, "UNATTESTED_PARTIAL")
+            self.assertFalse(token.verified)
+        with self.assertRaisesRegex(Exception, "verified external readback"):
+            _prepare()
+
+    def test_authority_attested_matrix_readback_can_advance_human_gate(self) -> None:
+        dataset = ArtifactRef(
+            kind="dataset",
+            ref="dataset:frozen",
+            content_hash="sha256:" + "b" * 64,
+            source_kind="frozen-dataset",
+            provenance="FROZEN",
+            classification="NON_LIVE",
+            attestation_ref="manifest:dataset",
+        )
+        evaluation = ArtifactRef(
+            kind="evaluation",
+            ref="evaluation:frozen",
+            content_hash="sha256:" + "c" * 64,
+            source_kind="evaluation-export",
+            provenance="FROZEN",
+            classification="NON_LIVE",
+            attestation_ref="manifest:evaluation",
+        )
+        trace = ArtifactRef(
+            kind="trace",
+            ref="trace:partial",
+            content_hash="sha256:" + "d" * 64,
+            source_kind="evaluation-export",
+            provenance="REPLAY",
+            classification="NON_LIVE",
+            attestation_ref="manifest:trace",
+            run_id=AUTHORITY["run_id"],
+        )
+        evidence = ArtifactRef(
+            kind="evidence",
+            ref="evidence:partial",
+            content_hash="sha256:" + "f" * 64,
+            source_kind="evaluation-export",
+            provenance="REPLAY",
+            classification="NON_LIVE",
+            attestation_ref="manifest:evidence",
+            run_id=AUTHORITY["run_id"],
+        )
+        baseline = Baseline.freeze(
+            baseline_id="baseline:hero",
+            dataset_ref=dataset,
+            evaluation_ref=evaluation,
+            run_id=AUTHORITY["run_id"],
+            trace_refs=(trace,),
+            evidence_refs=(evidence,),
+        )
+        attribution = Attribution.create(
+            attribution_id="attribution:hero",
+            skill_name="reconcile-before-retry",
+            base_version="1.0.0",
+            baseline=baseline,
+            trace_refs=(trace,),
+            evidence_refs=(evidence,),
+        )
+        proposal = SkillProposal.create(
+            proposal_id="proposal:hero",
+            skill_name="reconcile-before-retry",
+            base_version="1.0.0",
+            candidate_version="1.1.0",
+            content_hash="sha256:" + "e" * 64,
+            rollback_ref="nacos://registry/testweaver/reconcile-before-retry@1.0.0",
+            baseline=baseline,
+            attribution=attribution,
+        )
+        decision = HumanDecision.create(
+            decision_id="approval:hero",
+            decision_revision=1,
+            proposal=proposal,
+            actor_ref="@human:hs",
+            identity_ref="identity:alice",
+            attestation_ref="matrix:event:approval",
+            actor_kind="external-human",
+            decision="APPROVE",
+            decided_at="2026-09-03T08:00:00Z",
+        )
+        raw_event = b'{"event_id":"$approval","sender":"@human:hs"}'
+        authority_receipt = HumanReadbackAttestation.create(
+            verification_ref="matrix:verification:approval",
+            event_ref=decision.attestation_ref,
+            event_hash=digest_bytes(raw_event),
+            sender=decision.actor_ref,
+            identity_ref=decision.identity_ref,
+            approval_id=decision.decision_id,
+            phase="APPROVE",
+            decision="APPROVE",
+            run_id=baseline.run_id,
+            campaign_id=AUTHORITY["campaign_id"],
+            trace_id=AUTHORITY["trace_id"],
+            revision=decision.decision_revision,
+            verified_at="2026-09-03T08:00:01Z",
+        )
+        token = matrix_readback_from_authority(authority_receipt, raw=raw_event)
+        verification = HumanDecisionVerification.create(
+            verification_ref=authority_receipt.verification_ref,
+            source="matrix-live-readback",
+            event_ref=decision.attestation_ref,
+            event_hash=digest_bytes(raw_event),
+            sender=decision.actor_ref,
+            identity_ref=decision.identity_ref,
+            decision_ref=decision.decision_id,
+            decision_hash=decision.record_hash,
+            proposal_ref=proposal.proposal_id,
+            proposal_hash=proposal.record_hash,
+            decision_revision=decision.decision_revision,
+            decision=decision.decision,
+            baseline_ref=baseline.baseline_id,
+            baseline_hash=baseline.record_hash,
+            run_id=baseline.run_id,
+            verified_at=authority_receipt.verified_at,
+            verified_readback=token,
+        )
+        lifecycle = SkillEvolution(proposal.skill_name)
+        lifecycle.freeze_baseline(baseline)
+        lifecycle.attribute(attribution)
+        lifecycle.propose(proposal)
+        lifecycle.record_human_decision(
+            decision, verifier=lambda *_args: verification
+        )
+        self.assertEqual(lifecycle.state, "HUMAN_APPROVED")
 
 
 if __name__ == "__main__":
