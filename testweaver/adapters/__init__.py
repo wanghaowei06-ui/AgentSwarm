@@ -16,10 +16,13 @@ from .config import (
     AdapterConfig,
     AdapterConfigError,
     ExecutionLimits,
+    PROTECTED_PROVIDER_DIRECTORY,
     ProtectedReference,
     ProviderRoute,
     ReferencePreflight,
     preflight_reference,
+    read_protected_file,
+    validate_credential,
 )
 from .native_worker import (
     DSH_PROVIDER_PROFILES,
@@ -52,6 +55,7 @@ __all__ = [
     "DEFAULT_REASONING",
     "EvidenceReference",
     "ExecutionLimits",
+    "PROTECTED_PROVIDER_DIRECTORY",
     "DSH_PROVIDER_PROFILES",
     "DshProviderProfile",
     "NativeReferences",
@@ -71,5 +75,7 @@ __all__ = [
     "normalize_result",
     "preflight_native_worker_invocation",
     "preflight_reference",
+    "read_protected_file",
+    "validate_credential",
     "prepare_native_worker_invocation",
 ]

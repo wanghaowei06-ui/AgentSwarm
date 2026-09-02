@@ -19,7 +19,7 @@ from .config import (
     ProtectedReference,
     ProviderRoute,
     ReferencePreflight,
-    preflight_reference,
+    preflight_execution_reference,
 )
 from .result import NativeReferences, NormalizedResult, Provenance
 from .result import normalize_result as normalize_worker_result
@@ -291,23 +291,39 @@ def preflight_native_worker_invocation(
     if not isinstance(invocation, NativeWorkerInvocation):
         raise NativeWorkerAdapterError("preflight requires NativeWorkerInvocation")
     references = [
-        invocation.config.route.endpoint_ref,
-        invocation.config.route.model_ref,
-        invocation.config.route.credential_ref,
+        ("endpoint", invocation.config.route.endpoint_ref),
+        ("model", invocation.config.route.model_ref),
+        ("credential", invocation.config.route.credential_ref),
     ]
     if invocation.launch is not None:
-        references.extend(invocation.launch.protected_environment)
-    results = tuple(preflight_reference(reference) for reference in references)
-    reasons = tuple(
-        f"reference_{index}_{result.reason}"
-        for index, result in enumerate(results)
-        if not result.usable and result.reason is not None
-    )
+        references.extend(
+            ("protected_environment", reference)
+            for reference in invocation.launch.protected_environment
+        )
+    results: list[ReferencePreflight] = []
+    reasons: list[str] = []
+    if invocation.config.adapter_kind == "dsh":
+        if invocation.config.route.provider not in DSH_PROVIDER_PROFILES:
+            reasons.append("dsh_provider_not_allowlisted")
+        dedicated_provider = True
+    else:
+        if invocation.config.route.provider != "codex-cc":
+            reasons.append("codex_provider_not_allowlisted")
+        dedicated_provider = False
+    for field, reference in references:
+        result = preflight_execution_reference(
+            reference,
+            dedicated_provider=dedicated_provider,
+            field=field,
+        )
+        results.append(result)
+        if not result.usable and result.reason is not None:
+            reasons.append(f"reference_{len(results) - 1}_{result.reason}")
     return NativeWorkerPreflight(
         adapter_kind=invocation.config.adapter_kind,
         provider=invocation.config.route.provider,
         status="READY" if not reasons else "BLOCKED",
-        references=results,
+        references=tuple(results),
         command=invocation.launch.command if invocation.launch is not None else None,
-        reasons=reasons,
+        reasons=tuple(reasons),
     )

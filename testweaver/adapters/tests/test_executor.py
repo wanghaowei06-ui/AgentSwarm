@@ -11,6 +11,7 @@ import time
 import unittest
 from unittest.mock import patch
 
+import testweaver.adapters.config as adapter_config
 import testweaver.adapters.executor as executor
 from testweaver.adapters.config import AdapterConfig, _runtime_route_fields
 from testweaver.adapters.mcp_server import call_tool, handle_request, list_tools
@@ -216,6 +217,182 @@ class OneShotExecutorTests(unittest.TestCase):
             self.assertNotIn("fixture-worker-gateway-key-1234", content)
             self.assertNotIn("DEEPSEEK_BASE_URL", os.environ)
             self.assertNotIn("DEEPSEEK_API_KEY", os.environ)
+
+    def test_codex_child_environment_excludes_route_references(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory) / "workspace"
+            workspace.mkdir()
+            script = _script(
+                workspace,
+                "import os\n"
+                "for name in ('HOME', 'CODEX_HOME', 'TESTWEAVER_CODEX_ENDPOINT',\n"
+                "             'TESTWEAVER_CODEX_MODEL', 'TESTWEAVER_CODEX_CREDENTIAL'):\n"
+                "    print(name + '=' + str(name in os.environ))\n",
+            )
+            result, _ = self._run(
+                script,
+                _codex_config(),
+                workspace,
+                codex=True,
+            )
+            content = (workspace / result.result_ref).read_text(encoding="utf-8")
+        self.assertIn("HOME=True", content)
+        self.assertIn("CODEX_HOME=True", content)
+        self.assertIn("TESTWEAVER_CODEX_ENDPOINT=False", content)
+        self.assertIn("TESTWEAVER_CODEX_MODEL=False", content)
+        self.assertIn("TESTWEAVER_CODEX_CREDENTIAL=False", content)
+
+    def test_dsh_environment_credential_uses_file_validation_rules(self) -> None:
+        config = _config("deepseek")
+        cases = (
+            ("TESTWEAVER_DSH_ENDPOINT", "", "empty"),
+            ("TESTWEAVER_DSH_ENDPOINT", "not-an-endpoint", "invalid format"),
+            ("TESTWEAVER_DSH_MODEL", "", "empty"),
+            ("TESTWEAVER_DSH_MODEL", "model with whitespace", "invalid format"),
+            ("TESTWEAVER_DSH_CREDENTIAL", "", "too short"),
+            ("TESTWEAVER_DSH_CREDENTIAL", "short", "too short"),
+            ("TESTWEAVER_DSH_CREDENTIAL", "credential\nvalue", "invalid format"),
+        )
+        for name, value, message in cases:
+            with self.subTest(name=name, message=message), patch.dict(
+                os.environ,
+                {
+                    "TESTWEAVER_DSH_ENDPOINT": "https://deepseek.invalid/v1",
+                    "TESTWEAVER_DSH_MODEL": "deepseek-model",
+                    "TESTWEAVER_DSH_CREDENTIAL": "credential-value-1234",
+                    name: value,
+                },
+                clear=True,
+            ):
+                with self.assertRaisesRegex(executor.NativeExecutionError, message):
+                    executor._environment(config)
+
+    def test_dsh_file_refs_resolve_endpoint_and_credential_only_in_child(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "protected"
+            root.mkdir()
+            root.chmod(0o700)
+            workspace = Path(directory) / "workspace"
+            workspace.mkdir()
+            values = {
+                "endpoint": "https://file-gateway.invalid/v1",
+                "model": "file-model",
+                "credential": "file-credential-value-1234",
+            }
+            paths = {}
+            for field, value in values.items():
+                path = root / field
+                path.write_text(value, encoding="utf-8")
+                path.chmod(0o400)
+                paths[field] = {"source": "file", "path": str(path)}
+            config = AdapterConfig.from_mapping(
+                {
+                    "adapter_kind": "dsh",
+                    "route": {
+                        "provider": "deepseek",
+                        "endpoint": paths["endpoint"],
+                        "model": paths["model"],
+                        "credential": paths["credential"],
+                        "wire_api": "chat",
+                    },
+                    "limits": _limits(),
+                }
+            )
+            script = _script(
+                workspace,
+                "import os\n"
+                "print(os.environ['DEEPSEEK_BASE_URL'])\n"
+                "print(os.environ['DEEPSEEK_API_KEY'])\n"
+                "print('model_alias=' + str(bool(os.environ.get('DEEPSEEK_MODEL'))))\n",
+            )
+            with patch.dict(os.environ, {}, clear=True), patch.object(
+                adapter_config, "PROTECTED_PROVIDER_DIRECTORY", root
+            ):
+                result, metadata = self._run(script, config, workspace)
+            content = (workspace / result.result_ref).read_text(encoding="utf-8")
+            self.assertNotIn(values["endpoint"], content)
+            self.assertNotIn(values["credential"], content)
+            self.assertIn("model_alias=False", content)
+            self.assertNotIn(values["endpoint"], repr(metadata))
+            self.assertNotIn(values["credential"], repr(metadata))
+            self.assertNotIn("DEEPSEEK_BASE_URL", os.environ)
+            self.assertNotIn("DEEPSEEK_API_KEY", os.environ)
+
+    def test_dsh_file_refs_fail_closed_for_invalid_content(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "protected"
+            root.mkdir()
+            root.chmod(0o700)
+            workspace = Path(directory) / "workspace"
+            workspace.mkdir()
+            valid = root / "valid"
+            valid.write_text("valid-reference", encoding="utf-8")
+            valid.chmod(0o400)
+            max_file_bytes = 64 * 1024
+            bad_cases = {
+                "empty": b"",
+                "nul": b"valid\x00reference",
+                "oversize": b"x" * (max_file_bytes + 1),
+            }
+            for name, content in bad_cases.items():
+                with self.subTest(name=name):
+                    bad = root / name
+                    bad.write_bytes(content)
+                    bad.chmod(0o400)
+                    config = AdapterConfig.from_mapping(
+                        {
+                            "adapter_kind": "dsh",
+                            "route": {
+                                "provider": "deepseek",
+                                "endpoint": {"source": "file", "path": str(bad)},
+                                "model": {"source": "file", "path": str(valid)},
+                                "credential": {"source": "file", "path": str(valid)},
+                                "wire_api": "chat",
+                            },
+                            "limits": _limits(),
+                        }
+                    )
+                    with patch.object(adapter_config, "PROTECTED_PROVIDER_DIRECTORY", root):
+                        with self.assertRaisesRegex(executor.NativeExecutionError, "protected file"):
+                            executor._environment(config)
+
+    def test_dsh_file_refs_fail_closed_for_symlink_nonregular_and_permissions(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "protected"
+            root.mkdir()
+            root.chmod(0o700)
+            valid = root / "valid"
+            valid.write_text("valid-reference", encoding="utf-8")
+            valid.chmod(0o400)
+            model = {"source": "file", "path": str(valid)}
+            credential = {"source": "file", "path": str(valid)}
+            cases = {
+                "symlink": root / "symlink",
+                "directory": root / "directory",
+                "world_readable": root / "world-readable",
+            }
+            cases["symlink"].symlink_to(valid)
+            cases["directory"].mkdir()
+            cases["world_readable"].write_text("not-owner-only", encoding="utf-8")
+            cases["world_readable"].chmod(0o644)
+            for name, path in cases.items():
+                with self.subTest(name=name):
+                    config = AdapterConfig.from_mapping(
+                        {
+                            "adapter_kind": "dsh",
+                            "route": {
+                                "provider": "deepseek",
+                                "endpoint": {"source": "file", "path": str(path)},
+                                "model": model,
+                                "credential": credential,
+                                "wire_api": "chat",
+                            },
+                            "limits": _limits(),
+                        }
+                    )
+                    with patch.object(adapter_config, "PROTECTED_PROVIDER_DIRECTORY", root):
+                        with self.assertRaises(executor.NativeExecutionError):
+                            executor._environment(config)
 
     def test_bailian_legacy_refs_bind_from_agentteams_runtime_without_persisting_values(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

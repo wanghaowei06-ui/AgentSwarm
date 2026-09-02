@@ -5,10 +5,12 @@ from __future__ import annotations
 import copy
 import os
 import tempfile
+import time
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+import testweaver.adapters.config as adapter_config
 from testweaver.adapters.codex_cli import (
     CODEX_EXECUTABLE,
     DEFAULT_MODEL,
@@ -18,6 +20,8 @@ from testweaver.adapters.codex_cli import (
 from testweaver.adapters.config import (
     AdapterConfig,
     AdapterConfigError,
+    preflight_adapter_reference,
+    read_protected_file,
     ProtectedReference,
     preflight_reference,
 )
@@ -128,6 +132,27 @@ class AdapterConfigTests(unittest.TestCase):
             os.chmod(path, 0o644)
             self.assertFalse(preflight_reference(reference).usable)
 
+    def test_environment_preflight_applies_field_validation_without_reading_values(self) -> None:
+        cases = (
+            ("endpoint", ProtectedReference.env("TESTWEAVER_DSH_ENDPOINT"), ""),
+            ("endpoint", ProtectedReference.env("TESTWEAVER_DSH_ENDPOINT"), "not-an-endpoint"),
+            ("model", ProtectedReference.env("TESTWEAVER_DSH_MODEL"), ""),
+            ("model", ProtectedReference.env("TESTWEAVER_DSH_MODEL"), "model with whitespace"),
+            ("credential", ProtectedReference.env("TESTWEAVER_DSH_CREDENTIAL"), ""),
+            ("credential", ProtectedReference.env("TESTWEAVER_DSH_CREDENTIAL"), "short"),
+        )
+        for field, reference, value in cases:
+            with self.subTest(field=field), patch.dict(
+                os.environ, {reference.location: value}, clear=True
+            ):
+                for preflight in (preflight_reference, preflight_adapter_reference):
+                    result = preflight(reference, field=field)
+                    self.assertTrue(result.present)
+                    self.assertFalse(result.usable)
+                    self.assertEqual(result.reason, "environment_value_invalid")
+                    if value:
+                        self.assertNotIn(value, result.as_dict()["reason"] or "")
+
     def test_dsh_accepts_both_existing_provider_route_shapes(self) -> None:
         self.assertTrue(TEST_FIXTURE_ONLY_NOT_LIVE)
         deepseek = _config(
@@ -190,6 +215,85 @@ class AdapterConfigTests(unittest.TestCase):
                     "limits": _limits(),
                 }
             )
+
+    def test_read_protected_file_requires_dedicated_directory_and_field_shapes(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "testweaver-provider"
+            root.mkdir()
+            root.chmod(0o700)
+            values = {
+                "endpoint": "https://provider.invalid/v1",
+                "model": "provider-model",
+                "credential": "credential-value-1234",
+            }
+            with patch.object(adapter_config, "PROTECTED_PROVIDER_DIRECTORY", root):
+                for field, value in values.items():
+                    path = root / field
+                    path.write_text(value, encoding="utf-8")
+                    path.chmod(0o400)
+                    self.assertEqual(
+                        read_protected_file(ProtectedReference.file(str(path)), field),
+                        value,
+                    )
+
+                outside = root.parent / "providers.env"
+                outside.write_text("AGENTTEAMS_BAILIAN_MODEL=not-a-single-ref", encoding="utf-8")
+                outside.chmod(0o400)
+                with self.assertRaisesRegex(AdapterConfigError, "dedicated provider directory"):
+                    read_protected_file(ProtectedReference.file(str(outside)), "model")
+                self.assertFalse(
+                    preflight_adapter_reference(
+                        ProtectedReference.file(str(outside)),
+                        dedicated_provider=True,
+                    ).usable
+                )
+
+    def test_read_protected_file_validates_endpoint_and_model_shapes(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "testweaver-provider"
+            root.mkdir()
+            root.chmod(0o700)
+            cases = {
+                "endpoint": "provider.invalid/v1",
+                "model": "model with whitespace",
+            }
+            with patch.object(adapter_config, "PROTECTED_PROVIDER_DIRECTORY", root):
+                for field, value in cases.items():
+                    path = root / field
+                    path.write_text(value, encoding="utf-8")
+                    path.chmod(0o400)
+                    with self.subTest(field=field):
+                        with self.assertRaisesRegex(AdapterConfigError, "invalid format"):
+                            read_protected_file(ProtectedReference.file(str(path)), field)
+
+    def test_read_protected_file_rejects_unsafe_directory_content_without_blocking_fifo(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "testweaver-provider"
+            root.mkdir()
+            root.chmod(0o700)
+            path = root / "credential"
+            path.write_text("short", encoding="utf-8")
+            path.chmod(0o400)
+            with patch.object(adapter_config, "PROTECTED_PROVIDER_DIRECTORY", root):
+                with self.assertRaisesRegex(AdapterConfigError, "too short"):
+                    read_protected_file(ProtectedReference.file(str(path)), "credential")
+                path.write_text("credential\nvalue", encoding="utf-8")
+                with self.assertRaisesRegex(AdapterConfigError, "invalid format"):
+                    read_protected_file(ProtectedReference.file(str(path)), "credential")
+
+                root.chmod(0o755)
+                path.write_text("credential-value-1234", encoding="utf-8")
+                with self.assertRaisesRegex(AdapterConfigError, "directory"):
+                    read_protected_file(ProtectedReference.file(str(path)), "credential")
+                root.chmod(0o700)
+
+                fifo = root / "fifo"
+                os.mkfifo(fifo)
+                fifo.chmod(0o400)
+                started = time.monotonic()
+                with self.assertRaises(AdapterConfigError):
+                    read_protected_file(ProtectedReference.file(str(fifo)), "credential")
+                self.assertLess(time.monotonic() - started, 1.0)
 
 
 class ResultContractTests(unittest.TestCase):
@@ -351,15 +455,22 @@ class CodexCliContractTests(unittest.TestCase):
 class NativeWorkerAdapterTests(unittest.TestCase):
     def test_preflight_is_names_only_and_supports_dsh_and_codex(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            reference_path = Path(directory) / "protected-reference"
-            reference_path.write_text("reference-only\n", encoding="utf-8")
-            os.chmod(reference_path, 0o600)
-            reference = {"source": "file", "path": str(reference_path)}
+            provider_directory = Path(directory) / "testweaver-provider"
+            provider_directory.mkdir()
+            provider_directory.chmod(0o700)
+            endpoint_path = provider_directory / "endpoint"
+            model_path = provider_directory / "model"
+            credential_path = provider_directory / "credential"
+            endpoint_path.write_text("https://gateway.invalid/v1", encoding="utf-8")
+            model_path.write_text("provider-model", encoding="utf-8")
+            credential_path.write_text("credential-value-1234", encoding="utf-8")
+            for path in (endpoint_path, model_path, credential_path):
+                os.chmod(path, 0o600)
 
             dsh_profile = DshProviderProfile.aliyun_bailian(
-                endpoint_ref=reference,
-                model_ref=reference,
-                credential_ref=reference,
+                endpoint_ref={"source": "file", "path": str(endpoint_path)},
+                model_ref={"source": "file", "path": str(model_path)},
+                credential_ref={"source": "file", "path": str(credential_path)},
             )
             dsh_invocation = prepare_native_worker_invocation(
                 assignment=_assignment(),
@@ -372,11 +483,17 @@ class NativeWorkerAdapterTests(unittest.TestCase):
                 config=AdapterConfig.from_mapping(
                     {
                         "adapter_kind": "codex-cli",
-                        "route": _route(
-                            "codex-cc",
-                            reference,
-                            {"source": "env", "name": "CODEX_WORKER_MODEL"},
-                        ),
+                        "route": {
+                            **_route(
+                                "codex-cc",
+                                {"source": "file", "path": str(endpoint_path)},
+                                {"source": "env", "name": "CODEX_WORKER_MODEL"},
+                            ),
+                            "credential": {
+                                "source": "env",
+                                "name": "TESTWEAVER_CODEX_CREDENTIAL",
+                            },
+                        },
                         "limits": _limits(),
                     }
                 ),
@@ -389,9 +506,13 @@ class NativeWorkerAdapterTests(unittest.TestCase):
                     "HOME": "bound",
                     "CODEX_HOME": "bound",
                     "CODEX_WORKER_MODEL": "bound",
-                    "TESTWEAVER_PROVIDER_CREDENTIAL": "bound",
+                    "TESTWEAVER_CODEX_CREDENTIAL": "bound",
                 },
                 clear=False,
+            ), patch.object(
+                adapter_config, "PROTECTED_PROVIDER_DIRECTORY", provider_directory
+            ), patch.object(
+                adapter_config, "_ADAPTER_FILE_ROOTS", (provider_directory,)
             ):
                 dsh_preflight = preflight_native_worker_invocation(dsh_invocation)
                 codex_preflight = preflight_native_worker_invocation(codex_invocation)
@@ -403,6 +524,142 @@ class NativeWorkerAdapterTests(unittest.TestCase):
             self.assertIn("model_reasoning_effort=max", codex_preflight.command)
             self.assertNotIn("value", dsh_preflight.as_dict())
             self.assertNotIn("value", codex_preflight.as_dict())
+
+    def test_preflight_blocks_unallowlisted_dsh_provider_and_environment(self) -> None:
+        cases = (
+            (
+                "provider",
+                "unapproved-provider",
+                (
+                    "TESTWEAVER_DSH_ENDPOINT",
+                    "TESTWEAVER_DSH_MODEL",
+                    "TESTWEAVER_DSH_CREDENTIAL",
+                ),
+            ),
+            (
+                "environment",
+                "deepseek",
+                ("UNSAFE_DSH_ENDPOINT", "UNSAFE_DSH_MODEL", "UNSAFE_DSH_CREDENTIAL"),
+            ),
+        )
+        for kind, provider, names in cases:
+            with self.subTest(kind=kind):
+                profile = DshProviderProfile.from_provider(
+                    provider,
+                    endpoint_ref={"source": "env", "name": names[0]},
+                    model_ref={"source": "env", "name": names[1]},
+                    credential_ref={"source": "env", "name": names[2]},
+                )
+                invocation = prepare_native_worker_invocation(
+                    assignment=_assignment(),
+                    config=profile.as_config(_limits()),
+                    provenance=_provenance(),
+                )
+                with patch.dict(
+                    os.environ,
+                    {
+                        names[0]: "https://deepseek.invalid/v1",
+                        names[1]: "deepseek-model",
+                        names[2]: "credential-value-1234",
+                    },
+                    clear=True,
+                ):
+                    preflight = preflight_native_worker_invocation(invocation)
+                self.assertEqual(preflight.status, "BLOCKED")
+                self.assertTrue(any("allowlist" in reason for reason in preflight.reasons))
+
+    def test_dsh_preflight_validates_file_values_like_executor(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            provider_directory = Path(directory) / "testweaver-provider"
+            provider_directory.mkdir()
+            provider_directory.chmod(0o700)
+            endpoint = provider_directory / "endpoint"
+            model = provider_directory / "model"
+            credential = provider_directory / "credential"
+            endpoint.write_text("not-an-endpoint", encoding="utf-8")
+            model.write_text("deepseek-model", encoding="utf-8")
+            credential.write_text("credential-value-1234", encoding="utf-8")
+            for path in (endpoint, model, credential):
+                path.chmod(0o400)
+            profile = DshProviderProfile.deepseek(
+                endpoint_ref={"source": "file", "path": str(endpoint)},
+                model_ref={"source": "file", "path": str(model)},
+                credential_ref={"source": "file", "path": str(credential)},
+            )
+            invocation = prepare_native_worker_invocation(
+                assignment=_assignment(),
+                config=profile.as_config(_limits()),
+                provenance=_provenance(),
+            )
+            with patch.object(
+                adapter_config, "PROTECTED_PROVIDER_DIRECTORY", provider_directory
+            ):
+                preflight = preflight_native_worker_invocation(invocation)
+        self.assertEqual(preflight.status, "BLOCKED")
+        self.assertTrue(any("value" in reason for reason in preflight.reasons))
+
+    def test_codex_preflight_uses_executor_file_roots(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            outside = Path(directory) / "codex-endpoint"
+            outside.write_text("codex-endpoint", encoding="utf-8")
+            outside.chmod(0o600)
+            invocation = prepare_native_worker_invocation(
+                assignment=_assignment(),
+                config=AdapterConfig.from_mapping(
+                    {
+                        "adapter_kind": "codex-cli",
+                        "route": {
+                            **_route(
+                                "codex-cc",
+                                {"source": "file", "path": str(outside)},
+                                {"source": "env", "name": "CODEX_WORKER_MODEL"},
+                            ),
+                            "credential": {
+                                "source": "env",
+                                "name": "TESTWEAVER_CODEX_CREDENTIAL",
+                            },
+                        },
+                        "limits": _limits(),
+                    }
+                ),
+                provenance=_provenance(),
+            )
+            with patch.dict(
+                os.environ,
+                {
+                    "HOME": "bound",
+                    "CODEX_HOME": "bound",
+                    "CODEX_WORKER_MODEL": "gpt-5.6-luna",
+                    "TESTWEAVER_CODEX_CREDENTIAL": "credential-value-1234",
+                },
+                clear=True,
+            ):
+                preflight = preflight_native_worker_invocation(invocation)
+        self.assertEqual(preflight.status, "BLOCKED")
+        self.assertTrue(any("outside_protected_roots" in reason for reason in preflight.reasons))
+
+    def test_dsh_preflight_blocks_aggregate_provider_file(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            provider_directory = Path(directory) / "testweaver-provider"
+            provider_directory.mkdir()
+            provider_directory.chmod(0o700)
+            aggregate = Path(directory) / "providers.env"
+            aggregate.write_text("AGENTTEAMS_BAILIAN_MODEL=not-a-single-ref", encoding="utf-8")
+            aggregate.chmod(0o600)
+            profile = DshProviderProfile.aliyun_bailian(
+                endpoint_ref={"source": "file", "path": str(aggregate)},
+                model_ref={"source": "file", "path": str(aggregate)},
+                credential_ref={"source": "file", "path": str(aggregate)},
+            )
+            invocation = prepare_native_worker_invocation(
+                assignment=_assignment(),
+                config=profile.as_config(_limits()),
+                provenance=_provenance(),
+            )
+            with patch.object(adapter_config, "PROTECTED_PROVIDER_DIRECTORY", provider_directory):
+                preflight = preflight_native_worker_invocation(invocation)
+            self.assertEqual(preflight.status, "BLOCKED")
+            self.assertTrue(any("dedicated" in reason for reason in preflight.reasons))
 
     def test_dsh_has_explicit_deepseek_and_bailian_profiles_without_values(self) -> None:
         self.assertEqual(DSH_PROVIDER_PROFILES, frozenset({"deepseek", "aliyun-bailian"}))

@@ -27,6 +27,22 @@ class AdapterConfigError(ValueError):
 _ENV_NAME = re.compile(r"^[A-Z_][A-Z0-9_]*$")
 _PROVIDER_ID = re.compile(r"^[a-z0-9][a-z0-9._-]{0,63}$")
 _RUNTIME_CONFIG_MAX_BYTES = 64 * 1024
+_PROTECTED_FILE_MAX_BYTES = 64 * 1024
+PROTECTED_PROVIDER_DIRECTORY = Path("/var/run/secrets/agentteams/testweaver-provider")
+_ADAPTER_FILE_ROOTS = tuple(
+    Path(item)
+    for item in ("/etc/agentteams", "/run/secrets/agentteams", "/var/run/secrets/agentteams")
+)
+PROTECTED_REFERENCE_ENV_NAMES = frozenset(
+    "HOME CODEX_HOME CODEX_ENDPOINT CODEX_MODEL CODEX_WORKER_MODEL "
+    "AGENTTEAMS_AI_GATEWAY_URL AGENTTEAMS_WORKER_GATEWAY_KEY AGENTTEAMS_WORKER_MODEL "
+    "DEEPSEEK_API_KEY DEEPSEEK_BASE_URL DEEPSEEK_MODEL "
+    "DASHSCOPE_API_KEY DASHSCOPE_BASE_URL DASHSCOPE_MODEL "
+    "TESTWEAVER_BAILIAN_CREDENTIAL TESTWEAVER_BAILIAN_ENDPOINT TESTWEAVER_BAILIAN_MODEL "
+    "TESTWEAVER_CODEX_CREDENTIAL TESTWEAVER_CODEX_ENDPOINT TESTWEAVER_CODEX_MODEL "
+    "TESTWEAVER_DSH_CREDENTIAL TESTWEAVER_DSH_ENDPOINT TESTWEAVER_DSH_MODEL"
+    .split()
+)
 
 
 def _mapping(value: Any, field: str) -> Mapping[str, Any]:
@@ -136,26 +152,54 @@ class ReferencePreflight:
         }
 
 
-def preflight_reference(reference: ProtectedReference) -> ReferencePreflight:
-    """Check only reference binding and file metadata; never resolve a value."""
+def preflight_reference(
+    reference: ProtectedReference,
+    *,
+    dedicated_provider: bool = False,
+    allowed_roots: tuple[Path, ...] | None = None,
+    field: str | None = None,
+) -> ReferencePreflight:
+    """Check binding and metadata without returning or persisting a value."""
 
     if not isinstance(reference, ProtectedReference):
         raise AdapterConfigError("reference preflight requires ProtectedReference")
     if reference.source == "env":
         present = reference.location in os.environ
+        usable = present
+        reason = None if present else "environment_name_not_bound"
+        if present and field in {"endpoint", "model", "credential"}:
+            try:
+                _validate_reference_value(os.environ.get(reference.location), field)
+            except AdapterConfigError:
+                usable = False
+                reason = "environment_value_invalid"
         return ReferencePreflight(
             source="env",
             location=reference.location,
             present=present,
-            usable=present,
+            usable=usable,
             mode=None,
             owner_uid=None,
             owner_gid=None,
-            reason=None if present else "environment_name_not_bound",
+            reason=reason,
         )
 
+    path = Path(reference.location)
+    if dedicated_provider:
+        return _preflight_dedicated_reference(reference, path)
+    if allowed_roots is not None and not _inside(path.resolve(), allowed_roots):
+        return ReferencePreflight(
+            source="file",
+            location=reference.location,
+            present=False,
+            usable=False,
+            mode=None,
+            owner_uid=None,
+            owner_gid=None,
+            reason="file_outside_protected_roots",
+        )
     try:
-        metadata = Path(reference.location).stat()
+        metadata = path.stat()
     except OSError:
         return ReferencePreflight(
             source="file",
@@ -188,6 +232,233 @@ def preflight_reference(reference: ProtectedReference) -> ReferencePreflight:
         owner_gid=metadata.st_gid,
         reason=reason,
     )
+
+
+def preflight_adapter_reference(
+    reference: ProtectedReference,
+    *,
+    dedicated_provider: bool = False,
+    field: str | None = None,
+) -> ReferencePreflight:
+    """Apply the adapter file scope before an execution-time resolution."""
+
+    roots = None if dedicated_provider else _ADAPTER_FILE_ROOTS
+    return preflight_reference(
+        reference,
+        dedicated_provider=dedicated_provider,
+        allowed_roots=roots,
+        field=field,
+    )
+
+
+def validate_credential(value: Any, field: str = "credential") -> str:
+    """Validate a credential before it can enter an external child environment."""
+
+    if not isinstance(value, str) or len(value) < 8:
+        raise AdapterConfigError(f"{field} protected value is too short")
+    if any(char.isspace() or ord(char) < 32 for char in value):
+        raise AdapterConfigError(f"{field} protected value has invalid format")
+    return value
+
+
+def _validate_endpoint(value: Any, field: str = "endpoint") -> str:
+    if not isinstance(value, str):
+        raise AdapterConfigError(f"{field} protected value has invalid format")
+    normalized = value.strip()
+    if not normalized:
+        raise AdapterConfigError(f"{field} protected value is empty")
+    try:
+        endpoint = urlsplit(normalized)
+    except ValueError as exc:
+        raise AdapterConfigError(f"{field} protected value has invalid format") from exc
+    if (
+        endpoint.scheme not in {"http", "https"}
+        or not endpoint.hostname
+        or endpoint.username
+        or endpoint.password
+        or endpoint.query
+        or endpoint.fragment
+        or any(char.isspace() or ord(char) < 32 for char in normalized)
+    ):
+        raise AdapterConfigError(f"{field} protected value has invalid format")
+    return normalized
+
+
+def _validate_model(value: Any, field: str = "model") -> str:
+    if not isinstance(value, str):
+        raise AdapterConfigError(f"{field} protected value has invalid format")
+    normalized = value.strip()
+    if not normalized:
+        raise AdapterConfigError(f"{field} protected value is empty")
+    if len(normalized) > 512 or any(
+        char.isspace() or ord(char) < 32 for char in normalized
+    ):
+        raise AdapterConfigError(f"{field} protected value has invalid format")
+    return normalized
+
+
+def _validate_reference_value(value: Any, field: str) -> str:
+    if field == "endpoint":
+        return _validate_endpoint(value, field)
+    if field == "model":
+        return _validate_model(value, field)
+    if field == "credential":
+        return validate_credential(value, field)
+    raise AdapterConfigError(f"unsupported protected reference field: {field}")
+
+
+@contextmanager
+def _open_protected_file(reference: ProtectedReference, field: str):
+    if not isinstance(reference, ProtectedReference) or reference.source != "file":
+        raise AdapterConfigError(f"{field} must be a file reference")
+    path = Path(reference.location)
+    if path.parent != PROTECTED_PROVIDER_DIRECTORY or path.name in {"", ".", ".."}:
+        raise AdapterConfigError(f"{field} file reference is outside the dedicated provider directory")
+    directory_flags = os.O_RDONLY | os.O_CLOEXEC | os.O_DIRECTORY | os.O_NOFOLLOW
+    file_flags = (
+        os.O_RDONLY
+        | os.O_NONBLOCK
+        | os.O_CLOEXEC
+        | os.O_NOFOLLOW
+    )
+    directory_fd = -1
+    file_fd = -1
+    try:
+        directory_fd = os.open(PROTECTED_PROVIDER_DIRECTORY, directory_flags)
+        directory_metadata = os.fstat(directory_fd)
+        if (
+            not stat.S_ISDIR(directory_metadata.st_mode)
+            or directory_metadata.st_uid != 0
+            or stat.S_IMODE(directory_metadata.st_mode) != 0o700
+        ):
+            raise AdapterConfigError("dedicated provider directory failed safety checks")
+        file_fd = os.open(path.name, file_flags, dir_fd=directory_fd)
+        metadata = os.fstat(file_fd)
+        if (
+            not stat.S_ISREG(metadata.st_mode)
+            or metadata.st_uid != 0
+            or stat.S_IMODE(metadata.st_mode) not in {0o400, 0o600}
+            or not 0 < metadata.st_size <= _PROTECTED_FILE_MAX_BYTES
+        ):
+            raise AdapterConfigError(f"{field} protected file failed safety checks")
+        yield file_fd, metadata
+    except OSError as exc:
+        raise AdapterConfigError(f"{field} protected file is unavailable") from exc
+    finally:
+        if file_fd >= 0:
+            os.close(file_fd)
+        if directory_fd >= 0:
+            os.close(directory_fd)
+
+
+def _preflight_dedicated_reference(
+    reference: ProtectedReference,
+    path: Path,
+) -> ReferencePreflight:
+    if path.parent != PROTECTED_PROVIDER_DIRECTORY:
+        return ReferencePreflight(
+            source="file",
+            location=reference.location,
+            present=False,
+            usable=False,
+            mode=None,
+            owner_uid=None,
+            owner_gid=None,
+            reason="file_outside_dedicated_provider_directory",
+        )
+    try:
+        with _open_protected_file(reference, "protected_file") as (_, metadata):
+            return ReferencePreflight(
+                source="file",
+                location=reference.location,
+                present=True,
+                usable=True,
+                mode=stat.S_IMODE(metadata.st_mode),
+                owner_uid=metadata.st_uid,
+                owner_gid=metadata.st_gid,
+                reason=None,
+            )
+    except AdapterConfigError:
+        return ReferencePreflight(
+            source="file",
+            location=reference.location,
+            present=False,
+            usable=False,
+            mode=None,
+            owner_uid=None,
+            owner_gid=None,
+            reason="file_failed_dedicated_provider_checks",
+        )
+
+
+def read_protected_file(
+    reference: ProtectedReference,
+    field: str = "protected_file",
+) -> str:
+    """Read one dedicated owner-only provider reference without exposing its value."""
+
+    try:
+        with _open_protected_file(reference, field) as (file_fd, metadata):
+            raw = os.read(file_fd, _PROTECTED_FILE_MAX_BYTES + 1)
+    except OSError as exc:
+        raise AdapterConfigError(f"{field} protected file is unavailable") from exc
+    if (
+        len(raw) != metadata.st_size
+        or b"\x00" in raw
+    ):
+        raise AdapterConfigError(f"{field} protected file failed safety checks")
+    try:
+        decoded = raw.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise AdapterConfigError(f"{field} protected file is not valid text") from exc
+    if field in {"endpoint", "model", "credential"}:
+        return _validate_reference_value(decoded, field)
+    value = decoded.strip()
+    if not value:
+        raise AdapterConfigError(f"{field} protected file is empty")
+    return value
+
+
+def preflight_execution_reference(
+    reference: ProtectedReference,
+    *,
+    field: str,
+    dedicated_provider: bool = False,
+) -> ReferencePreflight:
+    """Apply the same reference checks used immediately before execution."""
+
+    if reference.source == "env" and reference.location not in PROTECTED_REFERENCE_ENV_NAMES:
+        return ReferencePreflight(
+            source="env",
+            location=reference.location,
+            present=reference.location in os.environ,
+            usable=False,
+            mode=None,
+            owner_uid=None,
+            owner_gid=None,
+            reason="environment_name_not_allowlisted",
+        )
+    result = preflight_adapter_reference(
+        reference,
+        dedicated_provider=dedicated_provider,
+        field=field if dedicated_provider else None,
+    )
+    if not result.usable or not dedicated_provider or reference.source != "file":
+        return result
+    try:
+        read_protected_file(reference, field)
+    except AdapterConfigError:
+        return ReferencePreflight(
+            source=result.source,
+            location=result.location,
+            present=result.present,
+            usable=False,
+            mode=result.mode,
+            owner_uid=result.owner_uid,
+            owner_gid=result.owner_gid,
+            reason="file_value_invalid",
+        )
+    return result
 
 
 @dataclass(frozen=True)
@@ -318,6 +589,33 @@ class AdapterConfig:
             "route": self.route.as_dict(),
             "limits": self.limits.as_dict(),
         }
+
+
+def resolve_dsh_file_environment(
+    route: ProviderRoute,
+    values: dict[str, str],
+) -> tuple[dict[str, str], tuple[str, ...]]:
+    """Resolve DSH file references in memory and add only its child aliases."""
+
+    file_values: dict[str, str] = {}
+    resolved: dict[str, str] = {}
+    for field, reference in (
+        ("endpoint", route.endpoint_ref),
+        ("model", route.model_ref),
+        ("credential", route.credential_ref),
+    ):
+        if reference.source == "file":
+            value = read_protected_file(reference, field)
+            file_values[field] = value
+        else:
+            value = os.environ.get(reference.location)
+            value = _validate_reference_value(value, field)
+            values[reference.location] = value
+        resolved[field] = value
+    endpoint = resolved["endpoint"]
+    credential = resolved["credential"]
+    values.update({"DEEPSEEK_BASE_URL": endpoint, "DEEPSEEK_API_KEY": credential})
+    return values, tuple((*values.values(), *file_values.values()))
 
 
 def _runtime_route_fields(path: str, roots: tuple[Path, ...]) -> tuple[bool, str, str]:

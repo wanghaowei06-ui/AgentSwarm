@@ -19,7 +19,15 @@ import time
 from typing import Any
 
 from .codex_cli import build_codex_cli_launch
-from .config import AdapterConfig, ProtectedReference, bind_bailian_route, preflight_reference
+from .config import (
+    AdapterConfig,
+    AdapterConfigError,
+    ProtectedReference,
+    PROTECTED_REFERENCE_ENV_NAMES,
+    bind_bailian_route,
+    preflight_execution_reference,
+    resolve_dsh_file_environment,
+)
 from .native_worker import (
     DSH_PROVIDER_PROFILES,
     NativeWorkerAssignment,
@@ -39,18 +47,7 @@ MAX_PROMPT_BYTES = 128 * 1024
 DEFAULT_MAX_OUTPUT_BYTES = 1024 * 1024
 KILL_GRACE_SECONDS = 1.0
 
-_PROTECTED_REFERENCE_ENV_NAMES = frozenset(
-    "HOME CODEX_HOME CODEX_ENDPOINT CODEX_MODEL CODEX_WORKER_MODEL "
-    "AGENTTEAMS_AI_GATEWAY_URL AGENTTEAMS_WORKER_GATEWAY_KEY AGENTTEAMS_WORKER_MODEL "
-    "DEEPSEEK_API_KEY DEEPSEEK_BASE_URL DEEPSEEK_MODEL "
-    "DASHSCOPE_API_KEY DASHSCOPE_BASE_URL DASHSCOPE_MODEL "
-    "TESTWEAVER_BAILIAN_CREDENTIAL TESTWEAVER_BAILIAN_ENDPOINT TESTWEAVER_BAILIAN_MODEL "
-    "TESTWEAVER_CODEX_CREDENTIAL TESTWEAVER_CODEX_ENDPOINT TESTWEAVER_CODEX_MODEL "
-    "TESTWEAVER_DSH_CREDENTIAL TESTWEAVER_DSH_ENDPOINT TESTWEAVER_DSH_MODEL"
-    .split()
-)
 _CHILD_ENV_NAMES = frozenset("CODEX_HOME HOME HTTPS_PROXY HTTP_PROXY LANG LC_ALL NO_PROXY PATH SSL_CERT_DIR SSL_CERT_FILE TMPDIR".split())
-_PROTECTED_FILE_ROOTS = tuple(Path(item) for item in ("/etc/agentteams", "/run/secrets/agentteams", "/var/run/secrets/agentteams"))
 _WORKSPACE_ROOTS = tuple(Path(item) for item in ("/root/agentteams-fs/agents", "/tmp/agentteams-native-worker"))
 _SECRET_RE = re.compile(r"(?i)(\b(?:authorization|api[_-]?key|access[_-]?key|secret|token|password)\b\s*[:=]\s*)([^\s,;\}\]\"]+)")
 _BEARER_RE = re.compile(r"(?i)\bBearer\s+[^\s,;]+")
@@ -81,13 +78,15 @@ def _redact(value: str, secrets: Iterable[str] = ()) -> str:
     return _SECRET_RE.sub(r"\1[REDACTED]", result)
 
 
-def _validate_reference(reference: ProtectedReference, field: str) -> None:
+def _validate_reference(reference: ProtectedReference, field: str, *, dsh_file: bool = False) -> None:
     if reference.source == "env":
-        if reference.location not in _PROTECTED_REFERENCE_ENV_NAMES:
+        if reference.location not in PROTECTED_REFERENCE_ENV_NAMES:
             raise NativeExecutionError(f"{field} environment reference is not allowlisted")
-    elif not _inside(Path(reference.location), _PROTECTED_FILE_ROOTS):
-        raise NativeExecutionError(f"{field} file reference is outside protected roots")
-    check = preflight_reference(reference)
+    check = preflight_execution_reference(
+        reference,
+        dedicated_provider=dsh_file,
+        field=field,
+    )
     if not check.usable:
         raise NativeExecutionError(f"{field} protected reference is unavailable")
 
@@ -105,19 +104,14 @@ def _workspace() -> Path:
 def _environment(config: AdapterConfig) -> tuple[dict[str, str], tuple[str, ...]]:
     names = set(_CHILD_ENV_NAMES)
     refs = (config.route.endpoint_ref, config.route.model_ref, config.route.credential_ref)
-    names.update(ref.location for ref in refs if ref.source == "env")
+    if config.adapter_kind == "dsh":
+        names.update(ref.location for ref in refs if ref.source == "env")
     values = {name: os.environ[name] for name in names if name in os.environ}
     if config.adapter_kind == "dsh":
-        for alias, reference in (
-            ("DEEPSEEK_BASE_URL", config.route.endpoint_ref),
-            ("DEEPSEEK_API_KEY", config.route.credential_ref),
-        ):
-            if reference.source != "env":
-                raise NativeExecutionError("DSH routes require environment references")
-            value = os.environ.get(reference.location)
-            if not value:
-                raise NativeExecutionError("DSH protected reference is empty")
-            values[alias] = value
+        try:
+            return resolve_dsh_file_environment(config.route, values)
+        except AdapterConfigError as exc:
+            raise NativeExecutionError(str(exc)) from exc
     if config.adapter_kind == "codex-cli" and any(not values.get(name) for name in ("HOME", "CODEX_HOME")):
         raise NativeExecutionError("Codex protected environment is not bound")
     return values, tuple(values.values())
@@ -137,7 +131,7 @@ def _validate(assignment: NativeWorkerAssignment, config: AdapterConfig, provena
         ("model", route.model_ref),
         ("credential", route.credential_ref),
     ):
-        _validate_reference(reference, name)
+        _validate_reference(reference, name, dsh_file=config.adapter_kind == "dsh")
     if config.adapter_kind == "dsh":
         if route.provider not in DSH_PROVIDER_PROFILES:
             raise NativeExecutionError("DSH provider profile is not allowlisted")
