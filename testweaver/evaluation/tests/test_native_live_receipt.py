@@ -287,6 +287,26 @@ class NativeLiveReceiptTests(unittest.TestCase):
                 expected_budget_hash=_BUDGET_HASH,
             )
 
+    def test_many_exports_allow_profiles_but_reject_duplicate_observations(self) -> None:
+        baseline = _export(run_id="baseline", repetition=1)
+        treatment = _export(run_id="treatment", repetition=1)
+        treatment["profile"] = "E0"
+
+        result = normalize_native_run_exports(
+            [baseline, treatment],
+            expected_input_hash=_INPUT_HASH,
+            expected_budget_hash=_BUDGET_HASH,
+        )
+        self.assertEqual(len(result["rows"]), 2)
+
+        duplicate = _export(run_id="duplicate", repetition=1)
+        with self.assertRaisesRegex(LiveReceiptError, "duplicate paired observation"):
+            normalize_native_run_exports(
+                [baseline, duplicate],
+                expected_input_hash=_INPUT_HASH,
+                expected_budget_hash=_BUDGET_HASH,
+            )
+
     def test_manifest_hash_is_sealed_and_input_is_not_mutated(self) -> None:
         export = _export()
         original = copy.deepcopy(export)

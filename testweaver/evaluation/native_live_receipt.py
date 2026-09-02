@@ -285,7 +285,7 @@ def normalize_native_run_exports(
             raise LiveReceiptError("duplicate fresh native identity")
         if len(set(all_ids)) != len(all_ids):
             raise LiveReceiptError("duplicate identity within normalized export")
-        pair_key = tuple(row[field] for field in PAIRING_FIELDS)
+        pair_key = tuple(row[field] for field in (*PAIRING_FIELDS, "profile"))
         if pair_key in seen_pair_keys:
             raise LiveReceiptError("duplicate paired observation")
         seen_ids.update(all_ids)
