@@ -1,0 +1,24 @@
+{
+  "schema": "testweaver.preflight-manifest/v1",
+  "run_id": "dsh-bailian-file-projection-20260903T000000Z",
+  "classification": "DSH_BAILIAN_LIVE",
+  "source_commit": "9aa1d0c43825ec9a0aac852f5a876086244283d8",
+  "files": {
+    "receipt.json": "sha256:150dd98c10d206dab5efe341aa492b296e08d3cdad641e4924444f0709655e85"
+  },
+  "probe": {
+    "mcp_call_count": 1,
+    "provider": "aliyun-bailian",
+    "result_status": "completed",
+    "dsh_exit_code": 0,
+    "usage": "NOT_OBSERVED",
+    "http_status": "NOT_OBSERVED",
+    "gateway_route_issue": "P1_HTTP_404",
+    "artifact_sha256": "sha256:c2702d58e775c18942046995b36c970f3a71ce93483980cf0ec2171555c1f5c9"
+  },
+  "secret_policy": {
+    "values": false,
+    "prompt_response": false,
+    "scan": "PASS"
+  }
+}

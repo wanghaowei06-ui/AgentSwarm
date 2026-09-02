@@ -1,0 +1,78 @@
+{
+  "schema": "testweaver.dsh-bailian-preflight/v1",
+  "run_id": "dsh-bailian-file-projection-20260903T000000Z",
+  "classification": "DSH_BAILIAN_LIVE",
+  "scope": "single-bounded-file-reference-provider-probe",
+  "source_commit": "9aa1d0c43825ec9a0aac852f5a876086244283d8",
+  "worker": {
+    "resource": "native-m0-clean-dsh-worker",
+    "container_id": "a83e091bcf194a7361191a7e1d615fcd31e4ec8901adb32003faeede6bc6a323",
+    "image": "agentteams/qwenpaw-worker:dsh-live-9aa1d0c",
+    "image_digest": "sha256:530ad2d39e2b5ca005fca63c59e31b676f04fa7a72eb6b9b7d058ca3725df9fb",
+    "runtime": "qwenpaw",
+    "model": "deepseek-v4-flash",
+    "team": "native-m0-clean-team",
+    "matrix_user_id": "@native-m0-clean-dsh-worker:matrix-native-m0-20260901.agentteams.local:28080",
+    "room_id": "!t8ycL6WDpsGf9D0mGo:matrix-native-m0-20260901.agentteams.local:28080"
+  },
+  "secret_projection": {
+    "source_file": "/etc/agentteams/providers.env",
+    "source_owner": "root:root",
+    "source_mode": "0600",
+    "source_key_names": [
+      "AGENTTEAMS_BAILIAN_BASE_URL",
+      "AGENTTEAMS_BAILIAN_MODEL",
+      "AGENTTEAMS_BAILIAN_API_KEY"
+    ],
+    "volume": "agentteams-native-m0-20260901-worker-native-m0-clean-dsh-worker-auth",
+    "host_projection_dir": "/var/lib/docker/volumes/agentteams-native-m0-20260901-worker-native-m0-clean-dsh-worker-auth/_data/testweaver-provider",
+    "container_projection_dir": "/var/run/secrets/agentteams/testweaver-provider",
+    "directory_owner": "root:root",
+    "directory_mode": "0700",
+    "file_names": ["endpoint", "model", "credential"],
+    "file_owner": "root:root",
+    "file_mode": "0400",
+    "values_in_receipt": false
+  },
+  "route": {
+    "provider": "aliyun-bailian",
+    "model_reference": "file:/var/run/secrets/agentteams/testweaver-provider/model",
+    "endpoint_reference": "file:/var/run/secrets/agentteams/testweaver-provider/endpoint",
+    "credential_reference": "file:/var/run/secrets/agentteams/testweaver-provider/credential",
+    "wire_api": "chat",
+    "route_name": "testweaver-bailian-route",
+    "path_shape": "/v1/testweaver-bailian"
+  },
+  "probe": {
+    "started_at": "2026-09-02T22:11:19Z",
+    "mcp_call_count": 1,
+    "mcp_request_sha256": "48aff248b15216d6f4b4e4b1e44666f84e4dafeee1da4cdd769bcf880af41805",
+    "mcp_response_sha256": "abfee8f96114a8a51e7e2acc360a17722d522e3f91d2abe0b1e7240647bf1304",
+    "mcp_process_exit": 0,
+    "mcp_inner_ok": true,
+    "dsh_child_started": true,
+    "dsh_exit_code": 0,
+    "provider_invocation": "OBSERVED",
+    "provider": "aliyun-bailian",
+    "model": "PROTECTED_FILE_REFERENCE",
+    "http_status": "NOT_OBSERVED",
+    "gateway_route_issue": "P1_HTTP_404",
+    "result_status": "completed",
+    "termination": "none",
+    "usage_status": "NOT_OBSERVED",
+    "usage_keys": ["cost_units", "input_tokens", "model_decisions", "observed", "output_tokens", "tool_calls"],
+    "latency_seconds": 2.8576626509893686,
+    "result_ref": ".testweaver-native-results/result-c2702d58e775c18942046995b36c970f3a71ce93483980cf0ec2171555c1f5c9.txt",
+    "artifact_sha256": "sha256:c2702d58e775c18942046995b36c970f3a71ce93483980cf0ec2171555c1f5c9",
+    "normalized_result_sha256": "sha256:d1309a4c25d0bb18ab845ffe705ab5e3524900dcdcb37fa6cf2d20a24cb6374f"
+  },
+  "safety": {
+    "prompt_recorded": false,
+    "response_recorded": false,
+    "secret_values_recorded": false,
+    "agentteams_task_created": false,
+    "hero_run_started": false,
+    "retries": 0,
+    "receipt_secret_scan": "PASS"
+  }
+}
