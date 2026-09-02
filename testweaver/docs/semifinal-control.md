@@ -18,6 +18,7 @@
 - 首个真实 Hero 的 DSH 百炼接线采用风险分层：P0 允许把现有百炼凭据以只读容器 Secret 仅挂载给目标 DSH adapter，先直连百炼跑通真实调用；Secret 不得进入镜像、仓库、Prompt、任务产物、日志或 receipt，运行后必须做 names-only readback 与泄密扫描。即使暂时绕过统一网关，adapter 仍必须记录同一 Run 的 provider/model、usage、延迟、HTTP/退出状态、request/response hash 和 Worker/Task 身份。该路径只证明真实异构调用，不得宣称已完成网关级统一限流、计费、轮换或消费者鉴权。
 - P1 在首个 Hero 冻结后把 DSH 切回现有 AgentTeams Provider/Route 和 Worker consumer credential；沿用同一统计/receipt schema，不重写上层任务链。网关化不得重新成为首次闭环前置条件。
 - Codex CLI 外部 Worker 必须由 `codex-cc` 启动，不使用裸 `codex`；计划模型固定为 `gpt-5.6-luna`、推理强度 `max`。首跑复用当前已登录的受保护 `CODEX_HOME`，只挂载到目标 Codex Worker，不复制认证缓存；M4 稳定复跑可把同一 CLI adapter 改为 API Key 登录。完整 Responses API adapter 属于 P1，不阻塞首次闭环。
+- Codex Worker 不再扩写第二套 runtime：优先复用旧资产树 `AgentTeams-pr1139/plugins/teamharness/remote/codex-cli/` 在提交 `071ae6e` 的原生 TeamHarness remote-member、Codex app-server、Matrix assignment、taskflow 和安全隔离能力；当前新仓库 `testweaver/adapters/codex_cli.py` 只保留固定 `codex-cc` 启动约束与 TestWeaver result/receipt 映射。旧资产树的未提交修改不直接复制，必须先证明相对 `071ae6e` 的必要性并独立复核。
 - 当前协作在同一工作区完成；按文件范围并行，不再为小任务创建大量 worktree。
 - 完整目标态以 [`semifinal-complete-project-proposal.md`](semifinal-complete-project-proposal.md) 为准；该方案已按最新复赛五项评分维度、工程安全七个子项和 AgentTeams 原生边界修订。它不承载实时进度，本文件仍是唯一实施总控。
 
@@ -58,6 +59,8 @@ TestWeaver 只做产品差异：
 5. `M4 交付`：继承可用的产品展示、离线包、复跑脚本和开源材料；所有 UI、PPT、视频只展示已冻结的真实 receipt，不造历史数据。
 
 每项资产都必须依次完成：证明原生缺口 → 在资产清单中分类 → 只迁入最薄差异层 → focused test → 真实运行验证 → receipt/保留或回退决定。禁止整提交回灌；旧 TaskRun/Scheduler、第二 Manager 协议、Observer 调度权、Room/Session 重建、Hermes 专用桥和外围巨型 Gate 永不继承。
+
+每个实现 Step 开始前必须先搜索当前仓库、24 项资产清单和对应供体路径；已有能力只能复用、配置或做薄映射，不得重新实现。当前继承优先级保持为：五个领域 Skill 与 Context/Evidence/Handoff（已迁入，待 LIVE）→ DSH 与 PR1139 Codex Worker（正在 LIVE）→ HITL/恢复/双 Oracle（已有真实 PARTIAL/PASS 资产，补同 Hero 关联）→ AgentLoop/OTel 与 PostgreSQL 证据关联 → Golden/E0–E3 → 离线包与开源材料。历史 receipt 只作来源线索，不替代新运行。
 
 ## 5. 当前事实
 
