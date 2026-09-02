@@ -1,3 +1,8 @@
+---
+name: testweaver-native-external-worker
+description: "Use when a native Leader assigns a real AgentTeams Task and this Worker must perform one bounded external execution through the testweaver-native-worker MCP tool."
+---
+
 # Native external Worker execution
 
 Use this skill only after the native Leader has assigned you a real

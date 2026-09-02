@@ -56,6 +56,20 @@ class PackageWiringTests(unittest.TestCase):
         for forbidden in ("create_project", "delegate_task", "submit_task", "scheduler"):
             self.assertNotIn(forbidden, skill)
 
+    def test_package_skill_has_qwenpaw_frontmatter(self) -> None:
+        skill = (PACKAGE / "skills/testweaver-native-external-worker/SKILL.md").read_text(encoding="utf-8")
+        self.assertTrue(skill.startswith("---\n"))
+        end = skill.find("\n---\n", len("---\n"))
+        self.assertGreater(end, len("---\n"))
+        frontmatter = skill[len("---\n") : end]
+        self.assertRegex(
+            frontmatter,
+            r"(?m)^name:\s*testweaver-native-external-worker\s*$",
+        )
+        description = re.search(r"(?m)^description:\s*(.+?)\s*$", frontmatter)
+        self.assertIsNotNone(description)
+        self.assertTrue(description.group(1).strip().strip('"').strip("'"))
+
     def test_extension_build_is_immutable_and_dsh_package_is_fixed(self) -> None:
         dockerfile = (ROOT / "Dockerfile.qwenpaw").read_text(encoding="utf-8")
         script = ROOT / "build-qwenpaw-native-extension.sh"
