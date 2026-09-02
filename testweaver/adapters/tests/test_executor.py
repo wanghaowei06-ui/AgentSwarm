@@ -485,7 +485,7 @@ class OneShotExecutorTests(unittest.TestCase):
                 with adapter_config.bind_bailian_route(config, (home, workspace)):
                     self.assertEqual(
                         os.environ["TESTWEAVER_BAILIAN_ENDPOINT"],
-                        "https://home.invalid/v1/testweaver-bailian",
+                        "https://home.invalid/v1/testweaver-bailian/v1",
                     )
                     self.assertEqual(os.environ["TESTWEAVER_BAILIAN_MODEL"], "home-bailian-model")
                     self.assertEqual(
@@ -523,10 +523,83 @@ class OneShotExecutorTests(unittest.TestCase):
                 with adapter_config.bind_bailian_route(_config("aliyun-bailian"), (home, workspace)):
                     self.assertEqual(
                         os.environ["TESTWEAVER_BAILIAN_ENDPOINT"],
-                        "https://workspace.invalid/v1/testweaver-bailian",
+                        "https://workspace.invalid/v1/testweaver-bailian/v1",
                     )
                     self.assertEqual(os.environ["TESTWEAVER_BAILIAN_MODEL"], "workspace-bailian-model")
                 self.assertEqual(os.environ, environment)
+
+    def test_bailian_endpoint_v1_suffix_is_idempotent_for_runtime_and_gateway(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory) / "workspace"
+            workspace.mkdir()
+            runtime = workspace / "runtime.yaml"
+            runtime.write_text(
+                "desired:\n"
+                "  model:\n"
+                "    gatewayUrl: https://runtime.invalid/v1/testweaver-bailian/v1\n"
+                "    model: runtime-bailian-model\n",
+                encoding="utf-8",
+            )
+            cases = (
+                (
+                    {
+                        "TEAMHARNESS_RUNTIME_CONFIG": str(runtime),
+                        "AGENTTEAMS_AI_GATEWAY_URL": "https://unused.invalid/gateway",
+                    },
+                    "https://runtime.invalid/v1/testweaver-bailian/v1",
+                ),
+                (
+                    {
+                        "TEAMHARNESS_RUNTIME_CONFIG": "",
+                        "AGENTTEAMS_AI_GATEWAY_URL": "https://gateway.invalid/v1/testweaver-bailian",
+                    },
+                    "https://gateway.invalid/v1/testweaver-bailian/v1",
+                ),
+            )
+            for environment, expected in cases:
+                with self.subTest(expected=expected), patch.dict(
+                    os.environ,
+                    {
+                        **environment,
+                        "TESTWEAVER_BAILIAN_ENDPOINT": "",
+                        "TESTWEAVER_BAILIAN_MODEL": "",
+                        "TESTWEAVER_BAILIAN_CREDENTIAL": "",
+                    },
+                    clear=True,
+                ):
+                    with adapter_config.bind_bailian_route(
+                        _config("aliyun-bailian"),
+                        (workspace,),
+                    ):
+                        self.assertEqual(os.environ["TESTWEAVER_BAILIAN_ENDPOINT"], expected)
+
+    def test_bailian_endpoint_normalization_is_provider_scoped_and_fail_closed(self) -> None:
+        original = {
+            "AGENTTEAMS_AI_GATEWAY_URL": "https://gateway.invalid/v1/testweaver-bailian",
+            "TESTWEAVER_DSH_ENDPOINT": "https://deepseek.invalid/base",
+        }
+        with patch.dict(os.environ, original, clear=True):
+            with adapter_config.bind_bailian_route(_config("deepseek"), (Path("/tmp"),)):
+                self.assertEqual(os.environ, original)
+
+        marker = "must-not-appear"
+        with patch.dict(
+            os.environ,
+            {
+                "AGENTTEAMS_AI_GATEWAY_URL": f"https://gateway.invalid/path?token={marker}",
+                "TESTWEAVER_BAILIAN_ENDPOINT": "",
+                "TESTWEAVER_BAILIAN_MODEL": "fixture-bailian-model",
+                "TESTWEAVER_BAILIAN_CREDENTIAL": "fixture-bailian-credential-1234",
+            },
+            clear=True,
+        ):
+            with adapter_config.bind_bailian_route(
+                _config("aliyun-bailian"),
+                (Path("/tmp"),),
+            ):
+                with self.assertRaises(executor.NativeExecutionError) as raised:
+                    executor._environment(_config("aliyun-bailian"))
+                self.assertNotIn(marker, str(raised.exception))
 
     def test_bailian_binding_does_not_fallback_to_default_route_when_runtime_is_unavailable(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

@@ -284,6 +284,22 @@ def _validate_endpoint(value: Any, field: str = "endpoint") -> str:
     return normalized
 
 
+def _ensure_url_path_suffix(value: str, suffix: str) -> str:
+    """Return a validated URL whose path ends with one exact suffix segment."""
+
+    normalized = _validate_endpoint(value)
+    endpoint = urlsplit(normalized)
+    try:
+        _ = endpoint.port
+    except ValueError as exc:
+        raise AdapterConfigError("endpoint protected value has invalid format") from exc
+    segment = "/" + suffix.strip("/")
+    path = endpoint.path.rstrip("/")
+    if not path.endswith(segment):
+        path += segment
+    return endpoint._replace(path=path).geturl()
+
+
 def _validate_model(value: Any, field: str = "model") -> str:
     if not isinstance(value, str):
         raise AdapterConfigError(f"{field} protected value has invalid format")
@@ -699,6 +715,11 @@ def bind_bailian_route(config: AdapterConfig, roots: tuple[Path, ...]):
         present, endpoint, model = _runtime_route_from_environment(roots)
         if not present:
             endpoint = os.environ.get("AGENTTEAMS_AI_GATEWAY_URL", "").strip()
+        if endpoint:
+            try:
+                endpoint = _ensure_url_path_suffix(endpoint, "v1")
+            except AdapterConfigError:
+                endpoint = ""
         model = model or os.environ.get("AGENTTEAMS_WORKER_MODEL", "").strip()
         candidates = {
             "TESTWEAVER_BAILIAN_ENDPOINT": endpoint,
