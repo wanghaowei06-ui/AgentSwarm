@@ -20,6 +20,11 @@ test ! -e "${package_root}/bundle-manifest.json"
 
 jq -e 'type == "object" and .version == "1.0" and has("schema_version") | not' \
   "${package_root}/manifest.json" >/dev/null
+jq -e '(.worker // {}) | has("suggested_name") | not' \
+  "${package_root}/manifest.json" >/dev/null
+package_version="$(jq -er '.version | strings | select(length > 0)' "${package_root}/manifest.json")"
+package_source_commit="$(jq -er '.source.source_commit | strings | select(length > 0)' "${package_root}/manifest.json")"
+manifest_sha256="$(sha256sum "${package_root}/manifest.json" | cut -d' ' -f1)"
 
 mapfile -t actual_names < <(
   find "${package_root}/skills" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort
@@ -43,4 +48,5 @@ for name in "${expected_names[@]}"; do
   sed -n '2,5p' "${package_file}" | grep -q '^assign_when: '
 done
 
-printf 'PASS: native AgentSpec package layout and five Skill hashes\n'
+printf 'PASS: native AgentSpec package layout version=%s source_commit=%s manifest_sha256=%s skill_count=%s\n' \
+  "${package_version}" "${package_source_commit}" "${manifest_sha256}" "${#expected_names[@]}"

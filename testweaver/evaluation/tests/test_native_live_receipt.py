@@ -72,6 +72,19 @@ def _export(*, run_id: str = "run-1", repetition: int = 1) -> dict:
     }
 
 
+def _attest_native_export(export: dict) -> dict:
+    raw_hash = canonical_hash(export)
+    attestation = {
+        "source_ref": f"native-source/{export['run_id']}",
+        "source_hash": raw_hash,
+        "attestation_ref": f"collector-attestation/{export['run_id']}",
+        "source_kind": "agentteams-native-export",
+    }
+    attestation["attestation_hash"] = canonical_hash(attestation)
+    export["raw_source_attestation"] = attestation
+    return export
+
+
 class NativeLiveReceiptTests(unittest.TestCase):
     def test_qwenpaw_token_usage_is_normalized_to_a_paired_row(self) -> None:
         result = normalize_native_run_export(
@@ -106,6 +119,60 @@ class NativeLiveReceiptTests(unittest.TestCase):
         self.assertEqual(result["manifest"]["usage"]["call_count"], 2)
         self.assertEqual(result["manifest"]["actor"]["runtime"], "qwenpaw")
         compare_pair(row, row)
+
+    def test_missing_raw_source_attestation_stays_partial(self) -> None:
+        result = normalize_native_run_export(
+            _export(), expected_input_hash=_INPUT_HASH, expected_budget_hash=_BUDGET_HASH
+        )
+
+        self.assertEqual(result["classification"], "PARTIAL")
+        self.assertEqual(result["manifest"]["classification"], "PARTIAL")
+        self.assertEqual(result["missing_observations"], ["raw_source_attestation"])
+
+    def test_attested_native_export_is_structural_only_until_hero_facts_exist(self) -> None:
+        result = normalize_native_run_export(
+            _attest_native_export(_export()),
+            expected_input_hash=_INPUT_HASH,
+            expected_budget_hash=_BUDGET_HASH,
+        )
+
+        self.assertEqual(result["classification"], "STRUCTURAL_LIVE_SMOKE")
+        self.assertNotEqual(result["classification"], "LIVE_AGENTTEAMS_HERO")
+        self.assertIn("worker_skill_invoke", result["missing_observations"])
+        self.assertEqual(result["manifest"]["raw_source_attestation"]["source_kind"], "agentteams-native-export")
+
+    def test_replay_or_fixture_source_cannot_be_attested_as_native_live(self) -> None:
+        for source_kind in ("fixture", "replay", "synthetic"):
+            with self.subTest(source_kind=source_kind):
+                export = _attest_native_export(_export())
+                export["raw_source_attestation"]["source_kind"] = source_kind
+                export["raw_source_attestation"]["attestation_hash"] = canonical_hash(
+                    {
+                        key: value
+                        for key, value in export["raw_source_attestation"].items()
+                        if key != "attestation_hash"
+                    }
+                )
+                with self.assertRaisesRegex(LiveReceiptError, "source_kind"):
+                    normalize_native_run_export(
+                        export, expected_input_hash=_INPUT_HASH, expected_budget_hash=_BUDGET_HASH
+                    )
+
+    def test_caller_classification_is_not_an_accepted_export_field(self) -> None:
+        export = _export()
+        export["classification"] = "LIVE_AGENTTEAMS_HERO"
+        with self.assertRaisesRegex(LiveReceiptError, "unknown"):
+            normalize_native_run_export(
+                export, expected_input_hash=_INPUT_HASH, expected_budget_hash=_BUDGET_HASH
+            )
+
+    def test_raw_source_hash_must_bind_unmodified_export(self) -> None:
+        export = _attest_native_export(_export())
+        export["latency_ms"] = 99.0
+        with self.assertRaisesRegex(LiveReceiptError, "source_hash"):
+            normalize_native_run_export(
+                export, expected_input_hash=_INPUT_HASH, expected_budget_hash=_BUDGET_HASH
+            )
 
     def test_qwenpaw_session_usage_shape_is_supported_without_content(self) -> None:
         export = _export()

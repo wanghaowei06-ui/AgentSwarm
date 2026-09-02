@@ -26,6 +26,8 @@ SCHEMA_VERSION = "testweaver.m3.native-run-export/v1"
 NORMALIZED_SCHEMA_VERSION = "testweaver.m3.native-run-receipt/v1"
 PROFILE_NAMES = frozenset({"E0", "E1", "E2", "E3"})
 TERMINAL_STATES = frozenset({"completed", "failed", "cancelled"})
+STRUCTURAL_CLASSIFICATION = "STRUCTURAL_LIVE_SMOKE"
+PARTIAL_CLASSIFICATION = "PARTIAL"
 _HASH = re.compile(r"^sha256:[0-9a-f]{64}$")
 _IDENTIFIER = re.compile(r"^\S{1,512}$")
 
@@ -48,13 +50,20 @@ _TOP_FIELDS = frozenset(
         "receipt_ref",
         "manifest_ref",
         "evidence_refs",
+        "raw_source_attestation",
         "usage",
         "latency_ms",
         "cost",
         "metrics",
     }
 )
-_REQUIRED_TOP_FIELDS = _TOP_FIELDS - {"usage", "latency_ms", "cost", "metrics"}
+_REQUIRED_TOP_FIELDS = _TOP_FIELDS - {
+    "raw_source_attestation",
+    "usage",
+    "latency_ms",
+    "cost",
+    "metrics",
+}
 _NATIVE_FIELDS = frozenset(
     {
         "project_id",
@@ -112,10 +121,86 @@ _FORBIDDEN_FIELD_NAMES = frozenset(
     }
 )
 _MISSING = object()
+_RAW_SOURCE_FIELDS = frozenset(
+    {"source_ref", "source_hash", "attestation_ref", "attestation_hash", "source_kind"}
+)
+_RAW_SOURCE_KIND = "agentteams-native-export"
+_HERO_MISSING_OBSERVATIONS = (
+    "manager_provider_and_dynamic_selection",
+    "independent_agent_identities",
+    "leader_native_delegation_and_handoff",
+    "worker_skill_invoke",
+    "human_pause_decision_resume",
+    "failure_recovery_and_late_result_rejection",
+    "postgres_quality_lineage",
+    "independent_outcome_boundary_oracles",
+)
 
 
 class LiveReceiptError(ValueError):
     """Raised when an external native export cannot be safely normalized."""
+
+
+def _validate_raw_source_attestation(
+    export: Mapping[str, Any],
+) -> dict[str, str] | None:
+    """Validate a hash-bound attestation for the unmodified native export.
+
+    The attestation contains references and hashes only.  It is intentionally
+    not inferred from a caller's classification, fixture label, or replay
+    metadata.  ``source_hash`` binds the attestation to the export fields
+    themselves, while ``attestation_hash`` seals the attestation record.
+    """
+
+    value = export.get("raw_source_attestation")
+    if value is None:
+        return None
+    if not isinstance(value, Mapping) or set(value) != _RAW_SOURCE_FIELDS:
+        raise LiveReceiptError("raw_source_attestation has unsupported or missing fields")
+    _reject_forbidden_fields(value)
+    source_kind = value["source_kind"]
+    if source_kind != _RAW_SOURCE_KIND:
+        raise LiveReceiptError("raw_source_attestation source_kind is not native")
+    source_ref = _identifier(value["source_ref"], "raw_source_attestation.source_ref")
+    attestation_ref = _identifier(value["attestation_ref"], "raw_source_attestation.attestation_ref")
+    source_hash = _hash_value(value["source_hash"], "raw_source_attestation.source_hash")
+    attestation_hash = _hash_value(value["attestation_hash"], "raw_source_attestation.attestation_hash")
+
+    attestation_payload = {key: child for key, child in value.items() if key != "attestation_hash"}
+    raw_payload = {key: child for key, child in export.items() if key != "raw_source_attestation"}
+    try:
+        expected_source_hash = canonical_hash(raw_payload)
+        expected_attestation_hash = canonical_hash(attestation_payload)
+    except (TypeError, ValueError) as error:
+        raise LiveReceiptError("raw_source_attestation hash input is not canonical JSON") from error
+    if source_hash != expected_source_hash:
+        raise LiveReceiptError("raw_source_attestation source_hash does not bind the export")
+    if attestation_hash != expected_attestation_hash:
+        raise LiveReceiptError("raw_source_attestation attestation_hash mismatch")
+    return {
+        "source_ref": source_ref,
+        "source_hash": source_hash,
+        "attestation_ref": attestation_ref,
+        "attestation_hash": attestation_hash,
+        "source_kind": source_kind,
+    }
+
+
+def _classify_export(
+    raw_source_attestation: Mapping[str, str] | None,
+) -> tuple[str, list[str]]:
+    """Return a conservative classification from existing native facts.
+
+    A raw-source attestation permits a structural live smoke label.  The
+    complete Hero label is deliberately unreachable from this M3 row alone:
+    native lifecycle, Skill invocation, Human decision, recovery, PostgreSQL
+    lineage, and independent Oracle facts must be observed by their existing
+    owners before a caller can classify a run as ``LIVE_AGENTTEAMS_HERO``.
+    """
+
+    if raw_source_attestation is None:
+        return PARTIAL_CLASSIFICATION, ["raw_source_attestation"]
+    return STRUCTURAL_CLASSIFICATION, list(_HERO_MISSING_OBSERVATIONS)
 
 
 def normalize_native_run_export(
@@ -167,6 +252,8 @@ def normalize_native_run_export(
     evidence_refs = _validate_refs(export["evidence_refs"], "evidence_refs")
     receipt_ref = _validate_ref(export["receipt_ref"], "receipt_ref")
     manifest_ref = _validate_ref(export["manifest_ref"], "manifest_ref")
+    raw_source_attestation = _validate_raw_source_attestation(export)
+    classification, missing_observations = _classify_export(raw_source_attestation)
 
     usage = _normalize_usage(export.get("usage"))
     usage_present = any(
@@ -222,6 +309,8 @@ def normalize_native_run_export(
     manifest_payload = {
         "schema_version": "testweaver.m3.native-run-manifest/v1",
         "source": "external_native_run_export",
+        "classification": classification,
+        "missing_observations": missing_observations,
         "run_id": run_id,
         "case_id": case_id,
         "input_hash": input_hash,
@@ -240,6 +329,7 @@ def normalize_native_run_export(
         "oracle_result_refs": oracle_refs,
         "receipt_ref": receipt_ref,
         "manifest_ref": manifest_ref,
+        "raw_source_attestation": raw_source_attestation,
     }
     manifest = {
         **manifest_payload,
@@ -249,6 +339,8 @@ def normalize_native_run_export(
         "schema_version": NORMALIZED_SCHEMA_VERSION,
         "rows": [row],
         "manifest": manifest,
+        "classification": classification,
+        "missing_observations": missing_observations,
     }
     return {**payload, "content_hash": canonical_hash(payload)}
 
@@ -276,9 +368,14 @@ def normalize_native_run_exports(
     manifests: list[dict[str, Any]] = []
     seen_ids: set[str] = set()
     seen_pair_keys: set[tuple[Any, ...]] = set()
+    batch_missing: set[str] = set()
+    batch_classification = STRUCTURAL_CLASSIFICATION
     for item in normalized:
         row = item["rows"][0]
         manifest = item["manifest"]
+        if item["classification"] != STRUCTURAL_CLASSIFICATION:
+            batch_classification = PARTIAL_CLASSIFICATION
+        batch_missing.update(item["missing_observations"])
         native_ids = tuple(manifest["native"][field] for field in ("project_id", "task_id", "room_id"))
         all_ids = (row["run_id"], *native_ids)
         if any(value in seen_ids for value in all_ids):
@@ -297,6 +394,8 @@ def normalize_native_run_exports(
         "schema_version": "testweaver.m3.native-run-manifest-batch/v1",
         "rows": rows,
         "manifests": manifests,
+        "classification": batch_classification,
+        "missing_observations": sorted(batch_missing),
     }
     return {**payload, "content_hash": canonical_hash(payload)}
 
