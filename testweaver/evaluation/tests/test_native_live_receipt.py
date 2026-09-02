@@ -136,8 +136,9 @@ class NativeLiveReceiptTests(unittest.TestCase):
             expected_budget_hash=_BUDGET_HASH,
         )
 
-        self.assertEqual(result["classification"], "STRUCTURAL_LIVE_SMOKE")
-        self.assertNotEqual(result["classification"], "LIVE_AGENTTEAMS_HERO")
+        self.assertEqual(result["classification"], "ATTESTED_EXTERNAL_EXPORT")
+        self.assertNotIn("LIVE", result["classification"])
+        self.assertNotIn("LIVE", result["manifest"]["classification"])
         self.assertIn("worker_skill_invoke", result["missing_observations"])
         self.assertEqual(result["manifest"]["raw_source_attestation"]["source_kind"], "agentteams-native-export")
 
@@ -165,6 +166,13 @@ class NativeLiveReceiptTests(unittest.TestCase):
             normalize_native_run_export(
                 export, expected_input_hash=_INPUT_HASH, expected_budget_hash=_BUDGET_HASH
             )
+
+        attested = normalize_native_run_export(
+            _attest_native_export(_export()),
+            expected_input_hash=_INPUT_HASH,
+            expected_budget_hash=_BUDGET_HASH,
+        )
+        self.assertNotIn("LIVE", attested["classification"])
 
     def test_raw_source_hash_must_bind_unmodified_export(self) -> None:
         export = _attest_native_export(_export())

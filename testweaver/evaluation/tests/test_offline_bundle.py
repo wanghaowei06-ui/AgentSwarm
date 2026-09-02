@@ -121,6 +121,22 @@ class OfflineBundleTests(unittest.TestCase):
                     raw_source_attestation=self._attestation(inputs),
                 )
 
+    def test_offline_bundle_preserves_attested_external_without_live_label(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            inputs = self._inputs(root)
+            bundle = root / "attested.zip"
+            build_bundle(
+                bundle,
+                inputs,
+                classification="ATTESTED_EXTERNAL_EXPORT",
+                source_commit="abc123",
+                raw_source_attestation=self._attestation(inputs),
+            )
+            result = verify_bundle(bundle, expected_files=tuple(inputs), expected_source_commit="abc123")
+            self.assertEqual(result["classification"], "ATTESTED_EXTERNAL_EXPORT")
+            self.assertNotIn("LIVE", result["classification"])
+
 
 if __name__ == "__main__":
     unittest.main()

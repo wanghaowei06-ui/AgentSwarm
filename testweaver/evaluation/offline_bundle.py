@@ -15,7 +15,7 @@ from testweaver.contracts.validator import canonical_hash
 SCHEMA_VERSION = "testweaver.m4.offline-bundle/v1"
 MANIFEST_NAME = "bundle-manifest.json"
 ALLOWED_CLASSIFICATIONS = frozenset(
-    {"STRUCTURAL_LIVE_SMOKE", "PARTIAL", "FAIL", "BLOCKED", "NOT_OBSERVED", "NOT_AVAILABLE"}
+    {"ATTESTED_EXTERNAL_EXPORT", "PARTIAL", "FAIL", "BLOCKED", "NOT_OBSERVED", "NOT_AVAILABLE"}
 )
 _HASH = re.compile(r"^sha256:[0-9a-f]{64}$")
 _SOURCE_KIND = "agentteams-native-export"

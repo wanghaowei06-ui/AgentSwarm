@@ -26,7 +26,7 @@ SCHEMA_VERSION = "testweaver.m3.native-run-export/v1"
 NORMALIZED_SCHEMA_VERSION = "testweaver.m3.native-run-receipt/v1"
 PROFILE_NAMES = frozenset({"E0", "E1", "E2", "E3"})
 TERMINAL_STATES = frozenset({"completed", "failed", "cancelled"})
-STRUCTURAL_CLASSIFICATION = "STRUCTURAL_LIVE_SMOKE"
+ATTESTED_EXTERNAL_CLASSIFICATION = "ATTESTED_EXTERNAL_EXPORT"
 PARTIAL_CLASSIFICATION = "PARTIAL"
 _HASH = re.compile(r"^sha256:[0-9a-f]{64}$")
 _IDENTIFIER = re.compile(r"^\S{1,512}$")
@@ -191,16 +191,16 @@ def _classify_export(
 ) -> tuple[str, list[str]]:
     """Return a conservative classification from existing native facts.
 
-    A raw-source attestation permits a structural live smoke label.  The
-    complete Hero label is deliberately unreachable from this M3 row alone:
+    A raw-source attestation permits only a provenance label.  No LIVE label
+    is reachable from this M3 row alone:
     native lifecycle, Skill invocation, Human decision, recovery, PostgreSQL
     lineage, and independent Oracle facts must be observed by their existing
-    owners before a caller can classify a run as ``LIVE_AGENTTEAMS_HERO``.
+    owners before a caller can classify a run as a live Hero.
     """
 
     if raw_source_attestation is None:
         return PARTIAL_CLASSIFICATION, ["raw_source_attestation"]
-    return STRUCTURAL_CLASSIFICATION, list(_HERO_MISSING_OBSERVATIONS)
+    return ATTESTED_EXTERNAL_CLASSIFICATION, list(_HERO_MISSING_OBSERVATIONS)
 
 
 def normalize_native_run_export(
@@ -369,11 +369,11 @@ def normalize_native_run_exports(
     seen_ids: set[str] = set()
     seen_pair_keys: set[tuple[Any, ...]] = set()
     batch_missing: set[str] = set()
-    batch_classification = STRUCTURAL_CLASSIFICATION
+    batch_classification = ATTESTED_EXTERNAL_CLASSIFICATION
     for item in normalized:
         row = item["rows"][0]
         manifest = item["manifest"]
-        if item["classification"] != STRUCTURAL_CLASSIFICATION:
+        if item["classification"] != ATTESTED_EXTERNAL_CLASSIFICATION:
             batch_classification = PARTIAL_CLASSIFICATION
         batch_missing.update(item["missing_observations"])
         native_ids = tuple(manifest["native"][field] for field in ("project_id", "task_id", "room_id"))
