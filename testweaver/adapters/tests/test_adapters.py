@@ -3,7 +3,11 @@
 from __future__ import annotations
 
 import copy
+import os
+import tempfile
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
 from testweaver.adapters.codex_cli import (
     CODEX_EXECUTABLE,
@@ -11,11 +15,17 @@ from testweaver.adapters.codex_cli import (
     DEFAULT_REASONING,
     build_codex_cli_launch,
 )
-from testweaver.adapters.config import AdapterConfig, AdapterConfigError
+from testweaver.adapters.config import (
+    AdapterConfig,
+    AdapterConfigError,
+    ProtectedReference,
+    preflight_reference,
+)
 from testweaver.adapters.native_worker import (
     DSH_PROVIDER_PROFILES,
     DshProviderProfile,
     NativeWorkerAssignment,
+    preflight_native_worker_invocation,
     prepare_native_worker_invocation,
 )
 from testweaver.adapters.result import (
@@ -78,6 +88,17 @@ def _provenance() -> Provenance:
     )
 
 
+def _assignment() -> NativeWorkerAssignment:
+    return NativeWorkerAssignment(
+        project_id="native-project-ref",
+        task_id="native-task-ref",
+        room_id="!native-room-ref:example.invalid",
+        worker_id="native-worker-ref",
+        leader_id="native-leader-ref",
+        task_ref="native-task-spec-ref",
+    )
+
+
 def _evidence() -> list[dict[str, str]]:
     return [
         {
@@ -90,6 +111,23 @@ def _evidence() -> list[dict[str, str]]:
 
 
 class AdapterConfigTests(unittest.TestCase):
+    def test_preflight_checks_reference_metadata_without_reading_file_content(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "provider-reference"
+            path.write_text("reference-only\n", encoding="utf-8")
+            os.chmod(path, 0o600)
+            reference = ProtectedReference.file(str(path))
+
+            with patch.object(Path, "read_text", side_effect=AssertionError("must not read")):
+                result = preflight_reference(reference)
+
+            self.assertTrue(result.usable)
+            self.assertEqual(result.mode, 0o600)
+            self.assertNotIn("value", result.as_dict())
+
+            os.chmod(path, 0o644)
+            self.assertFalse(preflight_reference(reference).usable)
+
     def test_dsh_accepts_both_existing_provider_route_shapes(self) -> None:
         self.assertTrue(TEST_FIXTURE_ONLY_NOT_LIVE)
         deepseek = _config(
@@ -310,6 +348,61 @@ class CodexCliContractTests(unittest.TestCase):
 
 
 class NativeWorkerAdapterTests(unittest.TestCase):
+    def test_preflight_is_names_only_and_supports_dsh_and_codex(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            reference_path = Path(directory) / "protected-reference"
+            reference_path.write_text("reference-only\n", encoding="utf-8")
+            os.chmod(reference_path, 0o600)
+            reference = {"source": "file", "path": str(reference_path)}
+
+            dsh_profile = DshProviderProfile.aliyun_bailian(
+                endpoint_ref=reference,
+                model_ref=reference,
+                credential_ref=reference,
+            )
+            dsh_invocation = prepare_native_worker_invocation(
+                assignment=_assignment(),
+                config=dsh_profile.as_config(_limits()),
+                provenance=_provenance(),
+            )
+
+            codex_invocation = prepare_native_worker_invocation(
+                assignment=_assignment(),
+                config=AdapterConfig.from_mapping(
+                    {
+                        "adapter_kind": "codex-cli",
+                        "route": _route(
+                            "codex-cc",
+                            reference,
+                            {"source": "env", "name": "CODEX_WORKER_MODEL"},
+                        ),
+                        "limits": _limits(),
+                    }
+                ),
+                provenance=_provenance(),
+            )
+
+            with patch.dict(
+                os.environ,
+                {
+                    "HOME": "bound",
+                    "CODEX_HOME": "bound",
+                    "CODEX_WORKER_MODEL": "bound",
+                    "TESTWEAVER_PROVIDER_CREDENTIAL": "bound",
+                },
+                clear=False,
+            ):
+                dsh_preflight = preflight_native_worker_invocation(dsh_invocation)
+                codex_preflight = preflight_native_worker_invocation(codex_invocation)
+
+            self.assertEqual(dsh_preflight.status, "READY")
+            self.assertEqual(codex_preflight.status, "READY")
+            self.assertEqual(codex_preflight.command[0], "codex-cc")
+            self.assertEqual(codex_preflight.command[2], "gpt-5.6-luna")
+            self.assertIn("model_reasoning_effort=max", codex_preflight.command)
+            self.assertNotIn("value", dsh_preflight.as_dict())
+            self.assertNotIn("value", codex_preflight.as_dict())
+
     def test_dsh_has_explicit_deepseek_and_bailian_profiles_without_values(self) -> None:
         self.assertEqual(DSH_PROVIDER_PROFILES, frozenset({"deepseek", "aliyun-bailian"}))
         deepseek = DshProviderProfile.deepseek(

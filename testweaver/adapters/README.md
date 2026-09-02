@@ -50,3 +50,22 @@ and result collection.
 The tests use explicit `TEST_FIXTURE_ONLY_NOT_LIVE` values.  They exercise
 configuration and result contracts only; they do not call a provider, execute
 the external worker, or prove a live run.
+
+## Deployment preflight and rollback
+
+`preflight_reference` and `preflight_native_worker_invocation` are
+names-only checks.  They inspect environment-name binding, file existence and
+type, owner-only permissions, the fixed Codex command, and no-execution flags;
+they never resolve a reference value, start a process, call a provider, or
+create/route native work.  A `BLOCKED` result leaves Leader, Worker, and
+Controller state unchanged.  DSH can be selected as `deepseek`,
+`aliyun-bailian`, or another valid provider identifier through the same
+provider-neutral route.
+
+This source-only package is not deployed by these checks, so its runtime
+rollback is intentionally a no-op.  If a later deployment installs it, use
+the normal AgentTeams package/image reference and Controller reconciliation to
+restore the prior immutable reference, then rerun the focused preflight.  Do
+not hand-run an external process, alter tmux settings, or change native task
+state.  LIVE remains `NOT_VERIFIED` until a real native Leader delegation
+produces and collects a Worker result.

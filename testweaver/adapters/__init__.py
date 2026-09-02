@@ -18,6 +18,8 @@ from .config import (
     ExecutionLimits,
     ProtectedReference,
     ProviderRoute,
+    ReferencePreflight,
+    preflight_reference,
 )
 from .native_worker import (
     DSH_PROVIDER_PROFILES,
@@ -25,6 +27,8 @@ from .native_worker import (
     NativeWorkerAdapterError,
     NativeWorkerAssignment,
     NativeWorkerInvocation,
+    NativeWorkerPreflight,
+    preflight_native_worker_invocation,
     prepare_native_worker_invocation,
 )
 from .result import (
@@ -54,14 +58,18 @@ __all__ = [
     "NativeWorkerAdapterError",
     "NativeWorkerAssignment",
     "NativeWorkerInvocation",
+    "NativeWorkerPreflight",
     "NormalizedResult",
     "ProtectedReference",
     "Provenance",
     "ProviderRoute",
+    "ReferencePreflight",
     "ResultContractError",
     "Usage",
     "WorkerResult",
     "build_codex_cli_launch",
     "normalize_result",
+    "preflight_native_worker_invocation",
+    "preflight_reference",
     "prepare_native_worker_invocation",
 ]

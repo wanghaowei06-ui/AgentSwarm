@@ -9,8 +9,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
+import os
 import re
 from collections.abc import Mapping
+from pathlib import Path
+import stat
 from typing import Any, Literal
 
 
@@ -101,6 +104,86 @@ class ProtectedReference:
     def as_dict(self) -> dict[str, str]:
         key = "name" if self.source == "env" else "path"
         return {"source": self.source, key: self.location}
+
+
+@dataclass(frozen=True)
+class ReferencePreflight:
+    """Names-only availability and permission result for one reference."""
+
+    source: Literal["env", "file"]
+    location: str
+    present: bool
+    usable: bool
+    mode: int | None
+    owner_uid: int | None
+    owner_gid: int | None
+    reason: str | None = None
+
+    def as_dict(self) -> dict[str, object]:
+        return {
+            "source": self.source,
+            "location": self.location,
+            "present": self.present,
+            "usable": self.usable,
+            "mode": self.mode,
+            "owner_uid": self.owner_uid,
+            "owner_gid": self.owner_gid,
+            "reason": self.reason,
+        }
+
+
+def preflight_reference(reference: ProtectedReference) -> ReferencePreflight:
+    """Check only reference binding and file metadata; never resolve a value."""
+
+    if not isinstance(reference, ProtectedReference):
+        raise AdapterConfigError("reference preflight requires ProtectedReference")
+    if reference.source == "env":
+        present = reference.location in os.environ
+        return ReferencePreflight(
+            source="env",
+            location=reference.location,
+            present=present,
+            usable=present,
+            mode=None,
+            owner_uid=None,
+            owner_gid=None,
+            reason=None if present else "environment_name_not_bound",
+        )
+
+    try:
+        metadata = Path(reference.location).stat()
+    except OSError:
+        return ReferencePreflight(
+            source="file",
+            location=reference.location,
+            present=False,
+            usable=False,
+            mode=None,
+            owner_uid=None,
+            owner_gid=None,
+            reason="file_missing_or_unreadable",
+        )
+
+    mode = stat.S_IMODE(metadata.st_mode)
+    if not stat.S_ISREG(metadata.st_mode):
+        usable = False
+        reason = "file_not_regular"
+    elif mode & 0o077:
+        usable = False
+        reason = "file_not_owner_only"
+    else:
+        usable = True
+        reason = None
+    return ReferencePreflight(
+        source="file",
+        location=reference.location,
+        present=True,
+        usable=usable,
+        mode=mode,
+        owner_uid=metadata.st_uid,
+        owner_gid=metadata.st_gid,
+        reason=reason,
+    )
 
 
 @dataclass(frozen=True)

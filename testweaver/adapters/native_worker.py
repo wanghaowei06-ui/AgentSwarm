@@ -18,6 +18,8 @@ from .config import (
     ExecutionLimits,
     ProtectedReference,
     ProviderRoute,
+    ReferencePreflight,
+    preflight_reference,
 )
 from .result import NativeReferences, NormalizedResult, Provenance
 from .result import normalize_result as normalize_worker_result
@@ -28,6 +30,32 @@ DSH_PROVIDER_PROFILES = frozenset({"deepseek", "aliyun-bailian"})
 
 class NativeWorkerAdapterError(ValueError):
     """Raised when a native assignment cannot be bound safely."""
+
+
+@dataclass(frozen=True)
+class NativeWorkerPreflight:
+    """Names-only deployment check; it never starts or dispatches a Worker."""
+
+    adapter_kind: str
+    provider: str
+    status: Literal["READY", "BLOCKED"]
+    references: tuple[ReferencePreflight, ...]
+    command: tuple[str, ...] | None
+    process_started: bool = False
+    provider_called: bool = False
+    reasons: tuple[str, ...] = ()
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "adapter_kind": self.adapter_kind,
+            "provider": self.provider,
+            "status": self.status,
+            "references": [reference.as_dict() for reference in self.references],
+            "command": list(self.command) if self.command is not None else None,
+            "process_started": self.process_started,
+            "provider_called": self.provider_called,
+            "reasons": list(self.reasons),
+        }
 
 
 def _reference(value: ProtectedReference | Mapping[str, Any], field: str) -> ProtectedReference:
@@ -252,4 +280,34 @@ def prepare_native_worker_invocation(
         config=config,
         provenance=provenance,
         launch=launch,
+    )
+
+
+def preflight_native_worker_invocation(
+    invocation: NativeWorkerInvocation,
+) -> NativeWorkerPreflight:
+    """Validate protected references and the fixed launch without execution."""
+
+    if not isinstance(invocation, NativeWorkerInvocation):
+        raise NativeWorkerAdapterError("preflight requires NativeWorkerInvocation")
+    references = [
+        invocation.config.route.endpoint_ref,
+        invocation.config.route.model_ref,
+        invocation.config.route.credential_ref,
+    ]
+    if invocation.launch is not None:
+        references.extend(invocation.launch.protected_environment)
+    results = tuple(preflight_reference(reference) for reference in references)
+    reasons = tuple(
+        f"reference_{index}_{result.reason}"
+        for index, result in enumerate(results)
+        if not result.usable and result.reason is not None
+    )
+    return NativeWorkerPreflight(
+        adapter_kind=invocation.config.adapter_kind,
+        provider=invocation.config.route.provider,
+        status="READY" if not reasons else "BLOCKED",
+        references=results,
+        command=invocation.launch.command if invocation.launch is not None else None,
+        reasons=reasons,
     )
