@@ -42,7 +42,6 @@ class HigressBailianRouteTests(unittest.TestCase):
     def test_independent_route_is_exact_model_and_controller_scoped_auth(self):
         payload = build_route_payload(
             route_name="testweaver-bailian-route",
-            domain="aigw-local.agentteams.io",
             provider_name="testweaver-bailian",
             source_model="deepseek-v4-flash",
             target_model="qwen-test",
@@ -50,8 +49,10 @@ class HigressBailianRouteTests(unittest.TestCase):
 
         self.assertEqual(
             payload["pathPredicate"],
-            {"matchType": "PRE", "matchValue": "/testweaver-bailian/v1", "caseSensitive": False},
+            {"matchType": "PRE", "matchValue": "/v1/testweaver-bailian", "caseSensitive": False},
         )
+        self.assertEqual(payload["domains"], [])
+        self.assertNotIn("modelPredicates", payload)
         self.assertEqual(
             payload["upstreams"],
             [
@@ -61,10 +62,6 @@ class HigressBailianRouteTests(unittest.TestCase):
                     "modelMapping": {"deepseek-v4-flash": "qwen-test"},
                 }
             ],
-        )
-        self.assertEqual(
-            payload["modelPredicates"],
-            [{"matchType": "EXACT", "matchValue": "deepseek-v4-flash", "caseSensitive": False}],
         )
         self.assertEqual(
             payload["authConfig"],
@@ -103,15 +100,15 @@ class HigressBailianRouteTests(unittest.TestCase):
         self.assertEqual(provider_meta["token_count"], 1)
         self.assertNotIn("fixture-value", provider_meta)
 
-        route = build_route_payload("testweaver-bailian-route", "aigw-local.agentteams.io", "testweaver-bailian", "deepseek-v4-flash", "qwen-test")
+        route = build_route_payload("testweaver-bailian-route", "testweaver-bailian", "deepseek-v4-flash", "qwen-test")
         route_meta = route_readback(
             {"data": route},
-            {"name": "testweaver-bailian-route", "path": "/testweaver-bailian/v1", "provider": "testweaver-bailian", "source_model": "deepseek-v4-flash", "target_model": "qwen-test"},
+            {"name": "testweaver-bailian-route", "path": "/v1/testweaver-bailian", "provider": "testweaver-bailian", "source_model": "deepseek-v4-flash", "target_model": "qwen-test"},
         )
         self.assertEqual(route_meta["auth_scope"], "controller_managed")
 
     def test_permanent_readback_mismatch_fails_closed(self):
-        route = build_route_payload("route", "domain", "provider", "deepseek-v4-flash", "qwen-test")
+        route = build_route_payload("route", "provider", "deepseek-v4-flash", "qwen-test")
         with self.assertRaises(Failure):
             route_readback({"data": route}, {"name": "route", "path": "/wrong", "provider": "provider", "source_model": "deepseek-v4-flash", "target_model": "qwen-test"})
 

@@ -23,7 +23,7 @@ from urllib.parse import urlsplit
 
 PROVIDER = "testweaver-bailian"
 ROUTE = "testweaver-bailian-route"
-PATH = "/testweaver-bailian/v1"
+PATH = "/v1/testweaver-bailian"
 SOURCE_MODEL = "deepseek-v4-flash"
 
 class Failure(RuntimeError):
@@ -100,26 +100,21 @@ def build_provider_payload(name: str, base_url: str, api_key: str, model: str) -
 
 def build_route_payload(
     route_name: str,
-    domain: str,
     provider_name: str,
     source_model: str,
     target_model: str,
-    path: str = PATH,
 ) -> dict[str, Any]:
-    if not all((route_name, domain, provider_name, source_model, target_model)):
+    if not all((route_name, provider_name, source_model, target_model)):
         raise Failure("route_input_missing")
-    if not path.startswith("/") or path == "/":
-        raise Failure("route_path_invalid")
     return {
         "name": route_name,
-        "domains": [domain],
-        "pathPredicate": {"matchType": "PRE", "matchValue": path, "caseSensitive": False},
+        "domains": [],
+        "pathPredicate": {"matchType": "PRE", "matchValue": PATH, "caseSensitive": False},
         "upstreams": [{
             "provider": provider_name,
             "weight": 100,
             "modelMapping": {source_model: target_model},
         }],
-        "modelPredicates": [{"matchType": "EXACT", "matchValue": source_model, "caseSensitive": False}],
         "authConfig": {"enabled": True, "allowedCredentialTypes": ["key-auth"]},
     }
 
@@ -147,14 +142,14 @@ def route_readback(value: Any, expected: dict[str, Any]) -> dict[str, Any]:
     item = _data(value)
     try:
         upstream, auth = item["upstreams"][0], item["authConfig"]
-        predicate = {"matchType": "EXACT", "matchValue": expected["source_model"], "caseSensitive": False}
         good = (
             isinstance(item, dict)
             and item["name"] == expected["name"]
             and item["pathPredicate"]["matchValue"] == expected["path"]
+            and item["domains"] == []
             and upstream["provider"] == expected["provider"]
             and upstream["modelMapping"][expected["source_model"]] == expected["target_model"]
-            and predicate in item["modelPredicates"]
+            and ("modelPredicates" not in item or item["modelPredicates"] in (None, []))
             and auth["enabled"] is True
             and auth["allowedCredentialTypes"] == ["key-auth"]
         )
@@ -241,7 +236,7 @@ def main(args: argparse.Namespace) -> int:
             receipt["provider_readback"] = provider_readback(console(opener, args.console_url, "GET", f"/v1/ai/providers/{PROVIDER}"), PROVIDER, provider_type)
         if route_current is None:
             created.append(("route", ROUTE))
-            console(opener, args.console_url, "POST", "/v1/ai/routes", build_route_payload(ROUTE, args.domain, PROVIDER, SOURCE_MODEL, providers["AGENTTEAMS_BAILIAN_MODEL"]))
+            console(opener, args.console_url, "POST", "/v1/ai/routes", build_route_payload(ROUTE, PROVIDER, SOURCE_MODEL, providers["AGENTTEAMS_BAILIAN_MODEL"]))
             receipt["created"].append("route")
             expected = {"name": ROUTE, "path": PATH, "provider": PROVIDER, "source_model": SOURCE_MODEL, "target_model": providers["AGENTTEAMS_BAILIAN_MODEL"]}
             receipt["route_readback"] = route_readback(console(opener, args.console_url, "GET", f"/v1/ai/routes/{ROUTE}"), expected)
@@ -276,7 +271,6 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     p.add_argument("--console-url", default="http://127.0.0.1:28001")
     p.add_argument("--gateway-url", default="http://127.0.0.1:28080")
     p.add_argument("--gateway-host", required=True)
-    p.add_argument("--domain", required=True)
     p.add_argument("--probe-timeout", type=float, default=20)
     return p.parse_args(argv)
 
