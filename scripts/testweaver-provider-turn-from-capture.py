@@ -16,8 +16,9 @@ import os
 import re
 import sys
 import tempfile
+from collections.abc import Mapping
 from pathlib import Path, PurePosixPath
-from typing import Any, Mapping
+from typing import Any
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
@@ -30,8 +31,8 @@ from testweaver.contracts.validator import canonical_hash
 _CAPTURE_SCHEMA = "testweaver.native-hero-capture.v1"
 _OUTPUT_SCHEMA = "testweaver.provider-turn/v1"
 _RECEIPT_SCHEMA = "testweaver.provider-turn-build-receipt/v1"
-_PG_SCHEMA = "testweaver.pg-authority-readback/v1"
-_SKILL_SCHEMA = "testweaver.skill-invocation-readback/v1"
+_PG_SCHEMA = "testweaver.pg-exact-readback/v1"
+_SKILL_SCHEMA = "testweaver.skill-invocation-capture/v1"
 _HEX = re.compile(r"^[0-9a-f]{64}$")
 _HASH = re.compile(r"^sha256:[0-9a-f]{64}$")
 _TRACE_ID = re.compile(r"^[0-9a-f]{32}$")
@@ -243,20 +244,23 @@ def build(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
     scope = _scope(manifest.get("authority_scope"))
     snapshot_ref = _safe_relative(manifest.get("latest_snapshot", ""))
     snapshot_prefix = snapshot_ref + "/"
+    pg_ref = f"{snapshot_ref}/pg-exact-readback.jsonl"
+    skill_ref = f"{snapshot_ref}/skill-invocations.jsonl"
     requested_refs = {
         "provider": args.provider_session_ref,
         "task": args.task_ref,
-        "pg": args.pg_ref,
-        "skill": args.skill_invocation_ref,
+        "pg": pg_ref,
+        "skill": skill_ref,
     }
     if any(not ref.startswith(snapshot_prefix) for ref in requested_refs.values()):
         raise BuildBlocked("EVIDENCE_OUTSIDE_FINAL_SNAPSHOT")
 
     provider_path, provider_file_hash = _checked_ref(capture, sums, args.provider_session_ref)
     wanted_record_hash = _prefixed_hash(args.provider_record_hash)
+    session_records = _read_jsonl(provider_path)
     provider_matches = [
         item
-        for item in _read_jsonl(provider_path)
+        for item in session_records
         if _prefixed_hash(item.get("record_hash")) == wanted_record_hash
     ]
     if len(provider_matches) != 1:
@@ -335,14 +339,32 @@ def build(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
     }:
         raise BuildBlocked("EVIDENCE_BINDING_MISMATCH")
 
-    pg_path, pg_file_hash = _checked_ref(capture, sums, args.pg_ref)
-    pg = _read_json(pg_path)
+    pg_path, pg_file_hash = _checked_ref(capture, sums, pg_ref)
     pg_fields = {
-        "schema_version", "authority_scope", "pg_revision", "content_hash", "agent_id",
-        "task_id", "provider_session_record_hash", "source_ref", "source_hash", "record_hash",
+        "schema_version", "authority_scope", "table", "pg_revision", "content_hash",
+        "agent_id", "task_id", "provider_session_record_hash", "source_ref",
+        "source_hash", "record_hash",
     }
-    _sealed(pg, _PG_SCHEMA, pg_fields)
-    if not isinstance(pg.get("source_ref"), str) or not pg["source_ref"].startswith(snapshot_prefix):
+    pg_records = _read_jsonl(pg_path)
+    for record in pg_records:
+        _sealed(record, _PG_SCHEMA, pg_fields)
+    pg_matches = [
+        record
+        for record in pg_records
+        if record.get("authority_scope") == scope
+        and record.get("agent_id") == agent_id
+        and record.get("task_id") == task_id
+        and record.get("provider_session_record_hash") == wanted_record_hash
+    ]
+    if len(pg_matches) != 1:
+        raise BuildBlocked("EVIDENCE_AMBIGUOUS" if pg_matches else "EVIDENCE_MISSING")
+    pg = pg_matches[0]
+    try:
+        validate_ref(pg.get("table"), "pg.table")
+    except Exception:
+        raise BuildBlocked("EVIDENCE_FORMAT_INVALID") from None
+    pg_raw_prefix = f"{snapshot_ref}/pg-exact-raw/"
+    if not isinstance(pg.get("source_ref"), str) or not pg["source_ref"].startswith(pg_raw_prefix):
         raise BuildBlocked("EVIDENCE_OUTSIDE_FINAL_SNAPSHOT")
     pg_raw_path, pg_raw = _exact_raw_source(capture, sums, pg["source_ref"], pg["source_hash"])
     del pg_raw_path
@@ -354,7 +376,7 @@ def build(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
         "task_id": pg["task_id"],
         "provider_session_record_hash": pg["provider_session_record_hash"],
     }
-    if pg_raw != pg_expected_raw:
+    if any(pg_raw.get(key) != expected for key, expected in pg_expected_raw.items()):
         raise BuildBlocked("SOURCE_READBACK_MISMATCH")
     if (
         pg.get("authority_scope") != scope
@@ -369,41 +391,48 @@ def build(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
     ):
         raise BuildBlocked("EVIDENCE_BINDING_MISMATCH")
 
-    skill_path, skill_file_hash = _checked_ref(capture, sums, args.skill_invocation_ref)
-    skill = _read_json(skill_path)
+    skill_path, skill_file_hash = _checked_ref(capture, sums, skill_ref)
     skill_fields = {
         "schema_version", "authority_scope", "agent_id", "task_id",
         "provider_session_record_hash", "skill", "invoke_ref", "source_ref", "source_hash",
-        "record_hash",
+        "source_kind", "task_event_ref", "task_event_source_ref",
+        "task_event_source_hash", "session_ref", "session_hash",
+        "turn_input_record_hash", "event_timestamp_ms", "record_hash",
     }
-    _sealed(skill, _SKILL_SCHEMA, skill_fields)
+    skill_records = _read_jsonl(skill_path)
+    for record in skill_records:
+        _sealed(record, _SKILL_SCHEMA, skill_fields)
+    skill_matches = [
+        record
+        for record in skill_records
+        if record.get("authority_scope") == scope
+        and record.get("agent_id") == agent_id
+        and record.get("task_id") == task_id
+        and record.get("provider_session_record_hash") == wanted_record_hash
+    ]
+    if len(skill_matches) != 1:
+        raise BuildBlocked("EVIDENCE_AMBIGUOUS" if skill_matches else "EVIDENCE_MISSING")
+    skill = skill_matches[0]
     skill_data = skill.get("skill")
     if not isinstance(skill_data, dict) or set(skill_data) != {
         "name", "version", "source_ref", "source_hash"
     }:
         raise BuildBlocked("EVIDENCE_FORMAT_INVALID")
-    if not isinstance(skill.get("source_ref"), str) or not skill["source_ref"].startswith(snapshot_prefix):
+    safe_actor = re.sub(r"[^A-Za-z0-9._-]", "_", agent_id)
+    skill_event_prefix = f"{snapshot_ref}/matrix/{safe_actor}/events/"
+    if not isinstance(skill.get("source_ref"), str) or not skill["source_ref"].startswith(skill_event_prefix):
         raise BuildBlocked("EVIDENCE_OUTSIDE_FINAL_SNAPSHOT")
-    invocation_raw_path, invocation_raw = _exact_raw_source(
+    _, invocation_event = _exact_raw_source(
         capture, sums, skill["source_ref"], skill["source_hash"]
     )
-    del invocation_raw_path
-    expected_invocation = {
-        **scope,
-        "agent_id": agent_id,
-        "task_id": task_id,
-        "provider_session_record_hash": wanted_record_hash,
-        "skill_name": skill_data.get("name"),
-        "skill_version": skill_data.get("version"),
-        "invoke_ref": skill.get("invoke_ref"),
-    }
-    if invocation_raw != expected_invocation:
-        raise BuildBlocked("SOURCE_READBACK_MISMATCH")
     if (
         skill.get("authority_scope") != scope
         or skill.get("agent_id") != agent_id
         or skill.get("task_id") != task_id
         or skill.get("provider_session_record_hash") != wanted_record_hash
+        or skill.get("source_kind") != "runtime_matrix_skill_event"
+        or skill.get("session_ref") != args.provider_session_ref
+        or skill.get("session_hash") != provider_file_hash
     ):
         raise BuildBlocked("EVIDENCE_BINDING_MISMATCH")
     try:
@@ -411,10 +440,37 @@ def build(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
         skill_version = validate_ref(skill_data.get("version"), "skill.version")
         skill_source_ref = validate_ref(skill_data.get("source_ref"), "skill.source_ref")
         invoke_ref = validate_ref(skill.get("invoke_ref"), "skill.invoke_ref")
+        task_event_ref = validate_ref(skill.get("task_event_ref"), "skill.task_event_ref")
     except Exception:
         raise BuildBlocked("EVIDENCE_FORMAT_INVALID") from None
     skill_source_hash = _prefixed_hash(skill_data.get("source_hash"))
-    safe_actor = re.sub(r"[^A-Za-z0-9._-]", "_", agent_id)
+    if skill_version != skill_source_hash:
+        raise BuildBlocked("EVIDENCE_BINDING_MISMATCH")
+    event_timestamp_ms = skill.get("event_timestamp_ms")
+    actor_matrix_id = actor_matches[0].get("matrix_user_id")
+    event_index_ref = f"{snapshot_ref}/matrix/{safe_actor}/event-index.jsonl"
+    event_index_path, event_index_hash = _checked_ref(capture, sums, event_index_ref)
+    event_indexes = _read_jsonl(event_index_path)
+    invocation_indexes = [
+        item for item in event_indexes if item.get("event_id") == invoke_ref
+    ]
+    if len(invocation_indexes) != 1:
+        raise BuildBlocked("EVIDENCE_BINDING_MISMATCH")
+    invocation_index = invocation_indexes[0]
+    immutable = invocation_index.get("immutable_source")
+    if (
+        invocation_index.get("actor") != agent_id
+        or invocation_index.get("actor_matrix_id") != actor_matrix_id
+        or invocation_index.get("sender") != actor_matrix_id
+        or invocation_index.get("identity_binding") != "ACTOR_EXACT"
+        or invocation_index.get("authority_scope") != scope
+        or invocation_index.get("origin_server_ts") != event_timestamp_ms
+        or not isinstance(immutable, dict)
+        or immutable.get("ref") != skill.get("source_ref")
+        or _prefixed_hash(immutable.get("raw_bytes_sha256"))
+        != _prefixed_hash(skill.get("source_hash"))
+    ):
+        raise BuildBlocked("EVIDENCE_BINDING_MISMATCH")
     inventory_ref = f"{snapshot_ref}/skills/{safe_actor}/hashes.txt"
     inventory_path, inventory_hash = _checked_ref(capture, sums, inventory_ref)
     inventory_matches = []
@@ -427,6 +483,113 @@ def build(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
         raise BuildBlocked("EVIDENCE_FORMAT_INVALID") from None
     if inventory_matches != [skill_source_hash]:
         raise BuildBlocked("SOURCE_HASH_MISMATCH")
+    enabled_ref = f"{snapshot_ref}/skills/{safe_actor}/list.json"
+    enabled_path, enabled_hash = _checked_ref(capture, sums, enabled_ref)
+    try:
+        enabled = json.loads(enabled_path.read_bytes())
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        raise BuildBlocked("EVIDENCE_FORMAT_INVALID") from None
+    if not isinstance(enabled, list) or len(
+        [
+            item
+            for item in enabled
+            if isinstance(item, dict)
+            and item.get("name") == skill_name
+            and item.get("enabled") is True
+        ]
+    ) != 1:
+        raise BuildBlocked("SKILL_NOT_ENABLED")
+
+    content = invocation_event.get("content")
+    body = content.get("body") if isinstance(content, dict) else None
+    match = re.fullmatch(
+        r'^🔧 \*\*read_file\*\*\n```(?:json)?\n(\{[^\n]+\})\n```\s*$',
+        body or "",
+    )
+    try:
+        tool_input = json.loads(match.group(1)) if match is not None else None
+    except json.JSONDecodeError:
+        tool_input = None
+    relation = content.get("m.relates_to") if isinstance(content, dict) else None
+    if (
+        not isinstance(tool_input, dict)
+        or set(tool_input) != {"file_path"}
+        or tool_input.get("file_path") != skill_source_ref
+        or invocation_event.get("event_id") != invoke_ref
+        or invocation_event.get("sender") != actor_matrix_id
+        or invocation_event.get("origin_server_ts") != event_timestamp_ms
+        or not isinstance(relation, dict)
+        or relation.get("rel_type") != "m.thread"
+        or relation.get("event_id") != task_event_ref
+        or isinstance(event_timestamp_ms, bool)
+        or not isinstance(event_timestamp_ms, int)
+    ):
+        raise BuildBlocked("SOURCE_READBACK_MISMATCH")
+
+    task_event_source_ref = skill.get("task_event_source_ref")
+    if not isinstance(task_event_source_ref, str) or not task_event_source_ref.startswith(
+        skill_event_prefix
+    ):
+        raise BuildBlocked("EVIDENCE_OUTSIDE_FINAL_SNAPSHOT")
+    _, task_event = _exact_raw_source(
+        capture,
+        sums,
+        task_event_source_ref,
+        skill.get("task_event_source_hash"),
+    )
+    task_indexes = [
+        item for item in event_indexes if item.get("event_id") == task_event_ref
+    ]
+    if len(task_indexes) != 1:
+        raise BuildBlocked("EVIDENCE_BINDING_MISMATCH")
+    task_index = task_indexes[0]
+    task_immutable = task_index.get("immutable_source")
+    task_content = task_event.get("content")
+    task_body = task_content.get("body") if isinstance(task_content, dict) else None
+    if (
+        task_index.get("actor") != agent_id
+        or task_index.get("actor_matrix_id") != actor_matrix_id
+        or task_index.get("authority_scope") != scope
+        or task_index.get("room_id") != invocation_index.get("room_id")
+        or task_index.get("sender") != task_event.get("sender")
+        or task_index.get("origin_server_ts") != task_event.get("origin_server_ts")
+        or not isinstance(task_immutable, dict)
+        or task_immutable.get("ref") != task_event_source_ref
+        or _prefixed_hash(task_immutable.get("raw_bytes_sha256"))
+        != _prefixed_hash(skill.get("task_event_source_hash"))
+        or task_event.get("event_id") != task_event_ref
+        or task_event.get("room_id") != invocation_event.get("room_id")
+        or not isinstance(task_body, str)
+        or task_id not in re.findall(r"task-[A-Za-z0-9._:-]+", task_body)
+    ):
+        raise BuildBlocked("EVIDENCE_BINDING_MISMATCH")
+
+    turn_input_hash = _prefixed_hash(skill.get("turn_input_record_hash"))
+    turn_inputs = [
+        item
+        for item in session_records
+        if item.get("role") == "user"
+        and _prefixed_hash(item.get("record_hash")) == turn_input_hash
+    ]
+    if len(turn_inputs) != 1:
+        raise BuildBlocked("EVIDENCE_BINDING_MISMATCH")
+    turn_input = turn_inputs[0]
+    if (
+        turn_input.get("session_ref") != provider.get("session_ref")
+        or task_id not in (turn_input.get("task_refs") or [])
+        or task_event_ref not in (turn_input.get("matrix_event_refs") or [])
+        or isinstance(turn_input.get("sequence"), bool)
+        or not isinstance(turn_input.get("sequence"), int)
+        or isinstance(provider.get("sequence"), bool)
+        or not isinstance(provider.get("sequence"), int)
+        or provider["sequence"] <= turn_input["sequence"]
+        or isinstance(turn_input.get("timestamp_ms"), bool)
+        or not isinstance(turn_input.get("timestamp_ms"), int)
+        or isinstance(provider.get("timestamp_ms"), bool)
+        or not isinstance(provider.get("timestamp_ms"), int)
+        or not turn_input["timestamp_ms"] <= event_timestamp_ms <= provider["timestamp_ms"]
+    ):
+        raise BuildBlocked("EVIDENCE_BINDING_MISMATCH")
 
     turn: dict[str, Any] = {
         "schema_version": _OUTPUT_SCHEMA,
@@ -449,7 +612,7 @@ def build(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
         "latency_ms": latency,
         "source_ref": args.provider_session_ref,
         "source_hash": provider_file_hash,
-        "attestation_ref": args.skill_invocation_ref,
+        "attestation_ref": skill_ref,
         "attestation_hash": skill_file_hash,
         "synthetic": False,
     }
@@ -468,8 +631,12 @@ def build(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
             "pg": pg_file_hash,
             "pg_raw": _prefixed_hash(pg["source_hash"]),
             "skill_invocation": skill_file_hash,
-            "skill_invocation_raw": _prefixed_hash(skill["source_hash"]),
+            "skill_runtime_event": _prefixed_hash(skill["source_hash"]),
+            "skill_event_index": event_index_hash,
             "skill_inventory": inventory_hash,
+            "skill_enabled_inventory": enabled_hash,
+            "skill_task_event": _prefixed_hash(skill["task_event_source_hash"]),
+            "skill_session": _prefixed_hash(skill["session_hash"]),
         },
     }
     return turn, receipt
@@ -516,8 +683,6 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--provider-record-hash", required=True)
     parser.add_argument("--task-ref", required=True)
     parser.add_argument("--task-id", required=True)
-    parser.add_argument("--pg-ref", required=True)
-    parser.add_argument("--skill-invocation-ref", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--receipt", required=True)
     return parser

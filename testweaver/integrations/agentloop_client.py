@@ -9,12 +9,18 @@ classification API here.
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol
 from urllib.parse import quote, urlsplit
 
-from testweaver.authority import AuthorityError, digest_bytes, validate_ref
+from testweaver.authority import (
+    AuthorityError,
+    digest_bytes,
+    validate_hash,
+    validate_ref,
+)
 from testweaver.contracts.validator import canonical_hash
 
 
@@ -107,6 +113,34 @@ class AgentLoopScope:
 
 
 @dataclass(frozen=True, slots=True)
+class AgentLoopEvidenceBinding:
+    """Exact provider-turn anchors carried by EvaluationTask tags."""
+
+    trace_id: str
+    content_hash: str
+    provider_turn_record_hash: str
+    provider_turn_source_hash: str
+
+    def validate(self) -> None:
+        if not isinstance(self.trace_id, str) or re.fullmatch(
+            r"[0-9a-f]{32}", self.trace_id
+        ) is None:
+            raise AuthorityError("AgentLoop trace_id is invalid")
+        validate_hash(self.content_hash, "content_hash")
+        validate_hash(self.provider_turn_record_hash, "provider_turn_record_hash")
+        validate_hash(self.provider_turn_source_hash, "provider_turn_source_hash")
+
+    def tags(self) -> dict[str, str]:
+        self.validate()
+        return {
+            "traceId": self.trace_id,
+            "contentHash": self.content_hash,
+            "providerTurnRecordHash": self.provider_turn_record_hash,
+            "providerTurnSourceHash": self.provider_turn_source_hash,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class AgentLoopReceipt:
     operation: str
     status: str
@@ -191,6 +225,7 @@ class AgentLoopCallResult:
 class AgentLoopResponseSummary:
     ownership_verified: bool
     scope_verified: bool
+    evidence_verified: bool
     terminal: bool
     completed: bool
     result_count: int
@@ -204,6 +239,7 @@ class AgentLoopQueryVerification:
     runs_receipt_hash: str
     ownership_verified: bool
     scope_verified: bool
+    evidence_verified: bool
     terminal: bool
     result_count: int
     successful_result_count: int
@@ -222,6 +258,7 @@ class AgentLoopQueryVerification:
                 "runs_receipt_hash": self.runs_receipt_hash,
                 "ownership_verified": self.ownership_verified,
                 "scope_verified": self.scope_verified,
+                "evidence_verified": self.evidence_verified,
                 "terminal": self.terminal,
                 "result_count": self.result_count,
                 "successful_result_count": self.successful_result_count,
@@ -360,6 +397,7 @@ class AgentLoopClient:
         variable_mapping: Mapping[str, Any],
         hidden_gold_visible: bool,
         client_token: str,
+        evidence_binding: AgentLoopEvidenceBinding | None = None,
     ) -> AgentLoopCallResult:
         """Create a batch task with official backfill enabled (the bounded run operation)."""
 
@@ -379,6 +417,13 @@ class AgentLoopClient:
                 "AgentLoop candidate evaluation must keep hidden Gold isolated"
             )
 
+        tags = {
+            "campaignId": scope.campaign_id,
+            "runId": scope.run_id,
+            "revision": str(scope.revision),
+        }
+        if evidence_binding is not None:
+            tags.update(evidence_binding.tags())
         return self._call(
             scope,
             operation="CreateEvaluationTask",
@@ -399,11 +444,7 @@ class AgentLoopClient:
                 "config": {"datasetName": dataset_name},
                 "channel": "default",
                 "runStrategies": {"backfill": {"enabled": True}},
-                "tags": {
-                    "campaignId": scope.campaign_id,
-                    "runId": scope.run_id,
-                    "revision": str(scope.revision),
-                },
+                "tags": tags,
                 "description": "TestWeaver bounded real-run evaluation task.",
             },
             resource_ref=task_name,
@@ -411,7 +452,11 @@ class AgentLoopClient:
         )
 
     def get_evaluation_task(
-        self, scope: AgentLoopScope, *, task_id: str
+        self,
+        scope: AgentLoopScope,
+        *,
+        task_id: str,
+        evidence_binding: AgentLoopEvidenceBinding | None = None,
     ) -> AgentLoopCallResult:
         return self._call(
             scope,
@@ -421,6 +466,7 @@ class AgentLoopClient:
             query={},
             body=None,
             resource_ref=task_id,
+            evidence_binding=evidence_binding,
         )
 
     def get_evaluation_runs(
@@ -447,6 +493,7 @@ class AgentLoopClient:
         *,
         task_id: str,
         max_results: int = 10,
+        evidence_binding: AgentLoopEvidenceBinding | None = None,
     ) -> AgentLoopQueryVerification:
         """Read back task ownership/scope and a completed non-empty run.
 
@@ -455,13 +502,16 @@ class AgentLoopClient:
         reach ``API_QUERY_VERIFIED`` through this method.
         """
 
-        task = self.get_evaluation_task(scope, task_id=task_id)
+        task = self.get_evaluation_task(
+            scope, task_id=task_id, evidence_binding=evidence_binding
+        )
         runs = self.get_evaluation_runs(scope, task_id=task_id, max_results=max_results)
         task_summary = task.response_summary or _EMPTY_SUMMARY
         runs_summary = runs.response_summary or _EMPTY_SUMMARY
         blocked = task.receipt.status == "BLOCKED" or runs.receipt.status == "BLOCKED"
         ownership = task_summary.ownership_verified and runs_summary.ownership_verified
         scoped = task_summary.scope_verified
+        evidence_verified = task_summary.evidence_verified
         terminal = (
             task_summary.terminal
             and task_summary.completed
@@ -471,7 +521,12 @@ class AgentLoopClient:
         result_count = runs_summary.result_count
         successful = runs_summary.successful_result_count
         verified = (
-            ownership and scoped and terminal and result_count > 0 and successful > 0
+            ownership
+            and scoped
+            and evidence_verified
+            and terminal
+            and result_count > 0
+            and successful > 0
         )
         status = (
             "BLOCKED"
@@ -486,6 +541,7 @@ class AgentLoopClient:
             "runs_receipt_hash": runs.receipt.content_hash,
             "ownership_verified": ownership,
             "scope_verified": scoped,
+            "evidence_verified": evidence_verified,
             "terminal": terminal,
             "result_count": result_count,
             "successful_result_count": successful,
@@ -504,6 +560,7 @@ class AgentLoopClient:
         body: Mapping[str, Any] | None,
         resource_ref: str,
         response_resource_keys: tuple[str, ...] = (),
+        evidence_binding: AgentLoopEvidenceBinding | None = None,
     ) -> AgentLoopCallResult:
         scope.validate()
         validate_ref(self.config.endpoint, "agentloop_endpoint")
@@ -612,6 +669,7 @@ class AgentLoopClient:
                 agent_space=self.config.agent_space,
                 resource_ref=resource_ref,
                 scope=scope,
+                evidence_binding=evidence_binding,
             )
         receipt = AgentLoopReceipt.create(
             operation=operation,
@@ -660,7 +718,7 @@ def _resource_ref_from_response(body: bytes, keys: tuple[str, ...]) -> str:
     raise AuthorityError("successful AgentLoop create response lacks its resource ID")
 
 
-_EMPTY_SUMMARY = AgentLoopResponseSummary(False, False, False, False, 0, 0)
+_EMPTY_SUMMARY = AgentLoopResponseSummary(False, False, False, False, False, 0, 0)
 
 
 def _response_summary(
@@ -670,6 +728,7 @@ def _response_summary(
     agent_space: str,
     resource_ref: str,
     scope: AgentLoopScope,
+    evidence_binding: AgentLoopEvidenceBinding | None,
 ) -> AgentLoopResponseSummary:
     if len(body) > 4 * 1024 * 1024:
         return _EMPTY_SUMMARY
@@ -690,6 +749,12 @@ def _response_summary(
             "revision": str(scope.revision),
         }
         status = task.get("status")
+        evidence_verified = False
+        if evidence_binding is not None and isinstance(tags, Mapping):
+            evidence_verified = all(
+                tags.get(key) == expected
+                for key, expected in evidence_binding.tags().items()
+            )
         return AgentLoopResponseSummary(
             ownership_verified=(
                 task.get("agentSpace") == agent_space
@@ -699,6 +764,7 @@ def _response_summary(
             and all(
                 tags.get(key) == expected for key, expected in expected_tags.items()
             ),
+            evidence_verified=evidence_verified,
             terminal=status in {"Completed", "Failed", "Terminated", "Deleted"},
             completed=status == "Completed",
             result_count=0,
@@ -724,6 +790,7 @@ def _response_summary(
         return AgentLoopResponseSummary(
             ownership_verified=bool(matching),
             scope_verified=False,
+            evidence_verified=False,
             terminal=bool(matching)
             and statuses.issubset({"Completed", "Failed", "Terminated"}),
             completed=bool(completed_rows),
@@ -736,6 +803,7 @@ def _response_summary(
             ownership_verified=value.get("agentSpace") == agent_space
             and value.get("datasetName") == resource_ref,
             scope_verified=False,
+            evidence_verified=False,
             terminal=True,
             completed=True,
             result_count=1 if isinstance(schema, Mapping) and bool(schema) else 0,
@@ -749,6 +817,7 @@ def _response_summary(
             ownership_verified=evaluator.get("agentSpace") == agent_space
             and evaluator.get("name") == resource_ref,
             scope_verified=False,
+            evidence_verified=False,
             terminal=True,
             completed=True,
             result_count=1 if evaluator else 0,

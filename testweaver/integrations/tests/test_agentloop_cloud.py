@@ -13,6 +13,7 @@ from testweaver.integrations.agentloop_client import (
     AgentLoopClient,
     AgentLoopCredentialLease,
     AgentLoopEndpoint,
+    AgentLoopEvidenceBinding,
     AgentLoopHTTPResponse,
     AgentLoopScope,
 )
@@ -30,6 +31,13 @@ from testweaver.integrations.xtrace_readback import (
 )
 
 HASH = "sha256:" + "a" * 64
+HASH_B = "sha256:" + "b" * 64
+HASH_C = "sha256:" + "c" * 64
+TRACE_ID = "0123456789abcdef0123456789abcdef"
+
+
+def _evidence_binding() -> AgentLoopEvidenceBinding:
+    return AgentLoopEvidenceBinding(TRACE_ID, HASH, HASH_B, HASH_C)
 
 
 class QueueTransport:
@@ -38,6 +46,15 @@ class QueueTransport:
 
     def request(self, **_: Any) -> AgentLoopHTTPResponse:
         return self.responses.pop(0)
+
+
+class RecordingAgentLoopTransport:
+    def __init__(self) -> None:
+        self.calls: list[dict[str, Any]] = []
+
+    def request(self, **request: Any) -> AgentLoopHTTPResponse:
+        self.calls.append(request)
+        return AgentLoopHTTPResponse(200, b'{"taskId":"task-1"}')
 
 
 def _lease() -> AgentLoopCredentialLease:
@@ -308,7 +325,15 @@ def test_evaluation_query_requires_ownership_scope_terminal_and_nonempty_result(
         "agentSpace": "space-1",
         "status": "Completed",
         "evaluators": [{"evaluatorRef": "eval-1"}],
-        "tags": {"campaignId": "campaign-1", "runId": "run-1", "revision": "7"},
+        "tags": {
+            "campaignId": "campaign-1",
+            "runId": "run-1",
+            "revision": "7",
+            "traceId": TRACE_ID,
+            "contentHash": HASH,
+            "providerTurnRecordHash": HASH_B,
+            "providerTurnSourceHash": HASH_C,
+        },
     }
     runs = {
         "evaluationRuns": [
@@ -333,13 +358,48 @@ def test_evaluation_query_requires_ownership_scope_terminal_and_nonempty_result(
         _lease,
         lambda: "2026-09-03T02:00:00Z",
     )
-    verified = client.verify_evaluation_task_run(scope, task_id="task-1")
+    verified = client.verify_evaluation_task_run(
+        scope, task_id="task-1", evidence_binding=_evidence_binding()
+    )
     assert verified.status == "API_QUERY_VERIFIED"
     assert verified.ownership_verified
     assert verified.scope_verified
+    assert verified.evidence_verified
     assert verified.terminal
     assert verified.result_count == 1
     assert verified.successful_result_count == 1
+
+
+def test_evaluation_task_can_carry_every_exact_provider_turn_tag() -> None:
+    transport = RecordingAgentLoopTransport()
+    client = AgentLoopClient(
+        AgentLoopEndpoint("https://agentloop.cn-beijing.aliyuncs.com", "space-1"),
+        transport,
+        _lease,
+        lambda: "2026-09-03T02:00:00Z",
+    )
+    client.create_evaluation_task_run(
+        AgentLoopScope("campaign-1", "run-1", 7),
+        task_name="task-1",
+        dataset_name="dataset-1",
+        evaluator_ref="eval-1",
+        data_type="dataset",
+        data_filter={"datasetName": "dataset-1", "maxRecords": 1},
+        variable_mapping={"input": "content"},
+        hidden_gold_visible=False,
+        client_token="client-token-1",
+        evidence_binding=_evidence_binding(),
+    )
+    body = json.loads(transport.calls[0]["body"])
+    assert body["tags"] == {
+        "campaignId": "campaign-1",
+        "runId": "run-1",
+        "revision": "7",
+        "traceId": TRACE_ID,
+        "contentHash": HASH,
+        "providerTurnRecordHash": HASH_B,
+        "providerTurnSourceHash": HASH_C,
+    }
 
 
 def test_evaluation_query_keeps_empty_or_wrong_scope_result_not_verified() -> None:
@@ -363,10 +423,109 @@ def test_evaluation_query_keeps_empty_or_wrong_scope_result_not_verified() -> No
         _lease,
         lambda: "2026-09-03T02:00:00Z",
     )
-    result = client.verify_evaluation_task_run(scope, task_id="task-1")
+    result = client.verify_evaluation_task_run(
+        scope, task_id="task-1", evidence_binding=_evidence_binding()
+    )
     assert result.status == "NOT_VERIFIED"
     assert not result.scope_verified
     assert result.result_count == 0
+
+
+@pytest.mark.parametrize(
+    "missing_tag",
+    ["traceId", "contentHash", "providerTurnRecordHash", "providerTurnSourceHash"],
+)
+def test_evaluation_query_never_verifies_without_every_provider_turn_tag(
+    missing_tag: str,
+) -> None:
+    tags = {
+        "campaignId": "campaign-1",
+        "runId": "run-1",
+        "revision": "7",
+        "traceId": TRACE_ID,
+        "contentHash": HASH,
+        "providerTurnRecordHash": HASH_B,
+        "providerTurnSourceHash": HASH_C,
+    }
+    tags.pop(missing_tag)
+    task = {
+        "taskId": "task-1",
+        "agentSpace": "space-1",
+        "status": "Completed",
+        "tags": tags,
+    }
+    runs = {
+        "evaluationRuns": [
+            {
+                "taskId": "task-1",
+                "status": "Completed",
+                "totalCount": 1,
+                "successCount": 1,
+            }
+        ]
+    }
+    client = AgentLoopClient(
+        AgentLoopEndpoint("https://agentloop.cn-beijing.aliyuncs.com", "space-1"),
+        QueueTransport(
+            [
+                AgentLoopHTTPResponse(200, json.dumps(task).encode()),
+                AgentLoopHTTPResponse(200, json.dumps(runs).encode()),
+            ]
+        ),
+        _lease,
+        lambda: "2026-09-03T02:00:00Z",
+    )
+    result = client.verify_evaluation_task_run(
+        AgentLoopScope("campaign-1", "run-1", 7),
+        task_id="task-1",
+        evidence_binding=_evidence_binding(),
+    )
+    assert result.status == "NOT_VERIFIED"
+    assert not result.evidence_verified
+
+
+def test_evaluation_query_never_verifies_a_mismatched_provider_turn_tag() -> None:
+    tags = {
+        "campaignId": "campaign-1",
+        "runId": "run-1",
+        "revision": "7",
+        **_evidence_binding().tags(),
+        "providerTurnSourceHash": HASH_B,
+    }
+    task = {
+        "taskId": "task-1",
+        "agentSpace": "space-1",
+        "status": "Completed",
+        "tags": tags,
+    }
+    runs = {
+        "evaluationRuns": [
+            {
+                "taskId": "task-1",
+                "status": "Completed",
+                "totalCount": 1,
+                "successCount": 1,
+            }
+        ]
+    }
+    client = AgentLoopClient(
+        AgentLoopEndpoint("https://agentloop.cn-beijing.aliyuncs.com", "space-1"),
+        QueueTransport(
+            [
+                AgentLoopHTTPResponse(200, json.dumps(task).encode()),
+                AgentLoopHTTPResponse(200, json.dumps(runs).encode()),
+            ]
+        ),
+        _lease,
+        lambda: "2026-09-03T02:00:00Z",
+    )
+    result = client.verify_evaluation_task_run(
+        AgentLoopScope("campaign-1", "run-1", 7),
+        task_id="task-1",
+        evidence_binding=_evidence_binding(),
+    )
+    assert result.status == "NOT_VERIFIED"
+    assert not result.evidence_verified
 
 
 class XTraceQueue:

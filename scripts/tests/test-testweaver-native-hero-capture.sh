@@ -72,26 +72,51 @@ if [[ "$all" == *'account/whoami'* ]]; then
 elif [[ "$all" == *'joined_rooms'* ]]; then
   printf '%s\n' '{"joined_rooms":["!hero:hs"]}'
 elif [[ "$all" == *'/messages?dir=b'* ]]; then
-  printf '%s\n' '{"chunk":[{"event_id":"$human-event","sender":"@human:hs","origin_server_ts":9999999999999}]}'
+  printf '%s\n' '{"chunk":[{"event_id":"$human-event","sender":"@human:hs","origin_server_ts":9999999999999},{"event_id":"$task-root","sender":"@explore-leader:hs","origin_server_ts":9999999999000},{"event_id":"$skill-event","sender":"@explore-worker:hs","origin_server_ts":9999999999100}]}'
 elif [[ "$all" == *'/event/'* ]]; then
-  printf '%s\n' '{"event_id":"$human-event","room_id":"!hero:hs","sender":"@human:hs","origin_server_ts":9999999999999,"type":"m.room.message","content":{"msgtype":"m.text","body":"approved"}}'
+  if [[ "$all" == *'%24task-root'* ]]; then
+    printf '%s\n' '{"event_id":"$task-root","room_id":"!hero:hs","sender":"@explore-leader:hs","origin_server_ts":9999999999000,"type":"m.room.message","content":{"msgtype":"m.text","body":"@explore-worker:hs TASK_ASSIGNED task-1"}}'
+  elif [[ "$all" == *'%24skill-event'* ]]; then
+    printf '%s\n' '{"event_id":"$skill-event","room_id":"!hero:hs","sender":"@explore-worker:hs","origin_server_ts":9999999999100,"type":"m.room.message","content":{"msgtype":"m.text","body":"🔧 **read_file**\n```\n{\"file_path\":\"/root/agentteams-fs/agents/explore-worker/skills/evidence/SKILL.md\"}\n```","m.relates_to":{"event_id":"$task-root","rel_type":"m.thread","is_falling_back":false}}}'
+  else
+    printf '%s\n' '{"event_id":"$human-event","room_id":"!hero:hs","sender":"@human:hs","origin_server_ts":9999999999999,"type":"m.room.message","content":{"msgtype":"m.text","body":"approved"}}'
+  fi
 elif [[ "$all" == *'/profile/'* ]]; then
   printf '%s\n' '{"displayname":"External Human"}'
 elif [[ "$all" == *'/api/agents/default/skills'* ]]; then
   # Current QwenPaw returns the inventory as a top-level array.
   printf '%s\n' '[{"name":"evidence","enabled":true}]'
+elif [[ "$all" == *'find /root/agentteams-fs /root/manager-workspace'* ]]; then
+  printf '%s  %s\n' "$(printf '%064d' 2)" '/root/agentteams-fs/agents/explore-worker/skills/evidence/SKILL.md'
 elif [[ "$all" == *'find /root/manager-workspace'* ]]; then
   printf '%s\n' '/root/manager-workspace/.openclaw/agents/main/sessions/hero.jsonl'
-elif [[ "$all" == *'find /root/agentteams-fs/agents'* ]]; then
-  :
+elif [[ "$all" == *'find "/root/agentteams-fs/agents/$ACTOR_NAME"'* ]]; then
+  if [[ "$container" == explore-worker-box ]]; then
+    printf '%s\n' '/root/agentteams-fs/agents/explore-worker/sessions/agentteams_matrix/hero.jsonl'
+  fi
 elif [[ "$all" == *'find "$root/projects"'* ]]; then
-  printf '%s\n' "/root/agentteams-fs/teams/explore/shared/tasks/task-1/meta.json"
-  printf '%s\n' "/root/agentteams-fs/teams/explore/shared/tasks/task-1/result.md"
-elif [[ "$all" == *'cat "$1"'* && "$all" == *'/sessions/hero.jsonl'* ]]; then
-  printf '%s\n' '{"id":"req","timestamp":"2026-09-03T00:01:00Z","type":"message","message":{"role":"user","content":"campaign-1 run-1 trace-1"}}'
-  printf '%s\n' '{"id":"res","timestamp":"2026-09-03T00:01:01Z","durationMs":123,"type":"message","message":{"role":"assistant","provider":"gateway","model":"manager-model","usage":{"input":10,"output":5}}}'
+  if [[ "$container" == explore-leader-box ]]; then
+    printf '%s\n' "/root/agentteams-fs/teams/explore/shared/tasks/task-1/meta.json"
+    printf '%s\n' "/root/agentteams-fs/teams/explore/shared/tasks/task-1/result.md"
+  fi
+elif [[ "$all" == *'cat "$1"'* && "$all" == *'/hero.jsonl'* ]]; then
+  if [[ "$container" == explore-worker-box ]]; then
+    printf '%s\n' '{"id":"req","timestamp":9999999999050,"type":"message","message":{"role":"user","content":"$task-root task-1 campaign-1 run-1 0123456789abcdef0123456789abcdef"}}'
+    printf '%s\n' '{"id":"res","timestamp":9999999999200,"durationMs":123,"type":"message","message":{"role":"assistant","provider":"gateway","model":"worker-model","content":"campaign-1 run-1 0123456789abcdef0123456789abcdef","usage":{"input":10,"output":5}}}'
+  else
+    printf '%s\n' '{"id":"req","timestamp":"2026-09-03T00:01:00Z","type":"message","message":{"role":"user","content":"campaign-1 run-1 0123456789abcdef0123456789abcdef"}}'
+    printf '%s\n' '{"id":"res","timestamp":"2026-09-03T00:01:01Z","durationMs":123,"type":"message","message":{"role":"assistant","provider":"gateway","model":"manager-model","content":"campaign-1 run-1 0123456789abcdef0123456789abcdef","usage":{"input":10,"output":5}}}'
+  fi
 elif [[ "$all" == *'cat "$1"'* && "$all" == *'/meta.json'* ]]; then
   printf '%s\n' '{"task_id":"task-1","project_id":"project-1","status":"submitted","assigned_to":"@explore-worker:hs","result_status":"SUCCESS","eventId":"$task-event"}'
+elif [[ "$container" == pg-box && "$all" == *'select tablename'* ]]; then
+  if [[ "${PG_EMPTY_TABLES:-0}" != 1 ]]; then
+    printf '%s\n' tw_authority
+  fi
+elif [[ "$container" == pg-box && "$all" == *'select column_name'* ]]; then
+  printf '%s\n' agent_id campaign_id content_hash pg_revision provider_session_record_hash run_id task_id trace_id
+elif [[ "$container" == pg-box && "$all" == *'row_to_json'* ]]; then
+  printf '%s\n' "$PG_TUPLE_FIXTURE"
 elif [[ "${1:-}" == sha256sum ]]; then
   printf '%064d  %s\n' 1 "${2:-file}"
 else
@@ -103,13 +128,15 @@ chmod +x "$tmp/bin/docker"
 export PATH="$tmp/bin:$PATH"
 export FAKE_DOCKER_CALLS="$tmp/docker.calls"
 export TOKEN_SENTINEL='super-secret-token-value'
+trace_id=0123456789abcdef0123456789abcdef
+export PG_TUPLE_FIXTURE=$(jq -nc --arg trace_id "$trace_id" '{campaign_id:"campaign-1",run_id:"run-1",trace_id:$trace_id,pg_revision:9,content_hash:("sha256:"+("c"*64)),agent_id:"explore-worker",task_id:"task-1",provider_session_record_hash:("sha256:"+("a"*64))}')
 allowlist="$tmp/humans.allow"
 printf '%s\n' '@human:hs' >"$allowlist"
 chmod 600 "$allowlist"
 evidence="$tmp/evidence"
 
-args=(--run-id run-1 --campaign-id campaign-1 --trace-id trace-1 --evidence-dir "$evidence" \
-  --agt-container agt-box --team explore --team verify --human-allowlist "$allowlist" --pg-container NONE)
+args=(--run-id run-1 --campaign-id campaign-1 --trace-id "$trace_id" --evidence-dir "$evidence" \
+  --agt-container agt-box --team explore --team verify --human-allowlist "$allowlist" --pg-container pg-box)
 
 bash "$capture" start "${args[@]}"
 test -f "$evidence/manifest.json"
@@ -120,6 +147,12 @@ test "$(jq '.teams|length' "$evidence/latest/roster.json")" -eq 2
 test -f "$evidence/latest/authority/managers.json.raw.sha256"
 jq -e '.status=="OBSERVED_PROVIDER_TURN" and .provider_models[0].provider=="gateway" and .request_hash!="NOT_OBSERVED" and .response_hash!="NOT_OBSERVED"' "$evidence/latest/manager-choice-readback.json" >/dev/null
 jq -e 'select(.task_id=="task-1" and .status=="submitted" and .raw_bytes_sha256)' "$evidence/latest/shared-fs/task-metadata.jsonl" >/dev/null
+jq -e 'select(.schema_version=="testweaver.pg-exact-readback/v1" and .task_id=="task-1" and .source_hash)' "$evidence/latest/pg-exact-readback.jsonl" >/dev/null
+pg_raw_ref=$(jq -r '.source_ref' "$evidence/latest/pg-exact-readback.jsonl")
+test -f "$evidence/$pg_raw_ref"
+jq -e 'select(.schema_version=="testweaver.skill-invocation-capture/v1" and .task_id=="task-1" and .source_kind=="runtime_matrix_skill_event" and .provider_session_record_hash)' "$evidence/latest/skill-invocations.jsonl" >/dev/null
+skill_raw_ref=$(jq -r '.source_ref' "$evidence/latest/skill-invocations.jsonl" | head -1)
+test -f "$evidence/$skill_raw_ref"
 
 index=$(find "$evidence/latest/matrix" -name event-index.jsonl -print -quit)
 test -n "$index"
@@ -164,5 +197,16 @@ if bash "$capture" start --run-id bad --campaign-id bad --trace-id bad --evidenc
   printf 'one-Team invocation unexpectedly succeeded\n' >&2
   exit 1
 fi
+
+empty_evidence="$tmp/empty-pg-evidence"
+empty_args=(--run-id run-empty --campaign-id campaign-empty --trace-id "$trace_id" \
+  --evidence-dir "$empty_evidence" --agt-container agt-box --team explore --team verify \
+  --human-allowlist "$allowlist" --pg-container pg-box)
+PG_EMPTY_TABLES=1 bash "$capture" start "${empty_args[@]}"
+jq -e '.status=="NOT_OBSERVED"' "$empty_evidence/latest/pg-tw-row-hashes.jsonl" >/dev/null
+test ! -s "$empty_evidence/latest/pg-exact-readback.jsonl"
+rg -q $'^pg.tw_rows\tNOT_OBSERVED$' "$empty_evidence/latest/not-observed.tsv"
+rg -q $'^pg.exact_tuple\tNOT_OBSERVED$' "$empty_evidence/latest/not-observed.tsv"
+PG_EMPTY_TABLES=1 bash "$capture" stop "${empty_args[@]}"
 
 printf 'native hero capture tests: PASS\n'

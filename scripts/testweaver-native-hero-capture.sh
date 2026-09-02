@@ -304,9 +304,9 @@ capture_sessions() {
     [[ -n "$file_hash" ]] || { note_missing "session.hash.$actor"; continue; }
     # Only provider metadata leaves the container; prompts, outputs and tool arguments never do.
     if ! docker exec "$container" sh -c 'cat "$1"' sh "$path" 2>/dev/null |
-      python3 -c 'import hashlib,json,sys
+      python3 -c 'import datetime,hashlib,json,re,sys
 run_id,campaign_id,trace_id=sys.argv[1:4]
-for raw in sys.stdin.buffer:
+for sequence,raw in enumerate(sys.stdin.buffer):
  try:
   value=json.loads(raw)
  except Exception:
@@ -317,7 +317,13 @@ for raw in sys.stdin.buffer:
  if role not in ("user","assistant"): continue
  usage=msg.get("usage") if isinstance(msg.get("usage"),dict) else None
  text=raw.decode("utf-8","replace")
- safe={"record_hash":hashlib.sha256(raw).hexdigest(),"id":value.get("id"),"timestamp":value.get("timestamp"),"role":role,"provider":msg.get("provider"),"model":msg.get("model"),"usage":usage,"latency_ms":msg.get("durationMs") or value.get("durationMs"),"scope_mentions":{"run_id":run_id in text,"campaign_id":campaign_id in text,"trace_id":trace_id in text}}
+ timestamp=value.get("timestamp")
+ timestamp_ms=None
+ if isinstance(timestamp,(int,float)) and not isinstance(timestamp,bool): timestamp_ms=int(timestamp)
+ elif isinstance(timestamp,str):
+  try: timestamp_ms=int(datetime.datetime.fromisoformat(timestamp.replace("Z","+00:00")).timestamp()*1000)
+  except Exception: pass
+ safe={"record_hash":hashlib.sha256(raw).hexdigest(),"sequence":sequence,"id":value.get("id"),"timestamp":timestamp,"timestamp_ms":timestamp_ms,"role":role,"provider":msg.get("provider"),"model":msg.get("model"),"usage":usage,"latency_ms":msg.get("durationMs") or value.get("durationMs"),"scope_mentions":{"run_id":run_id in text,"campaign_id":campaign_id in text,"trace_id":trace_id in text},"task_refs":sorted(set(re.findall(r"task-[A-Za-z0-9._:-]+",text))),"matrix_event_refs":sorted(set(re.findall(r"\$[A-Za-z0-9_-]{8,}",text)))}
  print(json.dumps(safe,separators=(",",":"),sort_keys=True))' "$RUN_ID" "$CAMPAIGN_ID" "$TRACE_ID" |
       jq -c --arg actor "$actor" --arg container "$container" --arg session_file_sha256 "$file_hash" --arg session_ref "$path" \
         '. + {actor:$actor,container:$container,session_file_sha256:$session_file_sha256,session_ref:$session_ref}' >>"$out/readback.jsonl"; then
@@ -369,12 +375,25 @@ capture_shared_files() {
 }
 
 capture_pg() {
-  local out=$1
-  if [[ "$PG_CONTAINER" == NONE ]]; then printf '{"status":"NOT_OBSERVED","reason":"disabled"}\n' >"$out"; note_missing pg.tw_rows; return; fi
-  : >"$out"
+  local hashes_out=$1 exact_out=$2 raw_root=$3
+  if [[ "$PG_CONTAINER" == NONE ]]; then
+    printf '{"status":"NOT_OBSERVED","reason":"disabled"}\n' >"$hashes_out"
+    : >"$exact_out"
+    note_missing pg.tw_rows
+    note_missing pg.exact_tuple
+    return
+  fi
+  : >"$hashes_out"
+  : >"$exact_out"
+  mkdir -p "$raw_root"
   tables=$(docker exec "$PG_CONTAINER" psql -XAt -U "$PG_USER" -d "$PG_DB" -c \
     "select tablename from pg_tables where schemaname='public' and tablename like 'tw\\_%' escape '\\' order by 1" 2>/dev/null || true)
-  [[ -n "$tables" ]] || { printf '{"status":"NOT_OBSERVED"}\n' >"$out"; note_missing pg.tw_rows; return; }
+  if [[ -z "$tables" ]]; then
+    printf '{"status":"NOT_OBSERVED"}\n' >"$hashes_out"
+    note_missing pg.tw_rows
+    note_missing pg.exact_tuple
+    return
+  fi
   while IFS= read -r table; do
     [[ "$table" =~ ^tw_[a-zA-Z0-9_]+$ ]] || continue
     columns=$(docker exec "$PG_CONTAINER" psql -XAt -U "$PG_USER" -d "$PG_DB" -c \
@@ -386,17 +405,151 @@ capture_pg() {
       where="${where}run_id='$RUN_ID'"
     fi
     if [[ -z "$where" ]]; then note_missing "pg.unscoped_table.$table"; continue; fi
+    rows_tmp="$STATE_DIR/pg-rows.$$.tmp"
     if ! docker exec "$PG_CONTAINER" psql -XAt -U "$PG_USER" -d "$PG_DB" -c \
-      "select row_to_json(t)::text from public.\"$table\" t where $where" 2>/dev/null |
-      python3 -c 'import hashlib,json,sys
-table=sys.argv[1]
-for raw in sys.stdin.buffer:
- raw=raw.rstrip(b"\n")
- if raw: print(json.dumps({"table":table,"row_hash":hashlib.sha256(raw).hexdigest()},sort_keys=True))' "$table" >>"$out"; then
+      "select row_to_json(t)::text from public.\"$table\" t where $where" >"$rows_tmp" 2>/dev/null; then
       note_missing "pg.read.$table"
+      rm -f "$rows_tmp"
+      continue
     fi
+    safe_table=$(safe_name "$table")
+    mkdir -p "$raw_root/$safe_table"
+    python3 - "$rows_tmp" "$table" "$raw_root/$safe_table" "${raw_root#"$EVIDENCE_DIR"/}/$safe_table" \
+      "$RUN_ID" "$CAMPAIGN_ID" "$TRACE_ID" "$hashes_out" "$exact_out" <<'PY'
+import hashlib,json,pathlib,re,sys
+source,table,raw_dir,raw_ref_root,run_id,campaign_id,trace_id,hashes_out,exact_out=sys.argv[1:]
+canonical=lambda item: "sha256:"+hashlib.sha256(json.dumps(item,ensure_ascii=False,sort_keys=True,separators=(",",":"),allow_nan=False).encode()).hexdigest()
+required={"campaign_id","run_id","trace_id","pg_revision","content_hash","agent_id","task_id","provider_session_record_hash"}
+with open(source,"rb") as stream,open(hashes_out,"a",encoding="utf-8") as hashes,open(exact_out,"a",encoding="utf-8") as exact:
+ for raw in stream:
+  payload=raw.rstrip(b"\r\n")
+  if not payload: continue
+  row_hash=hashlib.sha256(payload).hexdigest()
+  hashes.write(json.dumps({"table":table,"row_hash":row_hash},sort_keys=True,separators=(",",":"))+"\n")
+  try: value=json.loads(payload)
+  except Exception: continue
+  if not isinstance(value,dict) or not required.issubset(value): continue
+  if (value.get("campaign_id"),value.get("run_id"),value.get("trace_id"))!=(campaign_id,run_id,trace_id): continue
+  if re.fullmatch(r"[0-9a-f]{32}",trace_id) is None: continue
+  if type(value.get("pg_revision")) is not int or value["pg_revision"]<1: continue
+  if any(not isinstance(value.get(k),str) or not value[k] for k in ("agent_id","task_id")): continue
+  if any(not isinstance(value.get(k),str) or re.fullmatch(r"sha256:[0-9a-f]{64}",value[k]) is None for k in ("content_hash","provider_session_record_hash")): continue
+  source_hash=hashlib.sha256(raw).hexdigest()
+  destination=pathlib.Path(raw_dir)/(source_hash+".json")
+  if destination.exists():
+   if hashlib.sha256(destination.read_bytes()).hexdigest()!=source_hash: raise SystemExit(1)
+  else: destination.write_bytes(raw)
+  record={"schema_version":"testweaver.pg-exact-readback/v1","authority_scope":{"campaign_id":campaign_id,"run_id":run_id,"trace_id":trace_id},"table":table,"pg_revision":value["pg_revision"],"content_hash":value["content_hash"],"agent_id":value["agent_id"],"task_id":value["task_id"],"provider_session_record_hash":value["provider_session_record_hash"],"source_ref":f"{raw_ref_root}/{source_hash}.json","source_hash":"sha256:"+source_hash}
+  record["record_hash"]=canonical(record)
+  exact.write(json.dumps(record,ensure_ascii=False,sort_keys=True,separators=(",",":"))+"\n")
+PY
+    rm -f "$rows_tmp"
   done <<<"$tables"
-  [[ -s "$out" ]] || { printf '{"status":"NOT_OBSERVED"}\n' >"$out"; note_missing pg.tw_rows; }
+  [[ -s "$hashes_out" ]] || { printf '{"status":"NOT_OBSERVED"}\n' >"$hashes_out"; note_missing pg.tw_rows; }
+  [[ -s "$exact_out" ]] || note_missing pg.exact_tuple
+}
+
+capture_runtime_skill_invocations() {
+  local snapshot_dir=$1 out=$2
+  : >"$out"
+  python3 - "$EVIDENCE_DIR" "$snapshot_dir" "$out" "$RUN_ID" "$CAMPAIGN_ID" "$TRACE_ID" <<'PY'
+import hashlib,json,pathlib,re,sys
+evidence=pathlib.Path(sys.argv[1])
+snapshot=pathlib.Path(sys.argv[2])
+out=pathlib.Path(sys.argv[3])
+run_id,campaign_id,trace_id=sys.argv[4:]
+scope={"campaign_id":campaign_id,"run_id":run_id,"trace_id":trace_id}
+canonical=lambda item: "sha256:"+hashlib.sha256(json.dumps(item,ensure_ascii=False,sort_keys=True,separators=(",",":"),allow_nan=False).encode()).hexdigest()
+def json_file(path):
+ try: return json.loads(path.read_bytes())
+ except Exception: return None
+def json_lines(path):
+ try: return [json.loads(line) for line in path.read_bytes().splitlines() if line.strip()]
+ except Exception: return []
+def exact(index):
+ immutable=index.get("immutable_source")
+ if not isinstance(immutable,dict): return None
+ ref,claimed=immutable.get("ref"),immutable.get("raw_bytes_sha256")
+ if not isinstance(ref,str) or not isinstance(claimed,str) or re.fullmatch(r"[0-9a-f]{64}",claimed) is None: return None
+ path=evidence/ref
+ try: raw=path.read_bytes()
+ except OSError: return None
+ if hashlib.sha256(raw).hexdigest()!=claimed: return None
+ value=json_file(path)
+ return (value,ref,"sha256:"+claimed) if isinstance(value,dict) else None
+tasks=[]
+for task in json_lines(snapshot/"shared-fs"/"task-metadata.jsonl"):
+ if isinstance(task,dict) and isinstance(task.get("task_id"),str): tasks.append(task)
+roster=json_file(snapshot/"roster.json") or {}
+actors={item.get("name"):item for item in roster.get("actors",[]) if isinstance(item,dict) and isinstance(item.get("name"),str)}
+records=[]
+pattern=re.compile(r'^🔧 \*\*read_file\*\*\n```(?:json)?\n(\{[^\n]+\})\n```\s*$')
+for index_path in snapshot.glob("matrix/*/event-index.jsonl"):
+ indexes=json_lines(index_path)
+ by_event={item.get("event_id"):item for item in indexes if isinstance(item,dict)}
+ for index in indexes:
+  if index.get("identity_binding")!="ACTOR_EXACT" or index.get("authority_scope")!=scope: continue
+  checked=exact(index)
+  if checked is None: continue
+  event,event_ref,event_hash=checked
+  if event.get("event_id")!=index.get("event_id") or event.get("room_id")!=index.get("room_id") or event.get("origin_server_ts")!=index.get("origin_server_ts") or event.get("type")!="m.room.message": continue
+  content=event.get("content")
+  body=content.get("body") if isinstance(content,dict) else None
+  match=pattern.fullmatch(body) if isinstance(body,str) else None
+  if match is None: continue
+  try: payload=json.loads(match.group(1))
+  except Exception: continue
+  if not isinstance(payload,dict) or set(payload)!={"file_path"} or not isinstance(payload["file_path"],str): continue
+  actor=index.get("actor")
+  actor_info=actors.get(actor)
+  if not isinstance(actor_info,dict) or event.get("sender")!=actor_info.get("matrix_user_id"): continue
+  relation=content.get("m.relates_to")
+  if not isinstance(relation,dict) or relation.get("rel_type")!="m.thread" or not isinstance(relation.get("event_id"),str): continue
+  root_id=relation["event_id"]
+  root_index=by_event.get(root_id)
+  root_checked=exact(root_index) if isinstance(root_index,dict) else None
+  if root_checked is None: continue
+  root_event,root_ref,root_hash=root_checked
+  if root_event.get("event_id")!=root_index.get("event_id") or root_event.get("room_id")!=event.get("room_id") or root_index.get("room_id")!=event.get("room_id") or root_event.get("origin_server_ts")!=root_index.get("origin_server_ts") or root_event.get("type")!="m.room.message": continue
+  root_body=(root_event.get("content") or {}).get("body") if isinstance(root_event.get("content"),dict) else None
+  matching_tasks=[task for task in tasks if task["task_id"] in (root_body or "") and task.get("assigned_to") in {actor,actor_info.get("matrix_user_id")}]
+  if len(matching_tasks)!=1: continue
+  task_id=matching_tasks[0]["task_id"]
+  session_path=snapshot/"sessions"/re.sub(r"[^A-Za-z0-9._-]","_",actor)/"readback.jsonl"
+  session=json_lines(session_path)
+  try: session_hash="sha256:"+hashlib.sha256(session_path.read_bytes()).hexdigest()
+  except OSError: continue
+  event_ms=event.get("origin_server_ts")
+  if isinstance(event_ms,bool) or not isinstance(event_ms,int): continue
+  inputs=[item for item in session if item.get("role")=="user" and task_id in (item.get("task_refs") or []) and root_id in (item.get("matrix_event_refs") or []) and isinstance(item.get("timestamp_ms"),int) and item["timestamp_ms"]<=event_ms]
+  if not inputs: continue
+  turn_input=max(inputs,key=lambda item:(item["timestamp_ms"],item.get("sequence",-1)))
+  candidates=[item for item in session if item.get("role")=="assistant" and item.get("session_ref")==turn_input.get("session_ref") and isinstance(item.get("sequence"),int) and item["sequence"]>turn_input.get("sequence",-1) and isinstance(item.get("timestamp_ms"),int) and item["timestamp_ms"]>=event_ms and isinstance(item.get("provider"),str) and isinstance(item.get("model"),str)]
+  if not candidates: continue
+  provider_turn=min(candidates,key=lambda item:(item["timestamp_ms"],item["sequence"]))
+  file_path=payload["file_path"]
+  if "\\" in file_path or "/../" in f"/{file_path}/" or not file_path.endswith("/SKILL.md"): continue
+  inventory_path=snapshot/"skills"/re.sub(r"[^A-Za-z0-9._-]","_",actor)/"hashes.txt"
+  inventory=[]
+  try:
+   for line in inventory_path.read_text(encoding="utf-8").splitlines():
+    parts=line.split(maxsplit=1)
+    if len(parts)==2 and re.fullmatch(r"[0-9a-f]{64}",parts[0]) and parts[1]==file_path and re.fullmatch(r"(?:/[^/]+)*/skills/[A-Za-z0-9._-]+/SKILL\.md",parts[1]): inventory.append(parts)
+  except OSError: continue
+  if len(inventory)!=1: continue
+  skill_hash,skill_ref=inventory[0]
+  skill_name=pathlib.PurePosixPath(skill_ref).parent.name
+  enabled=json_file(snapshot/"skills"/re.sub(r"[^A-Za-z0-9._-]","_",actor)/"list.json")
+  if not isinstance(enabled,list) or len([item for item in enabled if isinstance(item,dict) and item.get("name")==skill_name and item.get("enabled") is True])!=1: continue
+  session_ref=session_path.relative_to(evidence).as_posix()
+  record={"schema_version":"testweaver.skill-invocation-capture/v1","authority_scope":scope,"agent_id":actor,"task_id":task_id,"provider_session_record_hash":"sha256:"+provider_turn["record_hash"],"skill":{"name":skill_name,"version":"sha256:"+skill_hash,"source_ref":skill_ref,"source_hash":"sha256:"+skill_hash},"invoke_ref":event.get("event_id"),"source_kind":"runtime_matrix_skill_event","task_event_ref":root_id,"task_event_source_ref":root_ref,"task_event_source_hash":root_hash,"source_ref":event_ref,"source_hash":event_hash,"session_ref":session_ref,"session_hash":session_hash,"turn_input_record_hash":"sha256:"+turn_input["record_hash"],"event_timestamp_ms":event_ms}
+  record["record_hash"]=canonical(record)
+  records.append(record)
+with out.open("w",encoding="utf-8") as stream:
+ for record in sorted(records,key=lambda item:(item["event_timestamp_ms"],item["invoke_ref"])):
+  stream.write(json.dumps(record,ensure_ascii=False,sort_keys=True,separators=(",",":"))+"\n")
+PY
+  [[ -s "$out" ]] || note_missing runtime.skill_invocations
 }
 
 snapshot() {
@@ -447,7 +600,8 @@ snapshot() {
   else
     printf '{"source":"native TeamHarness shared task metadata","status":"NOT_OBSERVED","tasks":[]}\n' >"$SNAPSHOT_DIR/authority/tasks.json"
   fi
-  capture_pg "$SNAPSHOT_DIR/pg-tw-row-hashes.jsonl"
+  capture_runtime_skill_invocations "$SNAPSHOT_DIR" "$SNAPSHOT_DIR/skill-invocations.jsonl"
+  capture_pg "$SNAPSHOT_DIR/pg-tw-row-hashes.jsonl" "$SNAPSHOT_DIR/pg-exact-readback.jsonl" "$SNAPSHOT_DIR/pg-exact-raw"
   jq -n --arg schema testweaver.native-hero-capture.v1 --arg captured_at "$(utc_now)" \
     --arg campaign_id "$CAMPAIGN_ID" --arg run_id "$RUN_ID" --arg trace_id "$TRACE_ID" \
     --arg boundary_utc "$BOUNDARY_UTC" --arg allowlist_sha256 "$HUMAN_ALLOWLIST_SHA256" \

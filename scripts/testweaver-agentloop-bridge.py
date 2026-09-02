@@ -23,7 +23,6 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
@@ -35,6 +34,7 @@ from testweaver.integrations.agentloop_client import (
     AgentLoopClient,
     AgentLoopCredentialLease,
     AgentLoopEndpoint,
+    AgentLoopEvidenceBinding,
     AgentLoopQueryVerification,
     AgentLoopScope,
 )
@@ -44,9 +44,9 @@ from testweaver.integrations.tea_transport import (
     load_protected_csv_credential,
 )
 from testweaver.integrations.xtrace_readback import (
+    TeaXTraceTransport,
     XTraceCorrelation,
     XTraceReadbackClient,
-    TeaXTraceTransport,
 )
 from testweaver.observability.otlp_genai import (
     EvidenceRef,
@@ -378,6 +378,7 @@ def _safe_agentloop(result: AgentLoopQueryVerification) -> dict[str, object]:
         "runs_receipt_hash": result.runs_receipt_hash,
         "ownership_verified": bool(result.ownership_verified),
         "scope_verified": bool(result.scope_verified),
+        "evidence_verified": bool(result.evidence_verified),
         "terminal": bool(result.terminal),
         "result_count": result.result_count,
         "successful_result_count": result.successful_result_count,
@@ -505,6 +506,12 @@ def project_provider_turn(
         )
         return _seal_receipt(receipt)
 
+    if agentloop_query is None:
+        receipt["classification"] = "LOCAL_PROJECTED"
+        receipt["agentloop"] = {"status": "NOT_QUERIED"}
+        receipt["reason"] = "AGENTLOOP_NOT_QUERIED"
+        return _seal_receipt(receipt)
+
     if agentloop_query is not None:
         try:
             agentloop = agentloop_query(turn)
@@ -518,6 +525,7 @@ def project_provider_turn(
             agentloop.status == "API_QUERY_VERIFIED"
             and agentloop.ownership_verified
             and agentloop.scope_verified
+            and agentloop.evidence_verified
             and agentloop.terminal
             and agentloop.result_count > 0
             and agentloop.successful_result_count > 0
@@ -634,6 +642,12 @@ def _agentloop_query_callback(args: argparse.Namespace) -> Callable[[ProviderTur
         return client.verify_evaluation_task_run(
             AgentLoopScope(turn.campaign_id, turn.run_id, turn.pg_revision),
             task_id=args.agentloop_task_id,
+            evidence_binding=AgentLoopEvidenceBinding(
+                trace_id=turn.trace_id,
+                content_hash=turn.content_hash,
+                provider_turn_record_hash=turn.record_hash,
+                provider_turn_source_hash=turn.source_hash,
+            ),
         )
 
     return query

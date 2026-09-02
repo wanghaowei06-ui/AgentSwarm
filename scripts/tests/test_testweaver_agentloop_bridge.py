@@ -8,8 +8,8 @@ from types import SimpleNamespace
 from typing import Any
 from unittest import mock
 
-from testweaver.contracts.validator import canonical_hash
 from testweaver.authority import digest_bytes
+from testweaver.contracts.validator import canonical_hash
 from testweaver.observability.otlp_genai import OtlpReceipt, OtlpResponse
 
 
@@ -154,7 +154,8 @@ class AgentLoopBridgeTests(unittest.TestCase):
                 clock=lambda: "2026-09-03T00:00:00Z",
             )
 
-        self.assertEqual(receipt["classification"], "PROJECTED_LIVE_TRACE")
+        self.assertEqual(receipt["classification"], "LOCAL_PROJECTED")
+        self.assertEqual(receipt["agentloop"]["status"], "NOT_QUERIED")
         self.assertFalse(receipt["live_claim"])
         self.assertEqual(len(calls), 1)
         self.assertTrue(calls[0][0].endswith("/v1/traces"))
@@ -212,6 +213,7 @@ class AgentLoopBridgeTests(unittest.TestCase):
                     runs_receipt_hash=HASH_B,
                     ownership_verified=False,
                     scope_verified=False,
+                    evidence_verified=False,
                     terminal=False,
                     result_count=0,
                     successful_result_count=0,
@@ -223,6 +225,7 @@ class AgentLoopBridgeTests(unittest.TestCase):
                             "runs_receipt_hash": HASH_B,
                             "ownership_verified": False,
                             "scope_verified": False,
+                            "evidence_verified": False,
                             "terminal": False,
                             "result_count": 0,
                             "successful_result_count": 0,
@@ -241,6 +244,7 @@ class AgentLoopBridgeTests(unittest.TestCase):
             "runs_receipt_hash": HASH_B,
             "ownership_verified": True,
             "scope_verified": True,
+            "evidence_verified": True,
             "terminal": True,
             "result_count": 1,
             "successful_result_count": 1,
@@ -260,6 +264,33 @@ class AgentLoopBridgeTests(unittest.TestCase):
             )
         self.assertEqual(receipt["classification"], "PROJECTED_LIVE_TRACE")
         self.assertEqual(receipt["agentloop"]["successful_result_count"], 1)
+
+    def test_agentloop_verification_requires_full_provider_turn_binding(self) -> None:
+        values = {
+            "status": "API_QUERY_VERIFIED",
+            "task_receipt_hash": HASH_A,
+            "runs_receipt_hash": HASH_B,
+            "ownership_verified": True,
+            "scope_verified": True,
+            "evidence_verified": False,
+            "terminal": True,
+            "result_count": 1,
+            "successful_result_count": 1,
+            "observed_at": "2026-09-03T00:00:00Z",
+        }
+        verification = bridge.AgentLoopQueryVerification(
+            **values, content_hash=canonical_hash(values)
+        )
+        with mock.patch.object(bridge, "emit_genai_span", side_effect=_fake_emit):
+            receipt = bridge.project_provider_turn(
+                _turn(),
+                otlp_endpoint="https://collector.example.invalid/v1/traces",
+                otlp_transport=_otlp_transport([]),
+                xtrace_client=XTraceFixture(),
+                agentloop_query=lambda _turn: verification,
+            )
+        self.assertEqual(receipt["classification"], "NOT_VERIFIED")
+        self.assertEqual(receipt["reason"], "AGENTLOOP_NOT_VERIFIED")
 
     def test_agentloop_cli_requires_sts_role_and_caches_temporary_credential(self) -> None:
         missing_role = SimpleNamespace(
