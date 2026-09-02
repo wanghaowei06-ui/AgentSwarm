@@ -249,6 +249,71 @@ def remove_broken_symlinks(root: Path) -> None:
         raise PackageError(f"runtime contains unresolved symlink: {broken[0].relative_to(root)}")
 
 
+def copy_pnpm_module_forest(
+    source: Path,
+    output: Path,
+    instances: dict[str, Path],
+) -> tuple[int, int]:
+    """Copy only safe links from pnpm's shared module forest."""
+
+    source_pnpm = source / "node_modules" / ".pnpm"
+    source_forest = source_pnpm / "node_modules"
+    if not source_forest.is_dir() or source_forest.is_symlink():
+        return 0, 0
+
+    source_pnpm = source_pnpm.resolve()
+    output_root = output.resolve()
+    target_forest = output / "node_modules" / ".pnpm" / "node_modules"
+    copied = 0
+    skipped = 0
+    for directory, names, files in os.walk(source_forest, followlinks=False):
+        for name in sorted((*names, *files)):
+            link = Path(directory) / name
+            if not link.is_symlink():
+                continue
+            target = os.readlink(link)
+            if os.path.isabs(target):
+                skipped += 1
+                continue
+
+            source_target = Path(os.path.realpath(link))
+            if not source_target.exists():
+                skipped += 1
+                continue
+            try:
+                source_target.relative_to(source_pnpm)
+            except ValueError:
+                skipped += 1
+                continue
+            instance = instance_root(source_target, source_pnpm)
+            if instance is None or instance.name not in instances:
+                skipped += 1
+                continue
+            if Path(os.path.realpath(instances[instance.name])) != Path(os.path.realpath(instance)):
+                skipped += 1
+                continue
+
+            relative = link.relative_to(source_forest)
+            destination = target_forest / relative
+            output_target = Path(os.path.realpath(destination.parent / target))
+            try:
+                output_target.relative_to(output_root)
+            except ValueError:
+                skipped += 1
+                continue
+            if not output_target.exists():
+                skipped += 1
+                continue
+            if destination.exists() or destination.is_symlink():
+                if destination.is_symlink() and os.readlink(destination) == target:
+                    continue
+                raise PackageError(f"pnpm module forest collision: {relative}")
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            os.symlink(target, destination)
+            copied += 1
+    return copied, skipped
+
+
 def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) -> dict[str, Any]:
     validate_inputs(source, canonical_lock, provenance)
     root_manifest = manifest(source / "package.json")
@@ -308,6 +373,7 @@ def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) ->
         elif not destination.exists():
             raise PackageError(f"root dependency is not materialized: {name}")
 
+    forest_links, forest_skipped = copy_pnpm_module_forest(source, output, instances)
     self_link = target_node_modules / "@deepseek-ai" / "dsh"
     if not self_link.exists() and not self_link.is_symlink():
         self_link.parent.mkdir(parents=True, exist_ok=True)
@@ -322,7 +388,9 @@ def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) ->
         "missing_optional_or_peer": len(missing),
         "skipped_unresolved": skipped_unresolved,
         "published_files": ["package.json", "lib", "config"],
-        "node_modules_source_copied": False,
+        "node_modules_source_copied": forest_links > 0,
+        "pnpm_forest_links_copied": forest_links,
+        "pnpm_forest_links_skipped": forest_skipped,
     }
 
 

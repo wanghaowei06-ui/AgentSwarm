@@ -114,6 +114,168 @@ class PackageWiringTests(unittest.TestCase):
             self.assertTrue(link.is_symlink())
             module.preflight_plugin_tree(output)
 
+    def test_nested_cordis_import_is_red_without_forest_and_green_after_package(self) -> None:
+        source = ROOT / "scripts/package_dsh.py"
+        spec = importlib.util.spec_from_file_location("package_dsh", source)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        with tempfile.TemporaryDirectory() as temporary:
+            source_root = Path(temporary) / "source"
+            output = Path(temporary) / "output"
+            dsh_instance_name = "@deepseek-ai+dsh-llm@fixture"
+            loader_instance_name = "@deepseek-ai+cordis-plugin-loader@fixture"
+            dsh_instance = (
+                source_root
+                / "node_modules/.pnpm"
+                / dsh_instance_name
+                / "node_modules/@deepseek-ai/dsh-llm"
+            )
+            loader_instance = (
+                source_root
+                / "node_modules/.pnpm"
+                / loader_instance_name
+                / "node_modules/@deepseek-ai/cordis-plugin-loader"
+            )
+            dsh_instance.joinpath("lib").mkdir(parents=True)
+            loader_instance.joinpath("lib").mkdir(parents=True)
+            (dsh_instance / "package.json").write_text(
+                json.dumps(
+                    {
+                        "name": "@deepseek-ai/dsh-llm",
+                        "version": "fixture",
+                        "type": "module",
+                        "exports": "./lib/index.mjs",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (dsh_instance / "lib/index.mjs").write_text(
+                'export const marker = "dsh-llm";\n', encoding="utf-8"
+            )
+            (loader_instance / "package.json").write_text(
+                json.dumps(
+                    {
+                        "name": "@deepseek-ai/cordis-plugin-loader",
+                        "version": "fixture",
+                        "type": "module",
+                        "exports": "./lib/index.mjs",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (loader_instance / "lib/index.mjs").write_text(
+                "export async function importHeadlessPlugin() {\n"
+                '  return await import("@deepseek-ai/dsh-llm");\n'
+                "}\n",
+                encoding="utf-8",
+            )
+            scope = source_root / "node_modules/@deepseek-ai"
+            scope.mkdir(parents=True)
+            (scope / "dsh-llm").symlink_to(
+                f"../.pnpm/{dsh_instance_name}/node_modules/@deepseek-ai/dsh-llm",
+                target_is_directory=True,
+            )
+            (scope / "cordis-plugin-loader").symlink_to(
+                f"../.pnpm/{loader_instance_name}/node_modules/@deepseek-ai/cordis-plugin-loader",
+                target_is_directory=True,
+            )
+            forest_scope = source_root / "node_modules/.pnpm/node_modules/@deepseek-ai"
+            forest_scope.mkdir(parents=True)
+            (forest_scope / "dsh-llm").symlink_to(
+                f"../../{dsh_instance_name}/node_modules/@deepseek-ai/dsh-llm",
+                target_is_directory=True,
+            )
+            phantom_instance = (
+                source_root
+                / "node_modules/.pnpm/@deepseek-ai+phantom@fixture"
+                / "node_modules/@deepseek-ai/phantom"
+            )
+            phantom_instance.mkdir(parents=True)
+            (phantom_instance / "package.json").write_text(
+                json.dumps({"name": "@deepseek-ai/phantom", "version": "fixture"}),
+                encoding="utf-8",
+            )
+            (forest_scope / "phantom").symlink_to(
+                "../../@deepseek-ai+phantom@fixture/node_modules/@deepseek-ai/phantom",
+                target_is_directory=True,
+            )
+            (forest_scope / "broken").symlink_to(
+                "../../@deepseek-ai+missing@fixture/node_modules/@deepseek-ai/missing",
+                target_is_directory=True,
+            )
+            (forest_scope / "absolute").symlink_to(
+                "/outside/materialized-source", target_is_directory=True
+            )
+            (source_root / "package.json").write_text(
+                json.dumps(
+                    {
+                        "name": "@deepseek-ai/dsh",
+                        "devDependencies": {
+                            "@deepseek-ai/dsh-llm": "workspace:^",
+                            "@deepseek-ai/cordis-plugin-loader": "workspace:^",
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (source_root / "lib").mkdir()
+            (source_root / "lib/bin.js").write_text("export {};\n", encoding="utf-8")
+            (source_root / "config").mkdir()
+            with mock.patch.object(module, "validate_inputs", return_value={}):
+                summary = module.build(
+                    source_root, output, Path("/unused/lock"), Path("/unused/provenance")
+                )
+            self.assertEqual(summary["pnpm_forest_links_copied"], 1)
+            self.assertEqual(summary["pnpm_forest_links_skipped"], 3)
+
+            loader_path = loader_instance.relative_to(source_root)
+            script = (
+                "import { pathToFileURL } from 'node:url';"
+                "const loader = await import(pathToFileURL(process.argv[1]).href);"
+                "const plugin = await loader.importHeadlessPlugin();"
+                "if (plugin.marker !== 'dsh-llm') process.exit(3);"
+            )
+
+            def run_import(tree: Path) -> subprocess.CompletedProcess[str]:
+                return subprocess.run(
+                    [
+                        "node",
+                        "--input-type=module",
+                        "-e",
+                        script,
+                        str(tree / loader_path / "lib/index.mjs"),
+                    ],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                    timeout=5,
+                )
+
+            source_root_link = source_root / "node_modules/@deepseek-ai/dsh-llm"
+            output_root_link = output / "node_modules/@deepseek-ai/dsh-llm"
+            source_root_link.unlink()
+            output_root_link.unlink()
+            self.assertEqual(run_import(source_root).returncode, 0)
+
+            forest_link = output / "node_modules/.pnpm/node_modules/@deepseek-ai/dsh-llm"
+            self.assertTrue(forest_link.is_symlink())
+            self.assertTrue(forest_link.readlink().is_absolute() is False)
+            self.assertTrue(forest_link.exists())
+            self.assertEqual(module.instance_root(forest_link.resolve(), output / "node_modules/.pnpm").name, dsh_instance_name)
+            for name in ("phantom", "broken", "absolute"):
+                self.assertFalse((forest_link.parent / name).exists())
+            self.assertFalse(
+                (
+                    output
+                    / "node_modules/.pnpm/@deepseek-ai+phantom@fixture"
+                ).exists()
+            )
+            self.assertEqual(run_import(output).returncode, 0)
+            forest_link.unlink()
+            self.assertNotEqual(run_import(output).returncode, 0)
+
     def test_noncritical_unresolved_root_dependency_is_skipped_and_reported(self) -> None:
         source = ROOT / "scripts/package_dsh.py"
         spec = importlib.util.spec_from_file_location("package_dsh", source)
