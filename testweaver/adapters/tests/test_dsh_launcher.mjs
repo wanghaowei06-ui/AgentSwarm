@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -24,6 +25,18 @@ function fixture() {
   fs.mkdirSync(path.dirname(entrypoint), { recursive: true });
   fs.writeFileSync(entrypoint, "", "utf8");
   return { root, home, runtimeRoot, forest };
+}
+
+function writePackage(root, packageName, manifest, files = {}) {
+  const packageDir = path.join(root, "node_modules", ...packageName.split("/"));
+  fs.mkdirSync(packageDir, { recursive: true });
+  fs.writeFileSync(path.join(packageDir, "package.json"), JSON.stringify(manifest), "utf8");
+  for (const [relativePath, contents] of Object.entries(files)) {
+    const file = path.join(packageDir, relativePath);
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, contents, "utf8");
+  }
+  return packageDir;
 }
 
 test("projects a profile node_modules symlink to the fixed forest", () => {
@@ -110,7 +123,7 @@ test("rejects unsafe HOME and profile values", () => {
   }
 });
 
-test("projects before spawning DSH", () => {
+test("projects the runtime root before spawning DSH", () => {
   const paths = fixture();
   try {
     let spawnArgs;
@@ -126,10 +139,83 @@ test("projects before spawning DSH", () => {
     assert.equal(status, 0);
     assert.equal(
       fs.readlinkSync(path.join(paths.home, ".dsh", "profiles", "headless", "node_modules")),
-      paths.forest,
+      path.join(paths.runtimeRoot, "node_modules"),
     );
     assert.equal(spawnArgs[0], "/opt/agentteams/testweaver-native-worker/bin/node");
     assert.deepEqual(spawnArgs[1].slice(1, 3), ["--profile", "headless"]);
+  } finally {
+    fs.rmSync(paths.root, { recursive: true, force: true });
+  }
+});
+
+test("boots a bare package through the Node cascaded loader from the profile anchor", () => {
+  const paths = fixture();
+  try {
+    const rootModules = path.join(paths.runtimeRoot, "node_modules");
+    writePackage(paths.runtimeRoot, "@deepseek-ai/dsh", {
+      name: "@deepseek-ai/dsh",
+      type: "module",
+      main: "lib/bin.js",
+    }, {
+      "lib/bin.js": `
+        import { createRequire } from "node:module";
+        import { pathToFileURL } from "node:url";
+        const require = createRequire(import.meta.url);
+        const loader = require("internal/modules/esm/loader").getOrInitializeCascadedLoader();
+        const loaded = await loader.import("@fixture/loader", pathToFileURL(process.cwd() + "/cordis.yml").href, {});
+        if (loaded.marker !== "root") process.exitCode = 7;
+      `,
+    });
+    writePackage(paths.runtimeRoot, "@fixture/loader", {
+      name: "@fixture/loader",
+      type: "module",
+      exports: { ".": "./lib/index.js" },
+    }, {
+      "lib/index.js": 'import { marker as nested } from "@fixture/transitive"; if (nested !== "ok") throw new Error("bad marker"); export const marker = "root";',
+    });
+    writePackage(paths.runtimeRoot, "@fixture/transitive", {
+      name: "@fixture/transitive",
+      type: "module",
+      exports: { ".": "./lib/index.js" },
+    }, {
+      "lib/index.js": 'export const marker = "ok";',
+    });
+
+    // The old .pnpm forest contains the package manifest but not its declared entry.
+    // This models a collected package instance that exists yet cannot boot through Cordis.
+    const forestLoader = path.join(paths.forest, "@fixture", "loader");
+    fs.mkdirSync(forestLoader, { recursive: true });
+    fs.writeFileSync(
+      path.join(forestLoader, "package.json"),
+      JSON.stringify({ name: "@fixture/loader", type: "module", exports: { ".": "./lib/index.js" } }),
+      "utf8",
+    );
+    fs.mkdirSync(path.join(forestLoader, "lib"), { recursive: true });
+    fs.writeFileSync(path.join(forestLoader, "lib/index.js"), 'export const marker = "forest";', "utf8");
+
+    let spawnArgs;
+    const profileDir = path.join(paths.home, ".dsh", "profiles", "headless");
+    const status = launch({
+      args: ["--profile", "headless", "--", "probe"],
+      env: { HOME: paths.home },
+      runtimeRoot: paths.runtimeRoot,
+      spawn: (executable, childArgs) => {
+        spawnArgs = [executable, childArgs];
+        const child = spawnSync(process.execPath, ["--expose-internals", ...childArgs], {
+          cwd: profileDir,
+          env: { ...process.env, HOME: paths.home },
+          stdio: "ignore",
+        });
+        return { status: child.status, error: child.error };
+      },
+    });
+
+    assert.equal(status, 0);
+    assert.equal(
+      fs.readlinkSync(path.join(profileDir, "node_modules")),
+      rootModules,
+    );
+    assert.equal(spawnArgs[0], "/opt/agentteams/testweaver-native-worker/bin/node");
   } finally {
     fs.rmSync(paths.root, { recursive: true, force: true });
   }

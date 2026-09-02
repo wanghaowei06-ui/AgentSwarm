@@ -135,8 +135,8 @@ export function launch({
 } = {}) {
   const profile = profileFromArgs(args);
   const root = path.resolve(runtimeRoot);
-  const forest = path.join(root, "node_modules", ".pnpm", "node_modules");
-  projectProfile({ home: env?.HOME, profile, forest });
+  const runtimeNodeModules = path.join(root, "node_modules");
+  projectProfile({ home: env?.HOME, profile, forest: runtimeNodeModules });
 
   const require = createRequire(import.meta.url);
   const entrypoint = require.resolve("@deepseek-ai/dsh/lib/bin.js", {
