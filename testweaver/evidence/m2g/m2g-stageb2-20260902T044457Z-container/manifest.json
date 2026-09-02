@@ -1,0 +1,24 @@
+{
+  "schema": "testweaver.m2g.stageb2.manifest.v1",
+  "run_id": "m2g-stageb2-20260902T044457Z-container",
+  "classification": "PARTIAL",
+  "receipt": "receipt.json",
+  "receipt_sha256": "6aa935a1a87965e6ce1dacf2edd2886831012b4b7824a77da1fc0147589726d1",
+  "files": ["receipt.json", "manifest.json", "SHA256SUMS"],
+  "evidence_boundary": "exact run_id Matrix/session/task-directory metadata only; no body or result content",
+  "observed": [
+    "Human initial event",
+    "Manager response event",
+    "Manager model turns",
+    "Manager-created task directory metadata"
+  ],
+  "not_observed": [
+    "native Project object",
+    "native Task state",
+    "Leader assignment",
+    "Worker ack",
+    "DSH provider/model/tool call",
+    "submit/check/accept",
+    "Manager second decision"
+  ]
+}

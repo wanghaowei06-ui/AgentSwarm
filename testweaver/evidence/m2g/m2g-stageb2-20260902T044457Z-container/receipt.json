@@ -1,0 +1,102 @@
+{
+  "schema": "testweaver.m2g.stageb2.observation.v1",
+  "run_id": "m2g-stageb2-20260902T044457Z-container",
+  "classification": "PARTIAL",
+  "status": "NOT_OBSERVED",
+  "source_commit": "71ec13b",
+  "scope": {
+    "exact_run_filter": true,
+    "human_sends_after_initial": 0,
+    "runtime_mutated_by_observer": false,
+    "body_prompt_result_persisted": false,
+    "credentials_read_or_stored": false
+  },
+  "human_initial": {
+    "status": "PASS",
+    "event_id": "$gs3e22coYj_zUoUt66g3yptIyPIUEaewBZRkuaNd85U",
+    "room_id": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+    "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+    "origin_server_ts": 1788324297348,
+    "type": "m.room.message",
+    "body_length": 2806,
+    "body_sha256": "8e1b28fab1fe52897045676226cf63dcaac64a29bf3f1722819cc9a5ea94040f"
+  },
+  "manager_response": {
+    "status": "PASS",
+    "event_id": "$HvdEqEMgywGMMHtPmGPShnbWZd4pq3ItQOldr3K2ejQ",
+    "room_id": "!Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080",
+    "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+    "origin_server_ts": 1788324328300,
+    "type": "m.room.message",
+    "body_length": 1132,
+    "body_sha256": "bbbc92b98d6bd01346142a3f10cd4cfa6f3641ac6964e609c78bb07f70201a13"
+  },
+  "manager_trace": {
+    "session_key": "agent:main:main",
+    "session_id": "72f72165-65e6-4911-95d4-415b63ffac21",
+    "session_file": "/root/manager-workspace/.openclaw/agents/main/sessions/72f72165-65e6-4911-95d4-415b63ffac21.jsonl",
+    "trace_window_sha256": "44d83510b384dd16f5dd0e0d6abe66193cd33e46d7d54d30b551f17ba2978c4c",
+    "model_turns": 9,
+    "provider": "agentteams-gateway",
+    "model": "deepseek-v4-flash",
+    "usage": {
+      "input": 48570,
+      "output": 4011,
+      "cacheRead": 559104,
+      "totalTokens_field_sum": 611685
+    },
+    "latency": "NOT_RECORDED",
+    "tool_calls": {
+      "exec": 4,
+      "read": 2,
+      "message": 2,
+      "all_openclaw_results": "SUCCESS"
+    },
+    "agt_get": 2,
+    "native_taskflow_create_or_delegate": 0,
+    "manage_state": 0,
+    "leader_target_message": "NOT_OBSERVED"
+  },
+  "manager_preparation": {
+    "task_directory": {
+      "status": "OBSERVED",
+      "name": "task-20260902-044457-m2g-stageb2",
+      "children": ["meta.json", "spec.md"]
+    },
+    "project_directory": "NOT_OBSERVED",
+    "native_task_object_or_state": "NOT_OBSERVED",
+    "mkdir": 1,
+    "minio_mc": {"cp": 2, "ls": 1},
+    "manage_state": 0
+  },
+  "native_lifecycle": {
+    "manager_dynamic_choice": "NOT_OBSERVED",
+    "leader_assignment": "NOT_OBSERVED",
+    "worker_ack": "NOT_OBSERVED",
+    "dsh_provider_call": "NOT_OBSERVED",
+    "skill_or_tool_invoke": "NOT_OBSERVED",
+    "submit": "NOT_OBSERVED",
+    "check": "NOT_OBSERVED",
+    "accept": "NOT_OBSERVED",
+    "manager_second_decision": "NOT_OBSERVED",
+    "assignment_event_ids": [],
+    "ack_event_ids": [],
+    "submit_event_ids": [],
+    "check_event_ids": [],
+    "accept_event_ids": []
+  },
+  "readback": {
+    "official_room_source": "agt get managers default -o json",
+    "rooms_queried_count": 5,
+    "matrix_http_statuses": [200],
+    "matched_event_count": 2,
+    "bounded_polls": 7,
+    "new_task_room": "NOT_OBSERVED",
+    "new_objects_after_manager_response": "NOT_OBSERVED"
+  },
+  "security": {
+    "secret_values": "NOT_READ_OR_STORED",
+    "message_bodies": "NOT_STORED",
+    "fixture_or_synthetic_substitution": false
+  }
+}

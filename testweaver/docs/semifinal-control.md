@@ -84,6 +84,7 @@ TestWeaver 只做产品差异：
 - 配置线已建立 names-only preflight，并确认 `/etc/agentteams/agentteams.env`、`providers.env`、LoongSuite、OTel 和 Nacos 只通过外部受保护引用复用；当前 Nacos 探测、OTel Collector 和 LoongSuite 服务状态如实标为延后，不冒充 LIVE。
 - AgentLoop 旧资产目前只可称合同/replay/历史受限证据；必须等待同一真实 M0/Hero 后完成真实查询回读。
 - M2-G Stage B run `m2g-stageb-20260902T041117Z-container` 已收口为 `PARTIAL/NOT_OBSERVED`：Human initial 与 Manager 原生响应事件回读 PASS；未观察到新的原生 Project、Task 对象或 Task room，也未观察到 Leader assignment、Worker ack、DSH provider/model/tool call、submit/check/accept 或 Manager 二次决策。唯一 Manager 响应中的 task reference 不足以证明原生 Task；不得补消息、代行或升级为 LIVE。脱敏 receipt/manifest/hash 位于 `testweaver/evidence/m2g/m2g-stageb-20260902T041117Z-container/`。
+- M2-G Stage B2 run `m2g-stageb2-20260902T044457Z-container` 同样诚实收口为 `PARTIAL/NOT_OBSERVED`：新的 Human initial 与 Manager 响应已回读；Manager 真实 model turn、`agt get` roster 查询、task directory（`meta.json`/`spec.md`）和 MinIO `mc` 准备动作已观察，但未观察到原生 Project/Task state、Leader room assignment、Worker ack、DSH provider/tool call 或 submit/check/accept。无补消息、无脚本代建 Task、无 Worker 指定；不得升级为 LIVE。脱敏 receipt/manifest/hash 位于 `testweaver/evidence/m2g/m2g-stageb2-20260902T044457Z-container/`。
 
 ## 6. 实施顺序与完成条件
 
