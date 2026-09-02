@@ -340,23 +340,138 @@ def remove_broken_symlinks(root: Path) -> None:
         raise PackageError(f"runtime contains unresolved symlink: {broken[0].relative_to(root)}")
 
 
+def _forest_package_name(relative: Path) -> str | None:
+    parts = relative.parts
+    if len(parts) == 1:
+        name = parts[0]
+        if name and not name.startswith("@") and name not in (".", "..") and "\\" not in name:
+            return name
+        return None
+    if len(parts) == 2:
+        scope, name = parts
+        if (
+            scope.startswith("@")
+            and len(scope) > 1
+            and name
+            and name not in (".", "..")
+            and "\\" not in scope
+            and "\\" not in name
+        ):
+            return f"{scope}/{name}"
+    return None
+
+
+def _ensure_root_projection_parent(root: Path, directory: Path) -> None:
+    try:
+        relative = directory.relative_to(root)
+    except ValueError as exc:
+        raise PackageError("root forest projection escapes output") from exc
+    current = root
+    for part in relative.parts:
+        current /= part
+        try:
+            current.lstat()
+        except FileNotFoundError:
+            current.mkdir()
+        if current.is_symlink() or not current.is_dir():
+            raise PackageError("root forest projection parent conflicts")
+
+
+def _validate_existing_root_projection(
+    destination: Path,
+    package_name: str,
+    output_root: Path,
+) -> None:
+    if destination.is_symlink():
+        target = os.readlink(destination)
+        if os.path.isabs(target):
+            raise PackageError("root forest projection conflicts with unsafe link")
+        resolved = Path(os.path.realpath(destination))
+    elif destination.is_dir():
+        resolved = destination.resolve()
+    else:
+        raise PackageError("root forest projection conflicts with existing file")
+    try:
+        resolved.relative_to(output_root)
+    except ValueError as exc:
+        raise PackageError("root forest projection conflicts with unsafe link") from exc
+    package_json = resolved / "package.json"
+    if not package_json.is_file() or package_json.is_symlink():
+        raise PackageError("root forest projection conflicts with invalid package")
+    if manifest(package_json).get("name") != package_name:
+        raise PackageError("root forest projection conflicts with different package")
+
+
+def project_pnpm_forest_root_links(output: Path, package_names: set[str]) -> tuple[int, int]:
+    """Expose only copied, validated pnpm forest entries at the package root."""
+
+    output_root = output.resolve()
+    root_node_modules = output_root / "node_modules"
+    forest = root_node_modules / ".pnpm" / "node_modules"
+    if not package_names:
+        return 0, 0
+    if not root_node_modules.is_dir() or root_node_modules.is_symlink():
+        raise PackageError("root node_modules projection directory is invalid")
+    if not forest.is_dir() or forest.is_symlink():
+        raise PackageError("pnpm forest projection directory is invalid")
+
+    projected = 0
+    skipped = 0
+    for package_name in sorted(package_names):
+        relative = Path(*package_name.split("/"))
+        if _forest_package_name(relative) != package_name:
+            raise PackageError("invalid pnpm forest package name")
+        forest_link = forest / relative
+        if not forest_link.is_symlink():
+            raise PackageError("root forest projection source is missing")
+        target = os.readlink(forest_link)
+        if os.path.isabs(target):
+            raise PackageError("root forest projection source is absolute")
+        resolved = Path(os.path.realpath(forest_link))
+        try:
+            resolved.relative_to(output_root)
+        except ValueError as exc:
+            raise PackageError("root forest projection source escapes output") from exc
+        if not resolved.is_dir():
+            raise PackageError("root forest projection source is not a directory")
+        package_json = resolved / "package.json"
+        if not package_json.is_file() or package_json.is_symlink():
+            raise PackageError("root forest projection source manifest is invalid")
+        if manifest(package_json).get("name") != package_name:
+            raise PackageError("root forest projection source package mismatches")
+
+        destination = root_node_modules / relative
+        _ensure_root_projection_parent(root_node_modules, destination.parent)
+        if destination.exists() or destination.is_symlink():
+            _validate_existing_root_projection(destination, package_name, output_root)
+            skipped += 1
+            continue
+        link_target = os.path.relpath(forest_link, destination.parent)
+        if os.path.isabs(link_target):
+            raise PackageError("root forest projection link is absolute")
+        os.symlink(link_target, destination, "dir")
+        projected += 1
+    return projected, skipped
+
+
 def copy_pnpm_module_forest(
     source: Path,
     output: Path,
     instances: dict[str, Path],
-) -> tuple[int, int]:
+) -> tuple[int, int, set[str]]:
     """Copy only safe links from pnpm's shared module forest."""
 
     source_pnpm = source / "node_modules" / ".pnpm"
     source_forest = source_pnpm / "node_modules"
     if not source_forest.is_dir() or source_forest.is_symlink():
-        return 0, 0
+        return 0, 0, set()
 
     source_pnpm = source_pnpm.resolve()
     output_root = output.resolve()
     target_forest = output / "node_modules" / ".pnpm" / "node_modules"
     copied = 0
     skipped = 0
+    copied_names: set[str] = set()
     for directory, names, files in os.walk(source_forest, followlinks=False):
         for name in sorted((*names, *files)):
             link = Path(directory) / name
@@ -397,12 +512,18 @@ def copy_pnpm_module_forest(
                 continue
             if destination.exists() or destination.is_symlink():
                 if destination.is_symlink() and os.readlink(destination) == target:
+                    package_name = _forest_package_name(relative)
+                    if package_name is not None:
+                        copied_names.add(package_name)
                     continue
                 raise PackageError(f"pnpm module forest collision: {relative}")
             destination.parent.mkdir(parents=True, exist_ok=True)
             os.symlink(target, destination)
             copied += 1
-    return copied, skipped
+            package_name = _forest_package_name(relative)
+            if package_name is not None:
+                copied_names.add(package_name)
+    return copied, skipped, copied_names
 
 
 def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) -> dict[str, Any]:
@@ -482,7 +603,12 @@ def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) ->
         elif not destination.exists():
             raise PackageError(f"root dependency is not materialized: {name}")
 
-    forest_links, forest_skipped = copy_pnpm_module_forest(source, output, instances)
+    forest_links, forest_skipped, forest_package_names = copy_pnpm_module_forest(
+        source, output, instances
+    )
+    root_links, root_links_skipped = project_pnpm_forest_root_links(
+        output, forest_package_names
+    )
     self_link = target_node_modules / "@deepseek-ai" / "dsh"
     if not self_link.exists() and not self_link.is_symlink():
         self_link.parent.mkdir(parents=True, exist_ok=True)
@@ -500,6 +626,8 @@ def build(source: Path, output: Path, canonical_lock: Path, provenance: Path) ->
         "node_modules_source_copied": forest_links > 0,
         "pnpm_forest_links_copied": forest_links,
         "pnpm_forest_links_skipped": forest_skipped,
+        "pnpm_root_links_projected": root_links,
+        "pnpm_root_links_skipped": root_links_skipped,
         "root_physical_fallbacks": root_physical_fallbacks,
     }
 

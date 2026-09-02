@@ -6,6 +6,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 const RUNTIME_ROOT = "/opt/agentteams/testweaver-native-worker/dsh-runtime";
+const DSH_NODE_EXECUTABLE = "/opt/agentteams/testweaver-native-worker/bin/node";
 const PROFILE_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
 const MAX_PROFILE_LENGTH = 128;
 
@@ -141,7 +142,7 @@ export function launch({
   const entrypoint = require.resolve("@deepseek-ai/dsh/lib/bin.js", {
     paths: [root],
   });
-  const child = spawn(process.execPath, [entrypoint, ...args], {
+  const child = spawn(DSH_NODE_EXECUTABLE, [entrypoint, ...args], {
     stdio: "inherit",
   });
   if (child.error) {

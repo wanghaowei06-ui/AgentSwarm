@@ -128,7 +128,7 @@ test("projects before spawning DSH", () => {
       fs.readlinkSync(path.join(paths.home, ".dsh", "profiles", "headless", "node_modules")),
       paths.forest,
     );
-    assert.equal(spawnArgs[0], process.execPath);
+    assert.equal(spawnArgs[0], "/opt/agentteams/testweaver-native-worker/bin/node");
     assert.deepEqual(spawnArgs[1].slice(1, 3), ["--profile", "headless"]);
   } finally {
     fs.rmSync(paths.root, { recursive: true, force: true });

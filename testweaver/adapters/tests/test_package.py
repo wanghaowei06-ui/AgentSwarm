@@ -115,6 +115,150 @@ class PackageWiringTests(unittest.TestCase):
             self.assertTrue(link.is_symlink())
             module.preflight_plugin_tree(output)
 
+    def test_collected_forest_entries_project_missing_root_links_and_reject_conflicts(self) -> None:
+        source = ROOT / "scripts/package_dsh.py"
+        spec = importlib.util.spec_from_file_location("package_dsh", source)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        with tempfile.TemporaryDirectory() as temporary:
+            source_root = Path(temporary) / "source"
+            output = Path(temporary) / "output"
+            packages = {
+                "agent_loop": (
+                    "@deepseek-ai+dsh-agent-loop@fixture",
+                    "@deepseek-ai/dsh-agent-loop",
+                ),
+                "session_title": (
+                    "@deepseek-ai+dsh-session-title@fixture",
+                    "@deepseek-ai/dsh-session-title",
+                ),
+                "llm": ("@deepseek-ai+dsh-llm@fixture", "@deepseek-ai/dsh-llm"),
+                "zod": ("zod@fixture", "zod"),
+                "scoped": ("@scope+pkg@fixture", "@scope/pkg"),
+            }
+
+            def package_dir(instance_name: str, package_name: str) -> Path:
+                return (
+                    source_root
+                    / "node_modules/.pnpm"
+                    / instance_name
+                    / "node_modules"
+                    / Path(*package_name.split("/"))
+                )
+
+            for instance_name, package_name in packages.values():
+                directory = package_dir(instance_name, package_name)
+                directory.mkdir(parents=True)
+                (directory / "package.json").write_text(
+                    json.dumps({"name": package_name, "version": "fixture", "main": "index.js"}),
+                    encoding="utf-8",
+                )
+                (directory / "index.js").write_text("module.exports = {};\n", encoding="utf-8")
+
+            agent_loop_dir = package_dir(*packages["agent_loop"])
+            (agent_loop_dir / "package.json").write_text(
+                json.dumps(
+                    {
+                        "name": "@deepseek-ai/dsh-agent-loop",
+                        "version": "fixture",
+                        "main": "index.js",
+                        "dependencies": {"zod": "fixture", "@scope/pkg": "fixture"},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            for key in ("zod", "scoped"):
+                _, package_name = packages[key]
+                nested = agent_loop_dir / "node_modules" / Path(*package_name.split("/"))
+                nested.parent.mkdir(parents=True, exist_ok=True)
+                nested.symlink_to(
+                    Path(os.path.relpath(package_dir(*packages[key]), nested.parent)),
+                    target_is_directory=True,
+                )
+
+            source_root_targets = {}
+            source_root_scope = source_root / "node_modules"
+            for key in ("agent_loop", "session_title", "llm"):
+                instance_name, package_name = packages[key]
+                link = source_root_scope / Path(*package_name.split("/"))
+                link.parent.mkdir(parents=True, exist_ok=True)
+                target = os.path.relpath(package_dir(instance_name, package_name), link.parent)
+                link.symlink_to(target, target_is_directory=True)
+                source_root_targets[package_name] = target
+
+            source_forest = source_root / "node_modules/.pnpm/node_modules"
+            for instance_name, package_name in packages.values():
+                link = source_forest / Path(*package_name.split("/"))
+                link.parent.mkdir(parents=True, exist_ok=True)
+                link.symlink_to(
+                    os.path.relpath(package_dir(instance_name, package_name), link.parent),
+                    target_is_directory=True,
+                )
+            phantom = source_root / "node_modules/.pnpm/phantom@fixture/node_modules/phantom"
+            phantom.mkdir(parents=True)
+            (phantom / "package.json").write_text(
+                json.dumps({"name": "phantom", "version": "fixture", "main": "index.js"}),
+                encoding="utf-8",
+            )
+            (phantom / "index.js").write_text("module.exports = {};\n", encoding="utf-8")
+            (source_forest / "phantom").symlink_to(
+                os.path.relpath(phantom, source_forest), target_is_directory=True
+            )
+
+            (source_root / "package.json").write_text(
+                json.dumps(
+                    {
+                        "name": "@deepseek-ai/dsh",
+                        "devDependencies": {
+                            "@deepseek-ai/dsh-agent-loop": "fixture",
+                            "@deepseek-ai/dsh-session-title": "fixture",
+                            "@deepseek-ai/dsh-llm": "fixture",
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (source_root / "lib").mkdir()
+            (source_root / "lib/bin.js").write_text("module.exports = {};\n", encoding="utf-8")
+            (source_root / "config").mkdir()
+            with mock.patch.object(module, "validate_inputs", return_value={}):
+                summary = module.build(
+                    source_root, output, Path("/unused/lock"), Path("/unused/provenance")
+                )
+
+            self.assertEqual(summary["pnpm_forest_links_copied"], 5)
+            self.assertEqual(summary["pnpm_root_links_projected"], 2)
+            self.assertEqual(summary["pnpm_root_links_skipped"], 3)
+            for package_name in ("zod", "@scope/pkg"):
+                link = output / "node_modules" / Path(*package_name.split("/"))
+                forest_link = output / "node_modules/.pnpm/node_modules" / Path(*package_name.split("/"))
+                self.assertTrue(link.is_symlink())
+                self.assertFalse(os.readlink(link).startswith("/"))
+                self.assertEqual(link.resolve(), forest_link.resolve())
+            for package_name, target in source_root_targets.items():
+                self.assertEqual(
+                    os.readlink(output / "node_modules" / Path(*package_name.split("/"))),
+                    target,
+                )
+            self.assertEqual(
+                module._node_resolvable(
+                    output,
+                    ["zod", "@deepseek-ai/dsh-agent-loop", "@deepseek-ai/dsh-session-title"],
+                ),
+                {"zod", "@deepseek-ai/dsh-agent-loop", "@deepseek-ai/dsh-session-title"},
+            )
+            self.assertFalse((output / "node_modules/phantom").exists())
+            self.assertFalse((output / "node_modules/.pnpm/node_modules/phantom").exists())
+
+            conflict = output / "node_modules/zod"
+            conflict.unlink()
+            conflict.symlink_to("/outside/not-allowed", target_is_directory=True)
+            with self.assertRaisesRegex(module.PackageError, "root forest projection"):
+                module.project_pnpm_forest_root_links(output, {"zod"})
+            self.assertEqual(os.readlink(conflict), "/outside/not-allowed")
+
     def test_nested_cordis_import_is_red_without_forest_and_green_after_package(self) -> None:
         source = ROOT / "scripts/package_dsh.py"
         spec = importlib.util.spec_from_file_location("package_dsh", source)
