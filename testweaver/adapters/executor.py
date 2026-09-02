@@ -136,9 +136,9 @@ def _validate(assignment: NativeWorkerAssignment, config: AdapterConfig, provena
             _validate_reference(reference, "codex_environment")
 
 
-def _argv(config: AdapterConfig) -> list[str]:
+def _argv(config: AdapterConfig, prompt: str) -> list[str]:
     if config.adapter_kind == "dsh":
-        return [str(PRODUCTION_DSH_EXECUTABLE), "--protocol", NATIVE_EXECUTION_PROTOCOL]
+        return [str(PRODUCTION_DSH_EXECUTABLE), "--profile", "headless", "--", prompt]
     launch = build_codex_cli_launch()
     return [str(PRODUCTION_CODEX_EXECUTABLE), *launch.command[1:]]
 
@@ -308,7 +308,9 @@ def _failure(cwd: Path, capture: Mapping[str, Any], reason: str, termination: st
 
 def _raw_result(config: AdapterConfig, cwd: Path, capture: Mapping[str, Any], secrets: Iterable[str]) -> dict[str, Any]:
     text = _redact(capture["stdout"].decode("utf-8", errors="replace"), secrets)
-    if config.adapter_kind == "codex-cli":
+    if config.adapter_kind == "dsh" and not text.strip():
+        raise ResultContractError("DSH returned empty output")
+    if config.adapter_kind in {"codex-cli", "dsh"}:
         value: dict[str, Any] = {"status": "COMPLETED", "output": text, "usage": {}}
     else:
         try:
@@ -339,7 +341,7 @@ def _raw_result(config: AdapterConfig, cwd: Path, capture: Mapping[str, Any], se
 
 
 def _metadata(argv: list[str], cwd: Path, capture: Mapping[str, Any]) -> dict[str, Any]:
-    return {
+    metadata = {
         "protocol": NATIVE_EXECUTION_PROTOCOL,
         "executable": argv[0],
         "argv": list(argv),
@@ -354,6 +356,12 @@ def _metadata(argv: list[str], cwd: Path, capture: Mapping[str, Any]) -> dict[st
         "native_state_mutation": False,
         "native_result_submission": False,
     }
+    if len(argv) >= 5 and argv[1:3] == ["--profile", "headless"]:
+        prompt = argv[-1].encode("utf-8")
+        metadata["argv"][-1] = "[PROMPT_REDACTED]"
+        metadata["prompt_sha256"] = hashlib.sha256(prompt).hexdigest()
+        metadata["prompt_bytes"] = len(prompt)
+    return metadata
 
 
 def execute_native_worker(
@@ -377,7 +385,7 @@ def execute_native_worker(
         config=config,
         provenance=provenance,
     )
-    argv = _argv(config)
+    argv = _argv(config, prompt)
     executable = Path(argv[0])
     if executable.is_symlink() or not executable.is_file() or not os.access(executable, os.X_OK):
         raise NativeExecutionError("approved external executable is missing or not executable")
@@ -394,7 +402,7 @@ def execute_native_worker(
         ensure_ascii=False,
         sort_keys=True,
         separators=(",", ":"),
-    ).encode("utf-8")
+    ).encode("utf-8") if config.adapter_kind != "dsh" else b""
     capture = _run(
         argv,
         payload,

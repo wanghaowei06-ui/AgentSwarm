@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -114,11 +115,9 @@ class OneShotExecutorTests(unittest.TestCase):
                 workspace.mkdir()
                 script = _script(
                     workspace,
-                    "import json, os, sys\n"
-                    "request = json.load(sys.stdin)\n"
-                    "assert request['native_assignment']['task_id'] == 'native-task-ref'\n"
+                    "import os\n"
                     "secret = os.environ.get('TESTWEAVER_DSH_CREDENTIAL') or os.environ.get('TESTWEAVER_BAILIAN_CREDENTIAL', '')\n"
-                    "print(json.dumps({'status': 'COMPLETED', 'output': 'api_key=' + secret, 'usage': {}}))\n",
+                    "print('api_key=' + secret)\n",
                 )
                 result, metadata = self._run(script, _config(provider), workspace)
                 artifact = workspace / result.result_ref
@@ -127,11 +126,45 @@ class OneShotExecutorTests(unittest.TestCase):
                 self.assertFalse(result.usage.observed)
                 self.assertIn("[REDACTED]", content)
                 self.assertNotIn("fixture-redaction-value-1234", content)
+                self.assertNotIn("read the assigned source", content)
+                self.assertNotIn("read the assigned source", repr(result))
                 self.assertTrue(metadata["external_process_started"])
                 self.assertFalse(metadata["native_state_mutation"])
                 self.assertFalse(metadata["native_result_submission"])
-                self.assertEqual(metadata["argv"][1:], ["--protocol", executor.NATIVE_EXECUTION_PROTOCOL])
+                self.assertEqual(metadata["argv"][1:4], ["--profile", "headless", "--"])
+                self.assertEqual(metadata["argv"][4], "[PROMPT_REDACTED]")
+                self.assertNotIn("read the assigned source", repr(metadata))
+                self.assertEqual(metadata["prompt_bytes"], len("read the assigned source".encode()))
+                self.assertEqual(
+                    metadata["prompt_sha256"],
+                    hashlib.sha256(b"read the assigned source").hexdigest(),
+                )
                 self.assertEqual(result.evidence_refs[0].artifact_ref, result.result_ref)
+
+    def test_dsh_leading_dash_prompt_is_positional(self) -> None:
+        self.assertEqual(
+            executor._argv(_config("deepseek"), "-do not parse as an option")[1:],
+            ["--profile", "headless", "--", "-do not parse as an option"],
+        )
+
+    def test_dsh_nonzero_exit_is_provider_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory) / "workspace"
+            workspace.mkdir()
+            script = _script(workspace, "import sys\nsys.exit(7)\n")
+            result, metadata = self._run(script, _config("deepseek"), workspace)
+            self.assertEqual(result.status, "failed")
+            self.assertEqual(result.termination, "provider_error")
+            self.assertEqual(metadata["exit_code"], 7)
+
+    def test_dsh_empty_output_is_protocol_error(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory) / "workspace"
+            workspace.mkdir()
+            script = _script(workspace, "pass\n")
+            result, metadata = self._run(script, _config("deepseek"), workspace)
+            self.assertEqual(result.termination, "protocol_error")
+            self.assertNotIn("read the assigned source", repr(metadata))
 
     def test_codex_uses_fixed_noninteractive_exec_and_stdin_prompt(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
