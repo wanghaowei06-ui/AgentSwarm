@@ -111,6 +111,52 @@ def _script(directory: Path, body: str) -> Path:
 
 
 class OneShotExecutorTests(unittest.TestCase):
+    def test_workspace_derives_qwenpaw_default_from_working_dir_when_env_is_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            approved = Path(directory) / "agents"
+            qwenpaw_dir = approved / "worker" / ".qwenpaw"
+            workspace = qwenpaw_dir / "workspaces" / "default"
+            workspace.mkdir(parents=True)
+            with patch.dict(
+                os.environ,
+                {"QWENPAW_WORKING_DIR": str(qwenpaw_dir)},
+                clear=True,
+            ), patch.object(executor, "_WORKSPACE_ROOTS", (approved,)):
+                self.assertEqual(executor._workspace(), workspace)
+
+    def test_workspace_derives_qwenpaw_default_from_home_when_working_dir_is_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            approved = Path(directory) / "agents"
+            home = approved / "worker"
+            workspace = home / ".qwenpaw" / "workspaces" / "default"
+            workspace.mkdir(parents=True)
+            with patch.dict(os.environ, {"HOME": str(home)}, clear=True), patch.object(
+                executor, "_WORKSPACE_ROOTS", (approved,)
+            ):
+                self.assertEqual(executor._workspace(), workspace)
+
+    def test_workspace_rejects_unsafe_derived_path_without_fallback(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            approved = Path(directory) / "agents"
+            safe_home = approved / "worker"
+            safe_workspace = safe_home / ".qwenpaw" / "workspaces" / "default"
+            safe_workspace.mkdir(parents=True)
+            unsafe_working_dir = Path(directory) / "outside" / ".qwenpaw"
+            (unsafe_working_dir / "workspaces" / "default").mkdir(parents=True)
+            with patch.dict(
+                os.environ,
+                {
+                    "QWENPAW_WORKING_DIR": str(unsafe_working_dir),
+                    "HOME": str(safe_home),
+                },
+                clear=True,
+            ), patch.object(executor, "_WORKSPACE_ROOTS", (approved,)):
+                with self.assertRaisesRegex(
+                    executor.NativeExecutionError,
+                    "outside approved roots",
+                ):
+                    executor._workspace()
+
     def _run(
         self,
         script: Path,

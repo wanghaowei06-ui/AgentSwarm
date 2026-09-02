@@ -93,12 +93,17 @@ def _validate_reference(reference: ProtectedReference, field: str, *, dsh_file: 
 
 
 def _workspace() -> Path:
-    raw = os.environ.get(WORKSPACE_ENVIRONMENT, "")
-    if not raw or not Path(raw).is_absolute():
+    raw = os.environ.get(WORKSPACE_ENVIRONMENT)
+    if raw is None:
+        base = os.environ.get("QWENPAW_WORKING_DIR")
+        raw = str(Path(base.strip()) / "workspaces" / "default") if base is not None else str(Path(os.environ.get("HOME", "").strip()) / ".qwenpaw" / "workspaces" / "default")
+    if not (candidate := Path(raw.strip())).is_absolute():
         raise NativeExecutionError("Worker workspace must be an absolute approved path")
-    path = Path(raw).resolve()
-    if not path.is_dir() or not _inside(path, _WORKSPACE_ROOTS):
-        raise NativeExecutionError("Worker workspace is outside approved roots")
+    try:
+        path = candidate.resolve(strict=True)
+    except (OSError, RuntimeError):
+        raise NativeExecutionError("Worker workspace is missing or unreadable")
+    if not path.is_dir() or not _inside(path, _WORKSPACE_ROOTS): raise NativeExecutionError("Worker workspace is outside approved roots")
     return path
 
 
