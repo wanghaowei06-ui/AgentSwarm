@@ -29,6 +29,12 @@ required_fragments=(
     "Do not require or load every Skill"
     "If no Skill applies"
     "normal AgentTeams task/handoff path"
+    "Human, Manager, Leader, and Worker"
+    "use Chinese by default"
+    "protocol field names"
+    "log keys"
+    "evidence identifiers"
+    "stable English"
 )
 for fragment in "${required_fragments[@]}"; do
     if ! grep -Fq -- "${fragment}" <<<"${content}"; then

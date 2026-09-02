@@ -26,3 +26,10 @@ Use this instruction for every task you handle.
 Package provenance for this instruction set is declared in `manifest.json`:
 `source_commit` is `19a929ea084c32e0e551881ec709b1d9b1792512` and `version` is
 `1.0`.
+
+## Language boundary
+
+For task bodies and requester-facing reports addressed to or produced for
+Human, Manager, Leader, and Worker, use Chinese by default. Keep protocol field names,
+code, log keys, evidence identifiers, and resource/Matrix/Task IDs in stable English;
+do not translate or alter these identifiers.
