@@ -62,7 +62,7 @@ RUN cd /tmp \
     && HOME=/tmp/testweaver-dsh-home \
         /opt/agentteams/testweaver-native-worker/bin/dsh --profile headless --help >/dev/null \
     && test "$(readlink -- /tmp/testweaver-dsh-home/.dsh/profiles/headless/node_modules)" \
-        = "/opt/agentteams/testweaver-native-worker/dsh-runtime/node_modules/.pnpm/node_modules" \
+        = "/opt/agentteams/testweaver-native-worker/dsh-runtime/node_modules" \
     && /opt/agentteams/testweaver-native-worker/bin/codex-cc --version >/dev/null
 
 WORKDIR /opt/agentteams/testweaver-native-worker

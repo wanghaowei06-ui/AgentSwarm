@@ -82,12 +82,12 @@ class NodeRuntimeAssetTests(unittest.TestCase):
         normalized_dockerfile = " ".join(dockerfile.replace(chr(92) + "\n", " ").split())
         profile_home = "/tmp/testweaver-dsh-home"
         dsh = "/opt/agentteams/testweaver-native-worker/bin/dsh"
-        forest = "/opt/agentteams/testweaver-native-worker/dsh-runtime/node_modules/.pnpm/node_modules"
+        runtime_node_modules = "/opt/agentteams/testweaver-native-worker/dsh-runtime/node_modules"
         for marker in (
             f"install -d -m 0700 {profile_home}",
             f"HOME={profile_home} {dsh} --profile headless --version",
             f"HOME={profile_home} {dsh} --profile headless --help >/dev/null",
-            f'test "$(readlink -- {profile_home}/.dsh/profiles/headless/node_modules)" = "{forest}"',
+            f'test "$(readlink -- {profile_home}/.dsh/profiles/headless/node_modules)" = "{runtime_node_modules}"',
         ):
             self.assertIn(marker, normalized_dockerfile)
         self.assertNotIn(f"&& {dsh} --version", normalized_dockerfile)
