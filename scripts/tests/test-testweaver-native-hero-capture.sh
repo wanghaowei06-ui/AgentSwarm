@@ -19,7 +19,7 @@ if [[ "${1:-}" == ps ]]; then
 fi
 if [[ "${1:-}" == logs ]]; then
   printf '2026-09-03T00:00:00Z actor ready token=%s\n' "$TOKEN_SENTINEL"
-  exit 0
+  while :; do sleep 1; done
 fi
 if [[ "${1:-}" == inspect && "${2:-}" == --format ]]; then
   case "${4:-}" in
@@ -130,12 +130,24 @@ whoami=$(find "$evidence/latest/matrix" -name whoami.json -print -quit)
 test -n "$whoami"
 test -f "${whoami%.json}.raw.sha256"
 
-sleep 1
+chmod 644 "$evidence/.state/config"
+if bash "$capture" snapshot "${args[@]}" >/dev/null 2>&1; then
+  printf 'unsafe capture config mode unexpectedly succeeded\n' >&2
+  exit 1
+fi
+chmod 600 "$evidence/.state/config"
 bash "$capture" snapshot "${args[@]}"
+test "$(find "$evidence/snapshots" -mindepth 1 -maxdepth 1 -type d | wc -l)" -ge 2
 sleep 1
 bash "$capture" stop "${args[@]}"
 jq -e '.status=="STOPPED" and .checksum_state=="FINAL"' "$evidence/manifest.json" >/dev/null
 (cd "$evidence" && sha256sum -c SHA256SUMS >/dev/null)
+while IFS=$'\t' read -r pid _; do
+  if kill -0 "$pid" 2>/dev/null; then
+    printf 'owned log follower %s survived stop\n' "$pid" >&2
+    exit 1
+  fi
+done <"$evidence/.state/collectors.tsv"
 
 if rg -F "$TOKEN_SENTINEL" "$evidence" --glob '!*.sha256' --glob '!SHA256SUMS' >/dev/null; then
   printf 'secret sentinel leaked into evidence\n' >&2
