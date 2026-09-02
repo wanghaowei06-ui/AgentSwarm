@@ -16,7 +16,7 @@ RUN test "${CODEX_CLI_SPEC}" = "@openai/codex@0.152.0" \
         /opt/agentteams/testweaver-native-worker/codex-cli \
         /opt/agentteams/testweaver-native-worker/dsh-runtime
 
-COPY __init__.py codex_cli.py config.py native_worker.py result.py executor.py mcp_server.py \
+COPY __init__.py codex_cli.py config.py native_worker.py result.py executor.py mcp_server.py mcp_client.py \
     /opt/agentteams/testweaver-native-worker/testweaver/adapters/
 COPY qwenpaw-package/ /opt/agentteams/testweaver-native-worker/package/
 COPY dsh-launcher.mjs /opt/agentteams/testweaver-native-worker/bin/dsh-launcher.mjs

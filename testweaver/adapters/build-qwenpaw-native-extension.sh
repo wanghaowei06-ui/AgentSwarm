@@ -37,7 +37,7 @@ tar -C "${dsh_stage}" --sort=name --mtime='2026-01-01 00:00:00Z' \
 dsh_hash="$(sha256sum "${build_context}/dsh-runtime.tar.gz" | awk '{print $1}')"
 printf '%s  dsh-runtime.tar.gz\n' "${dsh_hash}" > "${build_context}/dsh-runtime.tar.gz.sha256"
 
-for file in __init__.py codex_cli.py config.py native_worker.py result.py executor.py mcp_server.py; do
+for file in __init__.py codex_cli.py config.py native_worker.py result.py executor.py mcp_server.py mcp_client.py; do
   cp "${adapter_root}/${file}" "${build_context}/${file}"
 done
 cp "${adapter_root}/Dockerfile.qwenpaw" "${build_context}/Dockerfile.qwenpaw"
