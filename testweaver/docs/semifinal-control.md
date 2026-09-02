@@ -2,9 +2,9 @@
 
 更新时间：2026-09-02（Asia/Shanghai）
 
-状态：`M2-C_PARTIAL / M2-D_HITL_AND_CONTAINER_RECOVERY_PASS / M2-D_REPLACEMENT_NOT_OBSERVED / M2-E_NATIVE_RECOVERY_PARTIAL`
+状态：`M2-C_PARTIAL / M2-D_HITL_AND_CONTAINER_RECOVERY_PASS / M2-D_REPLACEMENT_NOT_OBSERVED / M2-E_NATIVE_RECOVERY_PARTIAL / M2-F_PARTIAL`
 
-唯一当前里程碑：跨房间 assignment 通知修复镜像 `be10aaf` 已部署并由 M2-D 的真实 Worker assignment/submit 验证；M2-D continuation-2 已证明真实 HITL 与单容器恢复 PASS。故障发生时 Task 已终态，原生 replacement/迟到拒绝为 `NOT_OBSERVED`；根因是本次实验时序，不归因于 AgentTeams 故障。
+唯一当前里程碑：跨房间 assignment 通知修复镜像 `be10aaf` 已部署并由 M2-D 的真实 Worker assignment/submit 验证；M2-D continuation-2 已证明真实 HITL 与单容器恢复 PASS。M2-F continuation 已确认 Controller 在约五分钟周期内自然恢复同一 Worker；P0 terminal-cancelled rejection PASS，但 Leader 重复唤醒导致两次旧 Task submit 探针、exactly-once FAIL，整体为 `PARTIAL`。原 M2-F 观察窗 FAIL 保持不改写。
 
 ## 1. 已冻结决策
 
@@ -76,7 +76,7 @@ TestWeaver 只做产品差异：
 - 跨房间 assignment 通用根因修复 `be10aaf` 已顺序部署到四个 QwenPaw Agent；健康、身份、Team Ready 和 M2-D 中 Worker 的真实 ack/submit 已证明修复生效。
 - M2-D run `m2d-20260901T223736Z` 的 continuation-2 已真实完成 Human→Manager→Leader HITL 决策、同一 Project `resume_project`、恢复 Task、Worker ack/in_progress/submit、Leader accept、`FAULT_READY`、授权范围内唯一 `docker rm -f` 与 Controller 自动重建；真实 HITL 与容器恢复 PASS。故障发生时 recovery Task 已进入终态，重建后未观察到原生 `cancel old with replacementTaskId`、replacement delegate/execute/submit/check/accept 或旧 Task 迟到 ack/submit 拒绝（`NOT_OBSERVED`）。这是本次实验时序边界，不归因于 AgentTeams 故障；整体收据仍为 `PARTIAL`。
 - M2-E run `m2e-20260902T001049Z` 已真实完成新 Human 输入、Manager 基于 fresh roster 的动态 Team/Leader 选择、Leader 原生 Project/Task/delegate、Worker ack/真实只读源码与配置观察/partial artifact/唯一 `FAULT_READY`、窄范围 Human 批准、唯一 `docker rm -f`、同一 Worker CR/Matrix identity 的 Controller 重建、Human→Manager→Leader 恢复事实转交，以及 Leader 原生 `cancel_task(old,replacementTaskId=new)`→replacement delegate→真实 Worker artifact/submit→Leader check/accept。Project 最终 completed，old Task 为 cancelled，replacement Task 为 completed。由于容器重建丢失旧 Worker 上下文，未观察到恢复后 Worker 在 old cancelled Task 上下文的真实迟到 submit，故该段诚实记为 `NOT_OBSERVED`，M2-E 整体为 `PARTIAL`；不得伪造拒绝或新增协调器。完整 receipt/manifest 位于 `testweaver/evidence/m2e/m2e-20260902T001049Z/`。
-- M2-F run `m2f-20260902T012601Z` 仅关闭 M2-E 的迟到提交 P0，已真实完成单次 Human initial、Manager→Team/Leader、Leader 原生 Project/Task/delegate、Worker ack/工具/partial artifact/`FAULT_READY`，并在 Task 两侧确认 `in_progress` 且无 `result.md`。经唯一 Human 批准后仅执行一次 `docker rm -f`（无 `-v`）；但 Controller 保留同一 CR/Matrix identity 的陈旧 `Running` 投影，未重建 Worker 容器，故没有新 container ID、health/Team Ready、replacement 或 late-submit 原生返回，M2-F 为 `FAIL`，P0 仍未关闭。证据位于 `testweaver/evidence/m2f/m2f-20260902T012601Z/`；最小观察根因是 CR 状态没有桥接到本地容器重建，后续不得手工修复或伪造 terminal-cancelled。
+- M2-F run `m2f-20260902T012601Z` 的父收据 `e2bdb1f` 保持原观察窗 `FAIL` 不改写：故障后约 3 分 35 秒冻结时尚未见新容器。其 superseding continuation 随后以只读事实确认 Controller 在约五分钟周期内自然重建同名 Worker（同 CR/Matrix identity，new container `69817b42fde9`，应用 health 200）；Leader 原生完成 old cancel→replacement delegate→Worker submit→check/accept。恢复后的旧 Task 真实 `submit_task` 返回 `ok:false`、`submit_task cannot update terminal task: cancelled`，所以 P0 rejection PASS；但 Leader 重复唤醒发出两次 continuation，产生两次真实拒绝探针，exactly-once FAIL，M2-F 整体 `PARTIAL`。完整增量 manifest/receipt 位于 `testweaver/evidence/m2f/m2f-20260902T012601Z/continuation-20260902T020051Z/`；不得改写父收据或把重复探针升级为 PASS。
 - 异构 Worker 最薄适配已由 `2e1ef40` source-only 完成：DSH 显式支持 DeepSeek 与阿里云百炼，Codex 使用 `codex-cc`、`gpt-5.6-luna`、`max`；尚未 LIVE，不得替代原生 Leader 分配或回收结果。
 - 配置线已建立 names-only preflight，并确认 `/etc/agentteams/agentteams.env`、`providers.env`、LoongSuite、OTel 和 Nacos 只通过外部受保护引用复用；当前 Nacos 探测、OTel Collector 和 LoongSuite 服务状态如实标为延后，不冒充 LIVE。
 - AgentLoop 旧资产目前只可称合同/replay/历史受限证据；必须等待同一真实 M0/Hero 后完成真实查询回读。

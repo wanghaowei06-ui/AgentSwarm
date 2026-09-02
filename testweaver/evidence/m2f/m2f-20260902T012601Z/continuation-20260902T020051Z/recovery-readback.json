@@ -1,0 +1,84 @@
+{
+  "schema": "testweaver.m2f.superseding-recovery-readback/v1",
+  "run_id": "m2f-20260902T012601Z",
+  "parent_failure_receipt": "../m2f-failure-receipt.txt",
+  "observed_at": "2026-09-02T02:06:35Z",
+  "human_recovery_fact": {
+    "room_id": "!sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080",
+    "event_id": "$PcoP5MoVX-BpNwogatnrGkWBIwuAjWH2C1Xvl2-BSHU",
+    "sender_role": "authorized Human",
+    "delivery": "one ordinary m.room.message to the existing Human room"
+  },
+  "parent_observation_window": {
+    "observed_at": "2026-09-02T01:51:37Z",
+    "new_container": "NOT_OBSERVED",
+    "meaning": "observation-window result only; parent receipt is unchanged"
+  },
+  "worker": {
+    "cr_name": "native-m0-clean-worker",
+    "container_name": "agentteams-native-m0-20260901-worker-native-m0-clean-worker",
+    "old_container_id": "9727ed45c40a8c6efd74c9f2bd822b14d6fe979bc468be0e65391f6b86ed5631",
+    "new_container_id": "69817b42fde9da3b098eff14d7ecc3a6b8599a7fea55280c7dc3dd3a80a8ac94",
+    "image": "agentteams/qwenpaw-worker:be10aaf",
+    "created_at": "2026-09-02T01:51:41.662970908Z",
+    "started_at": "2026-09-02T01:51:41.724456019Z",
+    "running": true,
+    "restart_count": 0,
+    "old_id_lookup": "absent",
+    "application_health": "HTTP 200",
+    "docker_healthcheck": "absent"
+  },
+  "identity_and_team": {
+    "matrix_user_id": "@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080",
+    "worker_room_id": "!htUIJW5HXUYvFSIFW6:matrix-native-m0-20260901.agentteams.local:28080",
+    "team": "native-m0-clean-team",
+    "team_phase": "Active",
+    "team_leader": "native-m0-clean-leader",
+    "leader_ready": true,
+    "ready_workers": 1,
+    "total_workers": 1,
+    "cr_phase": "Running",
+    "cr_state": "Running",
+    "cr_container_state": "running",
+    "cr_container_managed": true,
+    "cr_image": "agentteams/qwenpaw-worker:be10aaf"
+  },
+  "original_task": {
+    "project_id": "m2f-recovery-20260902-013636",
+    "task_id": "task-20260902-013636",
+    "pre_fault_state": "in_progress",
+    "pre_fault_submit": "absent",
+    "pre_fault_partial_artifact": "recorded by parent raw Matrix/TeamHarness evidence",
+    "current_local_projection": {
+      "status": "assigned",
+      "result_md": "absent",
+      "submission": "absent"
+    },
+    "replacement_chain": "completed with native terminal rejection; exact-once probe violated by duplicate Leader continuation"
+  },
+  "native_chain_observation": "native-chain-observation.json",
+  "chain_verdict": "PARTIAL",
+  "p0_terminal_cancelled_rejection": "PASS",
+  "exact_once_late_probe": "FAIL; two real rejected old-task submit_task calls were observed",
+  "verdict": "RECOVERY_OBSERVED_AFTER_PARENT_FREEZE",
+  "scope": {
+    "controller_source_modified": false,
+    "controller_restarted_or_replaced": false,
+    "second_fault": false,
+    "operator_task_action": false,
+    "synthetic_event": false,
+    "secret_values_read_or_recorded": false
+  },
+  "sources": [
+    "../m2f-failure-receipt.txt",
+    "../recovery-observation.json",
+    "../fault-execution.json",
+    "../human-event.json",
+    "../human-approval-event.json",
+    "../matrix-events.jsonl",
+    "read-only docker inspect of the current same-name Worker",
+    "read-only agt get workers native-m0-clean-worker -o json",
+    "read-only agt get teams native-m0-clean-team -o json",
+    "read-only application GET /health"
+  ]
+}

@@ -1,9 +1,20 @@
 {
   "schema": "testweaver.m2f.evidence-manifest/v1",
   "run_id": "m2f-20260902T012601Z",
-  "result": "FAIL",
+  "result": "PARTIAL",
   "head": "5a9fdb49aedfe9e8e852c10b43333cac8680c1f9",
-  "file_count": 87,
+  "file_count": 90,
+  "continuation": {
+    "path": "continuation-20260902T020051Z",
+    "manifest": "continuation-20260902T020051Z/continuation-manifest.json",
+    "manifest_sha256": "5565468d1d113ceb4662759b6343d32f933a06b6ab74104eb736f6d6a8f33741",
+    "result": "PARTIAL",
+    "parent_failure_receipt_unchanged": true,
+    "controller_recovery": "observed after the parent observation-window freeze during the normal five-minute reconciliation cycle",
+    "p0_terminal_cancelled_rejection": "PASS",
+    "leader_duplicate_wakeup": "two real old-task submit probes",
+    "exactly_once_late_submit": "FAIL"
+  },
   "files": [
     {
       "path": ".state/api-native-m0-clean-leader.json",
@@ -412,6 +423,24 @@
       "size": 2096,
       "mode": "0600",
       "sha256": "9dfd0f5fe9e06530c4a69fbc21fc55bf34541af25c3c91e9df6f396534a0e9af"
+    },
+    {
+      "path": "continuation-20260902T020051Z/native-chain-observation.json",
+      "size": 4448,
+      "mode": "0644",
+      "sha256": "a863c5d8cd191161846258ddfc68cec4fb02aabf67c729d968fbfefb4915a8a8"
+    },
+    {
+      "path": "continuation-20260902T020051Z/recovery-readback.json",
+      "size": 3406,
+      "mode": "0644",
+      "sha256": "300b96b760545ef5148134d2216ec90525b695fdf820683c0fa16e71710973d8"
+    },
+    {
+      "path": "continuation-20260902T020051Z/superseding-receipt.txt",
+      "size": 3963,
+      "mode": "0644",
+      "sha256": "ba516893eb3b6ff89e2ce9de9fd05294f7e904cb0f8ea872a6adf1b032738edd"
     },
     {
       "path": "fault-execution.json",

@@ -1,0 +1,93 @@
+{
+  "schema": "testweaver.m2f.native-chain-observation/v1",
+  "run_id": "m2f-20260902T012601Z",
+  "recorded_at": "2026-09-02T02:16:07Z",
+  "project_id": "m2f-recovery-20260902-013636",
+  "old_task_id": "task-20260902-013636",
+  "replacement_task_id": "task-20260902-013636-r1",
+  "actors": {
+    "human": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+    "manager": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+    "leader": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+    "worker": "@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080"
+  },
+  "native_event_refs": {
+    "human_recovery_fact": {
+      "room_id": "!sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080",
+      "event_id": "$PcoP5MoVX-BpNwogatnrGkWBIwuAjWH2C1Xvl2-BSHU"
+    },
+    "manager_to_leader_fact": "$h3LY4bNhB1QnNnBr4YYBY3B85_8-iKw-q_VvNYLptKg",
+    "cancel_old_tool_display": "$dscW4ZAmHh0fsefvj9IONYiHnWwq9NuTHTpYY9L29mw",
+    "cancel_old_result": "$KVJvzVEvkVsBlirMYBqjwPM_vi35sYOVaUSR9OMeSRY",
+    "replacement_plan_dag_tool_display": "$2ecu5DiCGZfZIvue_X64Cp2h7Is-yRG0Trh8K0oJYys",
+    "replacement_delegate_tool_display": "$56Wu26qmLSWYSMbB5LprDGVr38Km_1pAr_3Xk1y4Ln0",
+    "replacement_delegate_result": "$VWHjh21G7V9qstdfZ8Uj6Zry9x6snR4MvXt9DJFpgYs",
+    "replacement_check_result": "$bwI6ybDQnH8wfYQ-McJAjssESKYT_OqYaUtzgPSCRdk",
+    "replacement_accept_result": "$zyjfgQjUwKTp4UYQDmTl__y7qt-OJfZji6ZDxnNA9lE",
+    "late_probe_message_tool_displays": [
+      "$g2mnDTmdMC9HCYmJl8vk1CD2T1ULoDWveZPMVGtQdmw",
+      "$RNTh3KUADw_beKnF7sW63-upB_IDYdhQQb5PrGgO2V8"
+    ],
+    "late_probe_message_result_events": [
+      "$KmRMWOZ1HGkfq6B58vzAzROgSwLc1Eh5OushZ0dHz3s",
+      "$45LRnujHN6midvXJGLKh0aCZTSwKJ6Rjydnt8FLVEQ8"
+    ]
+  },
+  "recovery": {
+    "old_container_id": "9727ed45c40a8c6efd74c9f2bd822b14d6fe979bc468be0e65391f6b86ed5631",
+    "new_container_id": "69817b42fde9da3b098eff14d7ecc3a6b8599a7fea55280c7dc3dd3a80a8ac94",
+    "new_container_created_at": "2026-09-02T01:51:41.662970908Z",
+    "new_container_started_at": "2026-09-02T01:51:41.724456019Z",
+    "same_worker_cr_and_matrix_identity": true,
+    "application_health": "HTTP 200",
+    "team_ready": "leaderReady=true, readyWorkers=1/1"
+  },
+  "replacement": {
+    "cancel_old": "observed_native_success; old status=cancelled; replacementTaskId=task-20260902-013636-r1",
+    "delegate_replacement": "observed_native_success; status=assigned",
+    "worker_submit": "observed_native_success; status=submitted; result_status=SUCCESS",
+    "recovery_artifact_sha256": "64f0a2b45d746795fa9ce0e87bc3f140e26b2c73de56ab8b6dba9ca25171bce6",
+    "leader_check": "observed_native_success; effective=true",
+    "leader_accept": "observed_native_success; accepted=true; replacement=completed"
+  },
+  "late_submit": {
+    "source": "recovered Worker session and its native taskflow tool results; no operator task action",
+    "old_task_status_before_attempts": "cancelled",
+    "attempt_count_observed": 2,
+    "attempts": [
+      {
+        "order": 1,
+        "trigger_event": "$g2mnDTmdMC9HCYmJl8vk1CD2T1ULoDWveZPMVGtQdmw",
+        "task_id": "task-20260902-013636",
+        "action": "submit_task",
+        "native_return": {
+          "ok": false,
+          "error": "submit_task cannot update terminal task: cancelled"
+        }
+      },
+      {
+        "order": 2,
+        "trigger_event": "$RNTh3KUADw_beKnF7sW63-upB_IDYdhQQb5PrGgO2V8",
+        "task_id": "task-20260902-013636",
+        "action": "submit_task",
+        "native_return": {
+          "ok": false,
+          "error": "submit_task cannot update terminal task: cancelled"
+        }
+      }
+    ],
+    "post_attempt_old_task_artifact": "no submission/result artifact; status remains cancelled",
+    "terminal_cancelled_rejection": "PASS",
+    "exactly_one_attempt_requirement": "FAIL"
+  },
+  "boundary": {
+    "operator_performed_task_action": false,
+    "new_project_or_task": false,
+    "second_fault": false,
+    "synthetic_event_or_prewritten_tool_return": false,
+    "controller_code_modified": false,
+    "secret_values_read_or_recorded": false
+  },
+  "verdict": "PARTIAL",
+  "verdict_reason": "The native replacement and terminal-cancelled rejection are real, but Leader emitted the old-task continuation twice and the recovered Worker made two real rejected late-submit attempts; the exactly-once probe requirement is not satisfied."
+}

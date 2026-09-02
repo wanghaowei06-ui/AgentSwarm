@@ -1,0 +1,74 @@
+M2-F SUPERSEDING CONTINUATION RECEIPT
+
+schema: testweaver.m2f.superseding-continuation/v1
+run_id: m2f-20260902T012601Z
+created_at: 2026-09-02T02:06:35Z
+parent_receipt: ../m2f-failure-receipt.txt
+supersedes: parent receipt's observation-window-only recovery NOT_OBSERVED
+does_not_rewrite: e2bdb1f or ../m2f-failure-receipt.txt
+
+Recovery fact
+- The parent failure froze at 2026-09-02T01:51:37Z, before the normal periodic
+  Controller reconciliation window had elapsed. Its FAIL remains an honest
+  observation-window result.
+- Read-only Docker inspection later found the same-name Worker recreated by the
+  Controller: new ID 69817b42fde9da3b098eff14d7ecc3a6b8599a7fea55280c7dc3dd3a80a8ac94.
+- New object create/start: 2026-09-02T01:51:41.662970908Z /
+  2026-09-02T01:51:41.724456019Z.
+- Image is agentteams/qwenpaw-worker:be10aaf; the old ID
+  9727ed45c40a8c6efd74c9f2bd822b14d6fe979bc468be0e65391f6b86ed5631 is absent.
+- New container is running with restart_count=0. The image has no Docker
+  HEALTHCHECK; its application endpoint returned HTTP 200.
+
+Identity and readiness
+- Worker CR: native-m0-clean-worker, phase/state/containerState
+  Running/Running/running, containerManaged=true.
+- CR Matrix identity: @native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080.
+- Worker room: !htUIJW5HXUYvFSIFW6:matrix-native-m0-20260901.agentteams.local:28080.
+- Team native-m0-clean-team is Active; leader is native-m0-clean-leader;
+  leaderReady=true and readyWorkers/totalWorkers=1/1.
+- The CR image and recreated container image are identical.
+
+Original task boundary
+- Existing Project: m2f-recovery-20260902-013636.
+- Existing old Task: task-20260902-013636.
+- Parent raw Matrix/TeamHarness evidence records Worker ack, partial artifact,
+  FAULT_READY, in_progress on both sides, and no pre-fault submit. The current
+  local projection has no result.md or submission; no replacement or late
+  submit has been attempted.
+- This is a continuation of the same Run. No new Project, Task, fault,
+  container mutation, synthetic event, or operator Task action was performed.
+
+Native continuation and observed result
+- One factual recovery message was sent from the authorized Human to the
+  existing Human room !sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080;
+  Matrix event: $PcoP5MoVX-BpNwogatnrGkWBIwuAjWH2C1Xvl2-BSHU.
+- Manager consumed that fact and relayed it to the existing Leader.
+- Leader natively cancelled old Task with replacementTaskId
+  task-20260902-013636-r1, planned the independent DAG node, delegated it,
+  and sent the replacement assignment to the real Task room.
+- The recovered Worker natively acked, performed the real read-only/tool and
+  filesync work, and submitted r1 successfully. Leader natively checked it
+  (effective=true) and accepted it (completed/accepted=true).
+- Leader then sent a continuation request to the old Task room. Because the
+  first request did not yield an observed response, the Leader emitted a
+  second continuation request. The recovered Worker consequently made two
+  real submit_task calls against the old cancelled Task. Both native returns
+  were `ok:false` with `submit_task cannot update terminal task: cancelled`.
+- Therefore the P0 terminal-cancelled rejection is PASS, but the required
+  exactly-one late-submit probe and the full run are PARTIAL. No further
+  message or Task action was sent after the second real rejection.
+- Scripts/operator may only observe, redact and receiptize. They may not create,
+  cancel, delegate, submit, check, accept, inject or prewrite Task results.
+
+Sources
+- ../m2f-failure-receipt.txt
+- ../recovery-observation.json
+- ../fault-execution.json
+- ../human-event.json and ../human-approval-event.json
+- ../matrix-events.jsonl and the parent raw Docker log collectors
+- read-only docker inspect, agt worker/team readback, and GET /health
+
+Chain evidence: native-chain-observation.json.
+
+Sensitive values: not read, copied, or recorded.

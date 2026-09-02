@@ -1,0 +1,43 @@
+{
+  "schema": "testweaver.m2f.continuation-manifest/v1",
+  "run_id": "m2f-20260902T012601Z",
+  "continuation_id": "continuation-20260902T020051Z",
+  "source_head_before_freeze": "ae2d696b4f799a9e93089b3b57df17baed0f2dac",
+  "parent_manifest": "../m2f-manifest.json",
+  "parent_manifest_before_increment_sha256": "492797b20073384fad3aff9a4c5b374f21c4956ce141141d0005aac126ac41d6",
+  "parent_failure_receipt": "../m2f-failure-receipt.txt",
+  "parent_failure_receipt_unchanged": true,
+  "result": "PARTIAL",
+  "recovery": {
+    "parent_observation_window_result": "FAIL",
+    "parent_observation_window_unchanged": true,
+    "controller_recovery": "observed after the parent freeze during the normal five-minute reconciliation cycle",
+    "p0_terminal_cancelled_rejection": "PASS",
+    "leader_duplicate_wakeup": "observed; two old-task submit probes were issued",
+    "exactly_once_late_submit": "FAIL",
+    "overall": "PARTIAL"
+  },
+  "files": [
+    {
+      "path": "native-chain-observation.json",
+      "size": 4448,
+      "mode": "0644",
+      "sha256": "a863c5d8cd191161846258ddfc68cec4fb02aabf67c729d968fbfefb4915a8a8"
+    },
+    {
+      "path": "recovery-readback.json",
+      "size": 3406,
+      "mode": "0644",
+      "sha256": "300b96b760545ef5148134d2216ec90525b695fdf820683c0fa16e71710973d8"
+    },
+    {
+      "path": "superseding-receipt.txt",
+      "size": 3963,
+      "mode": "0644",
+      "sha256": "ba516893eb3b6ff89e2ce9de9fd05294f7e904cb0f8ea872a6adf1b032738edd"
+    }
+  ],
+  "file_count": 3,
+  "values_redacted": true,
+  "secret_values_read_or_recorded": false
+}
