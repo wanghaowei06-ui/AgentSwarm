@@ -353,6 +353,8 @@ def emit_genai_span(
     *,
     endpoint: str,
     context: GenAIContext,
+    trace_id: str | None = None,
+    span_id: str | None = None,
     header_provider: HeaderProvider | None = None,
     transport: OtlpTransport | None = None,
     timeout_seconds: float = 10.0,
@@ -362,7 +364,11 @@ def emit_genai_span(
     if timeout_seconds <= 0 or timeout_seconds > 60:
         raise OtlpContractError("timeout_seconds must be between 0 and 60")
     safe_endpoint = _endpoint(endpoint)
-    body, trace_id, span_id = build_otlp_protobuf(context)
+    body, trace_id, span_id = build_otlp_protobuf(
+        context,
+        trace_id=trace_id,
+        span_id=span_id,
+    )
     if len(body) > _MAX_REQUEST_BYTES:
         raise OtlpContractError("OTLP request exceeds the bounded size")
     request_hash = "sha256:" + hashlib.sha256(body).hexdigest()
