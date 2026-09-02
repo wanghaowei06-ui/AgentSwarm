@@ -1,0 +1,85 @@
+{
+  "schema": "testweaver.dsh-preflight/v1",
+  "classification": "FAIL",
+  "status": "NOT_VERIFIED",
+  "scope": "bounded-not-live-provider-probe",
+  "source_commit": "9aa1d0c43825ec9a0aac852f5a876086244283d8",
+  "image": {
+    "tag": "agentteams/qwenpaw-worker:dsh-live-9aa1d0c",
+    "manifest_digest": "sha256:530ad2d39e2b5ca005fca63c59e31b676f04fa7a72eb6b9b7d058ca3725df9fb",
+    "base_tag": "agentteams/qwenpaw-worker:be10aaf",
+    "base_digest": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+    "node_version": "v22.23.1",
+    "qwenpaw_retry_marker": true
+  },
+  "worker": {
+    "resource": "native-m0-clean-dsh-worker",
+    "container_id": "a83e091bcf194a7361191a7e1d615fcd31e4ec8901adb32003faeede6bc6a323",
+    "previous_container_id": "25b6f0f0ff5b2056356e5784d8df96f04b3f9ef246a88d94438719b80b50b182",
+    "runtime": "qwenpaw",
+    "model": "deepseek-v4-flash",
+    "team": "native-m0-clean-team",
+    "role": "worker",
+    "matrix_user_id": "@native-m0-clean-dsh-worker:matrix-native-m0-20260901.agentteams.local:28080",
+    "room_id": "!t8ycL6WDpsGf9D0mGo:matrix-native-m0-20260901.agentteams.local:28080",
+    "image": "agentteams/qwenpaw-worker:dsh-live-9aa1d0c"
+  },
+  "stability": {
+    "container_state": "running",
+    "checks": 5,
+    "health_http": ["000ERR", "200", "200", "200", "200"],
+    "version_http": ["000ERR", "200", "200", "200", "200"],
+    "mcp_http": ["000ERR", "200", "200", "200", "200"]
+  },
+  "artifact_directory": {
+    "relative_path": ".testweaver-native-results",
+    "mode": "0700",
+    "is_symlink": false,
+    "is_directory": true,
+    "owner_is_current_uid": true,
+    "old_files_deleted_by_probe": false
+  },
+  "route": {
+    "provider": "aliyun-bailian",
+    "model_reference": "env:TESTWEAVER_BAILIAN_MODEL",
+    "endpoint_reference": "env:AGENTTEAMS_AI_GATEWAY_URL",
+    "credential_reference": "env:AGENTTEAMS_WORKER_GATEWAY_KEY",
+    "wire_api": "chat",
+    "route_name": "testweaver-bailian-route",
+    "path_shape": "/v1/testweaver-bailian"
+  },
+  "probe": {
+    "started_at": "2026-09-02T21:59:35Z",
+    "mcp_request_sha256": "c0aa9aa7dd5ac193061084ca093090a1bb48e07013afce0c22d93a0f485de45e",
+    "mcp_response_sha256": "37433d6ed04a91dde2ea8ae43a3c0a2dbe0acc91c068245965da5602730e59ea",
+    "mcp_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mcp_process_exit": 0,
+    "mcp_call_count": 1,
+    "inner_ok": true,
+    "external_process_started": true,
+    "dsh_exit_code": 1,
+    "provider": "aliyun-bailian",
+    "provider_called": "NOT_VERIFIED",
+    "model": "NOT_VERIFIED_VALUE_ONLY_REFERENCE_RECORDED",
+    "status": "failed",
+    "termination": "provider_error",
+    "latency_seconds": 2.3481977868359536,
+    "usage_observed": false,
+    "usage_keys": ["cost_units", "input_tokens", "model_decisions", "observed", "output_tokens", "tool_calls"],
+    "result_ref": ".testweaver-native-results/result-77408283c4137e214e9387eff4d055abd0e26811b6bd07b2f4cf126e2947b0d6.txt",
+    "result_artifact_sha256": "sha256:77408283c4137e214e9387eff4d055abd0e26811b6bd07b2f4cf126e2947b0d6",
+    "normalized_result_sha256": "sha256:cfd0ebaa2d70ac96a2f2b9377efdde2336f39be4753ad525ed1003db233dc782",
+    "failure_kind": "external_exit",
+    "failure_phase": "post-child",
+    "failure_hash": "sha256:77408283c4137e214e9387eff4d055abd0e26811b6bd07b2f4cf126e2947b0d6",
+    "stdout_sha256": "sha256:01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "stderr_sha256": "sha256:783d71f845e4b41e8001dcc7d9dee45dc33b5389604244a0d33c92cb56889d5a",
+    "previous_failure_hash": "sha256:3321bcb073ce44527b06223714bcc29dd2c4be688e6fd7616eb10c6f434adea8"
+  },
+  "secret_policy": {
+    "values_recorded": false,
+    "response_body_recorded": false,
+    "content_payloads_recorded": false,
+    "receipt_scope_scan": "PASS"
+  }
+}

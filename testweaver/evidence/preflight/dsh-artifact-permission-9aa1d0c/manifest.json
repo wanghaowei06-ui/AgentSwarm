@@ -1,0 +1,26 @@
+{
+  "schema": "testweaver.preflight-manifest/v1",
+  "run_id": "dsh-artifact-permission-9aa1d0c",
+  "classification": "FAIL",
+  "source_commit": "9aa1d0c43825ec9a0aac852f5a876086244283d8",
+  "receipt": {
+    "path": "receipt.json",
+    "sha256": "7bc327288dd0b588ed68dea38e74c9a1daad232c9ece251737cf46cfbdb89796"
+  },
+  "evidence": {
+    "previous_permission_failure_hash": "sha256:3321bcb073ce44527b06223714bcc29dd2c4be688e6fd7616eb10c6f434adea8",
+    "fixed_directory_mode": "0700",
+    "fixed_directory_owner_current_uid": true,
+    "fixed_directory_is_symlink": false,
+    "probe_mcp_call_count": 1,
+    "probe_result_status": "failed",
+    "probe_termination": "provider_error",
+    "probe_artifact_sha256": "sha256:77408283c4137e214e9387eff4d055abd0e26811b6bd07b2f4cf126e2947b0d6",
+    "provider_completion": "NOT_VERIFIED"
+  },
+  "secret_policy": {
+    "secret_values": false,
+    "content_payloads": false,
+    "receipt_scan": "PASS"
+  }
+}
