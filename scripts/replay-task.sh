@@ -17,6 +17,7 @@
 #   REPLAY_TIMEOUT             Reply timeout secs    (default: 300)
 #   REPLAY_READY_TIMEOUT       Manager readiness timeout (default: 300)
 #   REPLAY_MANAGER_CONTAINER   Manager container name    (default: agentteams-manager)
+#   REPLAY_ROOM_ID             Explicit Manager room ID (required; no discovery/create fallback)
 
 set -e
 
@@ -55,6 +56,7 @@ WAIT_FOR_REPLY="${REPLAY_WAIT:-1}"
 REPLY_TIMEOUT="${REPLAY_TIMEOUT:-300}"
 MANAGER_USER="manager"
 MANAGER_CONTAINER="${REPLAY_MANAGER_CONTAINER:-agentteams-manager}"
+REPLAY_ROOM_ID="${REPLAY_ROOM_ID:-}"
 
 # When REPLAY_USE_DOCKER_EXEC=1, all Matrix API calls go through docker exec
 # inside the container using the internal Tuwunel port. This avoids host proxy
@@ -79,6 +81,16 @@ log() {
 error() {
     echo -e "\033[31m[replay ERROR]\033[0m $1" >&2
     exit 1
+}
+
+validate_room_id() {
+    local room_id="$1"
+    if [ -z "${room_id}" ]; then
+        error "REPLAY_ROOM_ID is required; room discovery and creation are disabled"
+    fi
+    if [[ ! "${room_id}" =~ ^![^[:space:]:]+:[^[:space:]]+$ ]]; then
+        error "REPLAY_ROOM_ID is invalid; expected a Matrix room ID"
+    fi
 }
 
 # ============================================================
@@ -271,6 +283,8 @@ if [ -z "${TASK_MSG}" ]; then
     error "Task message cannot be empty"
 fi
 
+validate_room_id "${REPLAY_ROOM_ID}"
+
 log "Task: ${TASK_MSG}"
 log ""
 
@@ -299,26 +313,16 @@ if [ -z "${ACCESS_TOKEN}" ]; then
 fi
 log "Login successful"
 
-# Step 2: Find or create DM room with Manager
-log "Finding DM room with Manager..."
-ROOM_ID=$(find_manager_room "${ACCESS_TOKEN}" 2>/dev/null || true)
-if [ -z "${ROOM_ID}" ]; then
-    log "No existing DM room found, creating one..."
-    ROOM_ID=$(create_dm_room "${ACCESS_TOKEN}")
-    if [ -z "${ROOM_ID}" ]; then
-        error "Failed to create DM room with @${MANAGER_USER}. Is the Manager Agent running?"
-    fi
-    log "Created DM room: ${ROOM_ID}"
-else
-    log "Found existing room: ${ROOM_ID}"
-fi
+# Step 2: Use the explicitly authorized Manager room.
+log "Using explicit Manager room: ${REPLAY_ROOM_ID}"
+ROOM_ID="${REPLAY_ROOM_ID}"
 
 # Step 3: Wait for Manager agent to be ready
 # Use `openclaw gateway health` inside the container to confirm the gateway is running
 # and processing Matrix events, then verify Manager has joined the DM room.
 READY_TIMEOUT="${REPLAY_READY_TIMEOUT:-300}"
 READY_ELAPSED=0
-MANAGER_FULL_ID="@${MANAGER_USER}:${MATRIX_DOMAIN}"
+MANAGER_FULL_ID="@${MANAGER_USER}:${ROOM_ID#*:}"
 
 log "Waiting for Manager agent to be ready..."
 
