@@ -1,0 +1,19 @@
+{
+  "schema": "testweaver.dsh-preflight-manifest/v2",
+  "run_id": "dsh-live-ff865bd",
+  "source_commit": "ff865bdda8df7f1d368d5706d5054297e47e7228",
+  "classification": "NOT_LIVE_PROVIDER_PROBE_FAIL",
+  "files": [
+    {
+      "path": "receipt.json",
+      "sha256": "23fbaa07cd606ea46d6eec2d5e8d1c828024e6a1c5b910fc1821db04b304e810"
+    }
+  ],
+  "hash_list": "SHA256SUMS",
+  "previous_preflight_commit": "9b461dc0f4ebe5356e4fbe0530e06ebfeaa5555b",
+  "secrets": {
+    "values_present": false,
+    "assignment_pattern_matches": 0,
+    "plaintext_prompt_or_response": false
+  }
+}

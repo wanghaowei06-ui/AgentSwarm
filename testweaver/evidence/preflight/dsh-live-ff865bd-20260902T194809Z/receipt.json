@@ -1,0 +1,115 @@
+{
+  "schema": "testweaver.dsh-preflight/v2",
+  "classification": "NOT_LIVE_PROVIDER_PROBE_FAIL",
+  "run_id": "dsh-live-ff865bd",
+  "source_commit": "ff865bdda8df7f1d368d5706d5054297e47e7228",
+  "scope": {
+    "claim": "one bounded native_worker_execute provider preflight",
+    "hero_run": false,
+    "live_agentteams_claim": false,
+    "synthetic_or_replay": false,
+    "attempts": 1,
+    "retry": false
+  },
+  "build": {
+    "official_entrypoint": "testweaver/adapters/build-qwenpaw-native-extension.sh",
+    "tag": "agentteams/qwenpaw-worker:dsh-live-ff865bd",
+    "image_id": "sha256:176be3096b1a94acccf77951e0bad3f9cfd2338b1ce9e26a1eb690717ef4afcb",
+    "manifest_digest": "sha256:176be3096b1a94acccf77951e0bad3f9cfd2338b1ce9e26a1eb690717ef4afcb",
+    "config_digest": "sha256:21b1e808226d00ab99a701d33e34879eff0d9d9dce01ff400b3aefe83300a9a5",
+    "base_image": "agentteams/qwenpaw-worker:be10aaf",
+    "base_image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+    "source_root": "/root/projects/muti-agent/.testweaver/cache/g13-deepseek-runtime/dsh-package",
+    "canonical_lock": "/root/projects/muti-agent/artifacts/verification/g13/deepseek-harness-official-cache/pnpm-lock.yaml",
+    "provenance": "/root/projects/muti-agent/artifacts/verification/g13/deepseek-harness-provenance.json",
+    "node_version": "v22.23.1",
+    "node_runtime_sha256": "93956de2e59480474a7b46571da1651180b1a050cdf32641ebec4ce6e478e068",
+    "dsh_package_sha256": "44eef4c53ab223dfb759dc7e82f562f4b710a896fe0aead4b22fb02aad54c95b",
+    "pnpm_forest_links_copied": 720,
+    "pnpm_forest_links_skipped": 110,
+    "pnpm_root_links_projected": 636,
+    "pnpm_root_links_skipped": 84,
+    "root_physical_fallbacks": 2
+  },
+  "static_preflight": {
+    "node22_capabilities": "PASS",
+    "zod_root_resolution": "PASS",
+    "cordis_entrypoints": {
+      "@deepseek-ai/dsh-agent-loop": "PASS",
+      "@deepseek-ai/dsh-session-title": "PASS"
+    },
+    "profile_projection": "PASS",
+    "network": "none"
+  },
+  "worker_update": {
+    "official_command": "agt update worker --name native-m0-clean-dsh-worker --image agentteams/qwenpaw-worker:dsh-live-ff865bd",
+    "resource": "native-m0-clean-dsh-worker",
+    "old_image": "agentteams/qwenpaw-worker:dsh-live-7f3d0c8",
+    "old_container_id": "67679db5b7449bab0a266dae18841fd3cd2d70a6475fb47ce514b504280b740a",
+    "old_started_at": "2026-09-02T19:23:01.160785043Z",
+    "new_container_id": "8c2bc3426e622aba98ef7ce95a080d336ab9f6fb6f80fd7ef284449840060d40",
+    "new_container_created_at": "2026-09-02T19:45:37.425593241Z",
+    "new_container_started_at": "2026-09-02T19:45:37.525852365Z",
+    "readback": {
+      "phase": "Running",
+      "state": "Running",
+      "container_state": "running",
+      "identity": "Provider-neutral DSH heterogeneous Worker; gateway credential rotated; built-in tools disabled; DeepSeek path ready",
+      "matrix_user_id": "@native-m0-clean-dsh-worker:matrix-native-m0-20260901.agentteams.local:28080",
+      "room_id": "!t8ycL6WDpsGf9D0mGo:matrix-native-m0-20260901.agentteams.local:28080",
+      "team": "native-m0-clean-team",
+      "runtime": "qwenpaw",
+      "model": "deepseek-v4-flash",
+      "health_http": 200,
+      "version_http": 200,
+      "team_phase": "Active",
+      "host_port": 12910,
+      "old_container_present_after_update": false
+    }
+  },
+  "provider_preflight": {
+    "entrypoint": "native_worker_execute via testweaver.adapters.mcp_server",
+    "profile": "aliyun-bailian",
+    "logical_model": "deepseek-v4-flash",
+    "route_path_expected": "/v1/testweaver-bailian/v1/chat/completions",
+    "protected_refs": {
+      "endpoint": "TESTWEAVER_BAILIAN_ENDPOINT",
+      "model": "TESTWEAVER_BAILIAN_MODEL",
+      "credential": "TESTWEAVER_BAILIAN_CREDENTIAL"
+    },
+    "mcp_process_exit": 0,
+    "mcp_response_count": 3,
+    "native_worker_execute_response": "PASS",
+    "adapter_ok": false,
+    "first_error_class": "ERR_MODULE_NOT_FOUND",
+    "dsh_process_started": true,
+    "dsh_process_exit_code": 1,
+    "provider": "aliyun-bailian",
+    "provider_called": "NOT_OBSERVED",
+    "provider_http_status": "NOT_OBSERVED",
+    "usage": "NOT_OBSERVED",
+    "latency_ms": "NOT_OBSERVED",
+    "result": "NOT_OBSERVED",
+    "submit": "NOT_OBSERVED",
+    "check": "NOT_OBSERVED",
+    "accept": "NOT_OBSERVED",
+    "request_sha256": "e9cce257a601f96f537ca99f46adf6d1f129afaf8871bbe5e7da6a942cc92572",
+    "mcp_call_response_sha256": "37463cf5f3eed2e3f3ef4e3cfc66bde9d73464387e28fef9519e7fea12bb4cd0",
+    "failure_artifact": {
+      "path": "/root/agentteams-fs/agents/native-m0-clean-dsh-worker/.qwenpaw/workspaces/default/.testweaver-native-results/result-cddd28e9e8c57ca53d2a65f5e829b9ae6493ebc5e67f9cb073ea12719e50d335.txt",
+      "content_sha256": "cddd28e9e8c57ca53d2a65f5e829b9ae6493ebc5e67f9cb073ea12719e50d335",
+      "stderr_sha256": "45e1ea38b38947748be9d509d759009f5ab0530d62ff74b3f623e4e66612590c",
+      "stdout_bytes": 0,
+      "stderr_bytes": 8106
+    }
+  },
+  "safety": {
+    "native_task_state_mutated": false,
+    "native_result_submission": false,
+    "prompt_recorded": false,
+    "response_recorded": false,
+    "secret_values_recorded": false,
+    "previous_preflight_commit_preserved": "9b461dc0f4ebe5356e4fbe0530e06ebfeaa5555b",
+    "old_failure_receipt_preserved": "testweaver/evidence/preflight/dsh-live-3eb5875-20260902T191255Z/receipt.json"
+  }
+}
