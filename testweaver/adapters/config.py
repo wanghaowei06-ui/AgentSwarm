@@ -663,15 +663,16 @@ def _runtime_route_fields(path: str, roots: tuple[Path, ...]) -> tuple[bool, str
         or ""
     ).strip()
     model_name = str(model.get("model") or model.get("name") or "").strip()
-    parsed = urlsplit(endpoint)
-    if (
-        endpoint
-        and (parsed.scheme not in {"http", "https"} or not parsed.hostname or parsed.username or parsed.password or parsed.query or parsed.fragment)
-    ):
-        endpoint = ""
+    if endpoint:
+        try:
+            _validate_endpoint(endpoint, "runtime endpoint")
+        except AdapterConfigError as exc:
+            raise AdapterConfigError("runtime endpoint failed safety checks") from exc
     if any(char.isspace() or ord(char) < 32 for char in model_name) or len(model_name) > 512:
         model_name = ""
-    return True, endpoint, model_name
+    # A valid runtime projection without an endpoint is allowed to use the
+    # existing gateway URL. Invalid files remain present=True and fail closed.
+    return bool(endpoint), endpoint, model_name
 
 
 def _inside(path: Path, roots: tuple[Path, ...]) -> bool:
