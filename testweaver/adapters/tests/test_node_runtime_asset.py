@@ -77,6 +77,22 @@ class NodeRuntimeAssetTests(unittest.TestCase):
         self.assertNotIn("wget ", script + dockerfile)
         self.assertNotIn("/usr/bin/node", dockerfile)
 
+    def test_dsh_image_smoke_supplies_profile_home_and_checks_projection(self) -> None:
+        dockerfile = DOCKERFILE.read_text(encoding="utf-8")
+        normalized_dockerfile = " ".join(dockerfile.replace(chr(92) + "\n", " ").split())
+        profile_home = "/tmp/testweaver-dsh-home"
+        dsh = "/opt/agentteams/testweaver-native-worker/bin/dsh"
+        forest = "/opt/agentteams/testweaver-native-worker/dsh-runtime/node_modules/.pnpm/node_modules"
+        for marker in (
+            f"install -d -m 0700 {profile_home}",
+            f"HOME={profile_home} {dsh} --profile headless --version",
+            f"HOME={profile_home} {dsh} --profile headless --help >/dev/null",
+            f'test "$(readlink -- {profile_home}/.dsh/profiles/headless/node_modules)" = "{forest}"',
+        ):
+            self.assertIn(marker, normalized_dockerfile)
+        self.assertNotIn(f"&& {dsh} --version", normalized_dockerfile)
+        self.assertNotIn(f"&& {dsh} --help >/dev/null", normalized_dockerfile)
+
 
 if __name__ == "__main__":
     unittest.main()
