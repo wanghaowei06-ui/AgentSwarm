@@ -40,6 +40,26 @@ def candidate_from_gold(profile: str, commit: str, gold: dict) -> dict:
     }
 
 
+def public_boundary_policy(public: dict) -> dict:
+    allow_words = {"approve", "approved", "allowed", "yes"}
+    return {
+        "schema_version": "testweaver.m3.openworker-pr161.public-boundary/v1",
+        "dataset_id": public["dataset_id"],
+        "visibility": "public_policy_only",
+        "source_ref": "matrix:public-hitl-policy",
+        "gold_ref": None,
+        "cases": [
+            {
+                "case_id": case["case_id"],
+                "policy_committed_side_effects": int(case["reply"] in allow_words),
+                "policy_required_ledger_entries": 1,
+                "policy_response_known": True,
+            }
+            for case in public["cases"]
+        ],
+    }
+
+
 class OpenWorkerPr161EvaluationTests(unittest.TestCase):
     def test_public_inputs_are_versioned_and_gold_free(self) -> None:
         public = read_json(PUBLIC_INPUTS)
@@ -106,6 +126,92 @@ class OpenWorkerPr161EvaluationTests(unittest.TestCase):
         self.assertEqual(vulnerable_result["status"], "FAIL")
         self.assertEqual(vulnerable_result["case_results"][0]["outcome_pass"], False)
         self.assertEqual(vulnerable_result["case_results"][0]["boundary_pass"], False)
+
+    def test_outcome_and_boundary_are_separate_pure_modes(self) -> None:
+        public = read_json(PUBLIC_INPUTS)
+        manifest = read_json(MANIFEST)
+        gold = read_json(GOLD_BOUNDARY)
+        candidate = candidate_from_gold(
+            "historical-fixed",
+            manifest["baselines"]["historical-fixed"]["commit"],
+            gold,
+        )
+
+        outcome = verifier.verify_outcome(candidate, gold=gold, manifest=manifest)
+        boundary = verifier.verify_boundary(
+            candidate,
+            manifest=manifest,
+            public_boundary=public_boundary_policy(public),
+        )
+
+        self.assertEqual(outcome["oracle_kind"], "outcome")
+        self.assertEqual(outcome["status"], "PASS")
+        self.assertEqual(boundary["oracle_kind"], "boundary")
+        self.assertEqual(boundary["status"], "PASS")
+        self.assertIsNone(boundary["gold_ref"])
+        self.assertNotIn("gold_id", boundary)
+        self.assertNotIn("outcome_pass", boundary["case_results"][0])
+        self.assertNotIn("boundary_pass", outcome["case_results"][0])
+
+        outcome_only = copy.deepcopy(candidate)
+        for case in outcome_only["cases"]:
+            for field in ("committed_side_effects", "ledger_entry_count", "response_known"):
+                del case[field]
+        self.assertEqual(
+            verifier.verify_outcome(outcome_only, gold=gold, manifest=manifest)["status"],
+            "PASS",
+        )
+
+        boundary_only = copy.deepcopy(candidate)
+        for case in boundary_only["cases"]:
+            del case["observed_intent"]
+        self.assertEqual(
+            verifier.verify_boundary(
+                boundary_only,
+                manifest=manifest,
+                public_boundary=public_boundary_policy(public),
+            )["status"],
+            "PASS",
+        )
+
+    def test_boundary_rejects_gold_or_non_null_gold_reference(self) -> None:
+        public = read_json(PUBLIC_INPUTS)
+        manifest = read_json(MANIFEST)
+        gold = read_json(GOLD_BOUNDARY)
+        candidate = candidate_from_gold(
+            "historical-fixed",
+            manifest["baselines"]["historical-fixed"]["commit"],
+            gold,
+        )
+        policy = public_boundary_policy(public)
+        policy["cases"][0]["expected_intent"] = "deny"
+        with self.assertRaisesRegex(ValueError, "Gold fields"):
+            verifier.verify_boundary(candidate, manifest=manifest, public_boundary=policy)
+
+        policy = public_boundary_policy(public)
+        policy["gold_ref"] = "gold:must-not-be-read"
+        with self.assertRaisesRegex(ValueError, "gold_ref"):
+            verifier.verify_boundary(candidate, manifest=manifest, public_boundary=policy)
+
+        candidate["gold_ref"] = "gold:must-not-be-read"
+        with self.assertRaisesRegex(ValueError, "gold_ref"):
+            verifier.verify_boundary(
+                candidate,
+                manifest=manifest,
+                public_boundary=public_boundary_policy(public),
+            )
+
+    def test_compatibility_entry_is_one_combined_observation(self) -> None:
+        manifest = read_json(MANIFEST)
+        gold = read_json(GOLD_BOUNDARY)
+        candidate = candidate_from_gold(
+            "historical-fixed",
+            manifest["baselines"]["historical-fixed"]["commit"],
+            gold,
+        )
+        result = verifier.verify_observation(candidate, gold=gold, manifest=manifest)
+        self.assertEqual(result["oracle_runs"], 1)
+        self.assertFalse(result["independent_oracle_pair"])
 
     def test_verifier_rejects_duplicate_missing_and_gold_leaking_cases(self) -> None:
         manifest = read_json(MANIFEST)
