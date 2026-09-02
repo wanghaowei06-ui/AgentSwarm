@@ -93,6 +93,21 @@ class NodeRuntimeAssetTests(unittest.TestCase):
         self.assertNotIn(f"&& {dsh} --version", normalized_dockerfile)
         self.assertNotIn(f"&& {dsh} --help >/dev/null", normalized_dockerfile)
 
+    def test_extension_overlays_existing_bounded_qwenpaw_mcp_readiness_source(self) -> None:
+        script = BUILD_SCRIPT.read_text(encoding="utf-8")
+        dockerfile = DOCKERFILE.read_text(encoding="utf-8")
+        normalized_dockerfile = " ".join(dockerfile.replace(chr(92) + "\n", " ").split())
+        self.assertIn('qwenpaw/src/qwenpaw_worker', script)
+        self.assertIn('qwenpaw-worker-source', script)
+        self.assertIn('qwenpaw-worker-source', normalized_dockerfile)
+        for marker in (
+            'COPY qwenpaw-worker-source/ /tmp/qwenpaw-worker-source/',
+            'site-packages/qwenpaw_worker',
+            '_retry_builtin_mcp_configuration',
+            'BUILTIN_MCP_READY_TIMEOUT_SECONDS',
+        ):
+            self.assertIn(marker, normalized_dockerfile)
+
 
 if __name__ == "__main__":
     unittest.main()

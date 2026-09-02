@@ -22,10 +22,21 @@ COPY qwenpaw-package/ /opt/agentteams/testweaver-native-worker/package/
 COPY dsh-launcher.mjs /opt/agentteams/testweaver-native-worker/bin/dsh-launcher.mjs
 COPY dsh-headless-max-tokens.patch.yml /opt/agentteams/testweaver-native-worker/dsh-headless-max-tokens.patch.yml
 COPY node-runtime /opt/agentteams/testweaver-native-worker/bin/node
+COPY qwenpaw-worker-source/ /tmp/qwenpaw-worker-source/
 COPY ${TESTWEAVER_DSH_PACKAGE} /tmp/dsh-runtime.tar.gz
 COPY ${TESTWEAVER_DSH_PACKAGE_SHA256} /tmp/dsh-runtime.tar.gz.sha256
 
 ENV PATH="/opt/agentteams/testweaver-native-worker/bin:${PATH}"
+
+RUN test -d /opt/venv/qwenpaw/lib/python3.11/site-packages/qwenpaw_worker \
+    && cp -a /tmp/qwenpaw-worker-source/. \
+        /opt/venv/qwenpaw/lib/python3.11/site-packages/qwenpaw_worker/ \
+    && test -f /opt/venv/qwenpaw/lib/python3.11/site-packages/qwenpaw_worker/worker.py \
+    && grep -Fq '_retry_builtin_mcp_configuration' \
+        /opt/venv/qwenpaw/lib/python3.11/site-packages/qwenpaw_worker/worker.py \
+    && grep -Fq 'BUILTIN_MCP_READY_TIMEOUT_SECONDS' \
+        /opt/venv/qwenpaw/lib/python3.11/site-packages/qwenpaw_worker/worker.py \
+    && rm -rf /tmp/qwenpaw-worker-source
 
 RUN cd /tmp \
     && chmod 0755 /opt/agentteams/testweaver-native-worker/bin/node \

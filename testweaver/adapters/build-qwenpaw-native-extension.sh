@@ -47,12 +47,14 @@ preflight_node_runtime() {
 
 main() {
   local adapter_root
+  local repo_root
   local base_id
   local build_context
   local dsh_stage
   local dsh_hash
 
   adapter_root="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+  repo_root="$(CDPATH= cd -- "${adapter_root}/../.." && pwd)"
   : "${TESTWEAVER_QWENPAW_BASE_IMAGE:?set an immutable QwenPaw base image reference}"
   : "${TESTWEAVER_QWENPAW_BASE_IMAGE_ID:?set the expected immutable base image ID}"
   : "${TESTWEAVER_QWENPAW_IMAGE:?set an immutable output image tag}"
@@ -67,6 +69,7 @@ main() {
   test -d "${TESTWEAVER_DSH_SOURCE_DIR}"
   test -f "${TESTWEAVER_DSH_LOCKFILE}"
   test -f "${TESTWEAVER_DSH_PROVENANCE}"
+  test -d "${repo_root}/qwenpaw/src/qwenpaw_worker"
   if [ "${CODEX_CLI_SPEC:-@openai/codex@0.152.0}" != "@openai/codex@0.152.0" ]; then
     echo "CODEX_CLI_SPEC is fixed to @openai/codex@0.152.0" >&2
     exit 2
@@ -101,6 +104,7 @@ main() {
   cp "${adapter_root}/dsh-launcher.mjs" "${build_context}/dsh-launcher.mjs"
   cp "${adapter_root}/dsh-headless-max-tokens.patch.yml" "${build_context}/dsh-headless-max-tokens.patch.yml"
   cp -a "${adapter_root}/qwenpaw-package" "${build_context}/qwenpaw-package"
+  cp -a "${repo_root}/qwenpaw/src/qwenpaw_worker" "${build_context}/qwenpaw-worker-source"
 
   docker build --pull=false \
     --build-arg "QWENPAW_BASE_IMAGE=${TESTWEAVER_QWENPAW_BASE_IMAGE}" \
