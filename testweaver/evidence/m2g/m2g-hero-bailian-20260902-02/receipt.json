@@ -1,0 +1,67 @@
+{
+  "schema": "testweaver.m2g.hero-failure.observation.v1",
+  "run_id": "m2g-hero-bailian-20260902-02",
+  "collected_at": "2026-09-02T08:23:50Z",
+  "classification": "FAIL",
+  "status": "INPUT_UNAVAILABLE",
+  "scope": {
+    "exact_run_id_filter": true,
+    "read_only": true,
+    "matrix_messages_sent": 0,
+    "agent_tool_calls": 0,
+    "runtime_mutated": false,
+    "old_run_or_history_used": false,
+    "message_bodies_or_prompts_stored": false
+  },
+  "manager": {
+    "model_turn": "STREAM_METADATA_ONLY",
+    "run_id": "NOT_OBSERVED",
+    "stream_event_count": 338,
+    "last_matching_log_time": "2026-09-02T08:11:54.632Z",
+    "dynamic_team_choice": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "provider": "NOT_OBSERVED",
+    "model": "NOT_OBSERVED",
+    "usage": "NOT_OBSERVED",
+    "latency": "NOT_OBSERVED",
+    "response_hash": "NOT_OBSERVED",
+    "source": "current Manager Docker log, exact run-id filter; stream text was not retained"
+  },
+  "native_lifecycle": {
+    "project": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "task": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "leader_identity": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "leader_delegation": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "worker_identity": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "native_worker_execute": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "dsh_headless": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "submit": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "check": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "accept": {"status": "NOT_OBSERVED", "observed_count": 0},
+    "manager_second_decision": {"status": "NOT_OBSERVED", "observed_count": 0}
+  },
+  "failure": {
+    "error": "endpoint protected reference is unavailable",
+    "error_class": "INPUT_UNAVAILABLE",
+    "provider_called": false,
+    "bailian_usage_present": false,
+    "error_independently_present_in_permitted_log_output": false,
+    "basis": "Fail-closed run fact retained without persisting response/body text; no provider invocation is present because native execution was not observed."
+  },
+  "raw_readback": {
+    "manager_run_lines": 340,
+    "manager_assistant_stream_lines": 338,
+    "leader_run_lines": 2,
+    "worker_run_lines": 2,
+    "event_ids": [],
+    "hashes": [],
+    "task_file_names": [],
+    "source": "exact run-id filtered Docker logs and run-scoped workspace filename lookup"
+  },
+  "security": {
+    "secret_values": "NOT_READ_OR_STORED",
+    "headers_or_tokens": "NOT_READ_OR_STORED",
+    "message_bodies": "NOT_STORED",
+    "fixture_or_synthetic_substitution": false,
+    "historical_receipt_substitution": false
+  }
+}

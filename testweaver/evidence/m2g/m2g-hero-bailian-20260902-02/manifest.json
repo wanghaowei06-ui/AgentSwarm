@@ -1,0 +1,36 @@
+{
+  "schema": "testweaver.m2g.hero-failure.manifest.v1",
+  "run_id": "m2g-hero-bailian-20260902-02",
+  "classification": "FAIL",
+  "status": "INPUT_UNAVAILABLE",
+  "receipt": "receipt.json",
+  "receipt_sha256": "6d6096f09d8c18086153b590e3e8b44984112242abf9ea28186ce78726ad4a1a",
+  "files": ["receipt.json", "manifest.json", "SHA256SUMS"],
+  "observed": [
+    "Manager stream metadata only",
+    "fail-closed error classification"
+  ],
+  "not_observed": [
+    "Manager dynamic Team/Leader choice",
+    "native Project",
+    "native Task",
+    "Leader delegation",
+    "Worker identity or acknowledgement",
+    "native_worker_execute",
+    "DSH headless call",
+    "Bailian provider/model/usage/latency/hash",
+    "submit/check/accept",
+    "Manager second decision"
+  ],
+  "failure": {
+    "error": "endpoint protected reference is unavailable",
+    "provider_called": false,
+    "bailian_usage_present": false
+  },
+  "integrity": {
+    "exact_run_boundary": true,
+    "historical_substitution": false,
+    "secret_values": "NOT_READ_OR_STORED",
+    "body_or_prompt_persisted": false
+  }
+}
