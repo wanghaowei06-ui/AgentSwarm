@@ -1,12 +1,12 @@
 """Provider-neutral configuration references for external worker adapters.
 
-Only locations are accepted here.  This module never reads an environment
-variable or a file, so endpoint, model, and credential values cannot enter a
-checked-in contract accidentally.
+Only locations are accepted in the checked-in contract.  Runtime binding is
+temporary and reads existing protected AgentTeams values only in the Worker.
 """
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from dataclasses import dataclass
 import math
 import os
@@ -15,6 +15,9 @@ from collections.abc import Mapping
 from pathlib import Path
 import stat
 from typing import Any, Literal
+from urllib.parse import urlsplit
+
+import yaml
 
 
 class AdapterConfigError(ValueError):
@@ -23,6 +26,7 @@ class AdapterConfigError(ValueError):
 
 _ENV_NAME = re.compile(r"^[A-Z_][A-Z0-9_]*$")
 _PROVIDER_ID = re.compile(r"^[a-z0-9][a-z0-9._-]{0,63}$")
+_RUNTIME_CONFIG_MAX_BYTES = 64 * 1024
 
 
 def _mapping(value: Any, field: str) -> Mapping[str, Any]:
@@ -314,3 +318,78 @@ class AdapterConfig:
             "route": self.route.as_dict(),
             "limits": self.limits.as_dict(),
         }
+
+
+def _runtime_route_fields(path: str, roots: tuple[Path, ...]) -> tuple[bool, str, str]:
+    location = path.strip()
+    if not location:
+        return False, "", ""
+    candidate = Path(location)
+    if not candidate.is_absolute() or candidate.is_symlink() or not candidate.is_file():
+        return True, "", ""
+    resolved = candidate.resolve()
+    if not any(_inside(resolved, (root,)) for root in roots):
+        return True, "", ""
+    try:
+        if candidate.stat().st_size > _RUNTIME_CONFIG_MAX_BYTES:
+            return True, "", ""
+        raw = yaml.safe_load(candidate.read_text(encoding="utf-8")) or {}
+    except (OSError, UnicodeError, yaml.YAMLError):
+        return True, "", ""
+    desired = raw.get("desired") if isinstance(raw, dict) else None
+    model = desired.get("model") if isinstance(desired, dict) else None
+    if not isinstance(model, dict):
+        return True, "", ""
+    endpoint = str(
+        model.get("gatewayUrl")
+        or model.get("gateway_url")
+        or model.get("baseUrl")
+        or model.get("base_url")
+        or model.get("endpoint")
+        or ""
+    ).strip()
+    model_name = str(model.get("model") or model.get("name") or "").strip()
+    parsed = urlsplit(endpoint)
+    if (
+        endpoint
+        and (parsed.scheme not in {"http", "https"} or not parsed.hostname or parsed.username or parsed.password or parsed.query or parsed.fragment)
+    ):
+        endpoint = ""
+    if any(char.isspace() or ord(char) < 32 for char in model_name) or len(model_name) > 512:
+        model_name = ""
+    return True, endpoint, model_name
+
+
+def _inside(path: Path, roots: tuple[Path, ...]) -> bool:
+    return any(path == root or root in path.parents for root in roots)
+
+
+@contextmanager
+def bind_bailian_route(config: AdapterConfig, roots: tuple[Path, ...]):
+    """Project missing Bailian refs from native Worker route state briefly."""
+
+    updates: dict[str, str] = {}
+    if isinstance(config, AdapterConfig) and config.adapter_kind == "dsh" and config.route.provider == "aliyun-bailian":
+        present, endpoint, model = _runtime_route_fields(os.environ.get("TEAMHARNESS_RUNTIME_CONFIG", ""), roots)
+        if not present:
+            endpoint = os.environ.get("AGENTTEAMS_AI_GATEWAY_URL", "").strip()
+        model = model or os.environ.get("AGENTTEAMS_WORKER_MODEL", "").strip()
+        candidates = {
+            "TESTWEAVER_BAILIAN_ENDPOINT": endpoint,
+            "TESTWEAVER_BAILIAN_MODEL": model,
+            "TESTWEAVER_BAILIAN_CREDENTIAL": os.environ.get("AGENTTEAMS_WORKER_GATEWAY_KEY", ""),
+        }
+        for reference in (config.route.endpoint_ref, config.route.model_ref, config.route.credential_ref):
+            if reference.source == "env" and reference.location in candidates and not os.environ.get(reference.location):
+                if candidates[reference.location]:
+                    updates[reference.location] = candidates[reference.location]
+    previous = {name: os.environ.get(name) for name in updates}
+    os.environ.update(updates)
+    try:
+        yield
+    finally:
+        for name, value in previous.items():
+            if value is None:
+                os.environ.pop(name, None)
+            else:
+                os.environ[name] = value

@@ -12,7 +12,7 @@ import unittest
 from unittest.mock import patch
 
 import testweaver.adapters.executor as executor
-from testweaver.adapters.config import AdapterConfig
+from testweaver.adapters.config import AdapterConfig, _runtime_route_fields
 from testweaver.adapters.mcp_server import list_tools
 from testweaver.adapters.native_worker import NativeWorkerAssignment
 from testweaver.adapters.result import Provenance
@@ -105,7 +105,16 @@ def _script(directory: Path, body: str) -> Path:
 
 
 class OneShotExecutorTests(unittest.TestCase):
-    def _run(self, script: Path, config: AdapterConfig, workspace: Path, *, codex: bool = False):
+    def _run(
+        self,
+        script: Path,
+        config: AdapterConfig,
+        workspace: Path,
+        *,
+        codex: bool = False,
+        env_overrides: dict[str, str] | None = None,
+        env_remove: tuple[str, ...] = (),
+    ):
         env = {
             "AGENT_WORKSPACE": str(workspace),
             "TESTWEAVER_DSH_ENDPOINT": "https://deepseek.invalid",
@@ -122,6 +131,10 @@ class OneShotExecutorTests(unittest.TestCase):
             "HOME": str(workspace),
             "CODEX_HOME": str(workspace / "codex-home"),
         }
+        if env_overrides:
+            env.update(env_overrides)
+        for name in env_remove:
+            env.pop(name, None)
         (workspace / "codex-home").mkdir()
         executable_name = "PRODUCTION_CODEX_EXECUTABLE" if codex else "PRODUCTION_DSH_EXECUTABLE"
         with patch.dict(os.environ, env, clear=False), patch.object(executor, "_WORKSPACE_ROOTS", (workspace,)), patch.object(
@@ -203,6 +216,77 @@ class OneShotExecutorTests(unittest.TestCase):
             self.assertNotIn("fixture-worker-gateway-key-1234", content)
             self.assertNotIn("DEEPSEEK_BASE_URL", os.environ)
             self.assertNotIn("DEEPSEEK_API_KEY", os.environ)
+
+    def test_bailian_legacy_refs_bind_from_agentteams_runtime_without_persisting_values(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory) / "workspace"
+            workspace.mkdir()
+            runtime = workspace / "runtime.yaml"
+            runtime.write_text(
+                "desired:\n"
+                "  model:\n"
+                "    gatewayUrl: https://gateway.invalid/v1/testweaver-bailian\n"
+                "    model: runtime-bailian-model\n"
+                "    providerId: agentteams-gateway\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(
+                _runtime_route_fields(str(runtime), (workspace,)),
+                (True, "https://gateway.invalid/v1/testweaver-bailian", "runtime-bailian-model"),
+            )
+            script = _script(
+                workspace,
+                "import os\n"
+                "print('endpoint=' + str(bool(os.environ.get('TESTWEAVER_BAILIAN_ENDPOINT'))))\n"
+                "print('model=' + str(bool(os.environ.get('TESTWEAVER_BAILIAN_MODEL'))))\n"
+                "print('credential=' + str(bool(os.environ.get('TESTWEAVER_BAILIAN_CREDENTIAL'))))\n"
+                "print('deepseek_base=' + str(bool(os.environ.get('DEEPSEEK_BASE_URL'))))\n"
+                "print('deepseek_key=' + str(bool(os.environ.get('DEEPSEEK_API_KEY'))))\n",
+            )
+            with patch.dict(os.environ, {}, clear=True):
+                result, metadata = self._run(
+                    script,
+                    _config("aliyun-bailian"),
+                    workspace,
+                    env_overrides={
+                        "TEAMHARNESS_RUNTIME_CONFIG": str(runtime),
+                        "TESTWEAVER_BAILIAN_ENDPOINT": "",
+                        "TESTWEAVER_BAILIAN_MODEL": "",
+                        "TESTWEAVER_BAILIAN_CREDENTIAL": "",
+                    },
+                )
+                content = (workspace / result.result_ref).read_text(encoding="utf-8")
+                self.assertIn("endpoint=True", content)
+                self.assertIn("model=True", content)
+                self.assertIn("credential=True", content)
+                self.assertIn("deepseek_base=True", content)
+                self.assertIn("deepseek_key=True", content)
+                self.assertNotIn("runtime-bailian-model", content)
+                self.assertNotIn("fixture-worker-gateway-key-1234", content)
+                self.assertNotIn("TESTWEAVER_BAILIAN_ENDPOINT", repr(metadata))
+                self.assertNotIn("TESTWEAVER_BAILIAN_MODEL", repr(metadata))
+                self.assertNotIn("TESTWEAVER_BAILIAN_CREDENTIAL", repr(metadata))
+                self.assertEqual(os.environ, {})
+
+    def test_bailian_binding_does_not_fallback_to_default_route_when_runtime_is_unavailable(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory) / "workspace"
+            workspace.mkdir()
+            with patch.dict(os.environ, {}, clear=True):
+                with self.assertRaisesRegex(executor.NativeExecutionError, "endpoint protected reference is unavailable"):
+                    self._run(
+                        _script(workspace, "print('must not start')\n"),
+                        _config("aliyun-bailian"),
+                        workspace,
+                        env_overrides={
+                            "TEAMHARNESS_RUNTIME_CONFIG": str(workspace / "missing-runtime.yaml"),
+                        },
+                        env_remove=(
+                            "TESTWEAVER_BAILIAN_ENDPOINT",
+                            "TESTWEAVER_BAILIAN_MODEL",
+                            "TESTWEAVER_BAILIAN_CREDENTIAL",
+                        ),
+                    )
 
     def test_codex_uses_fixed_noninteractive_exec_and_stdin_prompt(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

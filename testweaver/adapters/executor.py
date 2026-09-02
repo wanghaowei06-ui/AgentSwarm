@@ -19,7 +19,7 @@ import time
 from typing import Any
 
 from .codex_cli import build_codex_cli_launch
-from .config import AdapterConfig, ProtectedReference, preflight_reference
+from .config import AdapterConfig, ProtectedReference, bind_bailian_route, preflight_reference
 from .native_worker import (
     DSH_PROVIDER_PROFILES,
     NativeWorkerAssignment,
@@ -41,7 +41,7 @@ KILL_GRACE_SECONDS = 1.0
 
 _PROTECTED_REFERENCE_ENV_NAMES = frozenset(
     "HOME CODEX_HOME CODEX_ENDPOINT CODEX_MODEL CODEX_WORKER_MODEL "
-    "AGENTTEAMS_AI_GATEWAY_URL AGENTTEAMS_WORKER_GATEWAY_KEY "
+    "AGENTTEAMS_AI_GATEWAY_URL AGENTTEAMS_WORKER_GATEWAY_KEY AGENTTEAMS_WORKER_MODEL "
     "DEEPSEEK_API_KEY DEEPSEEK_BASE_URL DEEPSEEK_MODEL "
     "DASHSCOPE_API_KEY DASHSCOPE_BASE_URL DASHSCOPE_MODEL "
     "TESTWEAVER_BAILIAN_CREDENTIAL TESTWEAVER_BAILIAN_ENDPOINT TESTWEAVER_BAILIAN_MODEL "
@@ -376,12 +376,12 @@ def _metadata(argv: list[str], cwd: Path, capture: Mapping[str, Any]) -> dict[st
     return metadata
 
 
-def execute_native_worker(
-    assignment: NativeWorkerAssignment,
-    config: AdapterConfig,
-    provenance: Provenance,
-    prompt: str,
-) -> tuple[NormalizedResult, dict[str, Any]]:
+def execute_native_worker(assignment: NativeWorkerAssignment, config: AdapterConfig, provenance: Provenance, prompt: str) -> tuple[NormalizedResult, dict[str, Any]]:
+    with bind_bailian_route(config, _WORKSPACE_ROOTS):
+        return _execute_native_worker(assignment, config, provenance, prompt)
+
+
+def _execute_native_worker(assignment: NativeWorkerAssignment, config: AdapterConfig, provenance: Provenance, prompt: str) -> tuple[NormalizedResult, dict[str, Any]]:
     """Run one fixed external process after a native assignment.
 
     The four arguments are the complete call surface.  Native IDs are passed
