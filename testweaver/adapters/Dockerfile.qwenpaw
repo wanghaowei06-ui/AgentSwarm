@@ -1,29 +1,42 @@
 # Small immutable extension image for the official QwenPaw Worker image.
-# Build context is testweaver/adapters; the DSH executable is an explicit,
-# externally supplied artifact and is never synthesized here.
+# The build entrypoint supplies a deterministic, platform-specific DSH package
+# assembled from the fixed upstream materialization; no source cache is copied.
 
 ARG QWENPAW_BASE_IMAGE
 FROM ${QWENPAW_BASE_IMAGE}
 
 ARG CODEX_CLI_SPEC=@openai/codex@0.152.0
-ARG TESTWEAVER_DSH_BINARY
+ARG TESTWEAVER_DSH_PACKAGE=dsh-runtime.tar.gz
+ARG TESTWEAVER_DSH_PACKAGE_SHA256=dsh-runtime.tar.gz.sha256
 
 USER root
-RUN test -n "${TESTWEAVER_DSH_BINARY}" \
+RUN test "${CODEX_CLI_SPEC}" = "@openai/codex@0.152.0" \
     && mkdir -p /opt/agentteams/testweaver-native-worker/bin \
         /opt/agentteams/testweaver-native-worker/testweaver/adapters \
-        /opt/agentteams/testweaver-native-worker/codex-cli
+        /opt/agentteams/testweaver-native-worker/codex-cli \
+        /opt/agentteams/testweaver-native-worker/dsh-runtime
 
 COPY __init__.py codex_cli.py config.py native_worker.py result.py executor.py mcp_server.py \
     /opt/agentteams/testweaver-native-worker/testweaver/adapters/
 COPY qwenpaw-package/ /opt/agentteams/testweaver-native-worker/package/
-COPY ${TESTWEAVER_DSH_BINARY} /opt/agentteams/testweaver-native-worker/bin/dsh
+COPY dsh-launcher.mjs /opt/agentteams/testweaver-native-worker/bin/dsh-launcher.mjs
+COPY ${TESTWEAVER_DSH_PACKAGE} /tmp/dsh-runtime.tar.gz
+COPY ${TESTWEAVER_DSH_PACKAGE_SHA256} /tmp/dsh-runtime.tar.gz.sha256
 
-RUN test -f /opt/agentteams/testweaver-native-worker/bin/dsh \
-    && test ! -L /opt/agentteams/testweaver-native-worker/bin/dsh \
-    && test -x /opt/agentteams/testweaver-native-worker/bin/dsh \
+RUN cd /tmp \
+    && sha256sum -c dsh-runtime.tar.gz.sha256 \
+    && tar -xzf /tmp/dsh-runtime.tar.gz \
+        -C /opt/agentteams/testweaver-native-worker/dsh-runtime \
+    && test -f /opt/agentteams/testweaver-native-worker/dsh-runtime/lib/bin.js \
+    && test -e /opt/agentteams/testweaver-native-worker/dsh-runtime/node_modules/@deepseek-ai/dsh \
+    && test "$(node -e 'const {createRequire}=require("node:module"); const r=createRequire("/opt/agentteams/testweaver-native-worker/bin/dsh-launcher.mjs"); process.stdout.write(r.resolve("@deepseek-ai/dsh/lib/bin.js", {paths:["/opt/agentteams/testweaver-native-worker/dsh-runtime"]}));')" \
+        = "/opt/agentteams/testweaver-native-worker/dsh-runtime/lib/bin.js" \
+    && cp /opt/agentteams/testweaver-native-worker/bin/dsh-launcher.mjs \
+        /opt/agentteams/testweaver-native-worker/bin/dsh \
+    && chmod 0755 /opt/agentteams/testweaver-native-worker/bin/dsh \
     && npm install --prefix /opt/agentteams/testweaver-native-worker/codex-cli \
-        --no-save --no-audit --no-fund "${CODEX_CLI_SPEC}" \
+        --ignore-scripts --no-save --no-package-lock --no-audit --no-fund \
+        "@openai/codex@0.152.0" \
     && test -x /opt/agentteams/testweaver-native-worker/codex-cli/node_modules/.bin/codex \
     && printf '%s\n' \
         '#!/usr/bin/python3' \
@@ -33,6 +46,9 @@ RUN test -f /opt/agentteams/testweaver-native-worker/bin/dsh \
         > /opt/agentteams/testweaver-native-worker/bin/codex-cc \
     && chmod 0755 /opt/agentteams/testweaver-native-worker/bin/codex-cc \
     && /opt/venv/qwenpaw/bin/python -m py_compile \
-        /opt/agentteams/testweaver-native-worker/testweaver/adapters/*.py
+        /opt/agentteams/testweaver-native-worker/testweaver/adapters/*.py \
+    && /opt/agentteams/testweaver-native-worker/bin/dsh --version \
+    && /opt/agentteams/testweaver-native-worker/bin/dsh --help >/dev/null \
+    && /opt/agentteams/testweaver-native-worker/bin/codex-cc --version >/dev/null
 
 WORKDIR /opt/agentteams/testweaver-native-worker

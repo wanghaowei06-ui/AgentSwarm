@@ -1,0 +1,30 @@
+{
+  "schema_version": "testweaver.dsh-package-build/v1",
+  "upstream": {
+    "repository": "deepseek-ai/deepseek-harness",
+    "commit": "47f943859bef60e4160492346772ded9b24f765a",
+    "tree": "f904efab9ef435201d6ba4da88a34d6366568272",
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.5",
+    "package_json_sha256": "a83af30293a1af777416ad890576840fecbeed33a56218993910239e39f19786",
+    "entrypoint": "lib/bin.js",
+    "entrypoint_sha256": "c0226687bb20f45c603ec6fe50f3de16d1c3510c3a803304ec575ef9bc366c62"
+  },
+  "lockfile": {
+    "path": "pnpm-lock.yaml",
+    "sha256": "6177ec61bdb8194eb5a606813a62ffb0ab2cc7fdfe2cd6e0249dcbfe4bce58e0",
+    "materialized_pnpm_lock_sha256": "b6f01683dca822848360087255d7847b4961afd2ad6e08cf6ed36a4d38daa377"
+  },
+  "materialized_cache_sha256": "bf23d5e48eadc9468442f035afd90f1624b9c0ad6784a1809150512f7376c761",
+  "tw_r2_0077": {
+    "step_id": "TW-R2-0077",
+    "reported_status": "DONE",
+    "local_mock_status": "RUNTIME_PASS",
+    "report_content_sha256": "1d743dc4395f933110b6ed9b335f88e7f5c56d4b6d2bc2927334d1402015a30b",
+    "scope": "LOCAL_DEVELOPER_PREVIEW_RUNTIME"
+  },
+  "npm": {
+    "fixed_artifact": "unavailable",
+    "reason": "@deepseek-ai/dsh@0.1.0-rc.5 is not published in the configured registry"
+  }
+}

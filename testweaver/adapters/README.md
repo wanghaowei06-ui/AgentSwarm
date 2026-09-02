@@ -60,9 +60,13 @@ state unchanged.
 The QwenPaw AgentSpec package is under `qwenpaw-package/`; it registers only
 the one stdio tool and one Skill through the existing package updater. The
 `Dockerfile.qwenpaw` and `build-qwenpaw-native-extension.sh` entrypoint add the
-adapter, fixed `codex-cc` CLI wrapper, and an explicitly supplied DSH binary to
-an immutable base image. The build entry refuses a missing or unsafe DSH
-artifact and never synthesizes provider capability. Roll back by restoring the
-prior immutable image/package reference through normal AgentTeams reconciliation;
-do not change native task state. LIVE remains `NOT_VERIFIED` until a real
-native Leader delegation produces and collects a Worker result.
+adapter, fixed `codex-cc` CLI wrapper, and a deterministic DSH runtime tarball
+to an immutable base image. The packager accepts only the fixed materialized
+DSH source, verifies the upstream commit/tree/lock/provenance hashes, copies
+the published DSH files and the Linux-resolved dependency closure, and never
+copies the source cache's `node_modules` tree. The image launcher resolves and
+executes the real `@deepseek-ai/dsh/lib/bin.js`; it does not emulate DSH or add
+native task permissions. Roll back by restoring the prior immutable
+image/package reference through normal AgentTeams reconciliation; do not change
+native task state. LIVE remains `NOT_VERIFIED` until a real native Leader
+delegation produces and collects a Worker result.
