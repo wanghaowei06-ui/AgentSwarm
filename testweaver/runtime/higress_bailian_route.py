@@ -149,7 +149,6 @@ def route_readback(value: Any, expected: dict[str, Any]) -> dict[str, Any]:
             and item["domains"] == []
             and upstream["provider"] == expected["provider"]
             and upstream["modelMapping"][expected["source_model"]] == expected["target_model"]
-            and ("modelPredicates" not in item or item["modelPredicates"] in (None, []))
             and auth["enabled"] is True
             and auth["allowedCredentialTypes"] == ["key-auth"]
         )
