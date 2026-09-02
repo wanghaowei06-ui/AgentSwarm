@@ -1,0 +1,42 @@
+[
+  {
+    "name": "native-m0-clean-leader",
+    "workerName": null,
+    "team": "native-m0-clean-team",
+    "role": "team_leader",
+    "runtime": "qwenpaw",
+    "image": "agentteams/qwenpaw-worker:be10aaf",
+    "phase": "Running",
+    "containerState": "running"
+  },
+  {
+    "name": "native-m0-clean-worker",
+    "workerName": null,
+    "team": "native-m0-clean-team",
+    "role": "worker",
+    "runtime": "qwenpaw",
+    "image": "agentteams/qwenpaw-worker:be10aaf",
+    "phase": "Running",
+    "containerState": "running"
+  },
+  {
+    "name": "native-m1-verify-worker",
+    "workerName": null,
+    "team": "native-m1-verify-team",
+    "role": "worker",
+    "runtime": "qwenpaw",
+    "image": "agentteams/qwenpaw-worker:be10aaf",
+    "phase": "Running",
+    "containerState": "running"
+  },
+  {
+    "name": "native-m1-verify-leader",
+    "workerName": null,
+    "team": "native-m1-verify-team",
+    "role": "team_leader",
+    "runtime": "qwenpaw",
+    "image": "agentteams/qwenpaw-worker:be10aaf",
+    "phase": "Running",
+    "containerState": "running"
+  }
+]

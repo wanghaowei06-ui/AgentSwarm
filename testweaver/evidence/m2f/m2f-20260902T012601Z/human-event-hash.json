@@ -1,0 +1,10 @@
+{
+  "schema": "testweaver.m2f.human-event-hash/v1",
+  "run_id": "m2f-20260902T012601Z",
+  "room_id": "!sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080",
+  "event_id": "$3bzmoiGEM_WnlTc28Z8tOKfHe1JyV6dO7ikAGuogrYU",
+  "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+  "origin_server_ts": 1788312855334,
+  "body_sha256": "edd7a512698f0a21be43f943b5450f4a8c74f888e4c1507322f7b45cfd79910f",
+  "values_redacted": true
+}

@@ -1,0 +1,45 @@
+{
+  "schema": "testweaver.m2f.recovery-observation/v1",
+  "run_id": "m2f-20260902T012601Z",
+  "observed_at": "2026-09-02T01:51:37Z",
+  "result": "FAIL",
+  "target": {
+    "worker_identity": "native-m0-clean-worker",
+    "container_name": "agentteams-native-m0-20260901-worker-native-m0-clean-worker",
+    "old_container_id": "9727ed45c40a8c6efd74c9f2bd822b14d6fe979bc468be0e65391f6b86ed5631",
+    "new_container_id": null,
+    "image": "agentteams/qwenpaw-worker:be10aaf"
+  },
+  "controller_readback": {
+    "resource_name": "native-m0-clean-worker",
+    "phase": "Running",
+    "state": "Running",
+    "container_state": "running",
+    "container_managed": true,
+    "matrix_identity": "@native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080",
+    "team": "native-m0-clean-team",
+    "generation": null,
+    "observed_generation": null
+  },
+  "docker_readback": {
+    "same_name_container_count": 0,
+    "new_worker_container": "NOT_OBSERVED"
+  },
+  "task_readback": {
+    "project_id": "m2f-recovery-20260902-013636",
+    "task_id": "task-20260902-013636",
+    "status": "in_progress",
+    "result_md": "ABSENT",
+    "late_submit": "NOT_ATTEMPTED"
+  },
+  "stop_condition": "Controller retained a Running CR projection but did not recreate a local Worker container; no manual repair was permitted.",
+  "replacement_and_late_submit": "NOT_ATTEMPTED",
+  "sources": [
+    "fault-execution.json",
+    "matrix-collector-status.json",
+    "matrix-events.jsonl",
+    "logs/arm-m2f-20260902T012601Z/*.docker.log",
+    "native task/project artifacts under /root/agentteams-fs/teams/native-m0-clean-team/shared/"
+  ],
+  "values_redacted": true
+}

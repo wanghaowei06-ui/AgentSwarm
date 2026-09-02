@@ -1,0 +1,15 @@
+{
+  "content": {
+    "body": "这是一次全新的 M2-F 原生 AgentTeams LIVE Run，只关闭 M2-E 唯一的 old-task late-submit/rejection P0；M2-E 的 P1 全部保留并如实记录，不修复、不扩 Gate。请隔离本 Run 的 room、Project、Task、session 和 evidence，不复用旧 Run 的对象或结论，不固定任何 Team、Leader、Worker、Task ID、container ID、模型输出或分支结果。\n\n先由 Manager fresh-read 当前 roster、Team/Leader/Worker、Room 和 TeamHarness 状态，并由真实 provider 动态选择一个可用 Team/Leader；Manager 只协调和转交事实，不代替 Leader 建 Project/Task、调用 taskflow 或代替 Worker 工作。被选 Leader 必须只使用官方原生 roomflow/projectflow/taskflow 创建本 Run 的新 Project 和一个可中断的初始 Task，再通过原生 delegate_task 委派真实 Worker；assignment 必须按真实 notificationNeeded.targetRoom 发一次完整 Worker Matrix ID mention，不得由脚本或 Human 代建、分派或改状态。\n\n初始 Worker 必须真实 ack_task，使用真实模型和只读工具读取非敏感来源，并通过官方 filesync 写入一份 partial artifact（含实际来源、内容 hash、工具/时间和 provenance）。完成后只发送一次 FAULT_READY 并结束 turn，严禁 submit_task；Leader 也不得在故障前 check_task、accept_task_result 或使 Task 进入终态。故障前必须由外部只读回读同时证明 Leader 与 Worker 的同一 Project/Task 原生状态明确为 in_progress，且该 oldTaskId 没有任何 submit；若任一方不是明确 in_progress，立即保持运行、不执行故障并记录缺口。\n\n达到上述条件后，向本 Human 请求一次窄范围批准，报告实际 Team/Leader/Worker、oldTaskId、Task room、当前 Worker container ID、故障命令、影响范围和回滚方式；未收到批准不得操作。批准仅允许外部 operator 对该实际 Worker 的单个 container 执行一次 docker rm -f，禁止 -v、删除卷、修改 CR/config、触碰其他资源或代行任何 Task 动作。随后只读确认 Controller 以同一 Worker CR 和 Matrix identity 恢复新 container、health 和 Team Ready；真实故障/恢复事实只经 Manager 原样转交 Leader。\n\n收到事实后，Leader 必须在同一 Project 内原生 cancel_task(oldTaskId, replacementTaskId) 并 delegate replacement；replacement Worker 必须真实 ack、工具/filesync、submit，Leader 原生 check_task、accept_task_result。replacement 被 accept 后，Leader 只向旧 Task room 发一次原生继续消息，要求恢复后的同一 Worker 读取已有 partial artifact，并对实际 oldTaskId 只调用一次原生 submit_task；Worker 不得预写预期结果，必须保留该调用的真实 native return。只有 native return 明确为 terminal cancelled 的提交拒绝才判该 P0 PASS；任何成功、其他错误、未调用、超时或缺少原始返回均诚实判 FAIL，不得伪造 rejection。\n\n所有 Project/Task/assignment/ack/submit/check/accept/message/status 动作必须由对应 Agent 通过官方原生工具完成；脚本只能配置、只读观测、脱敏、hash 和收据化，禁止注入事件、代行状态、预写结论或修改 Task 实现制造错误。保留原始 Matrix/TeamHarness/Task/Project/container/identity/provider/usage/hash 证据；完成后只更新唯一 Hero ledger/control doc，focused 校验后独立本地 commit，不 push，并保留无关 dirty。\n",
+    "msgtype": "m.text"
+  },
+  "event_id": "$3bzmoiGEM_WnlTc28Z8tOKfHe1JyV6dO7ikAGuogrYU",
+  "origin_server_ts": 1788312855334,
+  "room_id": "!sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080",
+  "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+  "type": "m.room.message",
+  "unsigned": {
+    "age": 21,
+    "transaction_id": "m2f-human-initial-1788312855321908870"
+  }
+}

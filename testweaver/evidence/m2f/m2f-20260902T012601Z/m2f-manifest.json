@@ -1,0 +1,547 @@
+{
+  "schema": "testweaver.m2f.evidence-manifest/v1",
+  "run_id": "m2f-20260902T012601Z",
+  "result": "FAIL",
+  "head": "5a9fdb49aedfe9e8e852c10b43333cac8680c1f9",
+  "file_count": 87,
+  "files": [
+    {
+      "path": ".state/api-native-m0-clean-leader.json",
+      "size": 368,
+      "mode": "0600",
+      "sha256": "98834f4355408194550c43c72bbd9a43250a206f13182a6b70a7702c74ac4f56"
+    },
+    {
+      "path": ".state/api-native-m0-clean-worker.json",
+      "size": 368,
+      "mode": "0600",
+      "sha256": "98834f4355408194550c43c72bbd9a43250a206f13182a6b70a7702c74ac4f56"
+    },
+    {
+      "path": ".state/api-native-m1-verify-leader.json",
+      "size": 368,
+      "mode": "0600",
+      "sha256": "98834f4355408194550c43c72bbd9a43250a206f13182a6b70a7702c74ac4f56"
+    },
+    {
+      "path": ".state/api-native-m1-verify-worker.json",
+      "size": 368,
+      "mode": "0600",
+      "sha256": "98834f4355408194550c43c72bbd9a43250a206f13182a6b70a7702c74ac4f56"
+    },
+    {
+      "path": ".state/api-states.tsv",
+      "size": 158,
+      "mode": "0600",
+      "sha256": "63e67c30a0e2a1dbbb3db17475c038cf907e9dabeecf7a5c2b28339a61d43cbf"
+    },
+    {
+      "path": ".state/collectors.tsv",
+      "size": 1353,
+      "mode": "0600",
+      "sha256": "655d97840597bc40e51c624684483b6cf50c64c6afeed94fb2e1a6b69d6e89a6"
+    },
+    {
+      "path": ".state/container-controller.json",
+      "size": 518,
+      "mode": "0600",
+      "sha256": "44da1e65585679c74a8d93b282469c1fa067e45e89bf7aa7d5ca4f72075b05db"
+    },
+    {
+      "path": ".state/container-manager.json",
+      "size": 401,
+      "mode": "0600",
+      "sha256": "08db87a4f901b513ffefc8e2c2b8fc22ccd212d52032592d26e0b8b76ffaf07a"
+    },
+    {
+      "path": ".state/container-worker-native-m0-clean-leader.json",
+      "size": 423,
+      "mode": "0600",
+      "sha256": "52a9486033aa2d8e79725eb71759918b9cb19aa9d06679a920e2bb40573d7bc6"
+    },
+    {
+      "path": ".state/container-worker-native-m0-clean-worker.json",
+      "size": 423,
+      "mode": "0600",
+      "sha256": "6aee57a0ce0fa46859f6012bb8f2d21b0bae08b38b7b48c52ea1e5dbbc290576"
+    },
+    {
+      "path": ".state/container-worker-native-m1-verify-leader.json",
+      "size": 424,
+      "mode": "0600",
+      "sha256": "55eb586e101e9395c12c08d05b24e955c6bed72c4d24545225c60745994d1b00"
+    },
+    {
+      "path": ".state/container-worker-native-m1-verify-worker.json",
+      "size": 424,
+      "mode": "0600",
+      "sha256": "8dc6a06ddff28379b82dfc37bd1d9402f6905c2d80487ce6b3997d2806c6bfb9"
+    },
+    {
+      "path": ".state/fault-pre-state.json",
+      "size": 324,
+      "mode": "0600",
+      "sha256": "9cc7f837a0c44d3ec04c36cd0e1df777272fcae403a9331006778aa3f78b923d"
+    },
+    {
+      "path": ".state/joined-manager.json",
+      "size": 586,
+      "mode": "0600",
+      "sha256": "f040130989d6ab7ddc0d63df3905f535e4ef067edf946b7a056fefcbd79d2d11"
+    },
+    {
+      "path": ".state/joined-native-m0-clean-leader.json",
+      "size": 728,
+      "mode": "0600",
+      "sha256": "17df55c39f05e281d74c8ccd5f1062523daf4fa1b811e11fa76cae13baf0b35c"
+    },
+    {
+      "path": ".state/joined-native-m0-clean-worker.json",
+      "size": 657,
+      "mode": "0600",
+      "sha256": "40d86612ac15b5a1c40cad1c8f1839e9c62dc684b850f48aa63c1979e9e55d20"
+    },
+    {
+      "path": ".state/joined-native-m1-verify-leader.json",
+      "size": 515,
+      "mode": "0600",
+      "sha256": "df36ba4e166e56085f96700b3e32143dd278c7943f9bf31c1a29dfb8dfa5d22f"
+    },
+    {
+      "path": ".state/joined-native-m1-verify-worker.json",
+      "size": 444,
+      "mode": "0600",
+      "sha256": "4732919f89a69224a2e6633494add0072735f60c9a821627ad04d3d120382e80"
+    },
+    {
+      "path": ".state/managers.json",
+      "size": 268,
+      "mode": "0600",
+      "sha256": "43d121d2bdc304c4a084d2a93fe75fe8f277b00a33e3c124aa93052a4e041418"
+    },
+    {
+      "path": ".state/matrix-rooms.tsv",
+      "size": 8079,
+      "mode": "0600",
+      "sha256": "d63dae2de0cf3f79b2da5a077868f75d586c89cc9092b8aec1594e38ee2accac"
+    },
+    {
+      "path": ".state/matrix-seen-event-ids",
+      "size": 11385,
+      "mode": "0600",
+      "sha256": "5751b8098d3f3c09922f3fc871422546721d0356ff9aa4199982177c1904c1c1"
+    },
+    {
+      "path": ".state/messages-manager-1.json",
+      "size": 166712,
+      "mode": "0600",
+      "sha256": "717969e6dec07bec11b8259eda37f94c97c349f5b657c09eb484fb2083f5ade4"
+    },
+    {
+      "path": ".state/messages-manager-2.json",
+      "size": 292455,
+      "mode": "0600",
+      "sha256": "a8138006fdcc9bc9a3d204c852a54c01349ee23886ab9f61d62aca1bd47c9bd3"
+    },
+    {
+      "path": ".state/messages-manager-3.json",
+      "size": 251655,
+      "mode": "0600",
+      "sha256": "e3cee547b7432f4b3fa89d15ead6f3239934511a6041742508dbb07d43ada42e"
+    },
+    {
+      "path": ".state/messages-manager-4.json",
+      "size": 244267,
+      "mode": "0600",
+      "sha256": "5f79b8e0191d6158aff783e0f2639606e7e354ffac75f51e78557b3c9b7f72f0"
+    },
+    {
+      "path": ".state/messages-manager-5.json",
+      "size": 252428,
+      "mode": "0600",
+      "sha256": "89df1d7e43747b7da4cd47150748350beed20098e96f310acc025790092f7450"
+    },
+    {
+      "path": ".state/messages-manager-6.json",
+      "size": 110647,
+      "mode": "0600",
+      "sha256": "fe189a63f64deb6f3e7b0632f63c4246051c11e71210abc61f5ab809e4400a19"
+    },
+    {
+      "path": ".state/messages-manager-7.json",
+      "size": 239597,
+      "mode": "0600",
+      "sha256": "2bff454f8d36b4558674802a4da179106a788943ad264aeebd6498d550e5f362"
+    },
+    {
+      "path": ".state/messages-manager-8.json",
+      "size": 233736,
+      "mode": "0600",
+      "sha256": "4f983c7693013b2d3c3d1c7e08f00218b608ebf5d263c79804916de14406178f"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-1.json",
+      "size": 280326,
+      "mode": "0600",
+      "sha256": "034fc13a1453dd0f2b6dd9a2cfd9d206e916c1fcf1f585560dd22283b824db88"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-10.json",
+      "size": 175382,
+      "mode": "0600",
+      "sha256": "9f3fc757171809cec4abfe8605f7a909ff287190e92352e4f6fa555250efc420"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-2.json",
+      "size": 255011,
+      "mode": "0600",
+      "sha256": "256da046952ac2e47aca0b0fb5f388fee495f028d7031597d127607814031739"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-3.json",
+      "size": 100811,
+      "mode": "0600",
+      "sha256": "396794c401d1c4faa0736d92600388297cc0d6e18723347f2f0b239b8c5440de"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-4.json",
+      "size": 131641,
+      "mode": "0600",
+      "sha256": "593b809d39338b194ab9c9a639ee63079e0b5c2391331131a876c7877430e651"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-5.json",
+      "size": 387460,
+      "mode": "0600",
+      "sha256": "80d928a9e7f9c9a1c5f26081c7570ea1a9045685fcbcc96240d17898c71476c4"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-6.json",
+      "size": 103411,
+      "mode": "0600",
+      "sha256": "7052de9a1352ed943d0a7ede8dd146bcdd3e543f258202d7ae29736c73ff006b"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-7.json",
+      "size": 184202,
+      "mode": "0600",
+      "sha256": "503b0d5fbcb8f907d9e1a705a94c6000fa5a56bf12f9adabd9f882ec0a0ba269"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-8.json",
+      "size": 200440,
+      "mode": "0600",
+      "sha256": "e2a9cc22bad658ea5a331308b7f956f5f2771136fcb3108c67e4dbddb7f5fbf1"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-leader-9.json",
+      "size": 167195,
+      "mode": "0600",
+      "sha256": "a3ecbf2fbff05a0453f38839fabf6f9592138f6c3c6248e5c458c45536c47b7b"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-worker-1.json",
+      "size": 281060,
+      "mode": "0600",
+      "sha256": "e1c8349ebf32ff6247bb4103179f6613ddb545fd97434060c14fc6ea5008cc6b"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-worker-2.json",
+      "size": 100815,
+      "mode": "0600",
+      "sha256": "22628cb201ac84718543bd7241cca3408bfaef345dbed6e2c4268217da849092"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-worker-3.json",
+      "size": 131287,
+      "mode": "0600",
+      "sha256": "b4e4787a9237c94dff454d239da00a3260fca0a3eb62d1e8a290b4eb35096fc1"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-worker-4.json",
+      "size": 387908,
+      "mode": "0600",
+      "sha256": "1fa14b3bef73e92a31d338a860968250c785ef03260aeaf6b285d2b4141a1d33"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-worker-5.json",
+      "size": 184775,
+      "mode": "0600",
+      "sha256": "1a9a938c0084af7500c41eebdf65a142390da20da2e4e135cbce92af73fc1079"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-worker-6.json",
+      "size": 8066,
+      "mode": "0600",
+      "sha256": "b8cc51ac88d37e44ab97d80f147080d408d39e37839a984469cc10227696257a"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-worker-7.json",
+      "size": 198381,
+      "mode": "0600",
+      "sha256": "86de7052f66cd68984a77d381f3ddff564adb103d59e05529e34be23c8bb8bbf"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-worker-8.json",
+      "size": 167457,
+      "mode": "0600",
+      "sha256": "4d1525e48cf638774daee4d8e2e4d5c455d801812c474f2dcb2f56e05c26568b"
+    },
+    {
+      "path": ".state/messages-native-m0-clean-worker-9.json",
+      "size": 175725,
+      "mode": "0600",
+      "sha256": "76a22dec8d537611fc0ececdd0279f47e496830b58fba0da08ea1ce808c27c64"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-leader-1.json",
+      "size": 177321,
+      "mode": "0600",
+      "sha256": "990a0363dd1e2a05d74d62b160aa8eaea44b05240a4c146c731f8b15eceb6c90"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-leader-2.json",
+      "size": 171836,
+      "mode": "0600",
+      "sha256": "917e348925899bafac77260564fef994e7c448917bb531e8826c74589d5c700e"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-leader-3.json",
+      "size": 292927,
+      "mode": "0600",
+      "sha256": "9a1aaa09540d0e280bdfb4c36848530dd0fc61e64fe16b860ee8fc27a17bd461"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-leader-4.json",
+      "size": 165266,
+      "mode": "0600",
+      "sha256": "9d36c5216b00baee37387a95312e205a87b0a00e929448eb4d2ec517ccb3e1dd"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-leader-5.json",
+      "size": 104216,
+      "mode": "0600",
+      "sha256": "535ce9161822fd5a7ad33842a5a76558b4d7edc29c9c81c7b80864d0585e287a"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-leader-6.json",
+      "size": 101416,
+      "mode": "0600",
+      "sha256": "d61bdbb8d544b78aaf7e17a7c70748c54b217bafa502d02ba50e4bf61fd8d55f"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-leader-7.json",
+      "size": 258680,
+      "mode": "0600",
+      "sha256": "0c5604f67723388c1e196b3293c59f86be4dc255cbdc3d958880520693661615"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-worker-1.json",
+      "size": 175193,
+      "mode": "0600",
+      "sha256": "5d6071bf610b37a62c9cc739edf20c3cf9c7a2c8e8aa140bb40b779dccfb9abe"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-worker-2.json",
+      "size": 293843,
+      "mode": "0600",
+      "sha256": "11e9f85c9e954d9f4a2e6ca4a1dd941da0b51b03cc1bb6175ddfb332b676acd0"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-worker-3.json",
+      "size": 164751,
+      "mode": "0600",
+      "sha256": "915cdb917e9f9d7f3e2c256e19e72b9cfc26718d8b5f3be2744acc3dbf460809"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-worker-4.json",
+      "size": 8080,
+      "mode": "0600",
+      "sha256": "e243afafbc30f7846122e3e00038516f5ac516f140ccea6d410750705a5b37b3"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-worker-5.json",
+      "size": 101416,
+      "mode": "0600",
+      "sha256": "58bca23fc4dc15a5bb57a72e16142c0ba24a32031011773366a4b069edb45e83"
+    },
+    {
+      "path": ".state/messages-native-m1-verify-worker-6.json",
+      "size": 257045,
+      "mode": "0600",
+      "sha256": "dc4006903fd2f0d50ec7b82b1fe102bf24e2cbded6c7e79cbaee3472d8233eca"
+    },
+    {
+      "path": ".state/skills.tsv",
+      "size": 4690,
+      "mode": "0600",
+      "sha256": "8ada1e96435ff52d1112f81075024a802ce027845a6f79f35b5a482597c1e3eb"
+    },
+    {
+      "path": ".state/teams.json",
+      "size": 561,
+      "mode": "0600",
+      "sha256": "62013a07325b47c1a27f25e1ff88b721aa61f0fe4bd199a5eaeccf8413b99941"
+    },
+    {
+      "path": ".state/workers.json",
+      "size": 1061,
+      "mode": "0600",
+      "sha256": "d6a25468601523f51834c1278ffa47b1a720ae0e941bbb6ca3d0baa215be3020"
+    },
+    {
+      "path": "arm-evidence.sh",
+      "size": 10596,
+      "mode": "0755",
+      "sha256": "8f353165d03033c4cdba6d14f4e694ef33fd851d85ae0c7663eab07e67d3f882"
+    },
+    {
+      "path": "baseline-manifest.json",
+      "size": 16434,
+      "mode": "0600",
+      "sha256": "2bf7033c8620836939c41a8154d5b9196e1945289858370cf808f333c16cec36"
+    },
+    {
+      "path": "collect-matrix-readback.sh",
+      "size": 7731,
+      "mode": "0755",
+      "sha256": "a8b0b9d1ea8d5db84853afb099dd5235fff8f3f98387e58df66eb250828e48dc"
+    },
+    {
+      "path": "collector-stop.json",
+      "size": 2096,
+      "mode": "0600",
+      "sha256": "9dfd0f5fe9e06530c4a69fbc21fc55bf34541af25c3c91e9df6f396534a0e9af"
+    },
+    {
+      "path": "fault-execution.json",
+      "size": 1124,
+      "mode": "0600",
+      "sha256": "1b2f8c74975242ef0de4465e5cd1187b984c31173f9770bf065f04f0de490b24"
+    },
+    {
+      "path": "human-approval-event.json",
+      "size": 1414,
+      "mode": "0600",
+      "sha256": "0515fe19eebcdb74a9c3ae4b6dc8d4d4d15ffae604afa75d320ebc49a0b34b19"
+    },
+    {
+      "path": "human-approval.txt",
+      "size": 895,
+      "mode": "0600",
+      "sha256": "0052f4bdaea72d85477d2e442095f14dbd659db5b9653c90265b9840ad0adb1f"
+    },
+    {
+      "path": "human-event-hash.json",
+      "size": 462,
+      "mode": "0600",
+      "sha256": "c5eba3133e4e62ad1673fddbede993001b9ea81a5742d8153b71dbb49cd22cda"
+    },
+    {
+      "path": "human-event.json",
+      "size": 3932,
+      "mode": "0600",
+      "sha256": "0936f2b590d9e5fc83b6a86937e5470e1236c84e1d6667f32fe5d23244b083e6"
+    },
+    {
+      "path": "human-input.txt",
+      "size": 3471,
+      "mode": "0600",
+      "sha256": "edd7a512698f0a21be43f943b5450f4a8c74f888e4c1507322f7b45cfd79910f"
+    },
+    {
+      "path": "logs/arm-m2f-20260902T012601Z/controller.docker.log",
+      "size": 0,
+      "mode": "0600",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/arm-m2f-20260902T012601Z/manager.docker.log",
+      "size": 1154231,
+      "mode": "0600",
+      "sha256": "a78d883f4517bfb5476f17f02d55a2fe28cab3540607a252ffcbfece1d769f00"
+    },
+    {
+      "path": "logs/arm-m2f-20260902T012601Z/worker-native-m0-clean-leader.docker.log",
+      "size": 145902,
+      "mode": "0600",
+      "sha256": "0e5fc471a10acf436443d23182f6b3489a48c214cb6361e6d4b65c955fa09230"
+    },
+    {
+      "path": "logs/arm-m2f-20260902T012601Z/worker-native-m0-clean-worker.docker.log",
+      "size": 96189,
+      "mode": "0600",
+      "sha256": "5ef5a74c75765d153cc7879c7d2c77686503d5f65500bd3445f1e14b123554b8"
+    },
+    {
+      "path": "logs/arm-m2f-20260902T012601Z/worker-native-m1-verify-leader.docker.log",
+      "size": 90604,
+      "mode": "0600",
+      "sha256": "2e7faeee0f1ceaa6c1eeb028cac2f9cf63976e2756b006ed3c92c1ce86cb9de7"
+    },
+    {
+      "path": "logs/arm-m2f-20260902T012601Z/worker-native-m1-verify-worker.docker.log",
+      "size": 90544,
+      "mode": "0600",
+      "sha256": "c12559a06e2ae42b2b93e359c3016189f8648708ac38b11ab89109dfcc109d20"
+    },
+    {
+      "path": "m2f-failure-receipt.txt",
+      "size": 3011,
+      "mode": "0644",
+      "sha256": "f9a6c6bded4de23d2dec19774d21a41b9ba6a0ad84600f113f89701586a4f3af"
+    },
+    {
+      "path": "matrix-collector-status.json",
+      "size": 1016,
+      "mode": "0600",
+      "sha256": "e71801725b9a1309394f2f399802601d2697386444f5e4ebda97cbe3a49c7852"
+    },
+    {
+      "path": "matrix-event-index.jsonl",
+      "size": 145300,
+      "mode": "0600",
+      "sha256": "7258759310f7c3abc6dd5ba4a997cf0ca19743d1135adcf24504b36de223b178"
+    },
+    {
+      "path": "matrix-events.jsonl",
+      "size": 529482,
+      "mode": "0600",
+      "sha256": "8626deb8689479a8962e62977cc24c5b35aa1c3393871a0b1a9507a943c55083"
+    },
+    {
+      "path": "pre-fault-authorization-request.txt",
+      "size": 3052,
+      "mode": "0600",
+      "sha256": "28a0b44d4e80325071f078a353a8f1e82236762209f9751259a54e1d103fc15d"
+    },
+    {
+      "path": "recovery-observation.json",
+      "size": 1655,
+      "mode": "0644",
+      "sha256": "cf56df6723392d80c5a5a5ff052275683a8ec3336cdb03b06d4dbce2e57eaac6"
+    },
+    {
+      "path": "redact-docker-log.pl",
+      "size": 759,
+      "mode": "0755",
+      "sha256": "d9f96f77ddafd3be0fc638b3e8ddca1e7a1cc4ebc202fe3f0e53f7c8b6a925c8"
+    }
+  ],
+  "key_hashes": {
+    "human_input": "edd7a512698f0a21be43f943b5450f4a8c74f888e4c1507322f7b45cfd79910f",
+    "human_approval": "0052f4bdaea72d85477d2e442095f14dbd659db5b9653c90265b9840ad0adb1f",
+    "fault_execution": "1b2f8c74975242ef0de4465e5cd1187b984c31173f9770bf065f04f0de490b24",
+    "failure_receipt": "f9a6c6bded4de23d2dec19774d21a41b9ba6a0ad84600f113f89701586a4f3af",
+    "recovery_observation": "cf56df6723392d80c5a5a5ff052275683a8ec3336cdb03b06d4dbce2e57eaac6"
+  },
+  "raw_evidence": {
+    "matrix": "matrix-events.jsonl",
+    "docker_logs": "logs/arm-m2f-20260902T012601Z/",
+    "native_artifacts": "read-only source paths recorded in receipts"
+  },
+  "values_redacted": true,
+  "transient_files_excluded": [
+    ".state/joined-native-m0-clean-worker.json.tmp.1191736"
+  ]
+}

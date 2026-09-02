@@ -1,0 +1,16 @@
+{
+  "content": {
+    "body": "【总控 Human 明确批准｜M2-F】我作为用户已授权的系统外总控 Human，批准对 run_id=m2f-20260902T012601Z 的 Worker 容器 9727ed45c40a8c6efd74c9f2bd822b14d6fe979bc468be0e65391f6b86ed5631 执行且仅执行一次：docker rm -f 9727ed45c40a8c6efd74c9f2bd822b14d6fe979bc468be0e65391f6b86ed5631。禁止 -v，禁止其他 stop/kill/run、卷/CR/配置/Task/Matrix 成员或其他容器变更。将本批准作为唯一 Human decision 原样持久化，并由获授权 Human 通路向当前 Human room 发送一次批准事实后执行；记录命令、退出码、时间与旧 ID。随后只观察 Controller 同 CR/Matrix identity 恢复；若未恢复则按既定 stop condition 诚实 FAIL，不手工修。恢复后继续既定 Manager 事实桥接、Leader cancel+replacement、replacement accept、旧 Task 一次真实 late submit 探针；不得预写工具结论。\n",
+    "msgtype": "m.text"
+  },
+  "event_id": "$3f6LeLkFLYs5xf9jREGSMw2stKFT9mIfccQU1UTpBPw",
+  "origin_server_ts": 1788313660277,
+  "room_id": "!sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080",
+  "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+  "type": "m.room.message",
+  "unsigned": {
+    "age": 19,
+    "transaction_id": "m2f-human-approval-1788313660266109047"
+  },
+  "send_transaction_id": "m2f-human-approval-1788313660266109047"
+}

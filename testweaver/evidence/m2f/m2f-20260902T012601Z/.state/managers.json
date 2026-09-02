@@ -1,0 +1,10 @@
+[
+  {
+    "name": "default",
+    "phase": "Running",
+    "runtime": "openclaw",
+    "image": "agentteams/manager:m1plus-15b7b14",
+    "version": "agentteams/manager:m1plus-15b7b14",
+    "matrixUserID": "@manager:matrix-native-m0-20260901.agentteams.local:28080"
+  }
+]

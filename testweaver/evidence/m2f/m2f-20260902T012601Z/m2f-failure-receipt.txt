@@ -1,0 +1,53 @@
+M2-F LIVE FAILURE RECEIPT
+
+run_id: m2f-20260902T012601Z
+result: FAIL
+failed_stage: Controller automatic Worker recreation after the approved container fault
+observed_at: 2026-09-02T01:51:37Z
+
+Human and fault facts
+- initial Human event: $3bzmoiGEM_WnlTc28Z8tOKfHe1JyV6dO7ikAGuogrYU
+- approval event: $3f6LeLkFLYs5xf9jREGSMw2stKFT9mIfccQU1UTpBPw
+- approval body sha256: 0052f4bdaea72d85477d2e442095f14dbd659db5b9653c90265b9840ad0adb1f
+- approved command: docker rm -f 9727ed45c40a8c6efd74c9f2bd822b14d6fe979bc468be0e65391f6b86ed5631
+- fault command exit code: 0
+- old container ID: 9727ed45c40a8c6efd74c9f2bd822b14d6fe979bc468be0e65391f6b86ed5631
+- fault execution receipt: fault-execution.json
+
+Recovery observations
+- same-name Worker container count: 0 at 2026-09-02T01:51:37Z
+- new Worker container ID: NOT_OBSERVED
+- Controller resource: native-m0-clean-worker, phase/state/containerState Running/running, containerManaged true
+- Controller Matrix identity: @native-m0-clean-worker:matrix-native-m0-20260901.agentteams.local:28080
+- Controller image: agentteams/qwenpaw-worker:be10aaf
+- health: NOT_OBSERVED
+- Team Ready: NOT_OBSERVED
+- old/new container identity equivalence: NOT_VERIFIABLE because no new container appeared
+- task after fault: task-20260902-013636 remained in_progress in the surviving native task artifact; result.md remained absent
+
+Stop condition
+The Controller/API projection retained the old CR as Running but did not produce a new local Worker container during the observation window. This is the minimum observed generic recovery gap: CR state did not bridge to local-container recreation after rm -f. No manual reconcile, docker run, restart, CR update, volume/config change, Matrix membership change, or Task action was attempted.
+
+Not attempted because recovery prerequisite failed
+- Manager factual bridge: NOT_ATTEMPTED
+- Leader native cancel(old,replacementTaskId)+delegate replacement: NOT_ATTEMPTED
+- replacement Worker execution/submit and Leader check/accept: NOT_ATTEMPTED
+- old Task continuation message: NOT_ATTEMPTED
+- restored Worker one-time late submit_task: NOT_ATTEMPTED
+- terminal-cancelled rejection: NOT_OBSERVED, not inferred
+
+Scope and P1 handling
+- M2-E P1 observations were not repaired or upgraded.
+- No model was called by the external operator after the initial Human message.
+- No Runner, fixture, synthetic event, prewritten result, or Task implementation change was used to manufacture a result.
+
+Evidence sources
+- baseline-manifest.json
+- human-input.txt, human-event.json, human-event-hash.json
+- human-approval.txt, human-approval-event.json
+- fault-execution.json and .state/fault-pre-state.json
+- matrix-events.jsonl, matrix-event-index.jsonl, matrix-collector-status.json
+- logs/arm-m2f-20260902T012601Z/*.docker.log
+- native task/project artifacts read-only under /root/agentteams-fs/teams/native-m0-clean-team/shared/
+
+This receipt records FAIL and the minimum observed recovery gap; it does not claim that the late-submit boundary passed.

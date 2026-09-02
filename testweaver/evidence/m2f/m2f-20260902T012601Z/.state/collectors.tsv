@@ -1,0 +1,6 @@
+manager	agentteams-native-m0-20260901-manager	/root/projects/agentteams/testweaver/evidence/m2f/m2f-20260902T012601Z/logs/arm-m2f-20260902T012601Z/manager.docker.log	1071003	true
+controller	agentteams-native-m0-20260901-controller	/root/projects/agentteams/testweaver/evidence/m2f/m2f-20260902T012601Z/logs/arm-m2f-20260902T012601Z/controller.docker.log	1071004	true
+worker-native-m0-clean-leader	agentteams-native-m0-20260901-worker-native-m0-clean-leader	/root/projects/agentteams/testweaver/evidence/m2f/m2f-20260902T012601Z/logs/arm-m2f-20260902T012601Z/worker-native-m0-clean-leader.docker.log	1071005	true
+worker-native-m0-clean-worker	agentteams-native-m0-20260901-worker-native-m0-clean-worker	/root/projects/agentteams/testweaver/evidence/m2f/m2f-20260902T012601Z/logs/arm-m2f-20260902T012601Z/worker-native-m0-clean-worker.docker.log	1071006	true
+worker-native-m1-verify-leader	agentteams-native-m0-20260901-worker-native-m1-verify-leader	/root/projects/agentteams/testweaver/evidence/m2f/m2f-20260902T012601Z/logs/arm-m2f-20260902T012601Z/worker-native-m1-verify-leader.docker.log	1071009	true
+worker-native-m1-verify-worker	agentteams-native-m0-20260901-worker-native-m1-verify-worker	/root/projects/agentteams/testweaver/evidence/m2f/m2f-20260902T012601Z/logs/arm-m2f-20260902T012601Z/worker-native-m1-verify-worker.docker.log	1071021	true

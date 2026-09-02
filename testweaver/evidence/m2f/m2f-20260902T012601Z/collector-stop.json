@@ -1,0 +1,48 @@
+{
+  "schema": "testweaver.m2f.collector-stop/v1",
+  "stopped_at": "2026-09-02T01:52:30Z",
+  "collectors": [
+    {
+      "label": "manager",
+      "container": "agentteams-native-m0-20260901-manager",
+      "log": "/root/projects/agentteams/testweaver/evidence/m2f/m2f-20260902T012601Z/logs/arm-m2f-20260902T012601Z/manager.docker.log",
+      "pid": 1071003,
+      "alive_at_arm": true
+    },
+    {
+      "label": "controller",
+      "container": "agentteams-native-m0-20260901-controller",
+      "log": "/root/projects/agentteams/testweaver/evidence/m2f/m2f-20260902T012601Z/logs/arm-m2f-20260902T012601Z/controller.docker.log",
+      "pid": 1071004,
+      "alive_at_arm": true
+    },
+    {
+      "label": "worker-native-m0-clean-leader",
+      "container": "agentteams-native-m0-20260901-worker-native-m0-clean-leader",
+      "log": "/root/projects/agentteams/testweaver/evidence/m2f/m2f-20260902T012601Z/logs/arm-m2f-20260902T012601Z/worker-native-m0-clean-leader.docker.log",
+      "pid": 1071005,
+      "alive_at_arm": true
+    },
+    {
+      "label": "worker-native-m0-clean-worker",
+      "container": "agentteams-native-m0-20260901-worker-native-m0-clean-worker",
+      "log": "/root/projects/agentteams/testweaver/evidence/m2f/m2f-20260902T012601Z/logs/arm-m2f-20260902T012601Z/worker-native-m0-clean-worker.docker.log",
+      "pid": 1071006,
+      "alive_at_arm": true
+    },
+    {
+      "label": "worker-native-m1-verify-leader",
+      "container": "agentteams-native-m0-20260901-worker-native-m1-verify-leader",
+      "log": "/root/projects/agentteams/testweaver/evidence/m2f/m2f-20260902T012601Z/logs/arm-m2f-20260902T012601Z/worker-native-m1-verify-leader.docker.log",
+      "pid": 1071009,
+      "alive_at_arm": true
+    },
+    {
+      "label": "worker-native-m1-verify-worker",
+      "container": "agentteams-native-m0-20260901-worker-native-m1-verify-worker",
+      "log": "/root/projects/agentteams/testweaver/evidence/m2f/m2f-20260902T012601Z/logs/arm-m2f-20260902T012601Z/worker-native-m1-verify-worker.docker.log",
+      "pid": 1071021,
+      "alive_at_arm": true
+    }
+  ]
+}

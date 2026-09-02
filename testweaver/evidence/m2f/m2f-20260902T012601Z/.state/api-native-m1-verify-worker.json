@@ -1,0 +1,22 @@
+[
+  {
+    "name": "approval-intent-boundary-check",
+    "enabled": true
+  },
+  {
+    "name": "avoid-redundant-exploration",
+    "enabled": true
+  },
+  {
+    "name": "diagnose-by-competing-hypotheses",
+    "enabled": true
+  },
+  {
+    "name": "preserve-critical-constraints",
+    "enabled": true
+  },
+  {
+    "name": "reconcile-before-retry",
+    "enabled": true
+  }
+]

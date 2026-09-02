@@ -1,0 +1,26 @@
+[
+  {
+    "name": "native-m0-clean-team",
+    "teamName": "native-m0-clean-team",
+    "leader": "native-m0-clean-leader",
+    "workerNames": [
+      "native-m0-clean-worker"
+    ],
+    "phase": "Active",
+    "leaderReady": true,
+    "readyWorkers": 1,
+    "totalWorkers": 1
+  },
+  {
+    "name": "native-m1-verify-team",
+    "teamName": "native-m1-verify-team",
+    "leader": "native-m1-verify-leader",
+    "workerNames": [
+      "native-m1-verify-worker"
+    ],
+    "phase": "Active",
+    "leaderReady": true,
+    "readyWorkers": 1,
+    "totalWorkers": 1
+  }
+]

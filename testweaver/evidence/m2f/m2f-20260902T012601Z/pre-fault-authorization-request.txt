@@ -1,0 +1,51 @@
+M2-F PRE-FAULT AUTHORIZATION REQUEST
+
+run_id: m2f-20260902T012601Z
+captured_at: 2026-09-02T01:46:00Z (operator observation window; see raw logs and Matrix index for exact event times)
+head: 5a9fdb49aedfe9e8e852c10b43333cac8680c1f9
+
+Human boundary
+- room: !sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080
+- initial event: $3bzmoiGEM_WnlTc28Z8tOKfHe1JyV6dO7ikAGuogrYU
+- initial body sha256: edd7a512698f0a21be43f943b5450f4a8c74f888e4c1507322f7b45cfd79910f
+- post-initial Human message count: 0
+
+Native run objects
+- Team: native-m0-clean-team
+- Leader identity/container: native-m0-clean-leader / agentteams-native-m0-20260901-worker-native-m0-clean-leader
+- Leader container ID: 6c986616c22eb2155d1fe62aefac1c632e042fb1f1f7eedf607b1a05b3680736
+- Worker identity/container: native-m0-clean-worker / agentteams-native-m0-20260901-worker-native-m0-clean-worker
+- Worker container ID: 9727ed45c40a8c6efd74c9f2bd822b14d6fe979bc468be0e65391f6b86ed5631
+- image: agentteams/qwenpaw-worker:be10aaf
+- image ID: sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb
+- Project: m2f-recovery-20260902-013636
+- Task: task-20260902-013636
+- Task room: !uwXjU7wlGJDHgMnj0e:matrix-native-m0-20260901.agentteams.local:28080
+- Project source room: !Jwsd6hEOvfcqfCXOIZ:matrix-native-m0-20260901.agentteams.local:28080
+
+Pre-fault readback
+- Task meta source: native task artifact shared/tasks/task-20260902-013636/meta.json
+- Leader-side Task status: in_progress
+- Worker-side Task status: in_progress
+- partial artifact: workspace/partial-baseline.md
+- partial artifact hash record: workspace/partial-baseline.sha256
+- result.md on both Leader and Worker sides: absent
+- exact native submit_task observed before this request: NOT_OBSERVED
+- FAULT_READY raw Matrix references: Worker $qxt4b6cZAUrS03NK9JuOR9rTdnaVqzXMeJI1hSv2G0M; Leader $AGNO5ixv2dyY-luekfMmrjfnjBQInFMUbJUz_rFN71o
+- Project task projection: assigned (retained as an observed projection discrepancy; not upgraded)
+
+Requested one-time operation (WAITING FOR EXPLICIT HUMAN APPROVAL)
+- target: only worker container ID 9727ed45c40a8c6efd74c9f2bd822b14d6fe979bc468be0e65391f6b86ed5631
+- command: docker rm -f 9727ed45c40a8c6efd74c9f2bd822b14d6fe979bc468be0e65391f6b86ed5631
+- constraints: exactly one rm -f; no -v; no stop/kill/run; no volume, CR, config, Task, Matrix, or other-container action
+- expected controller action: reconcile the existing Worker CR and restore the same Matrix identity
+- rollback/stop condition: if the CR does not recreate the same identity or health/Team readiness does not return, do not hand-fix; retain old/new IDs and report failure
+
+Evidence sources
+- baseline-manifest.json
+- human-event.json and human-event-hash.json
+- matrix-events.jsonl and matrix-event-index.jsonl
+- logs/arm-m2f-20260902T012601Z/*.docker.log
+- read-only native task/project artifacts inside /root/agentteams-fs/teams/native-m0-clean-team/shared/
+
+This file is an observation and authorization request, not a completion verdict. No fault command has been executed.
