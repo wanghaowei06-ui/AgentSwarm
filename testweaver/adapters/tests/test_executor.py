@@ -13,7 +13,7 @@ from unittest.mock import patch
 
 import testweaver.adapters.executor as executor
 from testweaver.adapters.config import AdapterConfig, _runtime_route_fields
-from testweaver.adapters.mcp_server import list_tools
+from testweaver.adapters.mcp_server import call_tool, handle_request, list_tools
 from testweaver.adapters.native_worker import NativeWorkerAssignment
 from testweaver.adapters.result import Provenance
 
@@ -360,6 +360,76 @@ class McpSurfaceTests(unittest.TestCase):
             set(tools[0]["inputSchema"]["required"]),
             {"assignment", "config", "provenance", "prompt"},
         )
+
+    def test_schema_rejects_legacy_shape_and_tools_call_accepts_contract_fixture(self) -> None:
+        listed = handle_request({"jsonrpc": "2.0", "id": 1, "method": "tools/list"})
+        schema = listed["result"]["tools"][0]["inputSchema"]
+        assignment = schema["properties"]["assignment"]
+        config = schema["properties"]["config"]
+        route = config["properties"]["route"]
+        provenance = schema["properties"]["provenance"]
+        self.assertEqual(
+            set(assignment["required"]),
+            {"project_id", "task_id", "room_id", "worker_id", "leader_id", "task_ref", "read_only"},
+        )
+        self.assertEqual(set(config["required"]), {"adapter_kind", "route", "limits"})
+        self.assertEqual(set(route["required"]), {"provider", "endpoint", "model", "credential", "wire_api"})
+        self.assertEqual(set(provenance["required"]), {"source", "source_revision", "method"})
+        legacy = {
+            "assignment": {
+                "leader": "native-leader-ref",
+                "worker": "native-worker-ref",
+                "source_room_id": "!native-room-ref:example.invalid",
+                "input_root": "current-task-input",
+                "spec_path": "current-task-spec",
+                "task_title": "fixed task",
+            },
+            "config": {"provider": "deepseek", "model": "fixture", "route": "default", "limits": {"max_tokens": 4}},
+            "provenance": {"source": "fixture", "method": "fixture"},
+            "prompt": "read the assigned source",
+        }
+        self.assertTrue(set(legacy["assignment"]) - set(assignment["properties"]))
+        rejected = call_tool("native_worker_execute", legacy)
+        self.assertFalse(json.loads(rejected["content"][0]["text"])["ok"])
+        valid = {
+            "assignment": {
+                "project_id": "native-project-ref",
+                "task_id": "native-task-ref",
+                "room_id": "!native-room-ref:example.invalid",
+                "worker_id": "native-worker-ref",
+                "leader_id": "native-leader-ref",
+                "task_ref": "native-task-spec-ref",
+                "read_only": True,
+            },
+            "config": {
+                "adapter_kind": "dsh",
+                "route": {
+                    "provider": "deepseek",
+                    "endpoint": {"source": "env", "name": "TESTWEAVER_DSH_ENDPOINT"},
+                    "model": {"source": "env", "name": "TESTWEAVER_DSH_MODEL"},
+                    "credential": {"source": "env", "name": "TESTWEAVER_DSH_CREDENTIAL"},
+                    "wire_api": "chat",
+                },
+                "limits": _limits(),
+            },
+            "provenance": {"source": "fixture", "source_revision": "fixture-revision", "method": "fixture"},
+            "prompt": "read the assigned source",
+        }
+
+        class FixtureResult:
+            def as_dict(self):
+                return {"status": "completed", "fixture": True}
+
+        with patch("testweaver.adapters.mcp_server.execute_native_worker", return_value=(FixtureResult(), {"fixture": True})):
+            accepted = handle_request(
+                {
+                    "jsonrpc": "2.0",
+                    "id": 2,
+                    "method": "tools/call",
+                    "params": {"name": "native_worker_execute", "arguments": valid},
+                }
+            )
+        self.assertTrue(json.loads(accepted["result"]["content"][0]["text"])["ok"])
 
     def test_adapter_source_has_no_native_task_operation_surface(self) -> None:
         source = Path(executor.__file__).read_text(encoding="utf-8") + Path(

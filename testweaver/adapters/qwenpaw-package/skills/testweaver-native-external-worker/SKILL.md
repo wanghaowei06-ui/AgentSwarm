@@ -27,6 +27,45 @@ work. Pass only these four fields:
 - `provenance`: the source, revision, and method for this Worker result.
 - `prompt`: the bounded, non-interactive instruction for this one execution.
 
+Use this generic contract-shaped example (replace only with the current opaque
+references; never add resolved values or case-specific fields):
+
+```json
+{
+  "assignment": {
+    "project_id": "native-project-ref",
+    "task_id": "native-task-ref",
+    "room_id": "native-task-room-ref",
+    "worker_id": "native-worker-ref",
+    "leader_id": "native-leader-ref",
+    "task_ref": "native-task-spec-ref",
+    "read_only": true
+  },
+  "config": {
+    "adapter_kind": "dsh",
+    "route": {
+      "provider": "deepseek",
+      "endpoint": {"source": "env", "name": "TESTWEAVER_DSH_ENDPOINT"},
+      "model": {"source": "env", "name": "TESTWEAVER_DSH_MODEL"},
+      "credential": {"source": "env", "name": "TESTWEAVER_DSH_CREDENTIAL"},
+      "wire_api": "chat"
+    },
+    "limits": {
+      "timeout_seconds": 120,
+      "max_model_decisions": 4,
+      "max_tool_calls": 8,
+      "max_cost_units": 3
+    }
+  },
+  "provenance": {
+    "source": "external-result-receipt",
+    "source_revision": "frozen-source-revision",
+    "method": "bounded native external execution"
+  },
+  "prompt": "Read only the current assigned task inputs and return a bounded result."
+}
+```
+
 The DSH route receives endpoint, model, and credential locations only; never
 place a resolved value in the request. The Codex route is fixed to
 `codex-cc`, model `gpt-5.6-luna`, and reasoning `max`, with the protected
