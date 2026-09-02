@@ -1,0 +1,21 @@
+{
+  "schema_version": "testweaver.evidence-manifest/v1",
+  "run_id": "dsh-live-3eb5875",
+  "source_commit": "3eb587515d3aae1352a9df8ecd1cdbe45029f305",
+  "status": "BLOCKED",
+  "classification": "BUILD_FAILED",
+  "evidence_scope": "one official QwenPaw native extension build attempt; no Worker update and no provider probe",
+  "failure_kind": "HOME_NOT_AVAILABLE_FOR_PROFILE_PROJECTION",
+  "files": [
+    {
+      "path": "receipt.json",
+      "sha256": "03f5a8f0280b2d3a27bb1c1fcf3581d913a06556b8c177424991666519ba9d3f"
+    },
+    {
+      "path": "SHA256SUMS",
+      "sha256": "036a53a8dd583289992a245ceb929f8cd175bec095cf6afdab6d3b0c873c7e8b"
+    }
+  ],
+  "manifest_self_hash": "excluded_from_SHA256SUMS",
+  "secret_scan": "PASS_NO_SECRET_VALUES"
+}

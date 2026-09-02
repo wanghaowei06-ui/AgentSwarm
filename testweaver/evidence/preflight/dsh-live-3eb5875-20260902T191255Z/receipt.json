@@ -1,0 +1,56 @@
+{
+  "schema_version": "testweaver.dsh-preflight/v1",
+  "run_id": "dsh-live-3eb5875",
+  "observed_at": "2026-09-02T19:12:55Z",
+  "source_commit": "3eb587515d3aae1352a9df8ecd1cdbe45029f305",
+  "status": "BLOCKED",
+  "classification": "BUILD_FAILED",
+  "attempts": {
+    "official_build": 1,
+    "worker_update": 0,
+    "provider_probe": 0
+  },
+  "build": {
+    "official_entrypoint": "testweaver/adapters/build-qwenpaw-native-extension.sh",
+    "candidate_image": "agentteams/qwenpaw-worker:dsh-live-3eb5875",
+    "candidate_image_present": false,
+    "base_image": "agentteams/qwenpaw-worker:be10aaf",
+    "base_image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+    "base_id_check": "PASS",
+    "dsh_source": "/root/projects/muti-agent/.testweaver/cache/g13-deepseek-runtime/dsh-package",
+    "canonical_lock": "/root/projects/muti-agent/artifacts/verification/g13/deepseek-harness-official-cache/pnpm-lock.yaml",
+    "provenance": "/root/projects/muti-agent/artifacts/verification/g13/deepseek-harness-provenance.json",
+    "dsh_package_validation": "PASS",
+    "node_executable": "/root/.hermes/node/bin/node",
+    "node_version": "v22.23.1",
+    "node_sha256": "93956de2e59480474a7b46571da1651180b1a050cdf32641ebec4ce6e478e068",
+    "node_preflight": "PASS",
+    "failure_step": "Dockerfile.qwenpaw:59 /opt/agentteams/testweaver-native-worker/bin/dsh --version",
+    "failure_kind": "HOME_NOT_AVAILABLE_FOR_PROFILE_PROJECTION",
+    "failure_summary": "The launcher fail-closed because the base image exposes no HOME environment entry and no absolute HOME was available during image smoke.",
+    "forest_image_checks": "NOT_REACHED",
+    "profile_projection_image_check": "NOT_REACHED"
+  },
+  "worker_update": {
+    "official_entrypoint": "agt update worker --name native-m0-clean-dsh-worker --image agentteams/qwenpaw-worker:dsh-live-3eb5875",
+    "status": "NOT_ATTEMPTED",
+    "reason": "candidate_image_not_built"
+  },
+  "provider_probe": {
+    "status": "NOT_ATTEMPTED",
+    "classification": "NOT_LIVE",
+    "reason": "candidate_image_not_built",
+    "adapter": "native_worker_execute",
+    "profile": "aliyun-bailian",
+    "provider": "NOT_OBSERVED",
+    "usage": "NOT_OBSERVED",
+    "latency_ms": null,
+    "request_response_hash": null
+  },
+  "verification": {
+    "candidate_tag_absent": true,
+    "secret_values_recorded": false,
+    "secret_scan": "PASS_NO_SECRET_VALUES"
+  },
+  "build_command": "TESTWEAVER_QWENPAW_BASE_IMAGE=agentteams/qwenpaw-worker:be10aaf TESTWEAVER_QWENPAW_BASE_IMAGE_ID=sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb TESTWEAVER_QWENPAW_IMAGE=agentteams/qwenpaw-worker:dsh-live-3eb5875 TESTWEAVER_DSH_SOURCE_DIR=/root/projects/muti-agent/.testweaver/cache/g13-deepseek-runtime/dsh-package TESTWEAVER_DSH_LOCKFILE=/root/projects/muti-agent/artifacts/verification/g13/deepseek-harness-official-cache/pnpm-lock.yaml TESTWEAVER_DSH_PROVENANCE=/root/projects/muti-agent/artifacts/verification/g13/deepseek-harness-provenance.json TESTWEAVER_NODE_EXECUTABLE=/root/.hermes/node/bin/node TESTWEAVER_NODE_SHA256=93956de2e59480474a7b46571da1651180b1a050cdf32641ebec4ce6e478e068 bash testweaver/adapters/build-qwenpaw-native-extension.sh"
+}
