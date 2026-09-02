@@ -20,10 +20,19 @@ COPY __init__.py codex_cli.py config.py native_worker.py result.py executor.py m
     /opt/agentteams/testweaver-native-worker/testweaver/adapters/
 COPY qwenpaw-package/ /opt/agentteams/testweaver-native-worker/package/
 COPY dsh-launcher.mjs /opt/agentteams/testweaver-native-worker/bin/dsh-launcher.mjs
+COPY node-runtime /opt/agentteams/testweaver-native-worker/bin/node
 COPY ${TESTWEAVER_DSH_PACKAGE} /tmp/dsh-runtime.tar.gz
 COPY ${TESTWEAVER_DSH_PACKAGE_SHA256} /tmp/dsh-runtime.tar.gz.sha256
 
+ENV PATH="/opt/agentteams/testweaver-native-worker/bin:${PATH}"
+
 RUN cd /tmp \
+    && chmod 0755 /opt/agentteams/testweaver-native-worker/bin/node \
+    && test "$(sha256sum /opt/agentteams/testweaver-native-worker/bin/node | awk '{print $1}')" \
+        = "93956de2e59480474a7b46571da1651180b1a050cdf32641ebec4ce6e478e068" \
+    && test "$(node --version)" = "v22.23.1" \
+    && test "$(command -v node)" = "/opt/agentteams/testweaver-native-worker/bin/node" \
+    && node -e 'const zlib = require("node:zlib"); if (typeof Promise.withResolvers !== "function" || typeof zlib.createZstdDecompress !== "function") process.exit(2)' \
     && sha256sum -c dsh-runtime.tar.gz.sha256 \
     && tar -xzf /tmp/dsh-runtime.tar.gz \
         -C /opt/agentteams/testweaver-native-worker/dsh-runtime \
