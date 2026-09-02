@@ -662,13 +662,41 @@ def _inside(path: Path, roots: tuple[Path, ...]) -> bool:
     return any(path == root or root in path.parents for root in roots)
 
 
+def _runtime_route_from_environment(roots: tuple[Path, ...]) -> tuple[bool, str, str]:
+    """Find the native runtime projection without weakening path checks."""
+
+    explicit = os.environ.get("TEAMHARNESS_RUNTIME_CONFIG", "").strip()
+    if explicit:
+        return _runtime_route_fields(explicit, roots)
+
+    for base_name in ("HOME", "AGENT_WORKSPACE"):
+        base = os.environ.get(base_name, "").strip()
+        if not base:
+            continue
+        candidate = Path(base) / "runtime" / "runtime.yaml"
+        if not candidate.is_absolute():
+            return True, "", ""
+        try:
+            resolved = candidate.resolve()
+            if not any(_inside(resolved, (root,)) for root in roots):
+                return True, "", ""
+            if not candidate.exists():
+                continue
+            if candidate.is_symlink() or not candidate.is_file():
+                return True, "", ""
+        except (OSError, ValueError):
+            return True, "", ""
+        return _runtime_route_fields(str(candidate), roots)
+    return False, "", ""
+
+
 @contextmanager
 def bind_bailian_route(config: AdapterConfig, roots: tuple[Path, ...]):
     """Project missing Bailian refs from native Worker route state briefly."""
 
     updates: dict[str, str] = {}
     if isinstance(config, AdapterConfig) and config.adapter_kind == "dsh" and config.route.provider == "aliyun-bailian":
-        present, endpoint, model = _runtime_route_fields(os.environ.get("TEAMHARNESS_RUNTIME_CONFIG", ""), roots)
+        present, endpoint, model = _runtime_route_from_environment(roots)
         if not present:
             endpoint = os.environ.get("AGENTTEAMS_AI_GATEWAY_URL", "").strip()
         model = model or os.environ.get("AGENTTEAMS_WORKER_MODEL", "").strip()

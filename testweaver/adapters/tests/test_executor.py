@@ -445,6 +445,89 @@ class OneShotExecutorTests(unittest.TestCase):
                 self.assertNotIn("TESTWEAVER_BAILIAN_CREDENTIAL", repr(metadata))
                 self.assertEqual(os.environ, {})
 
+    def test_bailian_legacy_refs_prefer_home_runtime_over_workspace_runtime(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory) / "home"
+            workspace = Path(directory) / "workspace"
+            home.mkdir()
+            workspace.mkdir()
+            home_runtime = home / "runtime" / "runtime.yaml"
+            workspace_runtime = workspace / "runtime" / "runtime.yaml"
+            home_runtime.parent.mkdir()
+            workspace_runtime.parent.mkdir()
+            home_runtime.write_text(
+                "desired:\n"
+                "  model:\n"
+                "    gatewayUrl: https://home.invalid/v1/testweaver-bailian\n"
+                "    model: home-bailian-model\n",
+                encoding="utf-8",
+            )
+            workspace_runtime.write_text(
+                "desired:\n"
+                "  model:\n"
+                "    gatewayUrl: https://workspace.invalid/v1/testweaver-bailian\n"
+                "    model: workspace-bailian-model\n",
+                encoding="utf-8",
+            )
+            environment = {
+                "HOME": str(home),
+                "AGENT_WORKSPACE": str(workspace),
+                "TEAMHARNESS_RUNTIME_CONFIG": "",
+                "AGENTTEAMS_AI_GATEWAY_URL": "https://gateway.invalid/v1",
+                "AGENTTEAMS_WORKER_MODEL": "worker-default-model",
+                "AGENTTEAMS_WORKER_GATEWAY_KEY": "fixture-worker-gateway-key-1234",
+                "TESTWEAVER_BAILIAN_ENDPOINT": "",
+                "TESTWEAVER_BAILIAN_MODEL": "",
+                "TESTWEAVER_BAILIAN_CREDENTIAL": "",
+            }
+            config = _config("aliyun-bailian")
+            with patch.dict(os.environ, environment, clear=True):
+                with adapter_config.bind_bailian_route(config, (home, workspace)):
+                    self.assertEqual(
+                        os.environ["TESTWEAVER_BAILIAN_ENDPOINT"],
+                        "https://home.invalid/v1/testweaver-bailian",
+                    )
+                    self.assertEqual(os.environ["TESTWEAVER_BAILIAN_MODEL"], "home-bailian-model")
+                    self.assertEqual(
+                        os.environ["TESTWEAVER_BAILIAN_CREDENTIAL"],
+                        "fixture-worker-gateway-key-1234",
+                    )
+                self.assertEqual(os.environ, environment)
+
+    def test_bailian_legacy_refs_use_workspace_runtime_when_home_runtime_is_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory) / "home"
+            workspace = Path(directory) / "workspace"
+            home.mkdir()
+            runtime = workspace / "runtime" / "runtime.yaml"
+            runtime.parent.mkdir(parents=True)
+            runtime.write_text(
+                "desired:\n"
+                "  model:\n"
+                "    gatewayUrl: https://workspace.invalid/v1/testweaver-bailian\n"
+                "    model: workspace-bailian-model\n",
+                encoding="utf-8",
+            )
+            environment = {
+                "HOME": str(home),
+                "AGENT_WORKSPACE": str(workspace),
+                "TEAMHARNESS_RUNTIME_CONFIG": "",
+                "AGENTTEAMS_AI_GATEWAY_URL": "https://gateway.invalid/v1",
+                "AGENTTEAMS_WORKER_MODEL": "worker-default-model",
+                "AGENTTEAMS_WORKER_GATEWAY_KEY": "fixture-worker-gateway-key-1234",
+                "TESTWEAVER_BAILIAN_ENDPOINT": "",
+                "TESTWEAVER_BAILIAN_MODEL": "",
+                "TESTWEAVER_BAILIAN_CREDENTIAL": "",
+            }
+            with patch.dict(os.environ, environment, clear=True):
+                with adapter_config.bind_bailian_route(_config("aliyun-bailian"), (home, workspace)):
+                    self.assertEqual(
+                        os.environ["TESTWEAVER_BAILIAN_ENDPOINT"],
+                        "https://workspace.invalid/v1/testweaver-bailian",
+                    )
+                    self.assertEqual(os.environ["TESTWEAVER_BAILIAN_MODEL"], "workspace-bailian-model")
+                self.assertEqual(os.environ, environment)
+
     def test_bailian_binding_does_not_fallback_to_default_route_when_runtime_is_unavailable(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             workspace = Path(directory) / "workspace"
@@ -457,11 +540,13 @@ class OneShotExecutorTests(unittest.TestCase):
                         workspace,
                         env_overrides={
                             "TEAMHARNESS_RUNTIME_CONFIG": str(workspace / "missing-runtime.yaml"),
+                            "AGENTTEAMS_AI_GATEWAY_URL": "https://gateway.invalid/v1",
+                            "AGENTTEAMS_WORKER_MODEL": "worker-default-model",
+                            "TESTWEAVER_BAILIAN_CREDENTIAL": "fixture-bailian-credential-1234",
                         },
                         env_remove=(
                             "TESTWEAVER_BAILIAN_ENDPOINT",
                             "TESTWEAVER_BAILIAN_MODEL",
-                            "TESTWEAVER_BAILIAN_CREDENTIAL",
                         ),
                     )
 
