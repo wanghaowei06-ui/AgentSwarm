@@ -1,0 +1,44 @@
+{
+  "schema": "testweaver.m2g.hero-observation-manifest.v1",
+  "run_id": "m2g-hero-bailian-20260902-04",
+  "status": "FAIL",
+  "failure_class": "SECRET_EXPOSED_TO_AGENT_CONTEXT",
+  "receipt": {
+    "path": "receipt.json",
+    "sha256": "4bda2795e44a4546b79132ed9294fe66c9f2e4e43cacb95613c2a1196f269caf"
+  },
+  "observed": [
+    "one exact Human initial event",
+    "Manager real provider/model turns and dynamic team/leader choice",
+    "global task assigned and native team project active",
+    "Leader delegation reference to native-m0-clean-dsh-worker",
+    "Team task projection in_progress with worker acknowledgement",
+    "DSH session Skill tool call and TeamHarness tool calls",
+    "official stop with Worker running_task_count=0 and approval_count=0"
+  ],
+  "not_observed": [
+    "exact Skill load name/invoke",
+    "actual native_worker_execute tool call/result",
+    "DSH/Bailian provider call",
+    "DSH provider/model/usage/latency/request-response telemetry",
+    "Worker result artifact",
+    "raw submit/check/accept",
+    "Leader summary",
+    "Manager second decision"
+  ],
+  "security": {
+    "protected_value_or_wal_read": false,
+    "wal_scanned": false,
+    "wal_copied": false,
+    "receipt_body_stored": false,
+    "frontmatter_repair_as_run_evidence": false
+  },
+  "integrity": {
+    "hash_algorithm": "sha256",
+    "files": [
+      "receipt.json",
+      "manifest.json",
+      "SHA256SUMS"
+    ]
+  }
+}

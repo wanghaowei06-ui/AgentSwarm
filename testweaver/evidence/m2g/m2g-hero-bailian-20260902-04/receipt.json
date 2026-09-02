@@ -1,0 +1,180 @@
+{
+  "schema": "testweaver.m2g.hero-observation-receipt.v1",
+  "run_id": "m2g-hero-bailian-20260902-04",
+  "status": "FAIL",
+  "failure_class": "SECRET_EXPOSED_TO_AGENT_CONTEXT",
+  "failure_reason": "Boolean-only official control-plane observation established that a protected internal gateway credential value entered the Worker history.db-wal. The value and WAL were not read, copied, scanned, hashed, or output.",
+  "human_initial": {
+    "status": "OBSERVED",
+    "event_id": "$s14WNPxuILUMNRkOuahFQb7HqEUqUBTydq4dUPpzrfw",
+    "room_id": "!sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080",
+    "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+    "origin_server_ts": 1788340343029,
+    "type": "m.room.message",
+    "body_length": 792,
+    "body_sha256": "b5d512ab920786a57d01e33a51f39ee6f70c43b8e2c296a1b98a1bf8a6417d30",
+    "count_in_exact_run": 1,
+    "source": "/root/agentteams-native-m0-20260901-manager/.openclaw/matrix/accounts/default/agentteams-native-m0-20260901-controller_6167__manager_matrix-native-m0-20260901.agentteams.local_28080/8789104a1316bd53/bot-storage.json"
+  },
+  "manager": {
+    "provider_turn": {
+      "status": "OBSERVED",
+      "provider": "agentteams-gateway",
+      "model": "deepseek-v4-flash",
+      "turn_count": 11,
+      "latest_cumulative_total_tokens": 121714,
+      "latency": "NOT_OBSERVED",
+      "source": "/root/agentteams-native-m0-20260901-manager/.openclaw/agents/main/sessions/72f72165-65e6-4911-95d4-415b63ffac21.jsonl"
+    },
+    "dynamic_choice": {
+      "status": "OBSERVED",
+      "team": "native-m0-clean-team",
+      "leader": "native-m0-clean-leader",
+      "event_id": "$MNyikfsydCjfbj-dYc4hcMcPk2o9OGcnI3F38dxmbv8",
+      "room_id": "!sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080",
+      "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+      "origin_server_ts": 1788340387539,
+      "type": "m.room.message",
+      "body_length": 601,
+      "body_sha256": "0a98d874ab363530cf341360b2af73c3b510198e4d39503164cc9bc8591119d7"
+    },
+    "global_task": {
+      "status": "assigned",
+      "task_id": "m2g-hero-bailian-20260902-04-20260902T091237Z",
+      "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+      "assigned_to": "native-m0-clean-leader",
+      "delegated_to_team": "native-m0-clean-team",
+      "project_id": null,
+      "source": "/root/agentteams-native-m0-20260901-manager/state.json"
+    },
+    "second_decision": "NOT_OBSERVED"
+  },
+  "native_lifecycle": {
+    "project": {
+      "status": "active",
+      "project_id": "m2g-hero-bailian-20260902-04-20260902T091237Z",
+      "plan_type": "dag",
+      "source_room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+      "source": "native-m0-clean-leader project metadata"
+    },
+    "leader_delegation": {
+      "status": "OBSERVED",
+      "target_worker": "native-m0-clean-dsh-worker",
+      "task_room_id": "!jlJkcOasvJI7Welc4c:matrix-native-m0-20260901.agentteams.local:28080",
+      "events": [
+        {
+          "event_id": "$12f01ApXPSHhEYx0W3tYqJ8o93z-NdjzpyyU-cCDv7M",
+          "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "origin_server_ts": 1788340399206,
+          "type": "m.room.message",
+          "body_length": 239,
+          "body_sha256": "c971dc7fa3d185af6ba6a95c173dee123a199971992215ed229ef27f1a20621c"
+        },
+        {
+          "event_id": "$6aeG8fW4L4NBNdDERrSZiefqmerl4aQoQvqcj9WnkVw",
+          "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080",
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "origin_server_ts": 1788340406643,
+          "type": "m.room.message",
+          "body_length": 1055,
+          "body_sha256": "60df74957580d91a5613d3750507df53b0738acc054cf77c67ed1f9526c79490"
+        }
+      ]
+    },
+    "task_projection": {
+      "status": "in_progress",
+      "acknowledged_by_role": "worker",
+      "submitted_by_role": null,
+      "result_path": null,
+      "result_status": null,
+      "raw_lifecycle_event": "NOT_OBSERVED",
+      "source": "/root/agentteams-fs/teams/native-m0-clean-team/shared/tasks/m2g-hero-bailian-20260902-04-20260902T091237Z"
+    },
+    "worker_session": {
+      "session_path": "/root/agentteams-fs/agents/native-m0-clean-dsh-worker/.qwenpaw/workspaces/default/sessions/agentteams_matrix/!jlJkcOasvJI7Welc4c--matrix-native-m0-20260901.agentteams.local--28080_matrix--!jlJkcOasvJI7Welc4c--matrix-native-m0-20260901.agentteams.local--28080.json",
+      "counts": {
+        "text": 21,
+        "thinking": 14,
+        "tool_call": 19,
+        "tool_result": 19
+      },
+      "tool_calls": {
+        "Skill": 1,
+        "execute_shell_command": 10,
+        "read_file": 5,
+        "teamharness__filesync": 2,
+        "teamharness__taskflow": 1
+      },
+      "skill_load_or_exact_name": "NOT_OBSERVED",
+      "native_worker_execute": {
+        "status": "NOT_OBSERVED",
+        "exact_tool_call_count": 0,
+        "text_marker_count": 6,
+        "raw_result": "NOT_OBSERVED"
+      },
+      "submit_check_accept_tool_calls": 0,
+      "submit_check_accept_raw_results": "NOT_OBSERVED",
+      "bailian_marker_only": true
+    },
+    "dsh_headless": {
+      "status": "FINISHED_BY_OFFICIAL_STOP",
+      "container_id": "07121447f927841c512f66cc32c2489e5c6a34e66c3ff9c39db34f59b7d563ca",
+      "image": "agentteams/qwenpaw-worker:dsh-headless-ce9590c",
+      "last_run_at": "2026-09-02T09:13:22.783860Z",
+      "last_finish_at": "2026-09-02T09:15:08.333693Z",
+      "running_task_count_after_stop": 0,
+      "approval_count_after_stop": 0
+    },
+    "provider": {
+      "dsh": "NOT_OBSERVED",
+      "provider": "NOT_OBSERVED",
+      "model": "NOT_OBSERVED",
+      "usage": "NOT_OBSERVED",
+      "latency": "NOT_OBSERVED",
+      "request_response_hash": "NOT_OBSERVED"
+    },
+    "result": "NOT_OBSERVED",
+    "submit": "NOT_OBSERVED",
+    "check": "NOT_OBSERVED",
+    "accept": "NOT_OBSERVED",
+    "leader_summary": "NOT_OBSERVED"
+  },
+  "operational_controls": {
+    "timeout_count": 1,
+    "approval_api_approve_count": 2,
+    "official_stop": {
+      "status": "OBSERVED",
+      "time": "2026-09-02T09:15:08Z",
+      "scope": "current native_worker_execute",
+      "hitl": false
+    },
+    "orphan_approval": {
+      "id": "31eda5f3",
+      "deny_count": 1,
+      "pending_count_after": 0,
+      "hitl": false
+    }
+  },
+  "matrix_exact_run_event_count": 16,
+  "sources": [
+    "Manager Matrix exact-run metadata",
+    "Manager global state metadata",
+    "Manager provider session metadata",
+    "Leader project/task metadata",
+    "DSH task metadata",
+    "DSH exact task-room session metadata",
+    "official Worker status/control-plane readback"
+  ],
+  "security": {
+    "event_bodies_stored": false,
+    "tool_input_output_stored": false,
+    "history_db_wal_read": false,
+    "history_db_wal_scanned": false,
+    "history_db_wal_copied": false,
+    "credentials_read_or_stored": false,
+    "frontmatter_repair_as_run_evidence": false,
+    "historical_evidence_used": false,
+    "secret_scan": "PASS"
+  }
+}
