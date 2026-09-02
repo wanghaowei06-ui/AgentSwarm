@@ -1,13 +1,19 @@
-# Read-only AgentLoop / OTel query preparation
+# AgentLoop / OTel trace and SLS readback
 
-This directory contains the thinnest query-side preparation for a real
-TestWeaver run. It does not emit spans, create or update AgentLoop resources,
-start containers, control an AgentTeams run, or make an Oracle decision.
+This directory contains the thinnest trace-export and query-side preparation
+for a real TestWeaver run. `otlp_genai.py` emits a standard OTLP/HTTP GenAI
+span from caller-supplied run facts; it does not create or update AgentLoop
+resources, start containers, control an AgentTeams run, or make an Oracle
+decision.
 
-`readonly_query.py` accepts only bounded `GET` requests. It keeps a
-location-only protected-config reference, never opens that file, and accepts
-secret-aware headers only from an external runtime callback. Headers and
-response bodies are never placed in `QueryReceipt`.
+`readonly_query.py` accepts generic bounded `GET` requests, while
+`sls_query.py` signs one bounded SLS `GetLogs` read in memory. Both keep
+protected-config references and secret-aware callbacks separate from receipts;
+headers, SQL, credentials, and response bodies never enter a receipt.
+
+`readiness.py` is a one-shot Collector probe. Its receipt is always
+`NOT_LIVE_PROBE`; an accepted OTLP response is not evidence that a Hero span
+reached AgentSpace or that an evaluation was queryable.
 
 One response is `VERIFIED` only when a successful JSON readback contains all
 four run anchors: `campaign_id`, `run_id`, PostgreSQL revision, and the exact
@@ -31,9 +37,12 @@ transports in the focused tests are contract tests, not LIVE evidence.
   reused here.
 - The old `muti-agent` AgentLoop cloud smoke creates datasets, evaluators and
   EvaluationTasks, adds data, and deletes resources. Those POST/DELETE paths
-  are not part of this read-only adapter. Only the previously observed GET
-  shapes are retained: EvaluationTask, EvaluationTask runs, and AgentLoop
-  dataset readback.
+  are not part of this read-only adapter. The current session/trace path is
+  the AgentSpace tenant's SLS data plane, not the old CRUD/SDK assumption.
+- `evaluation_detail` is queried explicitly for evaluation results. Trace
+  readback uses the configured SLS Logstore. A successful response verifies
+  only one returned row containing every required anchor in that same row;
+  partial or cross-row matches remain `NOT_VERIFIED`.
 
 ## Current preflight boundary
 
@@ -49,7 +58,10 @@ The existing names-only configuration points to:
 - `TESTWEAVER_NACOS_SOURCE_CONTAINER` and `TESTWEAVER_OTEL_CONTAINER` are
   names-only runtime references; no values are embedded here.
 
-At audit time the old local OTLP health/export ports were not listening and the
-LoongSuite Pilot service was inactive. No AgentLoop query endpoint or
-secret-aware header binding was therefore verified. The current LIVE status is
-`NOT_VERIFIED`; this package does not upgrade that status by itself.
+The current Collector/LoongSuite runtime is an external deployment dependency.
+The audited SLS config also has an endpoint/project binding mismatch, and the
+protected references expose no AgentSpace identifier or RAM credential
+reference for this workspace. SLS preflight therefore remains `BLOCKED` until
+those external bindings are corrected and supplied. The current LIVE status
+is `NOT_VERIFIED`; neither a Collector 2xx nor a local readiness probe
+upgrades that status.
