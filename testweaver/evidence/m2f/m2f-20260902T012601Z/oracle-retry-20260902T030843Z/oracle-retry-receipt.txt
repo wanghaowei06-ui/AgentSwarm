@@ -1,0 +1,35 @@
+schema: testweaver.m2f.oracle-retry-receipt/v1
+run_id: m2f-oracle-retry-20260902T030843Z
+observed_close_utc: 2026-09-02T03:25:15Z
+overall: PARTIAL
+
+BOUNDARY AND INPUT
+- The prior oracle-dual-20260902T022530Z closeout remains PARTIAL in its own directory and is not rewritten.
+- This retry used the same frozen bundle bytes: oracle-input-bundle.json sha256 e17cd27d96a2bce2e6e1dde9e983a2a948ed5432ecab9c91b16d302ca450d24e.
+- gold_ref=null; candidate output was not included in the Human input.
+- Frozen refs and hashes: continuation-manifest.json 5565468d1d113ceb4662759b6343d32f933a06b6ab74104eb736f6d6a8f33741; native-chain-observation.json a863c5d8cd191161846258ddfc68cec4fb02aabf67c729d968fbfefb4915a8a8; recovery-readback.json 300b96b760545ef5148134d2216ec90525b695fdf820683c0fa16e71710973d8; superseding-receipt.txt ba516893eb3b6ff89e2ce9de9fd05294f7e904cb0f8ea872a6adf1b032738edd.
+- One Human initial event only: room !sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080, event $TKuOoQYk18z2eR_97fohSE11LnAUrKESflo0Sj8hN8w, ts 1788318548569, body length 1814, body sha256 413f0ece33a1b6ebe9643464b2a75eae09785972f334880aa1ff81279bde1a77.
+- No supplemental notification was sent during this retry. The event index retains the readback IDs without event bodies.
+
+ROSTER AND ISOLATION
+- Existing Oracle workers were reused without rebuild: native-m0-boundary-oracle container 66973bbec61b715b2083187120cfeafe30d8bdd89b87e59144d7b5e9740fc96b, PID 1460891; native-m1-outcome-oracle container 97ad3445817374e31637bc574b2799a508d7322ceb3b5c3192eabc10d35f1feb, PID 1462641. Both used agentteams/qwenpaw-worker:be10aaf, runtime qwenpaw, model deepseek-v4-flash, and remained Running with restart_count 0.
+- The two native Teams were Active and Ready 2/2. Worker identities, private rooms, process IDs and containers were distinct.
+- Task-room cross-scope references were not observed. No observer-created Task, Matrix write, result injection, or model call was performed.
+
+NATIVE ROUTE AND LIFECYCLE
+- Manager routed to the existing Leaders. Each Leader natively created/planned a fresh Project and delegated a fresh Task; the complete event ID index is oracle-retry-event-index.json.
+- Boundary scope: Project m2f-boundary-oracle-retry-20260902-030843, Task task-20260902-030843-boundary-oracle, room !CH8uTw6fZw5G8JPfV3:matrix-native-m0-20260901.agentteams.local:28080. Assignment, Worker native ack, Worker native submit, Leader native check, and Leader accept/project-completed evidence are recorded in oracle-retry-task-readback.json. Worker result sha256 7874f85d04464c7770115eb7de9899686dedaab6e1ca22c30529a2fdffc6a6d7; Project result sha256 754b3333219b93a023058de69014cc9347d13eea405f0f188345888bf8ca78c1.
+- Outcome scope: Project m2f-oracle-retry-20260902-030843, Leader-created Task m2f-oracle-retry-20260902-030843-01, room !Se5wlvKILvNEwxNvaw:matrix-native-m0-20260901.agentteams.local:28080. The initial Manager projection task-20260902-030843-outcome-oracle remains an unmodified assigned projection; the submitted native delegated Task is the -01 Task. Assignment, Worker native ack, Worker native submit, Leader native check, and Leader accept/project-completed evidence are recorded in oracle-retry-task-readback.json. Worker result sha256 e20107148bd978f48d68a98ac4b4224bf265541193918c2948c00d678cd74bab; Project result sha256 6777a62134d8e18154e668843300031e7fedc43b7781bacccccd1727fac6f646.
+- A redacted byte scan of each materialized Worker result found all four frozen evidence hashes and the frozen evidence-root reference; only counts were recorded, never result content. Counts are in oracle-retry-task-readback.json.
+- Both Worker sessions contain real assistant/usage turns and native TeamHarness taskflow markers. Numeric usage is session-scoped; per-request latency was not exposed by this readback. No Oracle result text or conclusion was copied into this receipt.
+
+ACCEPTANCE AND FINAL STATE
+- Boundary lifecycle: Worker ack PASS; result materialization PASS; submit PASS; Leader check PASS; Leader accept evidenced by accept-task events plus TeamHarness task/project completed metadata PASS.
+- Outcome lifecycle: Worker ack PASS; result materialization PASS; submit PASS; Leader check PASS; Leader accept evidenced by accept-task events plus TeamHarness task/project completed metadata PASS.
+- Manager final aggregation after both Leaders accepted: NOT_OBSERVED in the Human room by the close readback. Therefore this fresh retry is PARTIAL, not a dual-Oracle PASS. No conclusion was forced and no further notification or polling was issued.
+- Full redacted event IDs, timestamps, senders, message lengths and body hashes (without bodies) are in oracle-retry-event-index.json. Runtime, Task/Project metadata and QwenPaw session readback are in the companion JSON files.
+
+credentials_values_read_or_persisted: false
+event_bodies_persisted: false
+observer_wrote_matrix: false
+observer_created_tasks: false

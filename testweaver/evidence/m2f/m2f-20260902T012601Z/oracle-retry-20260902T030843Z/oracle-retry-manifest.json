@@ -1,0 +1,93 @@
+{
+  "schema": "testweaver.m2f.oracle-retry-manifest/v1",
+  "oracle_run_id": "m2f-oracle-retry-20260902T030843Z",
+  "parent_run_id": "m2f-20260902T012601Z",
+  "parent_oracle_attempt": "oracle-dual-20260902T022530Z",
+  "source_freeze_commit": "e55d45500134816765c3bd807029b86f973bc2fc",
+  "closeout_commit": "5f27a9f",
+  "repository_head_at_receipt": "466eaa94",
+  "human_initial_event_id": "$TKuOoQYk18z2eR_97fohSE11LnAUrKESflo0Sj8hN8w",
+  "human_initial_body_sha256": "413f0ece33a1b6ebe9643464b2a75eae09785972f334880aa1ff81279bde1a77",
+  "frozen_input_bundle": "oracle-dual-20260902T022530Z/oracle-input-bundle.json",
+  "frozen_input_bundle_sha256": "e17cd27d96a2bce2e6e1dde9e983a2a948ed5432ecab9c91b16d302ca450d24e",
+  "frozen_input_bundle_hash_file_sha256": "b8a2b5ac4b3549ea90744b3cbb3373df7412b9a575b76ed7ceee3676f709a70e",
+  "gold_ref": null,
+  "candidate_output_in_human_input": false,
+  "evidence_refs": [
+    {
+      "path": "continuation-20260902T020051Z/continuation-manifest.json",
+      "sha256": "5565468d1d113ceb4662759b6343d32f933a06b6ab74104eb736f6d6a8f33741"
+    },
+    {
+      "path": "continuation-20260902T020051Z/native-chain-observation.json",
+      "sha256": "a863c5d8cd191161846258ddfc68cec4fb02aabf67c729d968fbfefb4915a8a8"
+    },
+    {
+      "path": "continuation-20260902T020051Z/recovery-readback.json",
+      "sha256": "300b96b760545ef5148134d2216ec90525b695fdf820683c0fa16e71710973d8"
+    },
+    {
+      "path": "continuation-20260902T020051Z/superseding-receipt.txt",
+      "sha256": "ba516893eb3b6ff89e2ce9de9fd05294f7e904cb0f8ea872a6adf1b032738edd"
+    }
+  ],
+  "files": [
+    {
+      "path": "oracle-retry-event-index.json",
+      "size": 144535,
+      "mode": "0644",
+      "sha256": "803dce0a7c593ba728df1c5f1594b9139d0d1b18e7bac1aac57e2bd3fa6afa24"
+    },
+    {
+      "path": "oracle-retry-runtime.json",
+      "size": 3184,
+      "mode": "0644",
+      "sha256": "bb186336c8c7183ab7a9dcf45be9dddba8ac3ebbca04fa715e215d3ca3fb375e"
+    },
+    {
+      "path": "oracle-retry-task-readback.json",
+      "size": 7864,
+      "mode": "0644",
+      "sha256": "14e8455d098fdba61c9896d7c6a78391327f785fd855f239c1d69320e20da93e"
+    },
+    {
+      "path": "oracle-retry-session-readback.json",
+      "size": 2716,
+      "mode": "0644",
+      "sha256": "046223b467500cc30f47656a66b0c49a78d3d68e88725df34981882e3caaad95"
+    },
+    {
+      "path": "oracle-retry-receipt.txt",
+      "size": 4950,
+      "mode": "0644",
+      "sha256": "233d57bdb9269ae8b5874cbc34c79c592feb3dc78c5aff58edd7ce94c935ddad"
+    }
+  ],
+  "hash_index": "oracle-retry-files.sha256",
+  "hash_index_sha256": "bc69c7d346341b5acf721674c324ebdd84d72897f14f5ba962261e5b12267de5",
+  "hash_index_excludes": [
+    "oracle-retry-files.sha256",
+    "oracle-retry-manifest.json",
+    "oracle-retry-manifest.sha256"
+  ],
+  "manifest_hash": "recorded in oracle-retry-manifest.sha256",
+  "conclusion": {
+    "roster_project_task_delegate_initial_ack": "PASS",
+    "same_frozen_input_and_gold_null": "PASS",
+    "boundary_worker_ack_result_submit_check_accept": "PASS",
+    "outcome_worker_ack_result_submit_check_accept": "PASS",
+    "cross_oracle_task_room_reference": "NOT_OBSERVED",
+    "manager_final_aggregation": "NOT_OBSERVED",
+    "oracle_verdict_text_interpreted_by_observer": false,
+    "overall": "PARTIAL"
+  },
+  "observer": {
+    "matrix_writes": false,
+    "task_creation": false,
+    "result_injection": false,
+    "model_calls": false,
+    "credential_values_read_or_persisted": false,
+    "event_bodies_persisted": false
+  },
+  "values_redacted": true
+}

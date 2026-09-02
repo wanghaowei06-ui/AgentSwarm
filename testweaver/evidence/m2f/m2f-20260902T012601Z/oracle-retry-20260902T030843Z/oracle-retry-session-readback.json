@@ -1,0 +1,70 @@
+{
+  "schema": "testweaver.m2f.oracle-retry-session-readback/v1",
+  "run_id": "m2f-oracle-retry-20260902T030843Z",
+  "basis": "QwenPaw session structure and native taskflow markers only; no正文、credential value or session payload persisted",
+  "sessions": [
+    {
+      "worker": "native-m0-boundary-oracle",
+      "container": "agentteams-native-m0-20260901-worker-native-m0-boundary-oracle",
+      "path": "/root/agentteams-fs/agents/native-m0-boundary-oracle/.qwenpaw/workspaces/default/sessions/agentteams_matrix/!CH8uTw6fZw5G8JPfV3--matrix-native-m0-20260901.agentteams.local--28080_matrix--!CH8uTw6fZw5G8JPfV3--matrix-native-m0-20260901.agentteams.local--28080.json",
+      "size": 97888,
+      "sha256": "753dcadb5ad99a107383e2a98b310a877eb6ac7e5e37cb4aa75fc2b24c3cac3e",
+      "user_turns": 2,
+      "assistant_turns": 2,
+      "usage_objects": 6,
+      "native_taskflow_markers": 4,
+      "ack_markers": 7,
+      "submit_markers": 43,
+      "real_model_turn_observed": true,
+      "real_tool_turn_observed": true,
+      "session_usage_numeric_observation": [
+        {
+          "prompt_tokens": 39086,
+          "completion_tokens": 359,
+          "total_tokens": 39445,
+          "input_tokens": 434212,
+          "output_tokens": 12958
+        },
+        {
+          "prompt_tokens": 39642,
+          "completion_tokens": 386,
+          "total_tokens": 40028,
+          "input_tokens": 39642,
+          "output_tokens": 386
+        }
+      ],
+      "latency_ms": "NOT_AVAILABLE"
+    },
+    {
+      "worker": "native-m1-outcome-oracle",
+      "container": "agentteams-native-m0-20260901-worker-native-m1-outcome-oracle",
+      "path": "/root/agentteams-fs/agents/native-m1-outcome-oracle/.qwenpaw/workspaces/default/sessions/agentteams_matrix/!Se5wlvKILvNEwxNvaw--matrix-native-m0-20260901.agentteams.local--28080_matrix--!Se5wlvKILvNEwxNvaw--matrix-native-m0-20260901.agentteams.local--28080.json",
+      "size": 98497,
+      "sha256": "4f53a33798229b485216608402207f89e5d284270a2220c5d916929f7b727748",
+      "user_turns": 1,
+      "assistant_turns": 1,
+      "usage_objects": 3,
+      "native_taskflow_markers": 4,
+      "ack_markers": 6,
+      "submit_markers": 22,
+      "real_model_turn_observed": true,
+      "real_tool_turn_observed": true,
+      "session_usage_numeric_observation": [
+        {
+          "prompt_tokens": 39427,
+          "completion_tokens": 398,
+          "total_tokens": 39825,
+          "input_tokens": 404327,
+          "output_tokens": 12446
+        }
+      ],
+      "latency_ms": "NOT_AVAILABLE"
+    }
+  ],
+  "provider_model": {
+    "provider": "agentteams-gateway",
+    "model": "deepseek-v4-flash",
+    "runtime": "qwenpaw",
+    "credential_values_read": false
+  }
+}

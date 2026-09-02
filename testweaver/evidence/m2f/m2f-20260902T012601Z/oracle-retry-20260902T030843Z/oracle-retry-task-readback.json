@@ -1,0 +1,165 @@
+{
+  "schema": "testweaver.m2f.oracle-retry-task-readback/v1",
+  "run_id": "m2f-oracle-retry-20260902T030843Z",
+  "human_initial": {
+    "room_id": "!sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080",
+    "event_id": "$TKuOoQYk18z2eR_97fohSE11LnAUrKESflo0Sj8hN8w",
+    "origin_server_ts": 1788318548569,
+    "body_length": 1814,
+    "body_sha256": "413f0ece33a1b6ebe9643464b2a75eae09785972f334880aa1ff81279bde1a77",
+    "gold_ref": null,
+    "candidate_output_in_input": false
+  },
+  "frozen_input": {
+    "source_freeze_commit": "e55d45500134816765c3bd807029b86f973bc2fc",
+    "closeout_commit": "5f27a9f",
+    "bundle_path": "testweaver/evidence/m2f/m2f-20260902T012601Z/oracle-dual-20260902T022530Z/oracle-input-bundle.json",
+    "bundle_sha256": "e17cd27d96a2bce2e6e1dde9e983a2a948ed5432ecab9c91b16d302ca450d24e",
+    "bundle_hash_file_sha256": "b8a2b5ac4b3549ea90744b3cbb3373df7412b9a575b76ed7ceee3676f709a70e",
+    "evidence_root": "testweaver/evidence/m2f/m2f-20260902T012601Z/continuation-20260902T020051Z",
+    "gold_ref": null,
+    "shared_evidence_refs": [
+      {
+        "ref": "continuation-manifest.json",
+        "sha256": "5565468d1d113ceb4662759b6343d32f933a06b6ab74104eb736f6d6a8f33741"
+      },
+      {
+        "ref": "native-chain-observation.json",
+        "sha256": "a863c5d8cd191161846258ddfc68cec4fb02aabf67c729d968fbfefb4915a8a8"
+      },
+      {
+        "ref": "recovery-readback.json",
+        "sha256": "300b96b760545ef5148134d2216ec90525b695fdf820683c0fa16e71710973d8"
+      },
+      {
+        "ref": "superseding-receipt.txt",
+        "sha256": "ba516893eb3b6ff89e2ce9de9fd05294f7e904cb0f8ea872a6adf1b032738edd"
+      }
+    ]
+  },
+  "native_route_refs": {
+    "boundary": {
+      "manager_to_leader_event": "$eKOzhYto8e5mfccunHV09uYsjOSSEH86D1_IJH6nbIc",
+      "leader_native_create_plan_event": "$aOcClJLPMvqDcLS60lhkl-A7e4Km7hI3nlYHS6tg4oE",
+      "leader_native_delegate_event": "$TJVZTBSX8Mk4TpdGt2SDjxPAnrWy-aIk7nS0b_k4OHA",
+      "assignment_event": "$MbpgLlAnzWaJmXaIJ2RPrCAfU453FdvudHcU-6JzjuM",
+      "task_room_id": "!CH8uTw6fZw5G8JPfV3:matrix-native-m0-20260901.agentteams.local:28080",
+      "project_id": "m2f-boundary-oracle-retry-20260902-030843",
+      "task_id": "task-20260902-030843-boundary-oracle",
+      "worker_ack_event": "$ayHcaTd8gr95AMhHVg32nh8MN8enrnHsQZgfxYn4zJE",
+      "worker_submit_event": "$oPZCC-oZwrsaoQ0FylIyx5mTmGa7pBbkxhwd1Wk9u6Y",
+      "leader_check_event": "$fIqfMtvOV-7rAtIGNX7v_U41_U-HSFvGCOC0wedlvUM",
+      "leader_accept_events": [
+        "$LsOIUZRjxIWIOoKsqu--rAlYsqJNHw2a5p-Y0DbuKlQ",
+        "$hdci-zCK4ssnDK0Z6NMKTmk7RatZqgmjJZhpW5nb2Vs"
+      ],
+      "task_status": "submitted",
+      "task_result_status": "SUCCESS",
+      "project_status": "completed",
+      "project_result_status": "SUCCESS",
+      "task_meta": {
+        "path": "/root/agentteams-fs/teams/native-m0-clean-team/shared/tasks/task-20260902-030843-boundary-oracle/meta.json",
+        "size": 1579,
+        "sha256": "d164ecb0640c2ad597abcfdff0c38f4bb434117b5b81fd641bb93614d0d8b4b9"
+      },
+      "task_result": {
+        "path": "/root/agentteams-fs/teams/native-m0-clean-team/shared/tasks/task-20260902-030843-boundary-oracle/result.md",
+        "size": 13305,
+        "sha256": "7874f85d04464c7770115eb7de9899686dedaab6e1ca22c30529a2fdffc6a6d7"
+      },
+      "project_meta": {
+        "path": "/root/agentteams-fs/teams/native-m0-clean-team/shared/projects/m2f-boundary-oracle-retry-20260902-030843/meta.json",
+        "size": 1412,
+        "sha256": "7549ee2ab6fe000fd9c030a5b4c5782ec12de3f985a216626c7139b9a5728f29"
+      },
+      "project_result": {
+        "path": "/root/agentteams-fs/teams/native-m0-clean-team/shared/projects/m2f-boundary-oracle-retry-20260902-030843/result.md",
+        "size": 3681,
+        "sha256": "754b3333219b93a023058de69014cc9347d13eea405f0f188345888bf8ca78c1"
+      },
+      "redacted_result_reference_scan": {
+        "frozen_hash_occurrences": [2, 1, 1, 1],
+        "evidence_root_occurrences": 1,
+        "gold_ref_field_occurrences": 2,
+        "content_not_copied": true
+      }
+    },
+    "outcome": {
+      "manager_to_leader_event": "$QQVrW9m6Xk_ChURyFpk9YCKOQEB0rLrmgkgBdOm1e04",
+      "leader_native_create_plan_event": "$XEXWC3SaC_yhSPvJ1HusGrAsegp_s8dZhZAHWBLxwOw",
+      "leader_native_delegate_event": "$iKIWW2JY6alx5IyFfLFVW6oRX-kwmV20gX5j6RCInz4",
+      "assignment_event": "$Kec4RterYIVaa2BUmwDYd4IlFprLh6gVqXLFExLrM4w",
+      "task_room_id": "!Se5wlvKILvNEwxNvaw:matrix-native-m0-20260901.agentteams.local:28080",
+      "project_id": "m2f-oracle-retry-20260902-030843",
+      "manager_task_id": "task-20260902-030843-outcome-oracle",
+      "task_id": "m2f-oracle-retry-20260902-030843-01",
+      "worker_ack_event": "$gSdaluk7bqUeRPDBdIH7UnoWFtD4-abeTpVm22PInqI",
+      "worker_submit_event": "$-s6OKBM_kVSe6MOvyVtPPrPm2866pnt9Ef4HRzvAWK4",
+      "leader_check_event": "$xqtQL1Cf1qBjk7kMXvLC5NFjBDgOzYu6FgT-PMLnX6c",
+      "leader_accept_events": [
+        "$fdjvsm1Z29UwXoCcfP4l33qCi2LnOU28mzsciPFVJ7M",
+        "$DHqb37GqFAZx6tWRmkzDf-Nrb2V9EBukiBedc2ONh70"
+      ],
+      "task_status": "submitted",
+      "task_result_status": "SUCCESS",
+      "project_status": "completed",
+      "project_result_status": "SUCCESS",
+      "manager_global_projection": {
+        "path": "/root/agentteams-fs/teams/native-m1-verify-team/global-shared/tasks/task-20260902-030843-outcome-oracle/meta.json",
+        "size": 468,
+        "sha256": "6153fc8c30ed93a202aa5534b6e2a0b350893bb2b647d2014783fee6d9cfcb15",
+        "status": "assigned",
+        "note": "The Leader-created native task with suffix -01 is the submitted task; the initial global projection was not mutated."
+      },
+      "task_meta": {
+        "path": "/root/agentteams-fs/teams/native-m1-verify-team/shared/tasks/m2f-oracle-retry-20260902-030843-01/meta.json",
+        "size": 1431,
+        "sha256": "bd41358e5ff0533c61781cad076d1f767b2a44d1ab891fd2e12a9298efbb0d21"
+      },
+      "task_result": {
+        "path": "/root/agentteams-fs/teams/native-m1-verify-team/shared/tasks/m2f-oracle-retry-20260902-030843-01/result.md",
+        "size": 9667,
+        "sha256": "e20107148bd978f48d68a98ac4b4224bf265541193918c2948c00d678cd74bab"
+      },
+      "project_meta": {
+        "path": "/root/agentteams-fs/teams/native-m1-verify-team/shared/projects/m2f-oracle-retry-20260902-030843/meta.json",
+        "size": 1777,
+        "sha256": "1d926bbd1e83ffbe22dc54062aeb273bfe7925d9177b8a9f8525c44ef2fd0e68"
+      },
+      "project_result": {
+        "path": "/root/agentteams-fs/teams/native-m1-verify-team/shared/projects/m2f-oracle-retry-20260902-030843/result.md",
+        "size": 3379,
+        "sha256": "6777a62134d8e18154e668843300031e7fedc43b7781bacccccd1727fac6f646"
+      },
+      "redacted_result_reference_scan": {
+        "frozen_hash_occurrences": [3, 2, 2, 2],
+        "evidence_root_occurrences": 2,
+        "gold_ref_field_occurrences": 2,
+        "content_not_copied": true
+      }
+    }
+  },
+  "lifecycle_checks": {
+    "boundary": {
+      "worker_ack": "PASS",
+      "worker_result_materialized": "PASS",
+      "worker_submit": "PASS",
+      "leader_check": "PASS",
+      "leader_accept": "PASS_VIA_PROJECT_TASK_COMPLETED_AND_ACCEPT_EVENTS",
+      "oracle_verdict_text": "not copied or interpreted by observer"
+    },
+    "outcome": {
+      "worker_ack": "PASS",
+      "worker_result_materialized": "PASS",
+      "worker_submit": "PASS",
+      "leader_check": "PASS",
+      "leader_accept": "PASS_VIA_PROJECT_TASK_COMPLETED_AND_ACCEPT_EVENTS",
+      "oracle_verdict_text": "not copied or interpreted by observer"
+    },
+    "manager_final_aggregation_in_human_room": "NOT_OBSERVED",
+    "supplemental_notification_during_retry": "NOT_SENT",
+    "cross_oracle_task_room_reference": "NOT_OBSERVED"
+  },
+  "values_redacted": true,
+  "event_bodies_not_persisted": true
+}

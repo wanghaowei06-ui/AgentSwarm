@@ -1,0 +1,84 @@
+{
+  "schema": "testweaver.m2f.oracle-retry-runtime/v1",
+  "run_id": "m2f-oracle-retry-20260902T030843Z",
+  "observed_at_utc": "2026-09-02T03:25:15Z",
+  "image": {
+    "repository": "agentteams/qwenpaw-worker",
+    "tag": "be10aaf",
+    "image_id": "sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb",
+    "repo_digest": "agentteams/qwenpaw-worker@sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb"
+  },
+  "teams": [
+    {
+      "name": "native-m0-clean-team",
+      "phase": "Active",
+      "leader": "native-m0-clean-leader",
+      "team_room_id": "!NbRmgvdkZMdRcCvLg4:matrix-native-m0-20260901.agentteams.local:28080",
+      "leader_dm_room_id": "!Ypl073FDlR3fHMbFWW:matrix-native-m0-20260901.agentteams.local:28080",
+      "leader_ready": true,
+      "ready_workers": 2,
+      "total_workers": 2,
+      "worker_roster": [
+        "native-m0-clean-worker",
+        "native-m0-boundary-oracle"
+      ]
+    },
+    {
+      "name": "native-m1-verify-team",
+      "phase": "Active",
+      "leader": "native-m1-verify-leader",
+      "team_room_id": "!srvKopd1vnU0gQoC49:matrix-native-m0-20260901.agentteams.local:28080",
+      "leader_dm_room_id": "!Ytn2oG1asU4ujGQQki:matrix-native-m0-20260901.agentteams.local:28080",
+      "leader_ready": true,
+      "ready_workers": 2,
+      "total_workers": 2,
+      "worker_roster": [
+        "native-m1-verify-worker",
+        "native-m1-outcome-oracle"
+      ]
+    }
+  ],
+  "workers": [
+    {
+      "name": "native-m0-boundary-oracle",
+      "role": "worker",
+      "team": "native-m0-clean-team",
+      "runtime": "qwenpaw",
+      "model": "deepseek-v4-flash",
+      "container": "agentteams-native-m0-20260901-worker-native-m0-boundary-oracle",
+      "container_id": "66973bbec61b715b2083187120cfeafe30d8bdd89b87e59144d7b5e9740fc96b",
+      "pid": 1460891,
+      "started_at": "2026-09-02T02:26:40.671578794Z",
+      "restart_count": 0,
+      "state": "running",
+      "agt_phase": "Running",
+      "container_managed": true,
+      "matrix_user_id": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+      "private_room_id": "!iEirWTQL9ft7JywW83:matrix-native-m0-20260901.agentteams.local:28080"
+    },
+    {
+      "name": "native-m1-outcome-oracle",
+      "role": "worker",
+      "team": "native-m1-verify-team",
+      "runtime": "qwenpaw",
+      "model": "deepseek-v4-flash",
+      "container": "agentteams-native-m0-20260901-worker-native-m1-outcome-oracle",
+      "container_id": "97ad3445817374e31637bc574b2799a508d7322ceb3b5c3192eabc10d35f1feb",
+      "pid": 1462641,
+      "started_at": "2026-09-02T02:26:49.700385274Z",
+      "restart_count": 0,
+      "state": "running",
+      "agt_phase": "Running",
+      "container_managed": true,
+      "matrix_user_id": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+      "private_room_id": "!vFh96Fsqf9fu5GbvV2:matrix-native-m0-20260901.agentteams.local:28080"
+    }
+  ],
+  "checks": {
+    "roster_health_before_retry": "PASS",
+    "team_ready": "PASS",
+    "worker_rebuild_performed": false,
+    "runtime_changed_by_observer": false,
+    "credentials_values_read_or_persisted": false
+  }
+}

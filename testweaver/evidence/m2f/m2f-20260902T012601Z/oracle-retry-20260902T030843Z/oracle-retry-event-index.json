@@ -1,0 +1,3266 @@
+{
+  "schema": "testweaver.m2f.oracle-retry-event-index/v1",
+  "run_id": "m2f-oracle-retry-20260902T030843Z",
+  "since_origin_server_ts": 1788318548569,
+  "human_initial": {
+    "room_id": "!sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080",
+    "event_id": "$TKuOoQYk18z2eR_97fohSE11LnAUrKESflo0Sj8hN8w",
+    "origin_server_ts": 1788318548569,
+    "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+    "body_length": 1814,
+    "body_sha256": "413f0ece33a1b6ebe9643464b2a75eae09785972f334880aa1ff81279bde1a77"
+  },
+  "rooms": [
+    {
+      "count": 30,
+      "end": "47828",
+      "events": [
+        {
+          "action_tokens": [],
+          "body_length": 1814,
+          "body_sha256": "413f0ece33a1b6ebe9643464b2a75eae09785972f334880aa1ff81279bde1a77",
+          "event_id": "$TKuOoQYk18z2eR_97fohSE11LnAUrKESflo0Sj8hN8w",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318548569,
+          "sender": "@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 5,
+          "body_sha256": "f810b66877419ce9b8019ac042f0fc6127162d05cd1f6a74d319c81311ee7259",
+          "event_id": "$p-xXhykWWLHB8T2LtMwdvxD8aFmrELmXYmQurGd5Oeo",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318555088,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 215,
+          "body_sha256": "6974d7356064c96b249b4bd9fdba59d95ddad62a27ae8cd81fbf9ab47d0d6db6",
+          "event_id": "$mS0TI2afF6o4RMbcbKa30zglVf9sCNfPugNS3nGmIHA",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318556103,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 215,
+          "body_sha256": "6974d7356064c96b249b4bd9fdba59d95ddad62a27ae8cd81fbf9ab47d0d6db6",
+          "event_id": "$JxgL0YEJiAegY0g7eG9fJQ6cmPao0yPhsXc6mKn2Lag",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318568074,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 4,
+          "body_sha256": "b6c1d862f9f75ec31eb9829b6a5968eb291dc8785e7fb59d4bc6ef00f292d3f7",
+          "event_id": "$3hOEP9RxIuxXkjuy3IcqV9rfs7quKqDCVYuUyHAtB8Y",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318569838,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 198,
+          "body_sha256": "1a38f8b93be806da45fd1fba6f5dba74ca3ef04fb2f76f52aaa41ff01690e669",
+          "event_id": "$FTkVqfEqWjw6w61WpWK1WRRuAZT9T8qA08NLClUSE6Q",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318570854,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 198,
+          "body_sha256": "1a38f8b93be806da45fd1fba6f5dba74ca3ef04fb2f76f52aaa41ff01690e669",
+          "event_id": "$BcYRiX0pJ7FmpDTwjZM3tg09P4tRIPbDOd_BzKsUlDc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318571912,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 4,
+          "body_sha256": "b6c1d862f9f75ec31eb9829b6a5968eb291dc8785e7fb59d4bc6ef00f292d3f7",
+          "event_id": "$GKLcS3pemZ5GC14PuzBRPU3F55FNsT3jepacWYM1ld8",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318573261,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 94,
+          "body_sha256": "3dfa993a610c1fbe0e66fa61ee637d7e36934b6a0d67f34beb7bac648b9ab006",
+          "event_id": "$XViEYuZMYyLbhXLVYTSZWoDjzu-XiT6kVGrFFdclBC8",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318574278,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 94,
+          "body_sha256": "3dfa993a610c1fbe0e66fa61ee637d7e36934b6a0d67f34beb7bac648b9ab006",
+          "event_id": "$MhuPw-8_YqXoc8zRZOcSDX6Wv54WEusoDmH2vjwFgMo",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318578741,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 4,
+          "body_sha256": "b6c1d862f9f75ec31eb9829b6a5968eb291dc8785e7fb59d4bc6ef00f292d3f7",
+          "event_id": "$AOoNNcIlWeNzRK2qPii4QdROEZQ9zm-iA7dko4ShDyA",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318580527,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 10,
+          "body_sha256": "ca8d33ddbd4cb2aced1f77f71355e08e02bba0e54beb59af432ac6ec669e1c53",
+          "event_id": "$bRpK-4XNIlyrCEB5hU4L1l-djHjeOb-TbFei9H59mFg",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318580559,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 34,
+          "body_sha256": "2205112872e39f5d48ee0f1324b1689196cfa14e043b331b05cebdfc0ce5425b",
+          "event_id": "$G5CTk2Ox1GK_lcWVzdrzEQZ5e3T2uSSuEdZNAC2XHXo",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318580595,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 69,
+          "body_sha256": "b9ade465abb06cfd8650a0850b886e14670ab591cf89006f99a4516cf745914c",
+          "event_id": "$TaYMglrx3ncZo5_5H-3Z5oKI9ck_ac28gmstzzAwKzE",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318580617,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 69,
+          "body_sha256": "b9ade465abb06cfd8650a0850b886e14670ab591cf89006f99a4516cf745914c",
+          "event_id": "$F9hVM_hKFbEY4EeNyBc1y2jlsEjReOVPSZwAPKhWRkY",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318584454,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 1,
+          "body_sha256": "08f271887ce94707da822d5263bae19d5519cb3614e0daedc4c7ce5dab7473f1",
+          "event_id": "$SYC0sjyfkpjLaJYLSDQbS8Z4C6n6vL9TVr5TDYysVxY",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318590110,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 619,
+          "body_sha256": "86a58081231ac759efa6679948e124e31c4340e49787455fca0c5be72e71322f",
+          "event_id": "$oLin5OrEvjF6bhhxNgAk6mbTxy-bp2KVS_lStb48enw",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318591136,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 624,
+          "body_sha256": "aac393ba6993c30b3d05287cad094099bffc36b77233554a2b32182bee496394",
+          "event_id": "$yf_MFD4efAr25qDg-x66r-Tg8dNGrAdQcOhxhXDu2vI",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318591168,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 628,
+          "body_sha256": "ed4f4f6cf997d023f5e2f0f0031bc415d10f0f5a28d49e71b041895f8f931c94",
+          "event_id": "$AqmWWTgMKXDu2okaIolU9hkIiC2awbMjiYRbViZziY0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318591223,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 643,
+          "body_sha256": "af42512372bea00b03d399b712da649b2d494ee414605843b9e65b8d33fea199",
+          "event_id": "$kRJz9Ho5ziXIlIzJ1CnCSkEkfhK5IL8EUOteKlye0Go",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318591264,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 655,
+          "body_sha256": "6644cd987523aa2d54563b6ab1d81c5178c0724ff3f60c90d124d78bbdfc78f9",
+          "event_id": "$cPUyBl6OtK1p7NEsB4I8xt6gQudnSZCH3bG5m6fJdgM",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318591325,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 676,
+          "body_sha256": "a3a69a44868e85591a02951b8d6538207654c4846fd6546fdee0ffb9fea5d35b",
+          "event_id": "$tn26fsWF5CDBjFLz4QLCTGNOSy1230nZag58O3KkHpM",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318591425,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 703,
+          "body_sha256": "7d3164f104444056ee01f840829a4be2865e881385a630ff8bfb74ee387fc5c9",
+          "event_id": "$jQmSBAgrLGYzipsRHoLUGcrPLzWEMrt5U_BwaCV5qXY",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318591463,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 1108,
+          "body_sha256": "89f816dc8a20aca4c42377d542910da16d678e3921c8457107682f4a0aa5ef3d",
+          "event_id": "$sDSGvZVLKgqGx3YX4HzOiTYKid8rvl83ul05C-ve6MA",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318592160,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 1339,
+          "body_sha256": "f80737aec22daec93a4f005ffde49c871874583473d855c2dd69aa0df7a03864",
+          "event_id": "$IEfR5tiN9shoOEIP_Uo0qEZ1xQydx0pNO5N8o7BaxFU",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318592521,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 806,
+          "body_sha256": "31c6462d3929cc401046c3f5c60468e1c23d60becf09a8e7d5ca2a1d15f1a800",
+          "event_id": "$lKHMzlEEVoAB5swtJ1c3pYa8gw26_NOwCzbv740xODA",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318592548,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 531,
+          "body_sha256": "1fe858782cd579cbdc9de89b64827d51347915cedc535a452007ab213cacdd83",
+          "event_id": "$EuE8vAXtMvSeQVPZjcDLyJG3OW-z0o6p89zP8CV4Pjk",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318592584,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 534,
+          "body_sha256": "c8e5af13aa53050966cec40e224e57ab3f13f6657ed0a26a09cc324b939f4fb4",
+          "event_id": "$5UnTSxRK_IDZhiM_PpST9eXaXE-QoHmHU0KrBSBzKjU",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318592617,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 0,
+          "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "event_id": "$fmR0Kg1fkWA2ui_kcqjFVisukcv6Z7S1HENtCFMB3uM",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318592643,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": null,
+          "body_sha256": null,
+          "event_id": "$9AIrGGqEm_mt6gZptHfqLxJNYITTwkl_bOItxKYTj4E",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318592663,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.redaction"
+        }
+      ],
+      "label": "human",
+      "room_id": "!sNvx6zXzbF19HAXuFD:matrix-native-m0-20260901.agentteams.local:28080"
+    },
+    {
+      "count": 29,
+      "end": "46338",
+      "events": [
+        {
+          "action_tokens": [],
+          "body_length": 1137,
+          "body_sha256": "1518dbe508e4c1fb0de6827905bc7dd71f8af584b8f008a8d72721c4d81d2cde",
+          "event_id": "$eKOzhYto8e5mfccunHV09uYsjOSSEH86D1_IJH6nbIc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318578771,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 6,
+          "body_sha256": "c1fd812f81cab441a359fb85de5dddfb4a3d0e431989cfcfba6cfba059a814a2",
+          "event_id": "$IMtJGXAZFXksCQ4xJ-HNqngL_ctIadDjPQQ7E32M8lU",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318583546,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "create_project",
+            "plan_dag",
+            "delegate_task"
+          ],
+          "body_length": 1163,
+          "body_sha256": "b9d7cfdd34e53a9d6af51011d00a8c8ab839dccef7324beb1972c404adc2d30a",
+          "event_id": "$aOcClJLPMvqDcLS60lhkl-A7e4Km7hI3nlYHS6tg4oE",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318583561,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 71,
+          "body_sha256": "49fffaa9d1211415624d1c77e58754fa5572da28116cff2eeac4283b1ec42495",
+          "event_id": "$IedIVIg7zfWnIo7d9w2eoxwPaXEO9jXTdPOmG0qDWXE",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318584095,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 122,
+          "body_sha256": "6a53d7dbce3fa961ea958b889aa275da171015aa9ab5160ff45c838ed1ef3808",
+          "event_id": "$hE6oeQUevl4iw45yctaZirM0eS0PpQ2InGCeEypY7KA",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318584114,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 189,
+          "body_sha256": "471a3e06ca978e459f250d0ef1e7cf77fec60c261260beb15ffc8e67ab859bec",
+          "event_id": "$xcXrrcHmsmph2XnNdfFEJFbxk66vJsPJRDjvVxP9ld4",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318584905,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "create_project"
+          ],
+          "body_length": 168,
+          "body_sha256": "41be64d9908695486eb27e807c0c613fd2fc173e8d301bb334d2dbccb14c838e",
+          "event_id": "$o1cCMDOGP89yfTZa3Q-zsl25H_937YMfzAKaRh64PIE",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318587126,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 27,
+          "body_sha256": "228707b15755bd82e2aad8bc4754c4dc98846abc19043897a0e26eb5b567095a",
+          "event_id": "$QSBon9DG8lwngpPS0Fqfcbzcz12lhJjsfV88AaSN7Hg",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318587806,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 239,
+          "body_sha256": "42e40c5d2f943819de317e9e608177a48221762de6fc509a837302cde718a757",
+          "event_id": "$cZnwQZtLUJ2hUWbLYAL3b_Iv6S4Z5WFggLp6HiFaYiQ",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318587817,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "create_project",
+            "plan_dag"
+          ],
+          "body_length": 153,
+          "body_sha256": "049e097973c686143d09c3f00cff9e12c74279545b1fe47fbf0a2d1e0f0e054a",
+          "event_id": "$e7HCgQx54ICQ50CgenfFJYd9ATcU-mQaFzj5LJ6Novc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318590323,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 13,
+          "body_sha256": "21091c4f96be1d5555016468dd1419eb1ffb8652ff634959abae67a78e2eadcf",
+          "event_id": "$10YvJoY79cm-Vl9EXV0biX5QHLepOmGM6CRH7HEZAMs",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318591209,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "create_project"
+          ],
+          "body_length": 242,
+          "body_sha256": "893b628f5abc28d0f4c4b0f121767ba6a83e2795965c761c88ee4d5a2e48db25",
+          "event_id": "$ZmpeWkbOXr9ECotVO-Os_1lc18kHAVCoKUk1yXhtVUU",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318591228,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "plan_dag"
+          ],
+          "body_length": 32,
+          "body_sha256": "a362a44b39e0cce029bee61f56b4275c0a0823f9b864d5c886ef3378517efabf",
+          "event_id": "$lMt0O4bAY8keQzEG08dJC9CDj0RL6v0kXu9bF8Ij6ms",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318593723,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "plan_dag"
+          ],
+          "body_length": 242,
+          "body_sha256": "14a52c157449421c7738de7b6e59c6055c72e54645e84cc8dcc609ef2333fda1",
+          "event_id": "$xca27bzGIJnwbW-nJ-cId5UZrcN1Hz3HST1RYmn7q8c",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318593734,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 27,
+          "body_sha256": "1bdbe7fba7710c65a4ed70cb1869e508e7a7a712ed0ec2335e29552d7c1970cb",
+          "event_id": "$QbfXniomeBn3I-7qG2t0A2b2xwuts7Xjv6n0Rx--yag",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318596183,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "delegate_task"
+          ],
+          "body_length": 239,
+          "body_sha256": "db188c2b4e9f3ed6897c5ef991cae35e868714d72eb6af68a85ec32c43cd692c",
+          "event_id": "$TJVZTBSX8Mk4TpdGt2SDjxPAnrWy-aIk7nS0b_k4OHA",
+          "native_taskflow_marker": true,
+          "origin_server_ts": 1788318596195,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 63,
+          "body_sha256": "8cdb47cfd6a973706656b3df834fdec35ddaaa36a2933793cd2446a219ecac2b",
+          "event_id": "$Mxy6dHK-sl2g41TjD0ViBz6rj0ZZYEI0aZXervb-waA",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318599533,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 196,
+          "body_sha256": "3eb9bfa94096cab9c2e6057f7acb1bd19dca46a3290574cd63b40a7d88b4364e",
+          "event_id": "$lnHPJhzdOo2AghIeOHWJW_nAk5EbV_hj_ocRJr0AM4U",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318599541,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "create_project",
+            "plan_dag",
+            "delegate_task"
+          ],
+          "body_length": 571,
+          "body_sha256": "496bb305e2194a23179943e9717f936cec0a5042f59f9e21855fc756dcc75ec5",
+          "event_id": "$FSom9AEnW6ohJD2lA8_VKUFCmDtubuFYTJ92Allv7nc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318602324,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "create_project",
+            "plan_dag",
+            "delegate_task"
+          ],
+          "body_length": 942,
+          "body_sha256": "6229c9822dae818b9862f520e1469881a91a4324e3882db58fe0bed368f73789",
+          "event_id": "$wnlq0zsitzJNW49ntAy7_XZOs6HEdMGZjOHPMDU4QfI",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318604381,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "submit_task",
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 2593,
+          "body_sha256": "b6fe8ab2a55e69531b5c8c11bcaf3e7ef3a29ea28d4587627608df9b77370500",
+          "event_id": "$hdci-zCK4ssnDK0Z6NMKTmk7RatZqgmjJZhpW5nb2Vs",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318775280,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": null,
+          "body_sha256": null,
+          "event_id": "$UK4Ri7XdEriEI4Q936TMftSAwRZ-9vBplzvxI-U3Jng",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318775351,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.reaction"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 3,
+          "body_sha256": "48a4e3fbd9b57f805470fdb0b2dad29f753a2f425349f98cf44f4c469b013143",
+          "event_id": "$DehrrWSBaveXtDRsUfbObQ4pgeIZz46Oc-Y94gwJ-4Y",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318778461,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 71,
+          "body_sha256": "1d2cddd0f465d886f927a81e4ae545c4ff7ba91ac384b3384498a8264bb58004",
+          "event_id": "$GnuLMCjSKqWGb9i4UGozartAGPIz5UWcKcGZdKsx-lY",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318779482,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 71,
+          "body_sha256": "1d2cddd0f465d886f927a81e4ae545c4ff7ba91ac384b3384498a8264bb58004",
+          "event_id": "$ze9agLg2mRsgoTVjWbVgfwRAkx6qT5EXLWIFyDwYcD0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318783265,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 321,
+          "body_sha256": "d2bc5b6c3a2e5352e42f6d5174ea9b57c70b1040c2e14df90a23af5a169fffc3",
+          "event_id": "$CRyPw1RJ32CaYZCXObK1Eg-KmxRbNHdvQ1jKBNse8Vc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318783393,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 5,
+          "body_sha256": "d06cc9afdf7a5bed54ca95ffc93b8d83f5334dd4ae4607a3ca83e00883ebbc84",
+          "event_id": "$eAILckereyEAuNyGwdVtUdjH45Y97vZ02sWAc-3tyUA",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318785088,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 303,
+          "body_sha256": "17e2b3544b9b8c4dec358cb996fbab4b6f2f14d46f5ca1ed1ef955ef2879b8c0",
+          "event_id": "$-pyK0sfY_IE_ukGdH8gQhFqo-HH0T3jlY9kXqDqbYR8",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318785780,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 303,
+          "body_sha256": "17e2b3544b9b8c4dec358cb996fbab4b6f2f14d46f5ca1ed1ef955ef2879b8c0",
+          "event_id": "$a4bqbHrP1Dnes2DdqowS4-1xjbuIsDqOnNrcfHs05Z8",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318785811,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        }
+      ],
+      "label": "m0_leader_dm",
+      "room_id": "!Mmbv4eRA34KgXbXGGQ:matrix-native-m0-20260901.agentteams.local:28080"
+    },
+    {
+      "count": 27,
+      "end": "36456",
+      "events": [
+        {
+          "action_tokens": [],
+          "body_length": 1128,
+          "body_sha256": "a3f4b22abd28fd91f6a378ccfc17808228af33e88c6b94c943d3d5207e380a19",
+          "event_id": "$QQVrW9m6Xk_ChURyFpk9YCKOQEB0rLrmgkgBdOm1e04",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318578842,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 6,
+          "body_sha256": "c1fd812f81cab441a359fb85de5dddfb4a3d0e431989cfcfba6cfba059a814a2",
+          "event_id": "$VuXky_S0EVPopMFsIkSHPX63Ajlc9BEXuoHSWm6RGLU",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318581165,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 289,
+          "body_sha256": "2901f338bab942193d514cb4a6db4ed943dee0fb07768073664fce7edc98aa51",
+          "event_id": "$DUjP9tpYFz03n9GYigzI2DGEfJJu50-XDdOlAMzDInE",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318581176,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 89,
+          "body_sha256": "f63579fba6875f27ab3a834dcb1435f35bc762340ed792f43e2fc55163b3a8d0",
+          "event_id": "$aawtK2BX-IT8VpLqHYbkxTI0zbSG_rfuAKDiSVGr25k",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318581670,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 121,
+          "body_sha256": "b6938f04a2c65366a93c1b6d0f573c0254fec233c17a492045a3e6b4484107ca",
+          "event_id": "$FWTcVXn9m3jNbl_IkU72g7a6_tSEwOVKmy8jFlDPwog",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318581676,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 28,
+          "body_sha256": "81910f54c2b6803d3f57ad729781bfbd293101e654c63c78f47cb51f0c12fed7",
+          "event_id": "$ob3Wpl5OEMzzyIsnIDYD0XB_g3zg94w3XrH1LI52Axg",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318583380,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 152,
+          "body_sha256": "f88b1289ba178d182b022090ded3b43ccdc8bfd4b6d35403f9fb1658c35ec877",
+          "event_id": "$CKuIWPyDE1j5Sisxgo2TPRWfTfxYOSt_Hu93QqPeFXA",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318583401,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 154,
+          "body_sha256": "7a5df265c38c6a5e0ffe4095dd058980fe0dfc2a5f4681ddaafeeef093caf673",
+          "event_id": "$d4K7BW-EgdLa0Ex6y0mDUtAxaBEHCt6HZLbwQxnOrPg",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318583629,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "create_project",
+            "plan_dag",
+            "delegate_task"
+          ],
+          "body_length": 512,
+          "body_sha256": "4282de0ecf685853dc08d9da031c9f76c8dbb504509f54a92274e08b4c9d3d02",
+          "event_id": "$XEXWC3SaC_yhSPvJ1HusGrAsegp_s8dZhZAHWBLxwOw",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318586221,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 231,
+          "body_sha256": "95531c4a1e83c0f94442cf7a6b6e1ce1c1e046d997d4ad7824533ae75ec8d0a7",
+          "event_id": "$RNbJ6OwkIwiLOyi0tifUrWFNv4G3YX039sN1LCISh1g",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318587674,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 189,
+          "body_sha256": "ab3c3f469f80454f1e5d700b41a1a07360dcad55d417e1a16d55671e50ef0014",
+          "event_id": "$_JprmBT3MZucK--0f7O7GFKDTDNuifSANxEEbBUUKp0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318587679,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 53,
+          "body_sha256": "c0362c34687bc4ef8bd0d80cc93a5efb76bc53bdfa531f7f2e8a9366b9eac83f",
+          "event_id": "$7_J8TeQpOXyTZkvnyItK76F2CeiluzHwLT878ZQptdQ",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318589888,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "create_project"
+          ],
+          "body_length": 242,
+          "body_sha256": "c022117c53751cfdab85c81e47c30ccae89db460b49d3532e8f5e8c55bbb8f18",
+          "event_id": "$NAYwj0qh8bOUy5JhysA1op5fqQ6SH6ozerDqHP2-Z-0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318589898,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "plan_dag"
+          ],
+          "body_length": 42,
+          "body_sha256": "b4f6f4564e7179e3cc47060e1e78cf3c3f863f3d72671ce92d048ad36b81ca23",
+          "event_id": "$McqgX9kjsrWj4WAIYS-O9BBrwlVT3FktWwy2yQcEUYs",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318591913,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "plan_dag"
+          ],
+          "body_length": 242,
+          "body_sha256": "17e7672590bbf8612309107e35e7e56d6a2c951ab6773e4aec5af3fef3fd354d",
+          "event_id": "$-hNsNTsx1yvKe3peVtqbumV8Fj64SIBowLXZ7xqxYv4",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318591923,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "delegate_task"
+          ],
+          "body_length": 77,
+          "body_sha256": "b125698669ed7681d65bb676aba5a233c1004d541ad4ec67f2919af3f18871c0",
+          "event_id": "$0m9i8FI3iXTOIjkOCmjbnqZIGdYes9gTxQvQpd9Wiz0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318600512,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "delegate_task"
+          ],
+          "body_length": 239,
+          "body_sha256": "571646e9ee762518a42baf6eb9923c0dbbceca6d767225cce86db510cc670eab",
+          "event_id": "$iKIWW2JY6alx5IyFfLFVW6oRX-kwmV20gX5j6RCInz4",
+          "native_taskflow_marker": true,
+          "origin_server_ts": 1788318600521,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 81,
+          "body_sha256": "3c443bbb7f676b0ee00eec1dcf2ffcc6dfd050cb813d63f4772696630d2751bb",
+          "event_id": "$HZhA-Z1szchzfL0yqWYfuSiAby3vpY2HqBnGhv-lAGw",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318602960,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 195,
+          "body_sha256": "67f67c64973ccf115b644d6666842557ca64774aff9f56e69725d40919094fee",
+          "event_id": "$kaNCzZGUgQyxgNiAa_A6Qqh2S7Ism9YsfOZhuPT0-dQ",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318602967,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "plan_dag",
+            "delegate_task"
+          ],
+          "body_length": 1374,
+          "body_sha256": "a63b9dc973ea5c45abdc24fc161cacd372f53b15bc91594543f3ddf1a6d1e3e7",
+          "event_id": "$o7oFR5A8NPsVz_LfoM2xpa4GGrLRopTp4wj-ZYwi_g0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318607575,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 1672,
+          "body_sha256": "3e986dff7f1face2fa4d300db554e6bf5ccd67ebce53825bf705e1734b7826a1",
+          "event_id": "$kIWBARMByJLUWh9xzx1aK7RMEFsOAdpjhFEOMUpLp74",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318858254,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": null,
+          "body_sha256": null,
+          "event_id": "$-BfpvNCzV9wg2HuMli20KAymKpT8BSFRyIBIM2bM52M",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318858313,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.reaction"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 6,
+          "body_sha256": "b6ce788d9786917c9d19adaa0d904213365607c7f683d7277f508dcf142b4cc2",
+          "event_id": "$MhyftlwW9KqIme5QGgguQFe7efbswoP4SngcGHho1-0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318865677,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 83,
+          "body_sha256": "9c179fd68ce8170047a244082d3d18595b69e165bd597a02b6af24dfe6bda853",
+          "event_id": "$aDQCZR9C390194rZLCHKpcIw0GtBctWpXZwlNXAJu5U",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318866485,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 83,
+          "body_sha256": "9c179fd68ce8170047a244082d3d18595b69e165bd597a02b6af24dfe6bda853",
+          "event_id": "$IZrc5GrpeBC9UgqnhpZm3HWVIfpUeOi74V0wXd059jo",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318866528,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 87,
+          "body_sha256": "dcadf6d9cf7c2bc7e1a7c3456c4c398695adedbc2e76431180f95221766ea244",
+          "event_id": "$b7600MtbWTvqImmPLcUg-Fipje2XoequWtNSix-wkQU",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318866600,
+          "sender": "@manager:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 42,
+          "body_sha256": "1faf6bb636c87f76d76d2785890697def900c12bc3e6b90e836b06404575993a",
+          "event_id": "$e2WOOd44QlnEpLgqm58ieYCOS8cwBHsVyg7dclT9zFk",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318869640,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        }
+      ],
+      "label": "m1_leader_dm",
+      "room_id": "!IrR5zoeSGDaTVw4Ple:matrix-native-m0-20260901.agentteams.local:28080"
+    },
+    {
+      "count": 100,
+      "end": "54987",
+      "events": [
+        {
+          "action_tokens": [],
+          "body_length": null,
+          "body_sha256": null,
+          "cross_scope_reference": false,
+          "event_id": "$WIixeqdeWAvP7pQuO3fqKo0m-QlKe3wU1GmRhdcouxI",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318585123,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.member"
+        },
+        {
+          "action_tokens": [],
+          "body_length": null,
+          "body_sha256": null,
+          "cross_scope_reference": false,
+          "event_id": "$4jFIIETjH5b0-jx0k_u-pNKgBfxsMX0EilnQ5xpfa1I",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318585124,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.power_levels"
+        },
+        {
+          "action_tokens": [],
+          "body_length": null,
+          "body_sha256": null,
+          "cross_scope_reference": false,
+          "event_id": "$5jrLBBE9DuEDRyB03mxQsWVAUbS4CBY7dPpgZYgjD2s",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318585125,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.join_rules"
+        },
+        {
+          "action_tokens": [],
+          "body_length": null,
+          "body_sha256": null,
+          "cross_scope_reference": false,
+          "event_id": "$uNbdd8R3VoRPwn2S3PKzxh0_uPn9nPeQ46fVa7ueO1A",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318585126,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.history_visibility"
+        },
+        {
+          "action_tokens": [],
+          "body_length": null,
+          "body_sha256": null,
+          "cross_scope_reference": false,
+          "event_id": "$yDTqmc3ArdHASho6uqwicjhUCYRi55nQdJXgfPXwRpY",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318585129,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.guest_access"
+        },
+        {
+          "action_tokens": [],
+          "body_length": null,
+          "body_sha256": null,
+          "cross_scope_reference": false,
+          "event_id": "$cN56AePeChrpUDvu-xZCS9DojETkKxznEbzMv-tm4tc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318585130,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.name"
+        },
+        {
+          "action_tokens": [],
+          "body_length": null,
+          "body_sha256": null,
+          "cross_scope_reference": false,
+          "event_id": "$pNFTPinibWP0CyTuyaf9ni4pC8hf5sICkSgwayZAmWA",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318585131,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.topic"
+        },
+        {
+          "action_tokens": [],
+          "body_length": null,
+          "body_sha256": null,
+          "cross_scope_reference": false,
+          "event_id": "$jiyV3pY0oJ0dSdwlIC9dwpCrT2IY8_aPd1YZLTjcywY",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318585136,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.member"
+        },
+        {
+          "action_tokens": [],
+          "body_length": null,
+          "body_sha256": null,
+          "cross_scope_reference": false,
+          "event_id": "$XjiEt_H0L-ivnvyNPOxv_PTAwbApC-qWAHsoNRQ41a8",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318585138,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.member"
+        },
+        {
+          "action_tokens": [],
+          "body_length": null,
+          "body_sha256": null,
+          "cross_scope_reference": false,
+          "event_id": "$nWKQV04WYFNHsxBFtFrb8EBZtc2Yb0rSbnMp5xcsq_I",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318585145,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.member"
+        },
+        {
+          "action_tokens": [],
+          "body_length": null,
+          "body_sha256": null,
+          "cross_scope_reference": false,
+          "event_id": "$CrmDgt8NypX3GMHQp67KfGSVMXmKUgCTRyPyK_UWEQg",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318585150,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "room.meta"
+        },
+        {
+          "action_tokens": [
+            "ack_task",
+            "submit_task"
+          ],
+          "body_length": 715,
+          "body_sha256": "3aaf37c5d67b8aa927862e91ea39793ff96883cd62d8a4a14de833c8c163741c",
+          "cross_scope_reference": false,
+          "event_id": "$MbpgLlAnzWaJmXaIJ2RPrCAfU453FdvudHcU-6JzjuM",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318599611,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 6,
+          "body_sha256": "c1fd812f81cab441a359fb85de5dddfb4a3d0e431989cfcfba6cfba059a814a2",
+          "cross_scope_reference": false,
+          "event_id": "$fTXvN2nvXKskzyQd5ZEnFV9rnDk0qZBMwuvvR3d4mVY",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318602843,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "ack_task",
+            "submit_task"
+          ],
+          "body_length": 1212,
+          "body_sha256": "868c9115884afd1751c3f90475001161fbb9ea895ee64bfe474ade9eb1b222d9",
+          "cross_scope_reference": false,
+          "event_id": "$ce4tH9sKB1YbRtDWKhrzRGkq9kJvl3wsa9_DHWOekNM",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318602852,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 59,
+          "body_sha256": "52791344f8792d65e64b126b34e7a4a90421ddd336ea003e2a3843bdac2f7c63",
+          "cross_scope_reference": false,
+          "event_id": "$3JGxCqo5qhgVOYuWY33onzkdcmv3Rmj1uwD9vry06ho",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318603027,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "ack_task"
+          ],
+          "body_length": 166,
+          "body_sha256": "3b99034a3aac1e1aa9a7dbb8cfba3d7bf334002ae7110ad8283e0e14184e74a0",
+          "cross_scope_reference": false,
+          "event_id": "$ayHcaTd8gr95AMhHVg32nh8MN8enrnHsQZgfxYn4zJE",
+          "native_taskflow_marker": true,
+          "origin_server_ts": 1788318603372,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 201,
+          "body_sha256": "001840a14601237d9ce8a239c6afada78b717e9760a87fa9ec3350b6661f8cd6",
+          "cross_scope_reference": false,
+          "event_id": "$RiyuYG9MI4ezm_ttRfsb5gQIiHSQYlEqQmOT3-xQsY4",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318605012,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 44,
+          "body_sha256": "2f87f514843507ce4932e1f4d484d98d62cc5db3af899fc8e0f0db84a10da535",
+          "cross_scope_reference": false,
+          "event_id": "$YFfTzHhgppg7d8qsshKeO5U_nbFC0Cr1Ar6q2UoEj5I",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318605117,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 98,
+          "body_sha256": "83a5a2aaf64dc2c4c348a46dbe3b070778e1596c30b4c35dfe8b1f0e5c58240b",
+          "cross_scope_reference": false,
+          "event_id": "$IGRUtWGzjc9FxOmrrSsROLmV0xOSHGE_V27cH89W_8U",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318605122,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 90,
+          "body_sha256": "3bbd4a313994e6f413fc878b370bcef04eebcf864a26e7dd46bcb53a54233814",
+          "cross_scope_reference": false,
+          "event_id": "$mUswu7HJpB_l1HIo1xl8GCMIyOBtQMPaomhF6i7vpbE",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318606366,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 105,
+          "body_sha256": "c51c98ec35745c0235bdf167b0f62a654099249ebec6e9bedd0af27d852087ef",
+          "cross_scope_reference": false,
+          "event_id": "$QrAJIel1A3VVyQf-yNUgm-87-Jj2HGG0qfCiV7fsP-s",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318606544,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 119,
+          "body_sha256": "e734ac5637fda5708be96844edde8e8ec19484c044732ec0d6507dcbe0b81b23",
+          "cross_scope_reference": false,
+          "event_id": "$4z-uMNOGu4KDOiGf8Lj0jMXAde_6dNNY2al--09RLoE",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318608050,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 116,
+          "body_sha256": "def8b2b0e9f071efe7d0e3b8c690f5e7e02f4022ceb5f62fd48b22969edd6226",
+          "cross_scope_reference": false,
+          "event_id": "$hnGln5sqXKPWFXrvQEMALYPotslNQmD3PYQNHTDYHhY",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318608127,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 239,
+          "body_sha256": "8637f19b44a1b576ec70e3fda212f014276a83848669809b61b1628eaa16de7a",
+          "cross_scope_reference": false,
+          "event_id": "$KzWPUNhBNGWOa_tTo9q8D51NvEqpeDOjmT0jKBEo-xg",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318608562,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 102,
+          "body_sha256": "c78686fcae0c99fc221d52fe3fde56067b733e51e364a664696b896583eda8c0",
+          "cross_scope_reference": false,
+          "event_id": "$za3yxVHIFglQskDCqqmgCKOSjCRWq1Ybenhwho6h-f4",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318610246,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 98,
+          "body_sha256": "83a5a2aaf64dc2c4c348a46dbe3b070778e1596c30b4c35dfe8b1f0e5c58240b",
+          "cross_scope_reference": false,
+          "event_id": "$AU4t9VhCmQWXPqm_YIBO20uV4OFjEkrQXI7E7bSTD6g",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318610434,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 305,
+          "body_sha256": "5c98fa07c281fd342228a2ae7ebdd4bf4dcb1a9e0fb8af366007d897fb49b3a6",
+          "cross_scope_reference": false,
+          "event_id": "$6pUieDSrm_UcOhOQL9NWGRTqgsQwV_ykOTlSErDQZJM",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318611944,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 239,
+          "body_sha256": "472840b09bfed30050797ccc89566ce0ef0a96f7e97747ad654dcf612b3b9fa3",
+          "cross_scope_reference": false,
+          "event_id": "$hMLlDgRm6Q-8D5Wvcg6DcpsqsQnel6Qwhl_958p1nF8",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318612487,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 123,
+          "body_sha256": "379979137f9d1ff2b29ffce1b28a1a8a222a3493577f63f3226c4dad9a4616b4",
+          "cross_scope_reference": false,
+          "event_id": "$kn5-6DOw3VJ-KP6pwJIzCi1ZsesHrZnC2aZDqTohvjg",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318612747,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 49,
+          "body_sha256": "5195f499c7b8e6fde8685d13a1088bb59c044bfdc60695f07f8065b0489702d5",
+          "cross_scope_reference": false,
+          "event_id": "$daejDHpzwri2qBvby6BtpJgV87oaLp0okj7IalwRQGs",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318613632,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 105,
+          "body_sha256": "c51c98ec35745c0235bdf167b0f62a654099249ebec6e9bedd0af27d852087ef",
+          "cross_scope_reference": false,
+          "event_id": "$qiZIUJI3WvWzoS4Aya4fUZRrGvgxj0vvBlJlKV4xxl8",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318613819,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 255,
+          "body_sha256": "282d682d8582eaf3d35939a44613d4e729b8d8e1f605947d3b7435902ec70c06",
+          "cross_scope_reference": false,
+          "event_id": "$xBIj6kGs0psr5tirTjjpquOPwH72O_G8JGLogxlmKhw",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318614982,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 152,
+          "body_sha256": "87699445b5b754641c686c566f3c02a95310fcc028558e8806623f9a52b732e8",
+          "cross_scope_reference": false,
+          "event_id": "$w91oyrRSHq5Cq8-eTZSeJbSGGofjtXHOvC2BYise4ik",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318615237,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 239,
+          "body_sha256": "c96afb6b8890d8994fed366016f24691f0f351d8143fcabfa59c423523bf95d0",
+          "cross_scope_reference": false,
+          "event_id": "$lR250zdoSyFAG5eR9vVZtno0YOEHVIpr4uiJac_65TA",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318617076,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 250,
+          "body_sha256": "bf6846cf12ac9a749dbc3f1d0ae9f8ec3d795c2b65596984adf93b8f58788e06",
+          "cross_scope_reference": false,
+          "event_id": "$7PAPkiuLNpWWul_i_eiwlFUAydtjmhXBik8zZxaOEkk",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318618247,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 63,
+          "body_sha256": "276f08d79ae4056a34fefa27819913434ace25d25ded2ef5fadc0dddd8dc7dfd",
+          "cross_scope_reference": false,
+          "event_id": "$odD-4RAM1n2gAICxsSjgZqFQM8favsCeBHV8uVU1C1U",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318618651,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 123,
+          "body_sha256": "0f616123e7252906b822dc0a8c204142e86f177c67975214dd5261f0f4cce699",
+          "cross_scope_reference": false,
+          "event_id": "$bkLtuvRkOfqkcOaaarZOa-D702mzXyUVHkkBlvF1gYw",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318618662,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 152,
+          "body_sha256": "87699445b5b754641c686c566f3c02a95310fcc028558e8806623f9a52b732e8",
+          "cross_scope_reference": false,
+          "event_id": "$Ky39xiSwwnwukmExIh0jFW-Wv4WgvMoUV-jXk0Qv0q0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318619702,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "submit_task"
+          ],
+          "body_length": 1676,
+          "body_sha256": "34a8ded443c7af90cd27f987d866eb00dde6504b2b2a732506dc2a15ec551a93",
+          "cross_scope_reference": false,
+          "event_id": "$839Vrr3euMG4QH1gg2dnJOdSmntHnm1xAAUcSNBj9A0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318623503,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 186,
+          "body_sha256": "f9169d96654e15694166a8b4fed74efa6d408e0521ee4207de2fb7da0f6355f5",
+          "cross_scope_reference": false,
+          "event_id": "$d3fZ-QoIAzL1v9Ml1oQ5r9LXdLMZLZN4GY8-4kEBkEM",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318624412,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 239,
+          "body_sha256": "403dd9d6c0b020c7b646309bcf931971b2c26546db0071401f2d1dd372fafbe7",
+          "cross_scope_reference": false,
+          "event_id": "$AZxl7n2NSK8RRef_I9wWVlrU73tq-KnFGsigi9Sz6HU",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318624423,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 3260,
+          "body_sha256": "5a5f9be693d04425e07fb1f7fe5830468392b76dfb21895fdaae631e5a2960b3",
+          "cross_scope_reference": false,
+          "event_id": "$ytVRkl8Mx5sXKaK0IPBCQKaYgORGprnLgru-rWF6Ao8",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318631009,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 144,
+          "body_sha256": "696df5f205fd783c21479c5e07e5fa3d5e7cfe296ae64e46d9ff1dc57a6fc890",
+          "cross_scope_reference": false,
+          "event_id": "$LlJxnIu08imIM20rDTkiKkCOsqisbhSCxb4nBe6lCf8",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318631480,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 239,
+          "body_sha256": "d7e91fd31de5ade4b9cf4bf7baac29536cf1bc36251a3974ba03d671550b0555",
+          "cross_scope_reference": false,
+          "event_id": "$JlE5nDv5JDdIDp9GSEGZJ2z7J4HrilRhaRmARjW18DA",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318631488,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 531,
+          "body_sha256": "58dab891000d34e816df405d4d72a622c430adbbde54784c32afa56514ce3e00",
+          "cross_scope_reference": false,
+          "event_id": "$9jBOvV0wVyhW-jE-gO9POk6e2RYro3HGA2dLvgxyyeQ",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318632961,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 109,
+          "body_sha256": "41b57a0a3ec8f652666fe5719536c8cfc228818ba1a3f956938a90ee4399ac13",
+          "cross_scope_reference": false,
+          "event_id": "$e1EKCT5HdvJc4beFj7XeePUuVy9OUSzBN8KztUp1Sos",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318634194,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 239,
+          "body_sha256": "a7ce3c40909ee7f0ba603e5e93496075e1cf0029741717a27141be27329b0517",
+          "cross_scope_reference": false,
+          "event_id": "$fOdawKCSVsVUEhaNdojo239I_-iaT9s9m8ogo9xQlV4",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318634206,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 239,
+          "body_sha256": "9b31468ca9cded2bd2148314c8c4e31dfd76cd67de30a6f7daf041f64886a913",
+          "cross_scope_reference": false,
+          "event_id": "$4kkIa8Zg6FLkPeiyOvm4xSno68q89tdioHM1tcP6ChU",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318634736,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "submit_task"
+          ],
+          "body_length": 15033,
+          "body_sha256": "8476f56bb24d98920d9ce69310cfad49325a39181344cfb1a0426326e3f34c88",
+          "cross_scope_reference": false,
+          "event_id": "$HBlZajsYjIjGbSzA8N3M6apa3PtAvNwHOSVqMKotA-A",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318664005,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 128,
+          "body_sha256": "fc525f3ac799fba9442e0582e49ecec6501313914dfea237a18c76d3f113c8c9",
+          "cross_scope_reference": false,
+          "event_id": "$uL4Bv-mNRGdTmsD5G1kCxhhHBx_jGMlYqU1WV3Ok5HM",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318690447,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 228,
+          "body_sha256": "123111196eaa1c29e387ae19c169b1e4b9798301c74c9c9a80faf60c3c23229d",
+          "cross_scope_reference": false,
+          "event_id": "$TISEWTrTBtbrG0Mo1EiL8h4TnmyPELh9xRCRg7yF40s",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318690458,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 229,
+          "body_sha256": "f33389964a38b864bd900575e4a5e53770786f2e2c674607b5de8ec9692cc8cc",
+          "cross_scope_reference": false,
+          "event_id": "$991KnvrveO0YPgCXQAl_0s1XTvlPT7MftfXJ2yjRgmE",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318691928,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 66,
+          "body_sha256": "6113e94df81bb2ad6fd470bbe9b52bd1f6e5cb42fee679a1342131b863efaa2f",
+          "cross_scope_reference": false,
+          "event_id": "$KvWHVmLH5QPsPZGTdUAbqATG7rdlyK784xSKFj-99rw",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318694123,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "submit_task"
+          ],
+          "body_length": 239,
+          "body_sha256": "8b9aeda3f6ec9de3c758c0304cad7e4844bc95b10efe3c6752dcae0ca4e374b4",
+          "cross_scope_reference": false,
+          "event_id": "$oPZCC-oZwrsaoQ0FylIyx5mTmGa7pBbkxhwd1Wk9u6Y",
+          "native_taskflow_marker": true,
+          "origin_server_ts": 1788318694130,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 46,
+          "body_sha256": "89fd244d5277320a0893dfd4cd8aefe4a48dcb0d59284cfa55e16641e3d683cd",
+          "cross_scope_reference": false,
+          "event_id": "$dciQvLT24JuyUDxpN3gJ2N3ru0bCzwzA0YjAnvhqsak",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318694185,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 533,
+          "body_sha256": "cfb66c9e1055a502d6d96dde80eb9171047507cb616c7d63bb7b96eaaad0c806",
+          "cross_scope_reference": false,
+          "event_id": "$y9-GtScKUwOcYLRPBnHO2jm5PVPUXipla_eSU43Mevc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318697618,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 101,
+          "body_sha256": "659fd3811b06a7b8066f9c0f51dbed455e68dc3dcecd65c9b7bcd8ba133c0940",
+          "cross_scope_reference": false,
+          "event_id": "$ojiTogiI1y72onAU3zhejNpp-o9etwIUBKwA8_c9OwE",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318698000,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 85,
+          "body_sha256": "528bd9d0407868a14e80e4eed775e1392188aadeaf326c23e128cf7a3f6a97f7",
+          "cross_scope_reference": false,
+          "event_id": "$rpQV1H4jA3OIyn4Fmd6-LR8B7BJTC8nCiHppB5ebcQ0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318698007,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "submit_task"
+          ],
+          "body_length": 526,
+          "body_sha256": "b24462768c0e050407c251654faed16ebf95edd1df74c763c8d71196f162b169",
+          "cross_scope_reference": false,
+          "event_id": "$dyV2tHjpl78mY5Vllv5bRGk4pcd0LPwo4KztuD77kAs",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318699847,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "submit_task"
+          ],
+          "body_length": 526,
+          "body_sha256": "197955a03b7be3d2d1e370229c56c20c0176a0719ea616d6bdb505f7934e4e64",
+          "cross_scope_reference": false,
+          "event_id": "$UYWvS68CF0_hDHKo13sTn7V0YN4VHOV6Pc_A2oyCeTs",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318701258,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 6,
+          "body_sha256": "c1fd812f81cab441a359fb85de5dddfb4a3d0e431989cfcfba6cfba059a814a2",
+          "cross_scope_reference": false,
+          "event_id": "$55OlskDdmeNX8piwPb14vmVDoJz5QWgUBiFJS3eCGaQ",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318704978,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "submit_task",
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 1935,
+          "body_sha256": "b6f329ca467b7ee529855bfa2376710366e99bd556bf7d1c5a25c17d6bf19a62",
+          "cross_scope_reference": false,
+          "event_id": "$ZHy5fMdI0_lAumcCyCFbsGYBQw2dkP2HcU-guKauhAk",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318704989,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 101,
+          "body_sha256": "5eeba0b10966a28ee71de9af24d11734e748bd3a64f0800b0ad0e30f377bc053",
+          "cross_scope_reference": false,
+          "event_id": "$YbMZBvNCPYtqCbDKs2a4ItHZ6dA2sYiZ0e83HKA0RoQ",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318705204,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 106,
+          "body_sha256": "edbb2137a0f83e6f48a38812dd5972760cf19617e44e9aa8007926132c752ab3",
+          "cross_scope_reference": false,
+          "event_id": "$cOuHxSBGFCjX0D9PUmYCMmT7gZSh5oMx_zO0jWqp49g",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318705449,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 84,
+          "body_sha256": "eeddfb250339ff1c0abee1a9eef4984d2d1458b9ce1a6e1b02065076ce8b4bc1",
+          "cross_scope_reference": false,
+          "event_id": "$6AX4qq8GheeTpv866sl0eJ3_6_siQ85CHW1N20nZWHY",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318705661,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "submit_task",
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 7720,
+          "body_sha256": "f74915b5bc2bf80a2c201103c9e3c928b4eecacf1fdf4b7fd6548a13cd03ce30",
+          "cross_scope_reference": false,
+          "event_id": "$dKL67LEZ82PGPfTi5Mugn4t4SHZzr4gIpqGxhkZ_ta0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318719971,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 63,
+          "body_sha256": "2da0921fed3d4de7f2b87d42a55b65870628ee1ff8e643371305880bfd3d6e39",
+          "cross_scope_reference": false,
+          "event_id": "$J1VI7d8i0qTEba1Ouzxi8G-nPvFzFsB9okrS4ypF0pM",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318720099,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task"
+          ],
+          "body_length": 186,
+          "body_sha256": "48eab68c593b1b83c8472926c624a3c0fbeb2b963e0cf4d495bf67244530c755",
+          "cross_scope_reference": false,
+          "event_id": "$fIqfMtvOV-7rAtIGNX7v_U41_U-HSFvGCOC0wedlvUM",
+          "native_taskflow_marker": true,
+          "origin_server_ts": 1788318720509,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 826,
+          "body_sha256": "22051c5d2ed42d147b60dd5902e8816e68af5ad527b7d7c0063707ca740451d2",
+          "cross_scope_reference": false,
+          "event_id": "$B6qqixgtXaBhzHahrxTJdN9fHVkTJGn59-hX5rn1kE4",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318723186,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task"
+          ],
+          "body_length": 117,
+          "body_sha256": "ae65008d780f9001f08fca5e08cf69ef4324fac54efc0e0e99b8f0e1b5f91e12",
+          "cross_scope_reference": false,
+          "event_id": "$qpsXraO1n6AgC7ZZN-wS-qt5bf2M7VcuTmTg4VFwTgQ",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318724118,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 239,
+          "body_sha256": "08e0417ca73acad0fd7df3e02b4ec959b54e5593651c11c9df4935f42c3aab4b",
+          "cross_scope_reference": false,
+          "event_id": "$73GM4v7vjv35a4p-rqI2Dci9rfKjZbCvb9HUYzKSOFc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318724125,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 8223,
+          "body_sha256": "7f0af434d07c13fd452fee56051b7374c23516447374d4419347d68f8baf7367",
+          "cross_scope_reference": false,
+          "event_id": "$KXrSdd99VWLJY7DCHgpzJw2DEyh5PfPDLWkvP1ZaLj0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318739249,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 129,
+          "body_sha256": "b22b73208069e0d988d276d20ef0147bcdc8d0390d9ed6f97b35bb6a7f2d7380",
+          "cross_scope_reference": false,
+          "event_id": "$t8KXPBqoiz5Idz9gExoUi9hDRfmWjiu8rTsYKcY-bew",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318740831,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "accept_task"
+          ],
+          "body_length": 242,
+          "body_sha256": "d1742074c06c01a452d587d163caea421c6d51c96f3a10d89cd31a60ed552dca",
+          "cross_scope_reference": false,
+          "event_id": "$LsOIUZRjxIWIOoKsqu--rAlYsqJNHw2a5p-Y0DbuKlQ",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318740842,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 5535,
+          "body_sha256": "c4b35dde329f3a630b65456dc0b5988b547a5c944df2d12c9f58d5895f6943dc",
+          "cross_scope_reference": false,
+          "event_id": "$TtKY8YV7qhdxazy4eNoyZDciICEWF0RISsdGC3iTKvY",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318755232,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 114,
+          "body_sha256": "7ef964888f682ba36d8c76b3271ba3d5d00ad87f987fa80fc4db56f6d2f7734e",
+          "cross_scope_reference": false,
+          "event_id": "$T8VBrBn9RNxMAEqEfUACoYoIDLVtLaLUVaenGpj-RmM",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318762233,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 228,
+          "body_sha256": "2020e88d5bb31c388d38363a27c415610dbe392af7e4cd26b9b6a37773ff493e",
+          "cross_scope_reference": false,
+          "event_id": "$fK8-4wzwiZI3NLEQPGmqOzg4XY_fdy_EEq3UhEB27Kw",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318762241,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 1012,
+          "body_sha256": "e08394156176e495097cb53fae7d112b0c75769e8582dc8bc63e9e9a1c23f0d1",
+          "cross_scope_reference": false,
+          "event_id": "$tMJmyrGTISlOkhyMKSGnfZbfQN_5wpHcF1Pm4bkXQTM",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318765151,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 161,
+          "body_sha256": "3f8559f7c183b4966e1cedada1f1a43de6b8a2332f315fc0b4b48e7f392b7aa8",
+          "cross_scope_reference": false,
+          "event_id": "$zWIvcjr_YKPqAD8BaUdmjRVB01XODShz6khAZEh_DZI",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318765654,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 58,
+          "body_sha256": "02c59eec30ae98e59c56c8a11b80a654bcb7b868ebf159ec796032239f079f74",
+          "cross_scope_reference": false,
+          "event_id": "$SNLSoMBiRsVA2rjuisAJORwkfqpnptbYEqpl6mdTqDg",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318765667,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 1516,
+          "body_sha256": "4a57a1ac3f438211cfca036b45fc24641e9c7ca14e7791888e03f0240e6ef8a7",
+          "cross_scope_reference": false,
+          "event_id": "$6r1Hyc7Yn7OnJSwr8HLO7G93-8geuWpM67IM2OCgLXE",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318769559,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 94,
+          "body_sha256": "d223e023e1f4fa2f06faeca05ed31c389bcc05f682fc2b58ee0ecbde95a61762",
+          "cross_scope_reference": false,
+          "event_id": "$L2zF1jSMVWE7EhoGxx1hKAMRqsm0pblbWURLkE9THdc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318775195,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 188,
+          "body_sha256": "82700592f7c35ff01807debc0aad2b83b09e4d29ba17264d1775ece658ace0ba",
+          "cross_scope_reference": false,
+          "event_id": "$UrkL-4PhOTOnQbWvnXPArXXIR1jGU_Jo6t8N7_xD_t0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318775205,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 1640,
+          "body_sha256": "d6a10bbb1542cfeb95e1c0c6b7e05f716e8c1250e064e66639828e75c4263045",
+          "cross_scope_reference": false,
+          "event_id": "$l1PoamY3-jvFDVpNn4SmhuL1kV-51nKrQj4C8QbaV-w",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318780794,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 184,
+          "body_sha256": "0301c09177840d444f2d9b5e28506bbad6cc62c255d6d7d3ef95d22e29fd8764",
+          "cross_scope_reference": false,
+          "event_id": "$4u8W_yv0J1ipGw3W-6ajVtnQOn23tLszmZbHhksoxRE",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318781697,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 150,
+          "body_sha256": "abb3be76f5ac4ed719875ab5327dfa320819402b5bf819641ac3f06f02f9ae3f",
+          "cross_scope_reference": false,
+          "event_id": "$4KctHHAam3l5Zfoudcs5AdNc7BKwjyIuQLUzf9hu1Kc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318781708,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 140,
+          "body_sha256": "5cbe08ead8fcf1a7e6202fb39628bbc87c77fce10bdd998a53ffd42152efe9d6",
+          "cross_scope_reference": false,
+          "event_id": "$qzSKv9bMy10I0KBvz_yfvUQffIW0vux-OUZhQnVfvIU",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318783094,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 558,
+          "body_sha256": "5af6a9d3f16ee99145e976ff4f70041bd358bba10d633486ec713bb093cf529a",
+          "cross_scope_reference": false,
+          "event_id": "$uF_2Hk8FY3nfEzmXd72XSiwmCA0sQfZgcpifVPI5Qdk",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318785040,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 33,
+          "body_sha256": "2ac8539017252a4c7090d12409e30d72b8453b41e30b545ed464940c2f6c3321",
+          "cross_scope_reference": false,
+          "event_id": "$LH3wlk_Z2euDWYahVOFqtf1vATqyaUFfSsPAT1gSaL0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318785500,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 114,
+          "body_sha256": "ac8e97391b79314f1604959c31945eb1e91167bac181d0942c0e2948ab8c7eb3",
+          "cross_scope_reference": false,
+          "event_id": "$gwnvmouO0hBtOoSNBeDKi5prTd0hOmKZh6pWoRDW050",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318785510,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 227,
+          "body_sha256": "884be7a90fc65995a0ff20f7300276027534af1f6020d289cea116797f8cb30d",
+          "cross_scope_reference": false,
+          "event_id": "$i166uCBXZ4-YoQ0uoIDKvLMHp9H_608d_nq_cQE_Iko",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318790071,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 194,
+          "body_sha256": "14e08f8eff52c956f8e52affb977234c4950c53c3594985ae205863398d55447",
+          "cross_scope_reference": false,
+          "event_id": "$gyJ3FLKpdV_0-LHd6ZDIYelFQF8g2c8YKxqAs06CX6g",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318791947,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 49,
+          "body_sha256": "30e256c2933f8fd21a4eb4bbe61284a3a782e3daf5d3eda3a62ae1db7fb0610f",
+          "cross_scope_reference": false,
+          "event_id": "$Pj_sB4MSYYOMhJlpa5_m6c4zPJv8RCEIv37T_U9WdIc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318793830,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 196,
+          "body_sha256": "3eb9bfa94096cab9c2e6057f7acb1bd19dca46a3290574cd63b40a7d88b4364e",
+          "cross_scope_reference": false,
+          "event_id": "$DgUFZPPlQgPfneUmdnxTo8UZE0xFHhk7qgHFe23vSRQ",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318793840,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 495,
+          "body_sha256": "cc49ccab620702a72efeda87af7e21ac6ae1a32e739724141a07d00484a9a59b",
+          "cross_scope_reference": false,
+          "event_id": "$XsDbwcjtLqddFNF9vmamc1_U_VUGMsPj5ncRf3c1GbE",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318793906,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 6,
+          "body_sha256": "c1fd812f81cab441a359fb85de5dddfb4a3d0e431989cfcfba6cfba059a814a2",
+          "cross_scope_reference": false,
+          "event_id": "$jlsD1Eo2WlgProtKYAO-tS5y0pPUoTHG1uSee-CXkmQ",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318796512,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 979,
+          "body_sha256": "1ac7f60322941566703cc1c24f184d810765b202825f28e083517412a43a4014",
+          "cross_scope_reference": false,
+          "event_id": "$RJ2lXfVWAqfwzoPhBjFFNsfTn2eczcRqeBJJpVoVIZQ",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318796520,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 960,
+          "body_sha256": "4d71471eeb5775aafd4eec853d8acf8804690d9da732f9f70e19355dd8bca272",
+          "cross_scope_reference": false,
+          "event_id": "$752DOUm6Gd2thRBFAMAc3do1lRvJkR4ZZlsG1OKH09Y",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318797637,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 327,
+          "body_sha256": "58bdb55752b5624bf5d2120c268d14b980608679b30cd5b98aa245796c75f347",
+          "cross_scope_reference": false,
+          "event_id": "$YXglu7xjwTX_32sAlTqtM3DGWeAa6rfi447c4yKeU0o",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318797931,
+          "sender": "@native-m0-boundary-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 1394,
+          "body_sha256": "13ef20b04426035084097c74667ec3652543690f38cd3b4992bef111512b6185",
+          "cross_scope_reference": false,
+          "event_id": "$5jLejCmC1h58wazeJBiG_G1tKDbpi0MtFVayDqWKgiA",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318800999,
+          "sender": "@native-m0-clean-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        }
+      ],
+      "label": "boundary_task",
+      "room_id": "!CH8uTw6fZw5G8JPfV3:matrix-native-m0-20260901.agentteams.local:28080",
+      "since": 1788318548569
+    },
+    {
+      "count": 100,
+      "end": "55739",
+      "events": [
+        {
+          "action_tokens": [],
+          "body_length": 121,
+          "body_sha256": "3a2097dc9dd36d78e0b71f6cd1dc2dc017a5b8d354e9ab8973d139421eef62e2",
+          "cross_scope_reference": false,
+          "event_id": "$nxHwq-wO2NhHHewnE8xXKDD3LMTmFI0RPGdmBUgmcqk",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318626578,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 239,
+          "body_sha256": "ae77acc876c6a56693fa854150cb29c035f04e56b5ddd3122d3d4916c2399531",
+          "cross_scope_reference": false,
+          "event_id": "$AJLrJWMDILr_JaHOCbsdAsUfglFU7C0ivygYde-8q5A",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318626584,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 104,
+          "body_sha256": "41a3ad2eebc56d736860f4d2842215aa1a51b990ce5650c74051cff40f73d9d6",
+          "cross_scope_reference": false,
+          "event_id": "$SdLEWdpoI6IuXoGG59mc03RqMchJXJSshKS4UPR3pVk",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318626779,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 535,
+          "body_sha256": "099eaebbea6bace7d43ba9f5fe40681d09cd7c3e31365984e1239c28a899e5ee",
+          "cross_scope_reference": false,
+          "event_id": "$7booyo0NDSvMK-G-Bkf8wsNjySKOu9z-MZwF4JpFNkQ",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318628821,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 147,
+          "body_sha256": "c41dc02582672de8cfb5d9dbef98ff03959a9a7e3ea8d18707eba716ceb43b4d",
+          "cross_scope_reference": false,
+          "event_id": "$wbqrpQ4E1ZY3XP1mtULiMzRYGOVfGS8bxGsJ13q32t4",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318629554,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 239,
+          "body_sha256": "31c1ec643fb43fda47fe563ed324a9ebc16227c8e2f3cb0295c95648c4720b3a",
+          "cross_scope_reference": false,
+          "event_id": "$G4-kKRCRBgDyTqwVgk6Wz8DI2T8eVJzIWmeBHrtS5I4",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318629561,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 152,
+          "body_sha256": "f88b1289ba178d182b022090ded3b43ccdc8bfd4b6d35403f9fb1658c35ec877",
+          "cross_scope_reference": false,
+          "event_id": "$MTs2OVI-d-9_V_FxuMz43sX6lPe-G2FYnawuhOGggGc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318630872,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 854,
+          "body_sha256": "756eff842634c6f527f55732176d9844d71d1d76b1218fa372e84027f1b673ff",
+          "cross_scope_reference": false,
+          "event_id": "$cqJQO5Yp9pDXFC618v7NE6Pl8k63tEpkoJyvuiCHB2c",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318632780,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 136,
+          "body_sha256": "43be4e002a55a0cb2c8b8b71ba06630b214ff6ac072f35f7aed25524d964714a",
+          "cross_scope_reference": false,
+          "event_id": "$KpFeXjuXaz4e2QLI2yJ5K0nRXzj46Evw_AxQ620mf9Y",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318634242,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 239,
+          "body_sha256": "fc47e2e0bfe8719bc55adf61922c3eb9077567064712c547a66e55b4c591c4d4",
+          "cross_scope_reference": false,
+          "event_id": "$_jKw2NKYhsvXPhgFShCVJeEZs0gjXqAd_bqz4XrUFno",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318634250,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 239,
+          "body_sha256": "cc50c7f06c4672adcf33e9b27071c810f8d3dabaa0e0dcd01d7f0fdd6475e286",
+          "cross_scope_reference": false,
+          "event_id": "$aYdVtvk7M0F0UEY4PV4ru9SB6eLC3udlCof0ZqRA7so",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318635169,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 539,
+          "body_sha256": "0cacac12b2642edc84308c12c89ccdd429bf2ba0f670094f05f07ce63aeca6e7",
+          "cross_scope_reference": false,
+          "event_id": "$ob7Dx3mVpqqeR417BvKe1QtOAx46JrI2sP-bZNrMM2Y",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318637049,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 168,
+          "body_sha256": "23380b63303d085603a9ad70fc18877588e97744db92479256f2c2dd97c65baf",
+          "cross_scope_reference": false,
+          "event_id": "$PNG9Vs_8QsLzpRIh7Zg30EtBQ0Vk0rncgkJRUdJTKE8",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318637680,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 204,
+          "body_sha256": "4c25ff8d14ed404418d55e09b0b985477b0d77fd87b11e3e538886cab9a193af",
+          "cross_scope_reference": false,
+          "event_id": "$6i0TC9WISJh5N5tjb8Tl1at869uiZhdWWU9lCX-O4vg",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318637690,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 201,
+          "body_sha256": "9ed4b94bc75bdffe2abba77c2d2d9ce9f53a9df9605fe9349e164f3cc2c34657",
+          "cross_scope_reference": false,
+          "event_id": "$QsIBgLxRFzLk0ahAPAJiX6_Jjko9d6OgFYyLW_T7Hgc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318638036,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "submit_task"
+          ],
+          "body_length": 12124,
+          "body_sha256": "5a94c32dd13c10337ad8fb7a52c1704de32870f8ad7fd12d71bf8565c4b98b0a",
+          "cross_scope_reference": false,
+          "event_id": "$9_-3j8jNru376FcfugJ71lCvAZ_UZXYiun-3iJyzq8M",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318662358,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 195,
+          "body_sha256": "05acaae78fb26a1d4b3ec6a1848f6bea95d628a3c14c9e91bc722ebc6851f8b9",
+          "cross_scope_reference": false,
+          "event_id": "$kIl68NiVmZE-2p3fmTZ825g8z5UpNWbPRRxmGtQ_14s",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318662394,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 33,
+          "body_sha256": "63728da97b9553e609d0e5883843285974bcd26ad2853b1488fb1f1d2215334c",
+          "cross_scope_reference": false,
+          "event_id": "$odoAb-5fzRJintQ1milItBkpsXncFOdnCmWU-WXuy3Y",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318662404,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 6382,
+          "body_sha256": "e8de54a3194683f103c69f79dbde2b95d9457e0a240cb088e20ec38476d8711a",
+          "cross_scope_reference": false,
+          "event_id": "$TB72hBtRnaUlB7LyHORxoyVPibvcKjCoWDeRYUlqJ70",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318674913,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 77,
+          "body_sha256": "71776c7183115fbf8969466badb147c1d74444cfa2bb73c3bc6b8e11d7413300",
+          "cross_scope_reference": false,
+          "event_id": "$jThZuXpKcRQ_jy8uVlAFGuEE1TzI2LA_1N58kUfCRiw",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318692421,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 228,
+          "body_sha256": "9d7bf53ea05221acda4370997c78bd4d31470e0b6283dd86f40b597fbf67bccf",
+          "cross_scope_reference": false,
+          "event_id": "$ufWxcenrNO-EzlRfuNJ7j6pRcBzT1Mo90DEBlclb7Fg",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318692427,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 93,
+          "body_sha256": "a18359df48d017406d237861520f1b54bc17b8f805475a3ffe89506d5aebdaba",
+          "cross_scope_reference": false,
+          "event_id": "$sA3lpuaLZ4ifuLWLQH4XZ7lFCIAGBxdt42Wz8aeCvlM",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318693454,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 40,
+          "body_sha256": "cdf4d3e875d5bdb623c852753f363dcfb382b2a76daead0bf072248062268a83",
+          "cross_scope_reference": false,
+          "event_id": "$frNUHYiT9oU7-qQ7a5aVArkTEQwt9N5MG7IQwoNO4zc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318694956,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "submit_task"
+          ],
+          "body_length": 239,
+          "body_sha256": "b0c5324be21fea0124b039929def4cd7a1653af20a9a40f0d64e7eab43d428ca",
+          "cross_scope_reference": false,
+          "event_id": "$-s6OKBM_kVSe6MOvyVtPPrPm2866pnt9Ef4HRzvAWK4",
+          "native_taskflow_marker": true,
+          "origin_server_ts": 1788318694962,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 45,
+          "body_sha256": "7db7c05085ee823a9014559dd38deef7242b6f8c3f18f640ed771c29b0ddd3b5",
+          "cross_scope_reference": false,
+          "event_id": "$iFqxLVazk0qCP5k_MViiHGOE9GeEVA5QebN7-hEuLyc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318695014,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 425,
+          "body_sha256": "e531bdb8152c18e1d0f6658ed60049b58dcbe4c64938b14a6307e8f6c65b37f0",
+          "cross_scope_reference": false,
+          "event_id": "$ZN_VXPIn9G4QSPoaRu99_x5XPAF5OzR061xdn3LgIRs",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318696468,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 940,
+          "body_sha256": "09457ee8767245dc3153cd3f9e3b2db3273bd8a894cf08e76ad571f1f69e6430",
+          "cross_scope_reference": false,
+          "event_id": "$sFOCsSexjWP6O9sWdWzUirWDargjD8btLAPTX6FdBRc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318698239,
+          "sender": "@native-m1-outcome-oracle:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 6,
+          "body_sha256": "c1fd812f81cab441a359fb85de5dddfb4a3d0e431989cfcfba6cfba059a814a2",
+          "cross_scope_reference": false,
+          "event_id": "$DKRasrhQMadIuxbRktuDI0IR9Cw352thPUdoVn1RR78",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318702715,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 1977,
+          "body_sha256": "1fd4089dc6efd4d623808ae7c6b34e2ae1aa1db49a057cec0799e4642632e0c7",
+          "cross_scope_reference": false,
+          "event_id": "$Q93yBCTrigo2YODMOmkiBL7n9pmHRMYSnjfB3YQHmGU",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318702725,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 60,
+          "body_sha256": "52da065715a8ad1af42db87cc09d37fc4a78834e66cab4c2beb2efff4968ecb4",
+          "cross_scope_reference": false,
+          "event_id": "$3U1SLxGNukB9QjOBA2kfnoKVfS78xBfJJVsMS9NIkoQ",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318702842,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 100,
+          "body_sha256": "aff4393f3707ca8745ab38dc82e059932c2601bb4a927493d1225ec35f4cf5b3",
+          "cross_scope_reference": false,
+          "event_id": "$swAbbAXKl61wsadJF2_3FXgGcv1mWym2ICLakNmP_wc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318703051,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 99,
+          "body_sha256": "cbb07f2279e4781741493d0fecc69c34fb528b8875986aa8a4c8dbc7f8e29e83",
+          "cross_scope_reference": false,
+          "event_id": "$B--BHF19s71_x9ccPPR590Jdv-9w6a15OpVF17sffWM",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318703306,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task"
+          ],
+          "body_length": 448,
+          "body_sha256": "4d0c9e67de242cc5c328f5a29f9e0dbb5f10eca6a01df77bf676b28cf8d977eb",
+          "cross_scope_reference": false,
+          "event_id": "$m-OmPzUBb-5Lvnzmnf3jqp8lia2sRMWcbQWWABFoD4c",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318704890,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 186,
+          "body_sha256": "a99c6c3ccb7e371903e53498a8098c6d3ddb29312db95d6a365ef10be31bd3ec",
+          "cross_scope_reference": false,
+          "event_id": "$thxPqPQZdLGFZ-St48szR24pC0_mvi6VmvZ1bdQJQk4",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318706811,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task"
+          ],
+          "body_length": 140,
+          "body_sha256": "e51ef37d54cce97bb5da76d9283d68edcae2fdda2faa180b1417318f6a8e9636",
+          "cross_scope_reference": false,
+          "event_id": "$xqtQL1Cf1qBjk7kMXvLC5NFjBDgOzYu6FgT-PMLnX6c",
+          "native_taskflow_marker": true,
+          "origin_server_ts": 1788318706832,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 115,
+          "body_sha256": "28b558df70991d2c17895ca2e599ab09ed86e7ca982c1b4e480924e50777d176",
+          "cross_scope_reference": false,
+          "event_id": "$1NYeMZNe6mmZ0NRpZmQivnrbdnSwBdYMwr2n-TTNmpA",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318706892,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task"
+          ],
+          "body_length": 847,
+          "body_sha256": "586e9fcbc40cb177d84a3dc495c9b8c160c5589ab87941cb5f593236a0aa6891",
+          "cross_scope_reference": false,
+          "event_id": "$07nuFqE4FrfqPRMk2pbMkeErsmjAkwkSj7w6jKrsvm0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318709636,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 202,
+          "body_sha256": "a04070cf3cf99d0fcbcbe2ef8bf6a90e04fd2360756ab457d91133b6819e214f",
+          "cross_scope_reference": false,
+          "event_id": "$MHH58x93DyyUadLhIByOvShs37vq2afPoTorWok2yC4",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318710316,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 124,
+          "body_sha256": "5a3ca119c5d0d7b33ed707d66c771a79134984062365c7aea552ece8a5e8c80b",
+          "cross_scope_reference": false,
+          "event_id": "$5XMyOR4bHj2T6f4eq_tQ8EIlW9Cu2OjM48EzL-8tprw",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318710326,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 294,
+          "body_sha256": "a0f560661030e86cb79368a0f8797fcab89a76b2398b5f379ba644f756fd55a2",
+          "cross_scope_reference": false,
+          "event_id": "$HiySvPxR-jQ-wvQzxRdCnlluICTCIyvIBFvYBmZ43hk",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318711798,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 147,
+          "body_sha256": "9c5dd192f96b0f7021c4e287d2bceaa2161bc6ede32774f5df8d04db288cb634",
+          "cross_scope_reference": false,
+          "event_id": "$10PSkFGqDMK9AI8DdJB2QKLKcZR4jIfH26FQ4KEXuzo",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318712110,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 239,
+          "body_sha256": "ffc8fcda6f2ae13f1478fd251f7fbc7fb7e58aebf2767de84b06d4a28ce7366c",
+          "cross_scope_reference": false,
+          "event_id": "$akLRHY4fjXuDKF_8crEtSL7n8DN69ICEVQL965cBFjo",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318712609,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 775,
+          "body_sha256": "056c69aaf400df788a471938fa810b6c69c21e7b48546dc50d9429f29684274e",
+          "cross_scope_reference": false,
+          "event_id": "$erqH7ih9dVQGQay73BGAsrCUlpITZqgoAAGbBf1_abo",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318715020,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 259,
+          "body_sha256": "c64bf8cd68ad845790a6a7b62a3af19a939c855adf75899f464c1b079dda280b",
+          "cross_scope_reference": false,
+          "event_id": "$oNRszBQ26MDt5pq4s7mvqn7HICplTkthhFPGRqO9WzQ",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318715667,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 63,
+          "body_sha256": "2da0921fed3d4de7f2b87d42a55b65870628ee1ff8e643371305880bfd3d6e39",
+          "cross_scope_reference": false,
+          "event_id": "$7qmyqBbWbKGjy9_XfM9h7987KIR7DNW8LSC5TezaR1s",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318715678,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 113,
+          "body_sha256": "7a4cc08c96aa956fabb484868302c23fea6b2e9b89dca4cd0c747becdf0ea030",
+          "cross_scope_reference": false,
+          "event_id": "$II_M7ITBaipKO-wcjwKA8ArBTZFbvXb5L4pk7puHaaY",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318715900,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "accept_task"
+          ],
+          "body_length": 1378,
+          "body_sha256": "33ee5976e71246199a141b0a3e84e337ac0320f2785263bae054d8fc632dbd05",
+          "cross_scope_reference": false,
+          "event_id": "$fdjvsm1Z29UwXoCcfP4l33qCi2LnOU28mzsciPFVJ7M",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318719899,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 234,
+          "body_sha256": "ef592421f73676b684bb63ad72f8e4f041b374b1194561f0e1d2014808acccb1",
+          "cross_scope_reference": false,
+          "event_id": "$EY8vdLJcw67Gh4hW6iIIWiBY0JUTa18jhe8Pc6ngvSQ",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318721440,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "accept_task"
+          ],
+          "body_length": 242,
+          "body_sha256": "07de566c7b7cc4301b307172e2f7e04f93a38057c8fe2a611086faeb0d7d4c27",
+          "cross_scope_reference": false,
+          "event_id": "$DHqb37GqFAZx6tWRmkzDf-Nrb2V9EBukiBedc2ONh70",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318721447,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task"
+          ],
+          "body_length": 1796,
+          "body_sha256": "688a251f37914b7b3ee130e25dce47e1e87a32bec02933408c8e186cea0d4c89",
+          "cross_scope_reference": false,
+          "event_id": "$b-Z3tQ2sQoGjKkP147pJw1D7vJ2qE-uE60HrmRcS8EY",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318725225,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 214,
+          "body_sha256": "cb6fd856510f5664ea9ada74deee72135e8430d3025aca6453b3bcfb7e74ee32",
+          "cross_scope_reference": false,
+          "event_id": "$3WJwz__DdvD_fKbG6ORXRA9kv-BQQ8NwT35SOveEeUM",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318725743,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 58,
+          "body_sha256": "02c59eec30ae98e59c56c8a11b80a654bcb7b868ebf159ec796032239f079f74",
+          "cross_scope_reference": false,
+          "event_id": "$ofotb-NT-pO3SqE1jaiE0vvfmbMEjqbL92Fu6ZR-zfo",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318725748,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 147,
+          "body_sha256": "2d0b2883a60c9693b09e59593471e8c738095c98b06b53bc34f9416786a97df1",
+          "cross_scope_reference": false,
+          "event_id": "$gvQifVVcnAecxD35Txe60Su4XGxJqK26g0p9fCkNN6A",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318726031,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 145,
+          "body_sha256": "fe86c081567e9bb25fffb1bc0454cb97bc3e64b18ca575a2a9230cd556f322a0",
+          "cross_scope_reference": false,
+          "event_id": "$Mq61uFFOxStkuPDXuLBkRDCIxKhI99TvoXknvqUuHF0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318726479,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "accept_task"
+          ],
+          "body_length": 8639,
+          "body_sha256": "d75068c7818065d09d43e67f8abb5a729a2367dfff0e2d22a15cbc410c168d5a",
+          "cross_scope_reference": false,
+          "event_id": "$yXsZyMeBeD7O3H3UgpdMzo_DUwXU1BUrDm7wnfdKBJw",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318742074,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 303,
+          "body_sha256": "6014a049a3ce143cc055881968a78d8d7c82f52fbd7877a4aad2a9914b67bc17",
+          "cross_scope_reference": false,
+          "event_id": "$T-a6Zfa1uEurZhjVKEjWiKJYyM4OYyLRykleSbhGFJo",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318742742,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 57,
+          "body_sha256": "3037d2f1a823b417ccfbb29e2cb24fea212af61b6b1ba729c72b098e368b5f21",
+          "cross_scope_reference": false,
+          "event_id": "$_-SZNvKC6PRryB-fRg1Nv6SR6K4JOCsypMnu5_SbujY",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318742748,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 239,
+          "body_sha256": "8d4089d817a56c9d8b77f6f4876f19993197bad2aa9b3f9a20f0c597de51a6ba",
+          "cross_scope_reference": false,
+          "event_id": "$BnpXBgzADuDpog4RShe1ufeeXVHsNOMyvLNvsujlb70",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318743498,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 1164,
+          "body_sha256": "10160a9ba8c779a1a7d943358b6415a6f49349688c0023e0070ed61862d88dd0",
+          "cross_scope_reference": false,
+          "event_id": "$g9lKgyCIdbrR_5cNV1Qjcp5nbzdFMi3PyOs22ZZjvPc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318746616,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 139,
+          "body_sha256": "cffd2eb02a29b0b35fcf9a806625b851f3a1154ba6b147b558988fef0f35dc1d",
+          "cross_scope_reference": false,
+          "event_id": "$yED_eKuiDWv-4BTRcaacjlo81B4ksXJwPcxPg8bFAOU",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318752632,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 228,
+          "body_sha256": "21b49a946d157d91ef0d39575e949b25b9c6e7dc3bc3f3aa4333b16d5a72fa00",
+          "cross_scope_reference": false,
+          "event_id": "$Yi43kozKQsA2h2TnlX3DlpBdeFN0Je4kXw7jEgOrj90",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318752639,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 1223,
+          "body_sha256": "835dacee211fb15beb8c1b011071e28f775a8c20d17ebd476f08f1dcde8cfb73",
+          "cross_scope_reference": false,
+          "event_id": "$0NJ_Gj_lPiEuOkM51xvZolnPZzOzk9FHkD_h7ibs-aI",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318755651,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 95,
+          "body_sha256": "2220c2739fe6668d043ab848d3bcc997a309bb7e29ff765970142e582517e1dd",
+          "cross_scope_reference": false,
+          "event_id": "$0hoQHYXGQyCwxcz7C7LNpDO95CqpLttAoR27Nm5Y5ws",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318756081,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 114,
+          "body_sha256": "b23f7e09afeb7b81be0bb4f2ad4695b39ee0ed4ec77470c8867c9b126575b9b5",
+          "cross_scope_reference": false,
+          "event_id": "$rAyPZgtxgNmK_8Gfj_EXLLTDvzKSGexeLp1YZQnKcv0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318756087,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 188,
+          "body_sha256": "a2511195f5ef879f2197654ad009ec45b31cf0b875f59e7664485d9df63d1d71",
+          "cross_scope_reference": false,
+          "event_id": "$8jitba_SzcvjPFf6EYntYVbkx73iEKnyH0Kj_rZdvjI",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318758694,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 910,
+          "body_sha256": "f6534811b1ba916c0537a3f4307e0857e1bbc42a55b2aaa04892ce53db2567ac",
+          "cross_scope_reference": false,
+          "event_id": "$2VM7B3HGgJYcy0fM7ub6ur2V9CwLw1UkTk1x6Vye-0g",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318761446,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 141,
+          "body_sha256": "a6c103c09f814c764ec18b4f3623c781e955f24a597eb23d6411fa629c61ed5b",
+          "cross_scope_reference": false,
+          "event_id": "$l5GK5WaQ-6bb13KGFrAzy3Bys91blJVEioF-yvjpdkc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318762178,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 150,
+          "body_sha256": "e938ade501f6d73f1a1309907dda6097c8962e048f3fb4ea9a58bb925dac1fa0",
+          "cross_scope_reference": false,
+          "event_id": "$OBoSyOS4CYHKaujeB5ZpRuaC0F381VL3mcGUYmk7XEU",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318762188,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task"
+          ],
+          "body_length": 3074,
+          "body_sha256": "716d7bf06a6e43dd98694085b85e7d7e6d1321e86bcb43666b1d21781a40deca",
+          "cross_scope_reference": false,
+          "event_id": "$fprlH9xIwcnrwzJZC1upNtHBf44oEigs3FO-9OZQQmY",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318769481,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 219,
+          "body_sha256": "55b8c108890bf92ee3a5789e30866fed91ba11ba7a6cdc182b5b1fed8c4e0ed4",
+          "cross_scope_reference": false,
+          "event_id": "$j5zcolCU4fCIQZMNpb-_R84KRyCfj9h0TIMwpvtcNJ8",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318770386,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 120,
+          "body_sha256": "f6613b00e5449d9cf76b32f72e4bfa0124bfe851ccd828b1dcf7c04dee6d172a",
+          "cross_scope_reference": false,
+          "event_id": "$5kCQf4v7uqNMNjbD1cM5F7Zflo2Ox2324zckbYsSvw4",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318770391,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 60,
+          "body_sha256": "7ba9330e3249f8a264cb444eeccf9053410a5f7036360894b8e0f59987e7f10a",
+          "cross_scope_reference": false,
+          "event_id": "$g-tYIETsbsu1kbL5vYVYEoHy-elNTfOt6mkVQds8CvE",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318770507,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 2263,
+          "body_sha256": "bb519a2478dc3f850b1b6089156862eae14a6350a15ab1b21c54dbed0d6f380c",
+          "cross_scope_reference": false,
+          "event_id": "$mQEuL7IooQOQGLE6EqvvEk-55Q9bgj6u_DOW_DKjGVo",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318776428,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 185,
+          "body_sha256": "1b3f60815785a4f2d5f18c23be0a034a22b5211666060d0ed94b103d949a2c54",
+          "cross_scope_reference": false,
+          "event_id": "$yWzezVvjr7VJuy6SC8fOc5thRglNlUgryhlZpPO-43o",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318777045,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 146,
+          "body_sha256": "19b6070cd5cec48cc4271aa90180d3129f1c3789a97e40128993dc06ac598e57",
+          "cross_scope_reference": false,
+          "event_id": "$bpfIhz-PWEYHPCvwICB7ZUeCVygrbehPmIgF1QUDvHU",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318777052,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 2121,
+          "body_sha256": "ace212f4db5f83a0ab88d2e9a804875209b9a8b1baf83031924ab7834faecaf0",
+          "cross_scope_reference": false,
+          "event_id": "$clJO8i95wqaQqWPkwGSDFnq1IIJ2ft_UUvPAB5WRdwA",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318783175,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 177,
+          "body_sha256": "c13dfeb6f8abbe405126909a5c872bb4c855a3c498ba3b96c2ca3d92c4c1eb1e",
+          "cross_scope_reference": false,
+          "event_id": "$qJoOoxP8_BvHrFSGbxDb9vAuiRXSXx57ia34WctBfAw",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318784268,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 110,
+          "body_sha256": "185aaa0d93def71e85c4e3bd02ed21ab01aa2148483b80a6233ae55a19f06bee",
+          "cross_scope_reference": false,
+          "event_id": "$NrXIU8epfpoWgEC44JW2S86oKmGHaELGVQEAnYQRdQA",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318784280,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 130,
+          "body_sha256": "af74461899781d3929c082d5efa06fe5f6f6ad8b72cee816d9f462223e0a2f5b",
+          "cross_scope_reference": false,
+          "event_id": "$23l6rLaJJ__mcYxHusQkqQ4kWaL4L3jv46imTokGkTo",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318784413,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 12376,
+          "body_sha256": "a325e1bae45b8ddd04d9ae302405b80c1ffb9e307ead9562e5b037591dc87a10",
+          "cross_scope_reference": false,
+          "event_id": "$kzofFXkPVDpAPDGIX_CVmdc3NYKrdFAxv6YA6I_RxAI",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318809986,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 154,
+          "body_sha256": "11cb1227c220c7d7bcc72d579582705c9d6eff2752cf677cf810bdf10485a2f9",
+          "cross_scope_reference": false,
+          "event_id": "$1xUuA2kH3ZnF06RqGoWiYthY5ZGe-sbU3G_8amVzZUw",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318810624,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 134,
+          "body_sha256": "dc0f2cf0a067ff0dfe6d41820c33b3bba625b76ab89df076950a6d3151d8582e",
+          "cross_scope_reference": false,
+          "event_id": "$zVBhQkKXbVc4WfGPMMSKadDo8Fe5zwajHf2d7wVuLEQ",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318810636,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 121,
+          "body_sha256": "74e544911289e484c7b366261e470ea90e5c8d866ceb7e1efec7da2ee75d6e4d",
+          "cross_scope_reference": false,
+          "event_id": "$SMINJ2f0AZA3zYoUb8_uKhNX8TKzvWX1htmcVo7YNTU",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318812724,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 5964,
+          "body_sha256": "93c2982c2963f9aa7a920d16cadf0cd8bc54c781f8ca3724656ac900d41bc834",
+          "cross_scope_reference": false,
+          "event_id": "$ZRPlvZjxlhJoFHGQ7ws0pgufB3oEKoom5HqzheYicDY",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318825960,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 300,
+          "body_sha256": "9a89887bf7f447b36e7f4526a49d5a6bf776f25efd8fcdce5e6093f44c8b96bd",
+          "cross_scope_reference": false,
+          "event_id": "$djQLe114pPVtvc6BL9bjCqLNIv8F_gVNrJIAWOMDCPk",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318826886,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 123,
+          "body_sha256": "7bb0e7e60057c57dc1b98cd0dec1094f5f989eb4d072c130a68c6fcd49df3b39",
+          "cross_scope_reference": false,
+          "event_id": "$rzh4-akjau4-dYYLWnwk3lMdgzZFNIbpW5IrkEqesS8",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318826893,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 74,
+          "body_sha256": "273fedb636fe6d10a1e89b3f015d9959859b76ae01fbaacd9d7e2536ef6f8c8e",
+          "cross_scope_reference": false,
+          "event_id": "$Wrh4augxJUluhNxt8b1m2uzOdjE6YDSpXddFyF0D1tQ",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318827169,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 5027,
+          "body_sha256": "4090fe1ec84b7202a873908fa4833e7f6b47f865e84204c15fd54c052318db9d",
+          "cross_scope_reference": false,
+          "event_id": "$XEMEVmmN5UvCfOQXnBOC5Mmu0xFfiqbuPQWUNhFeyfY",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318838774,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 106,
+          "body_sha256": "9e1634a109e6a7dcf000a0a4d8084581944f23bdd5ae64d64283138a97bffe37",
+          "cross_scope_reference": false,
+          "event_id": "$xScp-ALRPwzckh-Zr_jHiAswa14tVB3SSLFUT4D_1Bs",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318839405,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 120,
+          "body_sha256": "ca046a31ab1d9ebb781108b0f714fc2cf2d4595749b4860dba71bff911f9ef88",
+          "cross_scope_reference": false,
+          "event_id": "$w6G_JBWqtfZ2bpgKhssxahPupdE9pJZRE2UrVbVRpQo",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318839412,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 75,
+          "body_sha256": "9bd13e7a3a6d446a70f8b49613ff363ae2a4572f7a4dde80e04d965ac07bf619",
+          "cross_scope_reference": false,
+          "event_id": "$jP9pJRDPHazBwk_8qbJ825wyDoKUa6sg4Bsw0zJ8eN8",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318841474,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 5724,
+          "body_sha256": "5922dc7af06499b9cc12b70161a614ac8801fd59bae7ab11a65519968b787689",
+          "cross_scope_reference": false,
+          "event_id": "$Bcix7mA-PU2GJ8V63yEpSrRkZtcAD_mQYwNFJLESdc4",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318854088,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 370,
+          "body_sha256": "7ad1c338cc2a3af73d3f40399607da0f84f0a35e90e98d5f90cdcc0c6aed303d",
+          "cross_scope_reference": false,
+          "event_id": "$kj42hu6DLXiFegRxjbylI5JFagk2XNCmeaHE6l1YRtM",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318858174,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 188,
+          "body_sha256": "5a3a5a11f1a592b7182965aa95c6628c410a5f2ff9759a5120c5bac4a56387b8",
+          "cross_scope_reference": false,
+          "event_id": "$fJ8_4cankQdkHFYz4H2kD3xpEdWp06oRaLZP7mNdXAc",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318858181,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 4764,
+          "body_sha256": "7a22b44846115c991d4affc0d7c2c99224108742197e1a8a30d9d3c213fa667b",
+          "cross_scope_reference": false,
+          "event_id": "$Yo-tGhHYML52AE8kXeo7W3qcmcuoxIv1jVP2qNzITcw",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318867852,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 264,
+          "body_sha256": "118c0b43d61a9e5dae52dbf4d664c031fef361a1a28dbc520ca28b5e0496b65c",
+          "cross_scope_reference": false,
+          "event_id": "$7E83ML26tWiWwKpWE0n2WzcW9HJMQElSwstrHuVbS90",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318869531,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 239,
+          "body_sha256": "77896b0f5bb23e7966aed0a8e45c75cef4cb7af2132a80b3ae697d35c6d56c3d",
+          "cross_scope_reference": false,
+          "event_id": "$4DUKUEzLpd9N2DFUtLh4GEvLuV_Vx_v2mxhK5t_gLI0",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318869540,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [],
+          "body_length": 141,
+          "body_sha256": "d844aba05e10a6f9c1e4403af95b49fed658b02eb0f0ae2e2c2f0e0cce4d0ea1",
+          "cross_scope_reference": false,
+          "event_id": "$JTa3hbfZKRnhG-EkP4-1BOuRB8Og9HuTFYJHInNcK0M",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318869570,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 1599,
+          "body_sha256": "96fd0bf6445b76715636fc50ca343176352aaf54d2e7cd56bd34bd1e90135fc2",
+          "cross_scope_reference": false,
+          "event_id": "$DiPcHA9u4BYrcShLryv9In-U4QCWp7SwnSWFGCTniXw",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318874130,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        },
+        {
+          "action_tokens": [
+            "check_task",
+            "accept_task"
+          ],
+          "body_length": 3121,
+          "body_sha256": "5a0d9419f192a7468f0ad99390058141b35a912f3163d92bb6ea7dcbc8da7a23",
+          "cross_scope_reference": false,
+          "event_id": "$lRPnGXMiKfKuHfOAr_4rq2ARJP9OYqpQ6_6Zbw9CbCk",
+          "native_taskflow_marker": false,
+          "origin_server_ts": 1788318880095,
+          "sender": "@native-m1-verify-leader:matrix-native-m0-20260901.agentteams.local:28080",
+          "type": "m.room.message"
+        }
+      ],
+      "label": "outcome_task",
+      "room_id": "!Se5wlvKILvNEwxNvaw:matrix-native-m0-20260901.agentteams.local:28080",
+      "since": 1788318548569
+    }
+  ],
+  "redaction": {
+    "event_bodies_persisted": false,
+    "credentials_persisted": false,
+    "observer_writes_matrix": false,
+    "observer_created_tasks": false
+  }
+}
