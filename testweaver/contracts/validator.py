@@ -11,7 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Any
 
@@ -30,6 +30,7 @@ _SCHEMA_VERSIONS = {
     "handoff": "testweaver.handoff/v1",
 }
 _CLAIM_TYPES = {"ROOT_CAUSE", "IMPACT", "REPAIR", "ATTACK"}
+_EPISTEMIC_STATUSES = {"FACT", "INFERENCE", "UNKNOWN"}
 _EVIDENCE_KINDS = {"file", "message", "artifact"}
 _TRANSPORT_CHANNELS = {"filesync", "message"}
 _COMMON_FIELDS = {
@@ -63,6 +64,44 @@ def seal(document: Mapping[str, Any]) -> dict[str, Any]:
     payload.pop("content_hash", None)
     payload["content_hash"] = canonical_hash(payload)
     return payload
+
+
+def deduplicate_claims(documents: Iterable[Mapping[str, Any]]) -> tuple[dict[str, Any], ...]:
+    """Keep exact duplicate claims once and reject conflicting replacements."""
+
+    merged: list[dict[str, Any]] = []
+    by_id: dict[str, dict[str, Any]] = {}
+    for document in documents:
+        if not isinstance(document, Mapping):
+            raise ContractError("claim must be an object")
+        validate("claim", document)
+        candidate = dict(document)
+        claim_id = candidate["claim_id"]
+        existing = by_id.get(claim_id)
+        if existing is None:
+            by_id[claim_id] = candidate
+            merged.append(candidate)
+        elif existing["content_hash"] != candidate["content_hash"]:
+            raise ContractError(
+                f"conflicting claim {claim_id}; explicit resolution is required"
+            )
+    return tuple(merged)
+
+
+def unique_source_hashes(documents: Iterable[Mapping[str, Any]]) -> tuple[tuple[str, str], ...]:
+    """Return stable source/content pairs for read de-duplication only."""
+
+    unique: list[tuple[str, str]] = []
+    seen: set[tuple[str, str]] = set()
+    for document in documents:
+        if not isinstance(document, Mapping):
+            raise ContractError("claim must be an object")
+        validate("claim", document)
+        key = (document["source"], document["evidence_ref"]["content_hash"])
+        if key not in seen:
+            seen.add(key)
+            unique.append(key)
+    return tuple(unique)
 
 
 def schema_path(kind: str) -> Path:
@@ -108,13 +147,25 @@ def validate(kind: str, document: Mapping[str, Any]) -> Mapping[str, Any]:
             {"summary", "claim_refs", "evidence_refs", "provenance_ref", "unresolved_items"}
         )
     elif kind == "claim":
-        required.update({"claim", "evidence_ref", "provenance", "confidence", "unresolved_items"})
+        required.update(
+            {"claim", "source", "evidence_ref", "provenance", "confidence", "unresolved_items"}
+        )
     elif kind == "evidence":
         required.update({"evidence_type", "evidence_ref", "provenance"})
     elif kind == "provenance":
         required.update({"source_refs", "method"})
     elif kind == "handoff":
-        required.update({"claim", "evidence_ref", "provenance", "confidence", "unresolved_items"})
+        required.update(
+            {
+                "claim",
+                "evidence_ref",
+                "provenance",
+                "confidence",
+                "context_refs",
+                "evidence_gaps",
+                "unresolved_items",
+            }
+        )
 
     unknown = set(document) - required
     missing = required - set(document)
@@ -162,6 +213,13 @@ def _check_identifier(value: Any, field: str) -> None:
 def _check_reference(value: Any, field: str) -> None:
     if not isinstance(value, str) or not 1 <= len(value) <= 2000 or any(char.isspace() for char in value):
         raise ContractError(f"{field} must be a non-empty opaque reference")
+
+
+def _check_reference_list(value: Any, field: str, *, minimum: int = 0) -> None:
+    if not isinstance(value, list) or len(value) < minimum:
+        raise ContractError(f"{field} must contain at least {minimum} references")
+    for index, reference in enumerate(value):
+        _check_reference(reference, f"{field}[{index}]")
 
 
 def _check_native_refs(value: Any) -> None:
@@ -225,12 +283,14 @@ def _check_confidence(value: Any) -> None:
 
 
 def _check_claim_body(value: Any, field: str = "claim") -> None:
-    if not isinstance(value, Mapping) or set(value) != {"statement", "claim_type"}:
+    if not isinstance(value, Mapping) or set(value) != {"statement", "claim_type", "epistemic_status"}:
         raise ContractError(f"{field} has an invalid shape")
     if not isinstance(value["statement"], str) or not 1 <= len(value["statement"]) <= 4000:
         raise ContractError(f"{field}.statement must be non-empty")
     if value["claim_type"] not in _CLAIM_TYPES:
         raise ContractError(f"{field}.claim_type is not supported")
+    if value["epistemic_status"] not in _EPISTEMIC_STATUSES:
+        raise ContractError(f"{field}.epistemic_status is not supported")
 
 
 def _check_context(document: Mapping[str, Any]) -> None:
@@ -255,6 +315,7 @@ def _check_context(document: Mapping[str, Any]) -> None:
 
 def _check_claim(document: Mapping[str, Any]) -> None:
     _check_identifier(document["claim_id"], "claim_id")
+    _check_reference(document["source"], "source")
     _check_claim_body(document["claim"])
     _check_evidence_ref(document["evidence_ref"])
     _check_provenance_value(document["provenance"])
@@ -290,4 +351,6 @@ def _check_handoff(document: Mapping[str, Any]) -> None:
     _check_evidence_ref(document["evidence_ref"])
     _check_provenance_value(document["provenance"])
     _check_confidence(document["confidence"])
+    _check_reference_list(document["context_refs"], "context_refs", minimum=1)
+    _check_unresolved(document["evidence_gaps"])
     _check_unresolved(document["unresolved_items"])

@@ -5,7 +5,14 @@ from __future__ import annotations
 import copy
 import unittest
 
-from testweaver.contracts.validator import ContractError, load_schema, seal, validate
+from testweaver.contracts.validator import (
+    ContractError,
+    deduplicate_claims,
+    load_schema,
+    seal,
+    unique_source_hashes,
+    validate,
+)
 
 
 TEST_FIXTURE_ONLY_NOT_LIVE = True
@@ -66,7 +73,12 @@ def _documents() -> dict[str, dict[str, object]]:
     claim.update(
         {
             "claim_id": "claim-reference",
-            "claim": {"statement": "bounded conclusion", "claim_type": "ROOT_CAUSE"},
+            "source": "native-source-reference",
+            "claim": {
+                "statement": "bounded conclusion",
+                "claim_type": "ROOT_CAUSE",
+                "epistemic_status": "INFERENCE",
+            },
             "evidence_ref": _evidence_ref(),
             "provenance": _provenance(),
             "confidence": 0.75,
@@ -97,10 +109,16 @@ def _documents() -> dict[str, dict[str, object]]:
     handoff.update(
         {
             "handoff_id": "handoff-reference",
-            "claim": {"statement": "bounded conclusion", "claim_type": "ROOT_CAUSE"},
+            "claim": {
+                "statement": "bounded conclusion",
+                "claim_type": "ROOT_CAUSE",
+                "epistemic_status": "INFERENCE",
+            },
             "evidence_ref": _evidence_ref(),
             "provenance": _provenance(),
             "confidence": 0.75,
+            "context_refs": ["context-reference"],
+            "evidence_gaps": ["independent-confirmation"],
             "unresolved_items": ["independent confirmation remains"],
         }
     )
@@ -129,10 +147,70 @@ class NativeContractTests(unittest.TestCase):
             self.assertIn("native_refs", schema["required"])
             self.assertIn("producer", schema["required"])
 
+        claim_schema = load_schema("claim")
+        self.assertIn("source", claim_schema["required"])
+        self.assertIn("epistemic_status", claim_schema["$defs"]["ClaimBody"]["required"])
+        handoff_schema = load_schema("handoff")
+        self.assertIn("context_refs", handoff_schema["required"])
+        self.assertIn("evidence_gaps", handoff_schema["required"])
+        self.assertIn("epistemic_status", handoff_schema["$defs"]["ClaimBody"]["required"])
+
     def test_valid_fixtures_cover_the_five_thin_artifacts(self) -> None:
         for kind, document in _documents().items():
             validate(kind, document)
             self.assertTrue(document["native_refs"]["read_only"])
+
+    def test_claim_metadata_and_epistemic_status_are_required(self) -> None:
+        claim = _documents()["claim"]
+        self.assertEqual(claim["source"], "native-source-reference")
+        self.assertIn("version", claim)
+        self.assertIn("evidence_ref", claim)
+        self.assertIn("content_hash", claim)
+        self.assertEqual(claim["claim"]["epistemic_status"], "INFERENCE")
+        for status in ("FACT", "INFERENCE", "UNKNOWN"):
+            candidate = copy.deepcopy(claim)
+            candidate["claim"]["epistemic_status"] = status
+            candidate["content_hash"] = seal(candidate)["content_hash"]
+            validate("claim", candidate)
+
+        missing_source = copy.deepcopy(claim)
+        del missing_source["source"]
+        missing_source["content_hash"] = seal(missing_source)["content_hash"]
+        with self.assertRaisesRegex(ContractError, "missing fields"):
+            validate("claim", missing_source)
+
+        missing_status = copy.deepcopy(claim)
+        del missing_status["claim"]["epistemic_status"]
+        missing_status["content_hash"] = seal(missing_status)["content_hash"]
+        with self.assertRaisesRegex(ContractError, "claim has an invalid shape"):
+            validate("claim", missing_status)
+
+    def test_conflicting_claims_are_not_overwritten_and_source_hashes_deduplicate(self) -> None:
+        claim = _documents()["claim"]
+        original = copy.deepcopy(claim)
+        duplicate = copy.deepcopy(claim)
+        self.assertEqual(len(deduplicate_claims([claim, duplicate])), 1)
+        self.assertEqual(claim, original)
+        self.assertEqual(
+            unique_source_hashes([claim, duplicate]),
+            (("native-source-reference", "sha256:" + "0" * 64),),
+        )
+
+        conflict = copy.deepcopy(claim)
+        conflict["claim"]["statement"] = "a conflicting conclusion"
+        conflict["content_hash"] = seal(conflict)["content_hash"]
+        with self.assertRaisesRegex(ContractError, "conflicting claim"):
+            deduplicate_claims([claim, conflict])
+
+    def test_handoff_is_limited_to_context_and_evidence_gaps(self) -> None:
+        handoff = _documents()["handoff"]
+        self.assertEqual(handoff["context_refs"], ["context-reference"])
+        self.assertEqual(handoff["evidence_gaps"], ["independent-confirmation"])
+
+        invalid = copy.deepcopy(handoff)
+        invalid["task_run"] = "must remain native and external to this contract"
+        with self.assertRaisesRegex(ContractError, "unknown fields"):
+            validate("handoff", invalid)
 
     def test_unknown_field_is_rejected(self) -> None:
         invalid = copy.deepcopy(_documents()["handoff"])

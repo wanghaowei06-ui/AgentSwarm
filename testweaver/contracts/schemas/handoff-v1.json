@@ -31,8 +31,18 @@
     "claim": {
       "$ref": "#/$defs/ClaimBody"
     },
+    "context_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "common-v1.json#/$defs/ArtifactRef"
+      }
+    },
     "evidence_ref": {
       "$ref": "common-v1.json#/$defs/EvidenceRef"
+    },
+    "evidence_gaps": {
+      "$ref": "common-v1.json#/$defs/UnresolvedItems"
     },
     "provenance": {
       "$ref": "common-v1.json#/$defs/Provenance"
@@ -53,7 +63,8 @@
       "additionalProperties": false,
       "required": [
         "statement",
-        "claim_type"
+        "claim_type",
+        "epistemic_status"
       ],
       "properties": {
         "statement": {
@@ -69,6 +80,9 @@
             "REPAIR",
             "ATTACK"
           ]
+        },
+        "epistemic_status": {
+          "$ref": "common-v1.json#/$defs/EpistemicStatus"
         }
       }
     }
@@ -82,9 +96,11 @@
     "native_refs",
     "producer",
     "claim",
+    "context_refs",
     "evidence_ref",
     "provenance",
     "confidence",
+    "evidence_gaps",
     "unresolved_items",
     "artifact"
   ]

@@ -26,6 +26,14 @@
       "type": "string",
       "pattern": "^sha256:[0-9a-f]{64}$"
     },
+    "EpistemicStatus": {
+      "type": "string",
+      "enum": [
+        "FACT",
+        "INFERENCE",
+        "UNKNOWN"
+      ]
+    },
     "NativeRefs": {
       "type": "object",
       "additionalProperties": false,

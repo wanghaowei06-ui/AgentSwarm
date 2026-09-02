@@ -22,6 +22,9 @@
     "claim_id": {
       "$ref": "common-v1.json#/$defs/Identifier"
     },
+    "source": {
+      "$ref": "common-v1.json#/$defs/ArtifactRef"
+    },
     "native_refs": {
       "$ref": "common-v1.json#/$defs/NativeRefs"
     },
@@ -53,7 +56,8 @@
       "additionalProperties": false,
       "required": [
         "statement",
-        "claim_type"
+        "claim_type",
+        "epistemic_status"
       ],
       "properties": {
         "statement": {
@@ -69,6 +73,9 @@
             "REPAIR",
             "ATTACK"
           ]
+        },
+        "epistemic_status": {
+          "$ref": "common-v1.json#/$defs/EpistemicStatus"
         }
       }
     }
@@ -79,6 +86,7 @@
     "revision",
     "content_hash",
     "claim_id",
+    "source",
     "native_refs",
     "producer",
     "claim",
