@@ -10,12 +10,26 @@ from .agentloop_client import (
     AgentLoopCredentialLease,
     AgentLoopEndpoint,
     AgentLoopHTTPResponse,
+    AgentLoopQueryVerification,
     AgentLoopReceipt,
+    AgentLoopResponseSummary,
     AgentLoopScope,
 )
 from .heterogeneity import CandidateCapability, HeterogeneityPolicyFact
 from .matrix_readback import MatrixDecisionExpectation, MatrixHumanReadbackVerifier
 from .projector import NativeEventProjector, ProjectionError
+from .tea_transport import (
+    AlibabaCloudCredential,
+    TeaAgentLoopTransport,
+    load_protected_csv_credential,
+)
+from .xtrace_readback import (
+    TeaXTraceTransport,
+    XTraceCorrelation,
+    XTraceHTTPResponse,
+    XTraceReadbackClient,
+    XTraceReadbackReceipt,
+)
 
 __all__ = [
     "AgentLoopCallResult",
@@ -23,12 +37,22 @@ __all__ = [
     "AgentLoopCredentialLease",
     "AgentLoopEndpoint",
     "AgentLoopHTTPResponse",
+    "AgentLoopQueryVerification",
     "AgentLoopReceipt",
+    "AgentLoopResponseSummary",
     "AgentLoopScope",
+    "AlibabaCloudCredential",
     "CandidateCapability",
     "HeterogeneityPolicyFact",
     "MatrixDecisionExpectation",
     "MatrixHumanReadbackVerifier",
     "NativeEventProjector",
     "ProjectionError",
+    "TeaAgentLoopTransport",
+    "TeaXTraceTransport",
+    "XTraceCorrelation",
+    "XTraceHTTPResponse",
+    "XTraceReadbackClient",
+    "XTraceReadbackReceipt",
+    "load_protected_csv_credential",
 ]

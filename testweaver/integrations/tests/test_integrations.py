@@ -340,7 +340,7 @@ def _client(
     transport: RecordingTransport, credential: object = "credential-material-sentinel"
 ) -> AgentLoopClient:
     return AgentLoopClient(
-        AgentLoopEndpoint("https://cms.example.invalid", "space-1"),
+        AgentLoopEndpoint("https://agentloop.cn-beijing.aliyuncs.com", "space-1"),
         transport,
         lambda: AgentLoopCredentialLease("protected:/etc/agentloop", credential),
         lambda: "2026-09-03T01:04:00Z",
@@ -377,9 +377,10 @@ def test_agentloop_client_uses_inherited_dataset_evaluator_task_shapes_and_hash_
             task_name="task-1",
             dataset_name="dataset-1",
             evaluator_ref="eval-1",
-            data_type="trace",
-            data_filter={"runId": "run-1"},
+            data_type="dataset",
+            data_filter={"datasetName": "dataset-1", "maxRecords": 1},
             variable_mapping={"input": "content"},
+            hidden_gold_visible=False,
             client_token="idem-4",
         ),
         client.get_evaluation_task(scope, task_id="task-1"),
@@ -396,6 +397,13 @@ def test_agentloop_client_uses_inherited_dataset_evaluator_task_shapes_and_hash_
         "ListEvaluationRuns",
     ]
     task_body = json.loads(transport.calls[5]["body"])
+    assert task_body["dataType"] == "dataset"
+    assert task_body["dataFilter"] == {
+        "datasetName": "dataset-1",
+        "maxRecords": 1,
+    }
+    assert task_body["evaluators"][0]["variableMapping"] == {"input": "content"}
+    assert "gold" not in json.dumps(task_body).lower()
     assert task_body["runStrategies"] == {"backfill": {"enabled": True}}
     assert task_body["tags"] == {
         "campaignId": "campaign-1",
@@ -409,7 +417,7 @@ def test_agentloop_client_uses_inherited_dataset_evaluator_task_shapes_and_hash_
             "protected:/etc/agentloop", "credential-material-sentinel"
         )
     )
-    assert all(result.receipt.status == "PASS" for result in results)
+    assert all(result.receipt.status == "API_ACCEPTED" for result in results)
     assert results[5].resource_ref == "task-1"
     assert not any(
         hasattr(client, method)
@@ -443,13 +451,45 @@ def test_agentloop_endpoint_and_permission_failures_are_explicitly_blocked() -> 
         task_name="task-1",
         dataset_name="dataset-1",
         evaluator_ref="eval-1",
-        data_type="trace",
-        data_filter={},
+        data_type="dataset",
+        data_filter={"datasetName": "dataset-1", "maxRecords": 1},
         variable_mapping={"input": "content"},
+        hidden_gold_visible=False,
         client_token="idem-1",
     )
-    assert malformed_result.receipt.status == "BLOCKED"
+    assert malformed_result.receipt.status == "API_ACCEPTED"
     assert malformed_result.receipt.error_category == "RESPONSE_CONTRACT_INVALID"
+
+
+@pytest.mark.parametrize(
+    ("data_type", "data_filter", "variable_mapping", "hidden_gold_visible"),
+    [
+        ("trace", {"datasetName": "dataset-1", "maxRecords": 1}, {"input": "content"}, False),
+        ("dataset", {"datasetName": "dataset-1", "maxRecords": 2}, {"input": "content"}, False),
+        ("dataset", {"datasetName": "other", "maxRecords": 1}, {"input": "content"}, False),
+        ("dataset", {"datasetName": "dataset-1", "maxRecords": 1}, {"output": "content"}, False),
+        ("dataset", {"datasetName": "dataset-1", "maxRecords": 1}, {"input": "content"}, True),
+    ],
+)
+def test_agentloop_evaluation_task_rejects_unbounded_or_gold_visible_inputs(
+    data_type: str,
+    data_filter: dict[str, Any],
+    variable_mapping: dict[str, Any],
+    hidden_gold_visible: bool,
+) -> None:
+    client = _client(RecordingTransport())
+    with pytest.raises(AuthorityError):
+        client.create_evaluation_task_run(
+            AgentLoopScope("campaign-1", "run-1", 1),
+            task_name="task-1",
+            dataset_name="dataset-1",
+            evaluator_ref="eval-1",
+            data_type=data_type,
+            data_filter=data_filter,
+            variable_mapping=variable_mapping,
+            hidden_gold_visible=hidden_gold_visible,
+            client_token="idem-1",
+        )
 
 
 def test_agentloop_credential_callback_failure_is_blocked_without_transport_call() -> (
@@ -457,7 +497,7 @@ def test_agentloop_credential_callback_failure_is_blocked_without_transport_call
 ):
     transport = RecordingTransport()
     client = AgentLoopClient(
-        AgentLoopEndpoint("https://cms.example.invalid", "space-1"),
+        AgentLoopEndpoint("https://agentloop.cn-beijing.aliyuncs.com", "space-1"),
         transport,
         lambda: (_ for _ in ()).throw(RuntimeError("missing")),
         lambda: "2026-09-03T01:04:00Z",

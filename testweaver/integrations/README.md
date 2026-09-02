@@ -20,8 +20,23 @@ Tasks, retries, and lifecycle state.
   backfill plus task/run get. Credentials come from a callback. Receipts retain
   hashes and classifications, not credential values, request bodies, response
   bodies, resource names, or request IDs. Endpoint and permission failures are
-  `BLOCKED`. There is no delete, lifecycle controller, Observer, or synthetic
-  `LIVE` assertion.
+  `BLOCKED`. A successful request is only `API_ACCEPTED`; only task and run GET
+  readback proving exact AgentSpace ownership, Campaign/Run/revision scope,
+  terminal state, and a non-empty successful result becomes
+  `API_QUERY_VERIFIED`. Dataset-backed evaluation is intentionally limited to
+  one `content` row and exposes no hidden Gold.
+- `tea_transport.py` loads an owner-only protected AccessKey CSV at runtime and
+  signs AgentLoop requests through the installed Alibaba Cloud Tea SDK. Secret
+  material is neither dataclass-expandable nor printable.
+- `xtrace_readback.py` performs bounded `XTrace/2019-08-08 GetTrace` reads for a
+  caller-supplied TraceID. Its sealed receipt retains only response/request
+  hashes, span count, and exact Campaign/Run/PostgreSQL-revision/content-hash
+  anchor matches. HTTP 401/403 remains `BLOCKED`; a successful export or an
+  OTLP HTTP 200 is never upgraded without this server-side readback.
+
+There is no delete, lifecycle controller, Observer, synthetic `LIVE` assertion,
+or autonomous cloud write probe in this package. A real run must supply the
+known TraceID and matching authority tuple; tests use injected transports only.
 
 The normalized native fact types are `manager_choice`, `accepted_result`,
 `handoff`, `skill_invocation`, `dsh_call`, `recovery_generation`,

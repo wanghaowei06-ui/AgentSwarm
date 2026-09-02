@@ -78,7 +78,8 @@ elif [[ "$all" == *'/event/'* ]]; then
 elif [[ "$all" == *'/profile/'* ]]; then
   printf '%s\n' '{"displayname":"External Human"}'
 elif [[ "$all" == *'/api/agents/default/skills'* ]]; then
-  printf '%s\n' '{"skills":[{"name":"evidence","enabled":true}]}'
+  # Current QwenPaw returns the inventory as a top-level array.
+  printf '%s\n' '[{"name":"evidence","enabled":true}]'
 elif [[ "$all" == *'find /root/manager-workspace'* ]]; then
   printf '%s\n' '/root/manager-workspace/.openclaw/agents/main/sessions/hero.jsonl'
 elif [[ "$all" == *'find /root/agentteams-fs/agents'* ]]; then

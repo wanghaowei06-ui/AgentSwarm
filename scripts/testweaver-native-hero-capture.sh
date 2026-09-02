@@ -271,7 +271,7 @@ capture_skills() {
   local actor=$1 container=$2 out=$3
   mkdir -p "$out"
   if docker exec "$container" sh -c 'curl -fsS http://127.0.0.1:8088/api/agents/default/skills' 2>/dev/null |
-      jq -S '[.skills[]? | {name,enabled}]' >"$out/list.json"; then :; else
+      jq -S '[(if type == "array" then .[] elif type == "object" then (.skills // [])[] else empty end) | {name,enabled}]' >"$out/list.json"; then :; else
     printf '{"status":"NOT_OBSERVED"}\n' >"$out/list.json"; note_missing "skills.list.$actor"
   fi
   if ! docker exec "$container" sh -c '

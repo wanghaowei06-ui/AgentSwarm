@@ -12,36 +12,55 @@ import json
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol
-from urllib.parse import quote
+from urllib.parse import quote, urlsplit
 
 from testweaver.authority import AuthorityError, digest_bytes, validate_ref
 from testweaver.contracts.validator import canonical_hash
 
 
-@dataclass(frozen=True, slots=True, repr=False)
 class AgentLoopCredentialLease:
-    protected_ref: str
-    material: object
+    """Runtime-only credential lease that cannot be expanded by dataclasses.asdict."""
+
+    __slots__ = ("_material", "protected_ref")
+
+    def __init__(self, protected_ref: str, material: object) -> None:
+        self.protected_ref = protected_ref
+        self._material = material
+
+    @property
+    def material(self) -> object:
+        return self._material
 
     def __repr__(self) -> str:
         return f"AgentLoopCredentialLease(protected_ref={self.protected_ref!r}, material=<redacted>)"
+
+    def as_dict(self) -> dict[str, str]:
+        return {"protected_ref": self.protected_ref, "material": "<redacted>"}
 
 
 CredentialCallback = Callable[[], AgentLoopCredentialLease]
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, repr=False)
 class AgentLoopHTTPResponse:
     status_code: int
     body: bytes
     request_id: str | None = None
     error_code: str | None = None
 
+    def __repr__(self) -> str:
+        return (
+            f"AgentLoopHTTPResponse(status_code={self.status_code!r}, body=<redacted>, "
+            f"request_id_present={self.request_id is not None!r}, "
+            f"error_code={self.error_code!r})"
+        )
+
 
 class AgentLoopTransport(Protocol):
     def request(
         self,
         *,
+        operation: str,
         method: str,
         endpoint: str,
         path: str,
@@ -55,6 +74,10 @@ class AgentLoopTransport(Protocol):
 class AgentLoopEndpoint:
     endpoint: str
     agent_space: str
+
+    def __post_init__(self) -> None:
+        _validate_agentloop_endpoint(self.endpoint)
+        validate_ref(self.agent_space, "agent_space")
 
 
 @dataclass(frozen=True, slots=True)
@@ -90,7 +113,7 @@ class AgentLoopReceipt:
     def __post_init__(self) -> None:
         validate_ref(self.operation, "agentloop_operation")
         validate_ref(self.observed_at, "observed_at")
-        if self.status not in {"PASS", "BLOCKED"}:
+        if self.status not in {"API_ACCEPTED", "BLOCKED"}:
             raise AuthorityError("AgentLoop receipt status is invalid")
         if self.status_code is not None and (
             type(self.status_code) is not int or not 100 <= self.status_code <= 599
@@ -148,6 +171,52 @@ class AgentLoopReceipt:
 class AgentLoopCallResult:
     receipt: AgentLoopReceipt
     resource_ref: str | None = None
+    response_summary: AgentLoopResponseSummary | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class AgentLoopResponseSummary:
+    ownership_verified: bool
+    scope_verified: bool
+    terminal: bool
+    completed: bool
+    result_count: int
+    successful_result_count: int
+
+
+@dataclass(frozen=True, slots=True)
+class AgentLoopQueryVerification:
+    status: str
+    task_receipt_hash: str
+    runs_receipt_hash: str
+    ownership_verified: bool
+    scope_verified: bool
+    terminal: bool
+    result_count: int
+    successful_result_count: int
+    observed_at: str
+    content_hash: str
+
+    def __post_init__(self) -> None:
+        if self.status not in {"API_QUERY_VERIFIED", "NOT_VERIFIED", "BLOCKED"}:
+            raise AuthorityError("AgentLoop query verification status is invalid")
+        if self.result_count < 0 or self.successful_result_count < 0:
+            raise AuthorityError("AgentLoop query result counts must be non-negative")
+        expected = canonical_hash(
+            {
+                "status": self.status,
+                "task_receipt_hash": self.task_receipt_hash,
+                "runs_receipt_hash": self.runs_receipt_hash,
+                "ownership_verified": self.ownership_verified,
+                "scope_verified": self.scope_verified,
+                "terminal": self.terminal,
+                "result_count": self.result_count,
+                "successful_result_count": self.successful_result_count,
+                "observed_at": self.observed_at,
+            }
+        )
+        if self.content_hash != expected:
+            raise AuthorityError("AgentLoop query verification is not sealed")
 
 
 @dataclass(slots=True)
@@ -276,9 +345,26 @@ class AgentLoopClient:
         data_type: str,
         data_filter: Mapping[str, Any],
         variable_mapping: Mapping[str, Any],
+        hidden_gold_visible: bool,
         client_token: str,
     ) -> AgentLoopCallResult:
         """Create a batch task with official backfill enabled (the bounded run operation)."""
+
+        expected_filter = {"datasetName": dataset_name, "maxRecords": 1}
+        if data_type != "dataset":
+            raise AuthorityError("AgentLoop evaluation data_type must be dataset")
+        if dict(data_filter) != expected_filter:
+            raise AuthorityError(
+                "AgentLoop evaluation must select exactly one row from its Dataset"
+            )
+        if dict(variable_mapping) != {"input": "content"}:
+            raise AuthorityError(
+                "AgentLoop evaluator input must map only to Dataset content"
+            )
+        if hidden_gold_visible is not False:
+            raise AuthorityError(
+                "AgentLoop candidate evaluation must keep hidden Gold isolated"
+            )
 
         return self._call(
             scope,
@@ -290,11 +376,11 @@ class AgentLoopClient:
                 "taskName": task_name,
                 "taskMode": "batch",
                 "dataType": data_type,
-                "dataFilter": dict(data_filter),
+                "dataFilter": expected_filter,
                 "evaluators": [
                     {
                         "evaluatorRef": evaluator_ref,
-                        "variableMapping": dict(variable_mapping),
+                        "variableMapping": {"input": "content"},
                     }
                 ],
                 "config": {"datasetName": dataset_name},
@@ -341,6 +427,58 @@ class AgentLoopClient:
             body=None,
             resource_ref=task_id,
         )
+
+    def verify_evaluation_task_run(
+        self,
+        scope: AgentLoopScope,
+        *,
+        task_id: str,
+        max_results: int = 10,
+    ) -> AgentLoopQueryVerification:
+        """Read back task ownership/scope and a completed non-empty run.
+
+        The two HTTP GET operations retain only their sealed receipts and
+        bounded summaries. A successful POST or a bare HTTP 2xx can never
+        reach ``API_QUERY_VERIFIED`` through this method.
+        """
+
+        task = self.get_evaluation_task(scope, task_id=task_id)
+        runs = self.get_evaluation_runs(scope, task_id=task_id, max_results=max_results)
+        task_summary = task.response_summary or _EMPTY_SUMMARY
+        runs_summary = runs.response_summary or _EMPTY_SUMMARY
+        blocked = task.receipt.status == "BLOCKED" or runs.receipt.status == "BLOCKED"
+        ownership = task_summary.ownership_verified and runs_summary.ownership_verified
+        scoped = task_summary.scope_verified
+        terminal = (
+            task_summary.terminal
+            and task_summary.completed
+            and runs_summary.terminal
+            and runs_summary.completed
+        )
+        result_count = runs_summary.result_count
+        successful = runs_summary.successful_result_count
+        verified = (
+            ownership and scoped and terminal and result_count > 0 and successful > 0
+        )
+        status = (
+            "BLOCKED"
+            if blocked
+            else "API_QUERY_VERIFIED"
+            if verified
+            else "NOT_VERIFIED"
+        )
+        values = {
+            "status": status,
+            "task_receipt_hash": task.receipt.content_hash,
+            "runs_receipt_hash": runs.receipt.content_hash,
+            "ownership_verified": ownership,
+            "scope_verified": scoped,
+            "terminal": terminal,
+            "result_count": result_count,
+            "successful_result_count": successful,
+            "observed_at": self.clock(),
+        }
+        return AgentLoopQueryVerification(**values, content_hash=canonical_hash(values))
 
     def _call(
         self,
@@ -410,6 +548,7 @@ class AgentLoopClient:
         credential_ref_hash = digest_bytes(lease.protected_ref.encode())
         try:
             response = self.transport.request(
+                operation=operation,
                 method=method,
                 endpoint=self.config.endpoint,
                 path=path,
@@ -434,7 +573,7 @@ class AgentLoopClient:
                 observed_at=observed_at,
             )
             return AgentLoopCallResult(receipt)
-        status = "PASS" if 200 <= response.status_code < 300 else "BLOCKED"
+        status = "API_ACCEPTED" if 200 <= response.status_code < 300 else "BLOCKED"
         if response.status_code in {401, 403}:
             category = "PERMISSION_DENIED"
         elif response.status_code == 404:
@@ -444,14 +583,23 @@ class AgentLoopClient:
         else:
             category = None
         returned_ref = resource_ref
-        if status == "PASS" and response_resource_keys:
+        if status == "API_ACCEPTED" and response_resource_keys:
             try:
                 returned_ref = _resource_ref_from_response(
                     response.body, response_resource_keys
                 )
             except AuthorityError:
-                status = "BLOCKED"
+                returned_ref = None
                 category = "RESPONSE_CONTRACT_INVALID"
+        response_summary = None
+        if status == "API_ACCEPTED" and method == "GET":
+            response_summary = _response_summary(
+                operation=operation,
+                body=response.body,
+                agent_space=self.config.agent_space,
+                resource_ref=resource_ref,
+                scope=scope,
+            )
         receipt = AgentLoopReceipt.create(
             operation=operation,
             status=status,
@@ -471,7 +619,11 @@ class AgentLoopClient:
             error_category=category,
             observed_at=observed_at,
         )
-        return AgentLoopCallResult(receipt, returned_ref if status == "PASS" else None)
+        return AgentLoopCallResult(
+            receipt,
+            returned_ref if status == "API_ACCEPTED" else None,
+            response_summary,
+        )
 
 
 def _quoted(value: str) -> str:
@@ -493,3 +645,132 @@ def _resource_ref_from_response(body: bytes, keys: tuple[str, ...]) -> str:
         if candidate is not None:
             return validate_ref(candidate, f"agentloop_response_{key}")
     raise AuthorityError("successful AgentLoop create response lacks its resource ID")
+
+
+_EMPTY_SUMMARY = AgentLoopResponseSummary(False, False, False, False, 0, 0)
+
+
+def _response_summary(
+    *,
+    operation: str,
+    body: bytes,
+    agent_space: str,
+    resource_ref: str,
+    scope: AgentLoopScope,
+) -> AgentLoopResponseSummary:
+    if len(body) > 4 * 1024 * 1024:
+        return _EMPTY_SUMMARY
+    try:
+        value = json.loads(body)
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return _EMPTY_SUMMARY
+    if not isinstance(value, Mapping):
+        return _EMPTY_SUMMARY
+    if operation == "GetEvaluationTask":
+        task = value.get("evaluationTask", value)
+        if not isinstance(task, Mapping):
+            return _EMPTY_SUMMARY
+        tags = task.get("tags")
+        expected_tags = {
+            "campaignId": scope.campaign_id,
+            "runId": scope.run_id,
+            "revision": str(scope.revision),
+        }
+        status = task.get("status")
+        return AgentLoopResponseSummary(
+            ownership_verified=(
+                task.get("agentSpace") == agent_space
+                and task.get("taskId") == resource_ref
+            ),
+            scope_verified=isinstance(tags, Mapping)
+            and all(
+                tags.get(key) == expected for key, expected in expected_tags.items()
+            ),
+            terminal=status in {"Completed", "Failed", "Terminated", "Deleted"},
+            completed=status == "Completed",
+            result_count=0,
+            successful_result_count=0,
+        )
+    if operation == "ListEvaluationRuns":
+        rows = value.get("evaluationRuns")
+        if not isinstance(rows, list):
+            return _EMPTY_SUMMARY
+        matching = [
+            row
+            for row in rows
+            if isinstance(row, Mapping) and row.get("taskId") == resource_ref
+        ]
+        completed_rows = [row for row in matching if row.get("status") == "Completed"]
+        result_count = sum(
+            _nonnegative_int(row.get("totalCount")) for row in completed_rows
+        )
+        successful = sum(
+            _nonnegative_int(row.get("successCount")) for row in completed_rows
+        )
+        statuses = {row.get("status") for row in matching}
+        return AgentLoopResponseSummary(
+            ownership_verified=bool(matching),
+            scope_verified=False,
+            terminal=bool(matching)
+            and statuses.issubset({"Completed", "Failed", "Terminated"}),
+            completed=bool(completed_rows),
+            result_count=result_count,
+            successful_result_count=successful,
+        )
+    if operation == "GetDataset":
+        schema = value.get("schema")
+        return AgentLoopResponseSummary(
+            ownership_verified=value.get("agentSpace") == agent_space
+            and value.get("datasetName") == resource_ref,
+            scope_verified=False,
+            terminal=True,
+            completed=True,
+            result_count=1 if isinstance(schema, Mapping) and bool(schema) else 0,
+            successful_result_count=0,
+        )
+    if operation == "GetEvaluator":
+        evaluator = value.get("evaluator")
+        if not isinstance(evaluator, Mapping):
+            return _EMPTY_SUMMARY
+        return AgentLoopResponseSummary(
+            ownership_verified=evaluator.get("agentSpace") == agent_space
+            and evaluator.get("name") == resource_ref,
+            scope_verified=False,
+            terminal=True,
+            completed=True,
+            result_count=1 if evaluator else 0,
+            successful_result_count=0,
+        )
+    return _EMPTY_SUMMARY
+
+
+def _nonnegative_int(value: object) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        return 0
+    return value
+
+
+def _validate_agentloop_endpoint(endpoint: str) -> None:
+    parsed = urlsplit(endpoint)
+    hostname = parsed.hostname or ""
+    labels = hostname.split(".")
+    if (
+        parsed.scheme != "https"
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.port is not None
+        or parsed.path not in {"", "/"}
+        or parsed.query
+        or parsed.fragment
+        or len(labels) != 4
+        or labels[0] != "agentloop"
+        or not labels[1]
+        or any(
+            not (character.islower() or character.isdigit() or character == "-")
+            for character in labels[1]
+        )
+        or labels[-2:] != ["aliyuncs", "com"]
+    ):
+        raise AuthorityError(
+            "AgentLoop endpoint must be a canonical Alibaba Cloud HTTPS endpoint"
+        )
