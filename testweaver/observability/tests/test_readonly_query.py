@@ -15,10 +15,29 @@ from testweaver.observability.readonly_query import (
     HttpResponse,
     ProtectedConfigRef,
     ReadOnlyQueryClient,
+    verify_hero_correlation,
 )
 
 
 _CONTENT_HASH = "sha256:" + "a" * 64
+
+
+def _hero_export(source: str, **overrides: Any) -> dict[str, Any]:
+    value: dict[str, Any] = {
+        "source": source,
+        "campaign_id": "campaign-ref",
+        "run_id": "run-ref",
+        "pg_revision": "pg-revision-ref",
+        "content_hash": _CONTENT_HASH,
+        "trace_id": "b" * 32,
+        "provider": "provider-ref",
+        "model": "model-ref",
+        "usage": {"total_tokens": 10},
+        "latency_ms": 12.5,
+        "synthetic": False,
+    }
+    value.update(overrides)
+    return value
 
 
 def _correlation() -> Correlation:
@@ -37,6 +56,49 @@ def _test_credential_ref() -> ProtectedConfigRef:
 
 
 class ReadOnlyQueryContractTests(unittest.TestCase):
+    def test_same_real_hero_tuple_verifies_otel_and_agentloop_exports(self) -> None:
+        result = verify_hero_correlation(
+            _hero_export("otel_export"), _hero_export("agentloop_query")
+        )
+
+        self.assertEqual(result["status"], "VERIFIED")
+        self.assertEqual(
+            result["authority_tuple"],
+            {
+                "campaign_id": "campaign-ref",
+                "run_id": "run-ref",
+                "pg_revision": "pg-revision-ref",
+                "content_hash": _CONTENT_HASH,
+                "trace_id": "b" * 32,
+            },
+        )
+        self.assertEqual(result["sources"], ["otel_export", "agentloop_query"])
+
+    def test_hero_verifier_rejects_mismatched_or_synthetic_observations(self) -> None:
+        mismatch = verify_hero_correlation(
+            _hero_export("otel_export"),
+            _hero_export("agentloop_query", run_id="other-run"),
+        )
+        self.assertEqual(mismatch["status"], "BLOCKED")
+
+        synthetic = verify_hero_correlation(
+            _hero_export("otel_export", synthetic=True), _hero_export("agentloop_query")
+        )
+        self.assertEqual(synthetic["status"], "BLOCKED")
+
+    def test_hero_verifier_keeps_missing_observations_unavailable(self) -> None:
+        missing = _hero_export("agentloop_query")
+        del missing["usage"]
+        result = verify_hero_correlation(_hero_export("otel_export"), missing)
+
+        self.assertEqual(result["status"], "NOT_AVAILABLE")
+
+    def test_hero_verifier_keeps_missing_source_unavailable(self) -> None:
+        missing_source = _hero_export("agentloop_query")
+        del missing_source["source"]
+        result = verify_hero_correlation(_hero_export("otel_export"), missing_source)
+
+        self.assertEqual(result["status"], "NOT_AVAILABLE")
     def test_protected_reference_inspects_metadata_without_loading_content(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "protected.env"

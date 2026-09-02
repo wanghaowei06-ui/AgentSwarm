@@ -27,6 +27,7 @@ _HASH = re.compile(r"^sha256:[0-9a-f]{64}$")
 _IDENTIFIER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:@/-]{0,255}$")
 _VARIABLE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 _TRACE_ID = re.compile(r"^[0-9a-f]{32}$")
+_HERO_TUPLE_FIELDS = ("campaign_id", "run_id", "pg_revision", "content_hash", "trace_id")
 _CORRELATION_FIELDS = ("campaign_id", "run_id", "pg_revision", "content_hash")
 _MAX_RESPONSE_BYTES = 4 * 1024 * 1024
 
@@ -526,6 +527,60 @@ class ReadOnlyQueryClient:
             matched_fields=(),
             reason=reason,
         )
+
+
+def verify_hero_correlation(
+    otel_export: Mapping[str, object], agentloop_query: Mapping[str, object]
+) -> dict[str, object]:
+    """Compare two frozen, non-synthetic observations without any I/O."""
+
+    observations = (otel_export, agentloop_query)
+    expected_sources = ("otel_export", "agentloop_query")
+    normalized: list[dict[str, object]] = []
+    for observation, expected_source in zip(observations, expected_sources, strict=True):
+        if not isinstance(observation, Mapping):
+            return {"status": "BLOCKED", "reason": "observation_not_object"}
+        missing = [
+            field
+            for field in (*_HERO_TUPLE_FIELDS, "source", "provider", "model", "usage", "latency_ms", "synthetic")
+            if field not in observation
+        ]
+        if missing:
+            return {"status": "NOT_AVAILABLE", "reason": "missing_observation_fields"}
+        if observation["source"] != expected_source:
+            return {"status": "BLOCKED", "reason": "observation_source_mismatch"}
+        if observation["synthetic"] is not False:
+            return {"status": "BLOCKED", "reason": "synthetic_observation"}
+        try:
+            for field in ("campaign_id", "run_id", "pg_revision"):
+                value = observation[field]
+                if not isinstance(value, str) or not _IDENTIFIER.fullmatch(value):
+                    raise ValueError(field)
+            if not isinstance(observation["content_hash"], str) or not _HASH.fullmatch(observation["content_hash"]):
+                raise ValueError("content_hash")
+            if not isinstance(observation["trace_id"], str) or not _TRACE_ID.fullmatch(observation["trace_id"]):
+                raise ValueError("trace_id")
+            if not isinstance(observation["provider"], str) or not observation["provider"]:
+                raise ValueError("provider")
+            if not isinstance(observation["model"], str) or not observation["model"]:
+                raise ValueError("model")
+            if not isinstance(observation["usage"], Mapping) or not observation["usage"]:
+                raise ValueError("usage")
+            latency = observation["latency_ms"]
+            if isinstance(latency, bool) or not isinstance(latency, (int, float)) or latency < 0:
+                raise ValueError("latency_ms")
+        except ValueError:
+            return {"status": "BLOCKED", "reason": "invalid_observation"}
+        normalized.append(dict(observation))
+
+    tuple_values = tuple(normalized[0][field] for field in _HERO_TUPLE_FIELDS)
+    if tuple(tuple(observation[field] for field in _HERO_TUPLE_FIELDS) for observation in normalized) != (tuple_values, tuple_values):
+        return {"status": "BLOCKED", "reason": "authority_tuple_mismatch"}
+    return {
+        "status": "VERIFIED",
+        "authority_tuple": dict(zip(_HERO_TUPLE_FIELDS, tuple_values, strict=True)),
+        "sources": list(expected_sources),
+    }
 
 
 def _validate_query_path(path: str) -> None:
