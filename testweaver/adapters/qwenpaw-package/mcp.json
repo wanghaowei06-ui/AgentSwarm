@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "testweaver-native-worker": {
+      "transport": "stdio",
+      "command": "/opt/venv/qwenpaw/bin/python",
+      "args": ["-m", "testweaver.adapters.mcp_server"],
+      "cwd": "/opt/agentteams/testweaver-native-worker",
+      "env": {
+        "PYTHONPATH": "/opt/agentteams/testweaver-native-worker"
+      }
+    }
+  }
+}

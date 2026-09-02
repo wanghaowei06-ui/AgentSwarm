@@ -327,9 +327,10 @@ class CodexCliContractTests(unittest.TestCase):
                 "gpt-5.6-luna",
                 "-c",
                 "model_reasoning_effort=max",
-                "app-server",
-                "--listen",
-                "stdio://",
+                "-s",
+                "read-only",
+                "--json",
+                "exec",
             ),
         )
         self.assertEqual(launch.model, DEFAULT_MODEL)

@@ -11,25 +11,26 @@ CODEX_EXECUTABLE = "codex-cc"
 DEFAULT_MODEL = "gpt-5.6-luna"
 DEFAULT_REASONING = "max"
 CODEX_REASONING_CONFIG = "model_reasoning_effort=max"
-_APP_SERVER_COMMAND = (
+_EXEC_COMMAND = (
     CODEX_EXECUTABLE,
     "-m",
     DEFAULT_MODEL,
     "-c",
     CODEX_REASONING_CONFIG,
-    "app-server",
-    "--listen",
-    "stdio://",
+    "-s",
+    "read-only",
+    "--json",
+    "exec",
 )
 
 
 @dataclass(frozen=True)
 class CodexCliLaunch:
-    """Non-executing launch metadata consumed by the upstream bridge."""
+    """Fixed one-shot launch metadata for the external Worker."""
 
     model: str = DEFAULT_MODEL
     reasoning: str = DEFAULT_REASONING
-    command: tuple[str, ...] = field(default=_APP_SERVER_COMMAND, init=False)
+    command: tuple[str, ...] = field(default=_EXEC_COMMAND, init=False)
     protected_environment: tuple[ProtectedReference, ...] = field(
         default_factory=lambda: (
             ProtectedReference.env("HOME"),
@@ -43,8 +44,8 @@ class CodexCliLaunch:
             raise ValueError("the external worker model is fixed to the approved default")
         if self.reasoning != DEFAULT_REASONING:
             raise ValueError("the external worker reasoning level is fixed to the approved default")
-        if self.command != _APP_SERVER_COMMAND:
-            raise ValueError("the external worker command is fixed to the app-server entrypoint")
+        if self.command != _EXEC_COMMAND:
+            raise ValueError("the external worker command is fixed to the non-interactive exec entrypoint")
         if tuple(ref.location for ref in self.protected_environment) != ("HOME", "CODEX_HOME"):
             raise ValueError("the external worker may reuse only HOME and CODEX_HOME references")
 

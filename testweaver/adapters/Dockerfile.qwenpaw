@@ -1,0 +1,38 @@
+# Small immutable extension image for the official QwenPaw Worker image.
+# Build context is testweaver/adapters; the DSH executable is an explicit,
+# externally supplied artifact and is never synthesized here.
+
+ARG QWENPAW_BASE_IMAGE
+FROM ${QWENPAW_BASE_IMAGE}
+
+ARG CODEX_CLI_SPEC=@openai/codex@0.152.0
+ARG TESTWEAVER_DSH_BINARY
+
+USER root
+RUN test -n "${TESTWEAVER_DSH_BINARY}" \
+    && mkdir -p /opt/agentteams/testweaver-native-worker/bin \
+        /opt/agentteams/testweaver-native-worker/testweaver/adapters \
+        /opt/agentteams/testweaver-native-worker/codex-cli
+
+COPY __init__.py codex_cli.py config.py native_worker.py result.py executor.py mcp_server.py \
+    /opt/agentteams/testweaver-native-worker/testweaver/adapters/
+COPY qwenpaw-package/ /opt/agentteams/testweaver-native-worker/package/
+COPY ${TESTWEAVER_DSH_BINARY} /opt/agentteams/testweaver-native-worker/bin/dsh
+
+RUN test -f /opt/agentteams/testweaver-native-worker/bin/dsh \
+    && test ! -L /opt/agentteams/testweaver-native-worker/bin/dsh \
+    && test -x /opt/agentteams/testweaver-native-worker/bin/dsh \
+    && npm install --prefix /opt/agentteams/testweaver-native-worker/codex-cli \
+        --no-save --no-audit --no-fund "${CODEX_CLI_SPEC}" \
+    && test -x /opt/agentteams/testweaver-native-worker/codex-cli/node_modules/.bin/codex \
+    && printf '%s\n' \
+        '#!/usr/bin/python3' \
+        'import os, sys' \
+        'target = "/opt/agentteams/testweaver-native-worker/codex-cli/node_modules/.bin/codex"' \
+        'os.execv(target, ["codex-cc", *sys.argv[1:]])' \
+        > /opt/agentteams/testweaver-native-worker/bin/codex-cc \
+    && chmod 0755 /opt/agentteams/testweaver-native-worker/bin/codex-cc \
+    && /opt/venv/qwenpaw/bin/python -m py_compile \
+        /opt/agentteams/testweaver-native-worker/testweaver/adapters/*.py
+
+WORKDIR /opt/agentteams/testweaver-native-worker
