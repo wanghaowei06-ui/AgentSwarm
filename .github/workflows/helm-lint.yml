@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'helm/**'
+      - 'hack/local-k8s-up.sh'
       - 'install/agentteams-install.sh'
       - 'openhuman/scripts/openhuman-worker-entrypoint.sh'
       - 'tests/check-agentteams-rename-defaults.sh'

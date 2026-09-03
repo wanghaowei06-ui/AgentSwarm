@@ -878,6 +878,34 @@ func TestReconcileRoomMembershipForceLeavesWhenKickPowerDenied(t *testing.T) {
 	}
 }
 
+func TestForceLeaveRoomSkipsInactiveUser(t *testing.T) {
+	for _, members := range []struct {
+		name    string
+		members []matrix.RoomMember
+	}{
+		{name: "absent"},
+		{
+			name: "left",
+			members: []matrix.RoomMember{
+				{UserID: "@manager:localhost", Membership: "leave"},
+			},
+		},
+	} {
+		t.Run(members.name, func(t *testing.T) {
+			matrixClient := newFakeTeamMatrix()
+			matrixClient.members["!worker:localhost"] = members.members
+			p := NewProvisioner(ProvisionerConfig{Matrix: matrixClient})
+
+			if err := p.ForceLeaveRoom(context.Background(), "@manager:localhost", "!worker:localhost"); err != nil {
+				t.Fatalf("ForceLeaveRoom: %v", err)
+			}
+			if len(matrixClient.adminCmds) != 0 {
+				t.Fatalf("admin commands=%v, want none for inactive membership", matrixClient.adminCmds)
+			}
+		})
+	}
+}
+
 func requireRoomState(t *testing.T, matrixClient *fakeTeamMatrix, roomID string) roomStateCall {
 	t.Helper()
 	for _, call := range matrixClient.roomStates {

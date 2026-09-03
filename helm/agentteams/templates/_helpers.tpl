@@ -192,3 +192,8 @@ app.kubernetes.io/component: {{ .component }}
 {{- $tag := default (include "agentteams.globalImageTag" .) .Values.worker.defaultImage.openhuman.tag }}
 {{- printf "%s:%s" .Values.worker.defaultImage.openhuman.repository $tag }}
 {{- end }}
+
+{{- define "agentteams.worker.qwenpawImage" -}}
+{{- $tag := default (include "agentteams.globalImageTag" .) .Values.worker.defaultImage.qwenpaw.tag }}
+{{- printf "%s:%s" .Values.worker.defaultImage.qwenpaw.repository $tag }}
+{{- end }}

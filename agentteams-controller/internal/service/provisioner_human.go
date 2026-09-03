@@ -186,8 +186,24 @@ func (p *Provisioner) KickFromRoom(ctx context.Context, roomID, userID, reason s
 // ForceLeaveRoom asks the Tuwunel admin bot to force-leave userID out of
 // roomID. Used by the Human delete flow where the controller no longer
 // holds a valid user token (password may be stale) and must rely on the
-// admin bot instead of /leave. Fire-and-forget at the bot layer.
+// admin bot instead of /leave. The operation is idempotent: no command is
+// sent unless the user is currently joined to the room.
 func (p *Provisioner) ForceLeaveRoom(ctx context.Context, userID, roomID string) error {
+	members, err := p.matrix.ListRoomMembers(ctx, roomID)
+	if err != nil {
+		return fmt.Errorf("check membership before force-leave %s from %s: %w", userID, roomID, err)
+	}
+	joined := false
+	for _, member := range members {
+		if member.UserID == userID && member.Membership == "join" {
+			joined = true
+			break
+		}
+	}
+	if !joined {
+		return nil
+	}
+
 	cmd := fmt.Sprintf("!admin users force-leave-room %s %s", userID, roomID)
 	log.FromContext(ctx).Info("sending tuwunel force-leave-room admin command", "room", roomID, "user", userID, "command", cmd)
 	return p.matrix.AdminCommand(ctx, cmd)
