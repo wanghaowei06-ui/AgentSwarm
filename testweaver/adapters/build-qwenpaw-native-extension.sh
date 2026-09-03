@@ -97,7 +97,7 @@ main() {
   install -m 0755 -- "${TESTWEAVER_NODE_EXECUTABLE}" "${build_context}/node-runtime"
   test "$(sha256sum "${build_context}/node-runtime" | awk '{print $1}')" = "${TESTWEAVER_NODE_RUNTIME_SHA256}"
 
-  for file in __init__.py codex_cli.py config.py native_worker.py result.py executor.py mcp_server.py; do
+  for file in __init__.py artifact_store.py codex_cli.py config.py native_worker.py result.py executor.py mcp_server.py; do
     cp "${adapter_root}/${file}" "${build_context}/${file}"
   done
   cp "${adapter_root}/Dockerfile.qwenpaw" "${build_context}/Dockerfile.qwenpaw"

@@ -111,6 +111,34 @@ def _script(directory: Path, body: str) -> Path:
 
 
 class OneShotExecutorTests(unittest.TestCase):
+    def test_artifact_rejects_symlinked_result_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory) / "workspace"
+            outside = Path(directory) / "outside"
+            workspace.mkdir()
+            outside.mkdir()
+            (workspace / executor.ARTIFACT_DIRECTORY).symlink_to(outside, target_is_directory=True)
+            with patch.object(executor, "_WORKSPACE_ROOTS", (workspace,)):
+                with self.assertRaisesRegex(executor.NativeExecutionError, "result directory"):
+                    executor._artifact(workspace, b"must stay inside")
+            self.assertEqual(list(outside.iterdir()), [])
+
+    def test_artifact_rejects_symlinked_target_without_writing_through_it(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory) / "workspace"
+            outside = Path(directory) / "outside.txt"
+            workspace.mkdir()
+            artifact_directory = workspace / executor.ARTIFACT_DIRECTORY
+            artifact_directory.mkdir(mode=0o700)
+            content = b"must not follow target"
+            digest = hashlib.sha256(content).hexdigest()
+            outside.write_bytes(b"outside")
+            (artifact_directory / f"result-{digest}.txt").symlink_to(outside)
+            with patch.object(executor, "_WORKSPACE_ROOTS", (workspace,)):
+                with self.assertRaisesRegex(executor.NativeExecutionError, "artifact"):
+                    executor._artifact(workspace, content)
+            self.assertEqual(outside.read_bytes(), b"outside")
+
     def test_artifact_relocks_filesync_restored_result_directory_without_deleting_files(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             workspace = Path(directory) / "workspace"
@@ -275,6 +303,8 @@ class OneShotExecutorTests(unittest.TestCase):
     def test_dsh_build_wires_immutable_patch_and_dump_config_guard(self) -> None:
         dockerfile = " ".join(DOCKERFILE.read_text(encoding="utf-8").split())
         build_script = BUILD_SCRIPT.read_text(encoding="utf-8")
+        self.assertIn("artifact_store.py", dockerfile)
+        self.assertIn("artifact_store.py", build_script)
         self.assertIn(
             "COPY dsh-headless-max-tokens.patch.yml /opt/agentteams/testweaver-native-worker/dsh-headless-max-tokens.patch.yml",
             dockerfile,

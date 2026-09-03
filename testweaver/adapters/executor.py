@@ -13,7 +13,6 @@ import os
 from pathlib import Path
 import re
 import signal
-import stat
 import subprocess
 import threading
 import time
@@ -29,6 +28,7 @@ from .config import (
     preflight_execution_reference,
     resolve_dsh_file_environment,
 )
+from .artifact_store import ArtifactStoreError, write_artifact
 from .native_worker import (
     DSH_PROVIDER_PROFILES,
     NativeWorkerAssignment,
@@ -60,6 +60,15 @@ class NativeExecutionError(ValueError):
     pass
 
 
+def _redact(value: str, secrets: Iterable[str] = ()) -> str:
+    result = value
+    for secret in sorted({item for item in secrets if isinstance(item, str) and len(item) >= 8}, key=len, reverse=True):
+        result = result.replace(secret, "[REDACTED]")
+    result = _PRIVATE_KEY_RE.sub("[REDACTED_PRIVATE_KEY]", result)
+    result = _BEARER_RE.sub("Bearer [REDACTED]", result)
+    return _SECRET_RE.sub(r"\1[REDACTED]", result)
+
+
 def _inside(path: Path, roots: Iterable[Path]) -> bool:
     resolved = path.resolve()
     for root in roots:
@@ -69,15 +78,6 @@ def _inside(path: Path, roots: Iterable[Path]) -> bool:
         except ValueError:
             pass
     return False
-
-
-def _redact(value: str, secrets: Iterable[str] = ()) -> str:
-    result = value
-    for secret in sorted({item for item in secrets if isinstance(item, str) and len(item) >= 8}, key=len, reverse=True):
-        result = result.replace(secret, "[REDACTED]")
-    result = _PRIVATE_KEY_RE.sub("[REDACTED_PRIVATE_KEY]", result)
-    result = _BEARER_RE.sub("Bearer [REDACTED]", result)
-    return _SECRET_RE.sub(r"\1[REDACTED]", result)
 
 
 def _validate_reference(reference: ProtectedReference, field: str, *, dsh_file: bool = False) -> None:
@@ -266,59 +266,10 @@ def _run(argv: list[str], payload: bytes, cwd: Path, env: dict[str, str], timeou
 
 
 def _artifact(cwd: Path, content: bytes) -> tuple[str, EvidenceReference]:
-    digest = hashlib.sha256(content).hexdigest()
     try:
-        workspace = cwd.resolve(strict=True)
-        if not workspace.is_dir() or not _inside(workspace, _WORKSPACE_ROOTS):
-            raise NativeExecutionError("result directory is outside approved workspace")
-        directory = workspace / ARTIFACT_DIRECTORY
-        directory.mkdir(mode=0o700, exist_ok=True)
-        info = os.lstat(directory)
-        resolved = directory.resolve(strict=True)
-    except NativeExecutionError:
-        raise
-    except (OSError, RuntimeError) as exc:
-        raise NativeExecutionError("result directory could not be prepared") from exc
-    if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
-        raise NativeExecutionError("result directory must be a non-symlink directory")
-    if info.st_uid != os.getuid():
-        raise NativeExecutionError("result directory must be owned by the Worker")
-    try:
-        resolved.relative_to(workspace)
-    except ValueError as exc:
-        raise NativeExecutionError("result directory is outside approved workspace") from exc
-    if stat.S_IMODE(info.st_mode) != 0o700:
-        try:
-            os.chmod(directory, 0o700, follow_symlinks=False)
-        except (OSError, NotImplementedError, TypeError) as exc:
-            raise NativeExecutionError("result directory permissions could not be tightened") from exc
-        try:
-            info = os.lstat(directory)
-        except OSError as exc:
-            raise NativeExecutionError("result directory could not be inspected") from exc
-        if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode) or info.st_uid != os.getuid() or stat.S_IMODE(info.st_mode) != 0o700:
-            raise NativeExecutionError("result directory permissions could not be verified")
-    target = directory / f"result-{digest}.txt"
-    if target.is_symlink():
-        raise NativeExecutionError("result artifact must not be a symlink")
-    if target.exists():
-        if not target.is_file() or hashlib.sha256(target.read_bytes()).hexdigest() != digest:
-            raise NativeExecutionError("existing result artifact has a different hash")
-    else:
-        try:
-            descriptor = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-            with os.fdopen(descriptor, "wb") as stream:
-                stream.write(content)
-        except FileExistsError:
-            if not target.is_file() or hashlib.sha256(target.read_bytes()).hexdigest() != digest:
-                raise NativeExecutionError("result artifact appeared with a different hash")
-    ref = target.relative_to(cwd).as_posix()
-    return ref, EvidenceReference(
-        id=f"native-result-{digest[:16]}",
-        kind="file",
-        artifact_ref=ref,
-        content_hash=f"sha256:{digest}",
-    )
+        return write_artifact(cwd, content, roots=_WORKSPACE_ROOTS, directory_name=ARTIFACT_DIRECTORY)
+    except ArtifactStoreError as exc:
+        raise NativeExecutionError(str(exc)) from exc
 
 
 def _failure(cwd: Path, capture: Mapping[str, Any], reason: str, termination: str, secrets: Iterable[str]) -> dict[str, Any]:
