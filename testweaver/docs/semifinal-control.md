@@ -2,7 +2,7 @@
 
 更新时间：2026-09-03（Asia/Shanghai）
 
-状态：`M2-G_CURRENT_HERO_PARTIAL_SEALED / GOLDEN_HERO_MINIMAL_FIX_BATCH / M0-M1_NATIVE_CHAIN_PASS`
+状态：`M2-G_CURRENT_HERO_PARTIAL_SEALED / GOLDEN_HERO_MINIMAL_FIX_BATCH / QWENPAW_IMAGE_BUILT_NOT_DEPLOYED / M0-M1_NATIVE_CHAIN_PASS`
 
 唯一当前里程碑：首轮完整 Hero 已封存为诚实 `PARTIAL`，证明了真实 Manager 两次动态决策、原生双 Team/Leader/Worker、证据根和两个独立 Oracle，但未闭合 DSH→百炼、有效 Human 决定、私有 Gold、恢复、Skill、PG 与 AgentLoop。当前只完成本轮暴露的最小通用修复批次（Taskflow 结构化终态、Matrix event_id 幂等、唯一 Human ACL、Outcome 私有 Gold 角色边界和 fresh-room 上下文约束），构建/部署一次后立即运行新的 Golden Hero；不新增 Gate、协调器或案例特例。
 
