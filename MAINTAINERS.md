@@ -14,7 +14,7 @@
 当前维护范围包括：
 
 - `main` 分支中已经公开的仓库文档、安装入口、Dashboard 和公开测试；
-- 通过 `competition-v1.2` 与仍可复现的 `competition-v1.1` 发布的比赛材料；
+- 通过 `competition-v1.3`、`competition-v1.2` 与仍可复现的 `competition-v1.1` 发布的比赛材料；
 - 对 AgentTeams 运行时源码的公开问题分流和必要的复现说明。
 
 AgentTeams Controller、Manager、Worker、Matrix、Helm 和运行时的上游路线，应同时参考

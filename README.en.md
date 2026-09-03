@@ -3,7 +3,7 @@
 [English](./README.en.md) | [中文](./README.md)
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](./LICENSE)
-[![Competition snapshot](https://img.shields.io/badge/competition-v1.2-6f42c1.svg)](./docs/competition-reproduction.md)
+[![Competition snapshot](https://img.shields.io/badge/competition-v1.3-6f42c1.svg)](./docs/competition-reproduction.md)
 
 > AgentSwarm is the public competition distribution based on the upstream open-source [AgentTeams](https://github.com/agentscope-ai/AgentTeams) project. It keeps AgentTeams' real runtime source, image names, environment variables, APIs, and installation contracts, while adding a competition reproduction entry point, public-boundary documentation, test/trace specifications, and repository governance.
 
@@ -49,18 +49,18 @@ The public tree contains the parts that can be rebuilt and checked from a clean 
 
 ## Competition reproduction
 
-The current public distribution is `competition-v1.2`. The earlier `competition-v1.1` remains an immutable historical snapshot; evaluators should use a fixed tag rather than the moving `main` branch.
+The current public distribution is `competition-v1.3`. Earlier `competition-v1.2` and `competition-v1.1` remain immutable historical snapshots; evaluators should use a fixed tag rather than the moving `main` branch.
 
 The following path builds real images from this repository and installs the embedded system. It does not use mocks, offline replay, or pre-recorded evidence:
 
 ~~~bash
 git clone https://github.com/wanghaowei06-ui/AgentSwarm.git
 cd AgentSwarm
-git checkout competition-v1.2
+git checkout competition-v1.3
 
-export VERSION=competition-v1.2
+export VERSION=competition-v1.3
 export OPENCLAW_BASE_IMAGE=agentteams/openclaw-base
-export OPENCLAW_BASE_VERSION=competition-v1.2
+export OPENCLAW_BASE_VERSION=competition-v1.3
 export AGENTTEAMS_DASHBOARD=0
 
 make build-openclaw-base
@@ -119,7 +119,7 @@ The public TestWeaver tree contains adapters, contracts, Skill/Schema material, 
 
 ## Version and maintenance
 
-- `competition-v1.2` is the current public distribution; `competition-v1.1` is the previously published immutable competition snapshot.
+- `competition-v1.3` is the current public distribution; `competition-v1.2` and `competition-v1.1` are previously published immutable competition snapshots.
 - Future public changes are verified on `main` before a new immutable tag is created.
 - See [CHANGELOG.md](./CHANGELOG.md), [NOTICE](./NOTICE), and the [open-source boundary](./docs/open-source-boundary.md).
 - See [MAINTAINERS.md](./MAINTAINERS.md) for the current maintainer and support scope.

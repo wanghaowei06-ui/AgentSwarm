@@ -3,7 +3,7 @@
 [English](./README.en.md) | 中文
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](./LICENSE)
-[![Competition snapshot](https://img.shields.io/badge/competition-v1.2-6f42c1.svg)](./docs/competition-reproduction.md)
+[![Competition snapshot](https://img.shields.io/badge/competition-v1.3-6f42c1.svg)](./docs/competition-reproduction.md)
 
 > AgentSwarm 是本次比赛提交的公开发行版，基于上游开源项目 [AgentTeams](https://github.com/agentscope-ai/AgentTeams)。它保留 AgentTeams 的真实运行时代码、镜像名、环境变量、API 和安装契约，并在本仓库中提供比赛复现入口、公开边界说明、测试/评测规范和治理文件。
 
@@ -49,18 +49,18 @@
 
 ## 比赛版快速复现
 
-当前公开发行版是 `competition-v1.2`。此前的 `competition-v1.1` 仍作为不可移动的历史快照保留；评委应始终使用固定 tag，而不是持续变化的 `main`。
+当前公开发行版是 `competition-v1.3`。此前的 `competition-v1.2` 和 `competition-v1.1` 仍作为不可移动的历史快照保留；评委应始终使用固定 tag，而不是持续变化的 `main`。
 
 下面的命令会从本仓库构建真实镜像并安装 embedded 系统，不使用 mock、离线回放或预录证据：
 
 ~~~bash
 git clone https://github.com/wanghaowei06-ui/AgentSwarm.git
 cd AgentSwarm
-git checkout competition-v1.2
+git checkout competition-v1.3
 
-export VERSION=competition-v1.2
+export VERSION=competition-v1.3
 export OPENCLAW_BASE_IMAGE=agentteams/openclaw-base
-export OPENCLAW_BASE_VERSION=competition-v1.2
+export OPENCLAW_BASE_VERSION=competition-v1.3
 export AGENTTEAMS_DASHBOARD=0
 
 make build-openclaw-base
@@ -127,7 +127,7 @@ TestWeaver 的公开部分提供 adapter、contract、Skill/Schema 和 Trace 规
 
 ## 版本与维护
 
-- `competition-v1.2` 是当前公开发行版；`competition-v1.1` 是此前已发布且不可移动的比赛快照。
+- `competition-v1.3` 是当前公开发行版；`competition-v1.2` 和 `competition-v1.1` 是此前已发布且不可移动的比赛快照。
 - 后续公开改动先在 `main` 完成验证，再创建新的不可变版本 tag。
 - 版本记录见 [CHANGELOG.md](./CHANGELOG.md)，来源和开放边界见 [NOTICE](./NOTICE) 与[开放范围文档](./docs/open-source-boundary.md)。
 - 当前仓库维护者、支持范围和未声明事项见 [MAINTAINERS.md](./MAINTAINERS.md)。

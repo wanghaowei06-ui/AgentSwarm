@@ -41,7 +41,7 @@ AgentSwarm 的依赖分为三类：
 
 - `go.sum` 和 `dashboard/package-lock.json` 提供可复核的 Go/npm 解析结果。
 - Python `pyproject.toml`、Dockerfile 和 Helm values 提供直接依赖、基础镜像和发布版本约束；部分 Python 依赖使用范围约束，不能声称所有传递依赖已经完全离线锁定。
-- `competition-v1.2` tag 固定本仓库源码，但不能固定外部模型服务的响应、公共 registry 的可用性或第三方服务的行为。
+- `competition-v1.3` tag 固定本仓库源码，但不能固定外部模型服务的响应、公共 registry 的可用性或第三方服务的行为。
 - 评委应在验证记录中保存 Git commit、Docker 版本、模型 provider/model、构建参数和实际测试输出。
 
 ## 5. 许可证检查原则

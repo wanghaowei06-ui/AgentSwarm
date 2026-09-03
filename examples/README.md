@@ -9,11 +9,11 @@
 ~~~bash
 git clone https://github.com/wanghaowei06-ui/AgentSwarm.git
 cd AgentSwarm
-git checkout competition-v1.2
+git checkout competition-v1.3
 
-export VERSION=competition-v1.2
+export VERSION=competition-v1.3
 export OPENCLAW_BASE_IMAGE=agentteams/openclaw-base
-export OPENCLAW_BASE_VERSION=competition-v1.2
+export OPENCLAW_BASE_VERSION=competition-v1.3
 export AGENTTEAMS_LLM_PROVIDER=qwen
 export AGENTTEAMS_DEFAULT_MODEL=qwen3.5-plus
 export AGENTTEAMS_ADMIN_USER=admin
