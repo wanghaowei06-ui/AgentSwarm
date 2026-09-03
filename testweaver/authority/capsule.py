@@ -33,6 +33,8 @@ def _refs(value: Sequence[Mapping[str, Any]], field: str) -> tuple[dict[str, Any
         if not isinstance(item, Mapping) or set(item) != {"ref", "content_hash"}:
             raise AuthorityError(f"{field}[{index}] has an invalid shape")
         result.append({"ref": validate_ref(item["ref"], f"{field}[{index}].ref"), "content_hash": validate_hash(item["content_hash"], f"{field}[{index}].content_hash")})
+    if not result:
+        raise AuthorityError(f"{field} must not be empty")
     return tuple(result)
 
 
@@ -371,6 +373,10 @@ class CapsuleAuthority:
                 raise AuthorityError("capsule_type is unsupported")
             clause += " AND capsule_type = ?"
             params.append(capsule_type)
+        # Legacy/handwritten rows without a positive revision or evidence
+        # reference are not searchable. Persisted records are validated on
+        # write, but keep the read path fail-closed for older stores too.
+        clause += " AND revision > 0 AND evidence_refs_json <> '[]'"
         rows = self.store.rows(
             "SELECT capsule_id, capsule_type, state, fingerprint, fault_owner, "
             "target_fault_domains_json, observation_ref, evidence_refs_json, baseline_strategy, "

@@ -314,6 +314,13 @@ class CapsuleTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             CapsuleRecord.create(**{**capsule.as_dict(include_hash=False), "body": "not stored"})  # type: ignore[call-arg]
 
+    def test_capsule_without_evidence_reference_is_not_valid_or_searchable(self) -> None:
+        capsule = _capsule()
+        with self.assertRaises(AuthorityError):
+            CapsuleRecord.create(
+                **{**capsule.as_dict(include_hash=False), "evidence_refs": ()},
+            )
+
 
 class HITLTests(unittest.TestCase):
     def test_pause_external_decision_and_new_revision_resume(self) -> None:
