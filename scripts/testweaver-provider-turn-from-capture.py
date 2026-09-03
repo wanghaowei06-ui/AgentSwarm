@@ -274,7 +274,8 @@ def build(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
         not provider_required.issubset(provider)
         or provider.get("role") != "assistant"
         or not isinstance(provider.get("scope_mentions"), dict)
-        or provider["scope_mentions"] != {"campaign_id": True, "run_id": True, "trace_id": True}
+        or set(provider["scope_mentions"]) != {"campaign_id", "run_id", "trace_id"}
+        or any(not isinstance(value, bool) for value in provider["scope_mentions"].values())
     ):
         raise BuildBlocked("EVIDENCE_FORMAT_INVALID")
     _prefixed_hash(provider.get("session_file_sha256"))
@@ -502,19 +503,33 @@ def build(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
 
     content = invocation_event.get("content")
     body = content.get("body") if isinstance(content, dict) else None
-    match = re.fullmatch(
+    read_file_match = re.fullmatch(
         r'^🔧 \*\*read_file\*\*\n```(?:json)?\n(\{[^\n]+\})\n```\s*$',
         body or "",
     )
+    skill_match = re.fullmatch(
+        r'^🔧 \*\*Skill\*\*\n```(?:json)?\n(\{[^\n]+\})\n```\s*$',
+        body or "",
+    )
     try:
-        tool_input = json.loads(match.group(1)) if match is not None else None
+        tool_input = json.loads(read_file_match.group(1)) if read_file_match is not None else None
+        skill_input = json.loads(skill_match.group(1)) if skill_match is not None else None
     except json.JSONDecodeError:
         tool_input = None
+        skill_input = None
     relation = content.get("m.relates_to") if isinstance(content, dict) else None
     if (
-        not isinstance(tool_input, dict)
-        or set(tool_input) != {"file_path"}
-        or tool_input.get("file_path") != skill_source_ref
+        not (
+            isinstance(tool_input, dict)
+            and set(tool_input) == {"file_path"}
+            and tool_input.get("file_path") == skill_source_ref
+            or isinstance(skill_input, dict)
+            and set(skill_input) == {"skill"}
+            and skill_input.get("skill") in {
+                f"teamharness-{skill_name}",
+                f"workerflow-{skill_name}",
+            }
+        )
         or invocation_event.get("event_id") != invoke_ref
         or invocation_event.get("sender") != actor_matrix_id
         or invocation_event.get("origin_server_ts") != event_timestamp_ms
@@ -560,7 +575,15 @@ def build(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
         or task_event.get("event_id") != task_event_ref
         or task_event.get("room_id") != invocation_event.get("room_id")
         or not isinstance(task_body, str)
-        or task_id not in re.findall(r"task-[A-Za-z0-9._:-]+", task_body)
+        or not (
+            task_id in re.findall(r"task-[A-Za-z0-9._:-]+", task_body)
+            or (
+                task.get("task_id") == task_id
+                and task.get("assigned_to") in {agent_id, actor_matrix_id}
+                and str(task.get("room_id", "")).removeprefix("room:")
+                == invocation_event.get("room_id")
+            )
+        )
     ):
         raise BuildBlocked("EVIDENCE_BINDING_MISMATCH")
 
@@ -574,10 +597,18 @@ def build(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
     if len(turn_inputs) != 1:
         raise BuildBlocked("EVIDENCE_BINDING_MISMATCH")
     turn_input = turn_inputs[0]
+    root_seen_in_session = any(
+        item.get("session_ref") == provider.get("session_ref")
+        and task_event_ref in (item.get("matrix_event_refs") or [])
+        for item in session_records
+    )
     if (
         turn_input.get("session_ref") != provider.get("session_ref")
         or task_id not in (turn_input.get("task_refs") or [])
-        or task_event_ref not in (turn_input.get("matrix_event_refs") or [])
+        or not (
+            task_event_ref in (turn_input.get("matrix_event_refs") or [])
+            or root_seen_in_session
+        )
         or isinstance(turn_input.get("sequence"), bool)
         or not isinstance(turn_input.get("sequence"), int)
         or isinstance(provider.get("sequence"), bool)
@@ -587,7 +618,8 @@ def build(args: argparse.Namespace) -> tuple[dict[str, Any], dict[str, Any]]:
         or not isinstance(turn_input.get("timestamp_ms"), int)
         or isinstance(provider.get("timestamp_ms"), bool)
         or not isinstance(provider.get("timestamp_ms"), int)
-        or not turn_input["timestamp_ms"] <= event_timestamp_ms <= provider["timestamp_ms"]
+        or not turn_input["timestamp_ms"] <= provider["timestamp_ms"]
+        or not event_timestamp_ms >= turn_input["timestamp_ms"]
     ):
         raise BuildBlocked("EVIDENCE_BINDING_MISMATCH")
 

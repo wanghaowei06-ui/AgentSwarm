@@ -2,6 +2,7 @@
 # Read-only evidence capture for a native AgentTeams Hero run.
 # This utility never sends Matrix messages or mutates AgentTeams resources.
 set -euo pipefail
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 usage() {
   cat <<'EOF'
@@ -253,7 +254,47 @@ capture_matrix_actor() {
           sender:$sender,identity_binding:$binding,origin_server_ts:$origin_server_ts,
           authority_scope:{campaign_id:$campaign_id,run_id:$run_id,trace_id:$trace_id},
           immutable_source:{ref:$source_ref,raw_bytes_sha256:$raw_sha256}}' >>"$out/event-index.jsonl"
-    done < <(jq -r --argjson boundary "$BOUNDARY_MS" '(.chunk // [])[] | select((.origin_server_ts // 0) >= $boundary) | [.event_id,.sender,(.origin_server_ts|tostring)] | @tsv' "$out/messages-$room_key.json")
+      # A thread root can be older than the bounded /messages page (and older
+      # than the capture boundary). Fetch that exact root once so the native
+      # relation remains verifiable without fabricating a task event.
+      root_id=$(jq -r '.content."m.relates_to".event_id? // empty' "$exact" 2>/dev/null || true)
+      if [[ "$root_id" =~ ^\$[A-Za-z0-9_-]{8,}$ ]] && ! grep -Fq -- "\"event_id\":\"$root_id\"" "$out/event-index.jsonl"; then
+        root_key=$(safe_name "$root_id")
+        root_exact="$out/events/$root_key.json"
+        root_hash_file="$out/events/$root_key.raw.sha256"
+        if [[ ! -f "$root_exact" ]] && ! matrix_get "$container" "$token_var" "/_matrix/client/v3/rooms/$room_uri/event/$(uri_component "$root_id")" "$root_exact" "$root_hash_file"; then
+          note_missing "matrix.thread_root.$actor.$root_id"
+        fi
+        if [[ -f "$root_exact" && -f "$root_hash_file" ]]; then
+          root_hash=$(cat "$root_hash_file")
+          root_sender=$(jq -r '.sender // "NOT_OBSERVED"' "$root_exact")
+          root_room=$(jq -r --arg fallback "$room" '.room_id // $fallback' "$root_exact")
+          root_ts=$(jq -r '.origin_server_ts // 0' "$root_exact")
+          root_binding=UNBOUND
+          [[ "$root_sender" == "$matrix_id" ]] && root_binding=ACTOR_EXACT
+          jq -nc --arg actor "$actor" --arg actor_matrix_id "$matrix_id" --arg container "$container" \
+            --arg room_id "$root_room" --arg event_id "$root_id" --arg sender "$root_sender" \
+            --arg binding "$root_binding" --arg source_ref "${root_exact#"$EVIDENCE_DIR"/}" --arg raw_sha256 "$root_hash" \
+            --arg run_id "$RUN_ID" --arg campaign_id "$CAMPAIGN_ID" --arg trace_id "$TRACE_ID" \
+            --argjson origin_server_ts "$root_ts" \
+            '{actor:$actor,actor_matrix_id:$actor_matrix_id,container:$container,room_id:$room_id,event_id:$event_id,
+              sender:$sender,identity_binding:$binding,origin_server_ts:$origin_server_ts,
+              authority_scope:{campaign_id:$campaign_id,run_id:$run_id,trace_id:$trace_id},
+              immutable_source:{ref:$source_ref,raw_bytes_sha256:$raw_sha256}}' >>"$out/event-index.jsonl"
+        fi
+      fi
+    # Preserve exact thread roots for post-boundary events. Native AgentTeams
+    # often uses a short root acknowledgement (for example, “处理中...”)
+    # whose task identity is carried by the authoritative task metadata. The
+    # root itself may predate the capture boundary, so retain it by relation
+    # without synthesizing any event.
+    done < <(jq -r --argjson boundary "$BOUNDARY_MS" '
+      (.chunk // []) as $all |
+      [$all[] | select((.origin_server_ts // 0) >= $boundary)] as $fresh |
+      (($fresh + [$fresh[] | (.content.m.relates_to.event_id? // empty) as $root |
+        $all[] | select(.event_id == $root)]) | unique_by(.event_id))[] |
+      [.event_id, (.sender // ""), (.origin_server_ts // 0)] | @tsv
+    ' "$out/messages-$room_key.json")
   done < <(jq -r '.joined_rooms[]?' "$out/joined_rooms.json")
 }
 
@@ -291,8 +332,13 @@ capture_sessions() {
     # shellcheck disable=SC2016
     find_cmd='find /root/manager-workspace/.openclaw/agents/main/sessions -maxdepth 1 -type f -name "*.jsonl" -newermt "$CAPTURE_BOUNDARY" -print 2>/dev/null'
   else
+    # Worker session envelopes are long-lived JSON files whose mtime is not a
+    # reliable run boundary. Read all Matrix envelopes (and no unrelated
+    # agent-scope history) and let the reference-only normalizer select
+    # task/provider records; no prompt, response, or tool body leaves the
+    # container.
     # shellcheck disable=SC2016
-    find_cmd='find "/root/agentteams-fs/agents/$ACTOR_NAME" -type f \( -path "*/sessions/agentteams_matrix/*.json" -o -name "*.jsonl" \) -newermt "$CAPTURE_BOUNDARY" -print 2>/dev/null'
+    find_cmd='find "/root/agentteams-fs/agents/$ACTOR_NAME" -type f -path "*/sessions/agentteams_matrix/*.json" -print 2>/dev/null'
   fi
   if ! docker exec -e CAPTURE_BOUNDARY="$BOUNDARY_UTC" -e ACTOR_NAME="$actor" "$container" sh -c "$find_cmd" >"$out/files.txt" 2>/dev/null; then
     printf 'NOT_OBSERVED\n' >"$out/files.txt"; note_missing "session.files.$actor"; return
@@ -304,27 +350,7 @@ capture_sessions() {
     [[ -n "$file_hash" ]] || { note_missing "session.hash.$actor"; continue; }
     # Only provider metadata leaves the container; prompts, outputs and tool arguments never do.
     if ! docker exec "$container" sh -c 'cat "$1"' sh "$path" 2>/dev/null |
-      python3 -c 'import datetime,hashlib,json,re,sys
-run_id,campaign_id,trace_id=sys.argv[1:4]
-for sequence,raw in enumerate(sys.stdin.buffer):
- try:
-  value=json.loads(raw)
- except Exception:
-  continue
- msg=value.get("message", value)
- if not isinstance(msg,dict): continue
- role=msg.get("role")
- if role not in ("user","assistant"): continue
- usage=msg.get("usage") if isinstance(msg.get("usage"),dict) else None
- text=raw.decode("utf-8","replace")
- timestamp=value.get("timestamp")
- timestamp_ms=None
- if isinstance(timestamp,(int,float)) and not isinstance(timestamp,bool): timestamp_ms=int(timestamp)
- elif isinstance(timestamp,str):
-  try: timestamp_ms=int(datetime.datetime.fromisoformat(timestamp.replace("Z","+00:00")).timestamp()*1000)
-  except Exception: pass
- safe={"record_hash":hashlib.sha256(raw).hexdigest(),"sequence":sequence,"id":value.get("id"),"timestamp":timestamp,"timestamp_ms":timestamp_ms,"role":role,"provider":msg.get("provider"),"model":msg.get("model"),"usage":usage,"latency_ms":msg.get("durationMs") or value.get("durationMs"),"scope_mentions":{"run_id":run_id in text,"campaign_id":campaign_id in text,"trace_id":trace_id in text},"task_refs":sorted(set(re.findall(r"task-[A-Za-z0-9._:-]+",text))),"matrix_event_refs":sorted(set(re.findall(r"\$[A-Za-z0-9_-]{8,}",text)))}
- print(json.dumps(safe,separators=(",",":"),sort_keys=True))' "$RUN_ID" "$CAMPAIGN_ID" "$TRACE_ID" |
+      python3 "$SCRIPT_DIR/testweaver-session-normalize.py" "$RUN_ID" "$CAMPAIGN_ID" "$TRACE_ID" |
       jq -c --arg actor "$actor" --arg container "$container" --arg session_file_sha256 "$file_hash" --arg session_ref "$path" \
         '. + {actor:$actor,container:$container,session_file_sha256:$session_file_sha256,session_ref:$session_ref}' >>"$out/readback.jsonl"; then
       note_missing "session.readback.$actor"
@@ -483,7 +509,19 @@ for task in json_lines(snapshot/"shared-fs"/"task-metadata.jsonl"):
 roster=json_file(snapshot/"roster.json") or {}
 actors={item.get("name"):item for item in roster.get("actors",[]) if isinstance(item,dict) and isinstance(item.get("name"),str)}
 records=[]
-pattern=re.compile(r'^🔧 \*\*read_file\*\*\n```(?:json)?\n(\{[^\n]+\})\n```\s*$')
+read_file_pattern=re.compile(r'^🔧 \*\*read_file\*\*\n```(?:json)?\n(\{[^\n]+\})\n```\s*$')
+skill_pattern=re.compile(r'^🔧 \*\*Skill\*\*\n```(?:json)?\n(\{[^\n]+\})\n```\s*$')
+# Each actor snapshot has a view of the same rooms. Keep a global fallback,
+# but prefer the invocation actor's own immutable event copy below.
+all_by_event={}
+for global_index_path in snapshot.glob("matrix/*/event-index.jsonl"):
+ for global_item in json_lines(global_index_path):
+  if not isinstance(global_item,dict) or global_item.get("authority_scope")!=scope: continue
+  global_event_id=global_item.get("event_id")
+  if not isinstance(global_event_id,str): continue
+  current=all_by_event.get(global_event_id)
+  if current is None or global_item.get("identity_binding")=="ACTOR_EXACT":
+   all_by_event[global_event_id]=global_item
 for index_path in snapshot.glob("matrix/*/event-index.jsonl"):
  indexes=json_lines(index_path)
  by_event={item.get("event_id"):item for item in indexes if isinstance(item,dict)}
@@ -495,24 +533,37 @@ for index_path in snapshot.glob("matrix/*/event-index.jsonl"):
   if event.get("event_id")!=index.get("event_id") or event.get("room_id")!=index.get("room_id") or event.get("origin_server_ts")!=index.get("origin_server_ts") or event.get("type")!="m.room.message": continue
   content=event.get("content")
   body=content.get("body") if isinstance(content,dict) else None
-  match=pattern.fullmatch(body) if isinstance(body,str) else None
-  if match is None: continue
-  try: payload=json.loads(match.group(1))
+  read_file_match=read_file_pattern.fullmatch(body) if isinstance(body,str) else None
+  skill_match=skill_pattern.fullmatch(body) if isinstance(body,str) else None
+  if read_file_match is None and skill_match is None: continue
+  try: payload=json.loads((read_file_match or skill_match).group(1))
   except Exception: continue
-  if not isinstance(payload,dict) or set(payload)!={"file_path"} or not isinstance(payload["file_path"],str): continue
+  if not isinstance(payload,dict): continue
+  event_skill_hint=None
+  if read_file_match is not None:
+   if set(payload)!={"file_path"} or not isinstance(payload["file_path"],str): continue
+  else:
+   if set(payload)!={"skill"} or not isinstance(payload["skill"],str): continue
+   event_skill_hint=payload["skill"]
   actor=index.get("actor")
   actor_info=actors.get(actor)
   if not isinstance(actor_info,dict) or event.get("sender")!=actor_info.get("matrix_user_id"): continue
   relation=content.get("m.relates_to")
   if not isinstance(relation,dict) or relation.get("rel_type")!="m.thread" or not isinstance(relation.get("event_id"),str): continue
   root_id=relation["event_id"]
-  root_index=by_event.get(root_id)
+  root_index=by_event.get(root_id) or all_by_event.get(root_id)
   root_checked=exact(root_index) if isinstance(root_index,dict) else None
   if root_checked is None: continue
   root_event,root_ref,root_hash=root_checked
   if root_event.get("event_id")!=root_index.get("event_id") or root_event.get("room_id")!=event.get("room_id") or root_index.get("room_id")!=event.get("room_id") or root_event.get("origin_server_ts")!=root_index.get("origin_server_ts") or root_event.get("type")!="m.room.message": continue
   root_body=(root_event.get("content") or {}).get("body") if isinstance(root_event.get("content"),dict) else None
   matching_tasks=[task for task in tasks if task["task_id"] in (root_body or "") and task.get("assigned_to") in {actor,actor_info.get("matrix_user_id")}]
+  if len(matching_tasks)!=1:
+   # Native TeamHarness roots can be terse acknowledgements; use the exact
+   # room/assigned-actor tuple from the authoritative task metadata.
+   matching_tasks=[task for task in tasks
+     if str(task.get("room_id",""))[5:] == event.get("room_id")
+     and task.get("assigned_to") in {actor,actor_info.get("matrix_user_id")}]
   if len(matching_tasks)!=1: continue
   task_id=matching_tasks[0]["task_id"]
   session_path=snapshot/"sessions"/re.sub(r"[^A-Za-z0-9._-]","_",actor)/"readback.jsonl"
@@ -521,21 +572,38 @@ for index_path in snapshot.glob("matrix/*/event-index.jsonl"):
   except OSError: continue
   event_ms=event.get("origin_server_ts")
   if isinstance(event_ms,bool) or not isinstance(event_ms,int): continue
-  inputs=[item for item in session if item.get("role")=="user" and task_id in (item.get("task_refs") or []) and root_id in (item.get("matrix_event_refs") or []) and isinstance(item.get("timestamp_ms"),int) and item["timestamp_ms"]<=event_ms]
+  inputs=[item for item in session if item.get("role")=="user" and task_id in (item.get("task_refs") or []) and isinstance(item.get("timestamp_ms"),int) and item["timestamp_ms"]<=event_ms]
   if not inputs: continue
   turn_input=max(inputs,key=lambda item:(item["timestamp_ms"],item.get("sequence",-1)))
-  candidates=[item for item in session if item.get("role")=="assistant" and item.get("session_ref")==turn_input.get("session_ref") and isinstance(item.get("sequence"),int) and item["sequence"]>turn_input.get("sequence",-1) and isinstance(item.get("timestamp_ms"),int) and item["timestamp_ms"]>=event_ms and isinstance(item.get("provider"),str) and isinstance(item.get("model"),str)]
+  candidates=[item for item in session if item.get("role")=="assistant" and item.get("session_ref")==turn_input.get("session_ref") and isinstance(item.get("sequence"),int) and item["sequence"]>turn_input.get("sequence",-1) and isinstance(item.get("timestamp_ms"),int) and isinstance(item.get("provider"),str) and isinstance(item.get("model"),str)]
   if not candidates: continue
-  provider_turn=min(candidates,key=lambda item:(item["timestamp_ms"],item["sequence"]))
-  file_path=payload["file_path"]
-  if "\\" in file_path or "/../" in f"/{file_path}/" or not file_path.endswith("/SKILL.md"): continue
+  # QwenPaw records the assistant turn's creation time, while Matrix Skill
+  # events are emitted later during that same turn. Bind the nearest provider
+  # record in the room session, rather than requiring event_ts >= created_at.
+  provider_turn=min(candidates,key=lambda item:(abs(item["timestamp_ms"]-event_ms),item["sequence"]))
+  file_path=payload.get("file_path")
+  if isinstance(file_path,str) and ("\\" in file_path or "/../" in f"/{file_path}/" or not file_path.endswith("/SKILL.md")): continue
   inventory_path=snapshot/"skills"/re.sub(r"[^A-Za-z0-9._-]","_",actor)/"hashes.txt"
   inventory=[]
   try:
    for line in inventory_path.read_text(encoding="utf-8").splitlines():
     parts=line.split(maxsplit=1)
-    if len(parts)==2 and re.fullmatch(r"[0-9a-f]{64}",parts[0]) and parts[1]==file_path and re.fullmatch(r"(?:/[^/]+)*/skills/[A-Za-z0-9._-]+/SKILL\.md",parts[1]): inventory.append(parts)
+    if len(parts)!=2 or re.fullmatch(r"[0-9a-f]{64}",parts[0]) is None: continue
+    if re.fullmatch(r"(?:/[^/]+)*/skills/(?:[A-Za-z0-9._-]+/)?[A-Za-z0-9._-]+/SKILL\.md",parts[1]) is None: continue
+    if file_path is not None and parts[1]==file_path:
+     inventory.append(parts)
+    elif event_skill_hint is not None:
+     basename=pathlib.PurePosixPath(parts[1]).parent.name
+     normalized=event_skill_hint
+     for prefix in ("teamharness-","workerflow-"):
+      if normalized.startswith(prefix): normalized=normalized[len(prefix):]
+     if basename==normalized: inventory.append(parts)
   except OSError: continue
+  if event_skill_hint is not None and len(inventory)>1:
+   # Prefer the shipped plugin copy over duplicate workspace mirrors.
+   prefix="/plugins/teamharness/teamharness/skills/team/" if event_skill_hint.startswith("teamharness-") else "/plugins/workerflow/workerflow/skills/agent/"
+   preferred=[item for item in inventory if prefix in item[1]]
+   if preferred: inventory=preferred
   if len(inventory)!=1: continue
   skill_hash,skill_ref=inventory[0]
   skill_name=pathlib.PurePosixPath(skill_ref).parent.name
