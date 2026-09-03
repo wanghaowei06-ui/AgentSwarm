@@ -1,0 +1,79 @@
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# Dependencies
+node_modules/
+venv/
+.venv/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+dist/
+build/
+target/
+.gradle/
+
+# Compiled files
+*.pyc
+*.class
+*.o
+*.exe
+*.dll
+*.so
+*.a
+*.obj
+*.out
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+
+# TestWeaver local runtime artifacts
+testweaver/evidence/
+evidence/
+testweaver/config/runtime.env
+
+# Public configuration templates
+!dashboard/.env.example
+
+# Documentation screenshots containing user-specific credentials or identifiers
+docs/zh-cn/images/windows-deploy/bailian-codingplan-apikey.png
+docs/zh-cn/images/windows-deploy/powershell-llm-config-apikey.png
+docs/zh-cn/images/windows-deploy/powershell-install-success.png
+```

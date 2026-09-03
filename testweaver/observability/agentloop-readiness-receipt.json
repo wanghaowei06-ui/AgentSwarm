@@ -1,0 +1,38 @@
+{
+  "agentspace_sls": {
+    "live_claim": false,
+    "read_only": true,
+    "reason": "sls_endpoint_project_mismatch",
+    "status": "BLOCKED"
+  },
+  "classification": "BLOCKED",
+  "collector": {
+    "endpoint": "http://127.0.0.1:54318/v1/traces",
+    "http_method": "POST",
+    "live_claim": false,
+    "read_only_native_state": true,
+    "reason": null,
+    "request_hash": "sha256:fddbfaaf45f3a1fa73f93872eec5e75badf5aed6536fd5858040366dbb2c671c",
+    "response_bytes": 21,
+    "response_hash": "sha256:f56b35823a693646bf987ca07c9cbc4ff72a83b79b34595b20546b539795fdf0",
+    "response_status": 200,
+    "schema_version": "testweaver.otlp-receipt/v1",
+    "span_id": "4be2e2b77ac9b6e4",
+    "status": "EXPORT_ACCEPTED",
+    "trace_id": "a3bfc75f5f88f59b8c095215f1b91e28"
+  },
+  "generated_at_utc": "2026-09-02T14:03:17.446515+00:00",
+  "live_claim": false,
+  "schema_version": "testweaver.agentloop-readiness-receipt/v1",
+  "scope": {
+    "agentteams_control": false,
+    "config_paths": {
+      "loongsuite": "/root/.loongsuite-pilot/config.json",
+      "sls_credential_ref": null
+    },
+    "model_or_provider_call": false,
+    "read_only_queries_only": true,
+    "synthetic_not_live": true
+  },
+  "source_kind": "bounded_readiness_probe"
+}

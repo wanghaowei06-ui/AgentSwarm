@@ -1,0 +1,32 @@
+{
+  "schema_version": "agentteams.agentspec/v1",
+  "name": "testweaver-native-external-worker",
+  "version": "0.1.0",
+  "role": "worker",
+  "source": {
+    "contract_commit": "ae9e239",
+    "paths": [
+      "testweaver/adapters/config.py",
+      "testweaver/adapters/native_worker.py",
+      "testweaver/adapters/result.py"
+    ]
+  },
+  "skills": [
+    {
+      "name": "testweaver-native-external-worker",
+      "path": "skills/testweaver-native-external-worker"
+    }
+  ],
+  "mcpServers": [
+    {
+      "name": "testweaver-native-worker",
+      "transport": "stdio",
+      "command": "/opt/venv/qwenpaw/bin/python",
+      "args": ["-m", "testweaver.adapters.mcp_server"],
+      "cwd": "/opt/agentteams/testweaver-native-worker"
+    }
+  ],
+  "native_state_owner": "AgentTeams",
+  "secret_values_embedded": false,
+  "test_samples_are_live_evidence": false
+}

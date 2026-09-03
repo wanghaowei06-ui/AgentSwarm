@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/agentscope-ai/AgentTeams/testweaver/contracts/schemas/claim-v1.json",
+  "title": "TestWeaver Native Claim",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "testweaver.claim/v1"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "content_hash": {
+      "$ref": "common-v1.json#/$defs/Hash"
+    },
+    "claim_id": {
+      "$ref": "common-v1.json#/$defs/Identifier"
+    },
+    "source": {
+      "$ref": "common-v1.json#/$defs/ArtifactRef"
+    },
+    "native_refs": {
+      "$ref": "common-v1.json#/$defs/NativeRefs"
+    },
+    "producer": {
+      "$ref": "common-v1.json#/$defs/Producer"
+    },
+    "claim": {
+      "$ref": "#/$defs/ClaimBody"
+    },
+    "evidence_ref": {
+      "$ref": "common-v1.json#/$defs/EvidenceRef"
+    },
+    "provenance": {
+      "$ref": "common-v1.json#/$defs/Provenance"
+    },
+    "confidence": {
+      "$ref": "common-v1.json#/$defs/Confidence"
+    },
+    "unresolved_items": {
+      "$ref": "common-v1.json#/$defs/UnresolvedItems"
+    },
+    "artifact": {
+      "$ref": "common-v1.json#/$defs/TransportArtifact"
+    }
+  },
+  "$defs": {
+    "ClaimBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "claim_type",
+        "epistemic_status"
+      ],
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "claim_type": {
+          "type": "string",
+          "enum": [
+            "ROOT_CAUSE",
+            "IMPACT",
+            "REPAIR",
+            "ATTACK"
+          ]
+        },
+        "epistemic_status": {
+          "$ref": "common-v1.json#/$defs/EpistemicStatus"
+        }
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "version",
+    "revision",
+    "content_hash",
+    "claim_id",
+    "source",
+    "native_refs",
+    "producer",
+    "claim",
+    "evidence_ref",
+    "provenance",
+    "confidence",
+    "unresolved_items",
+    "artifact"
+  ]
+}

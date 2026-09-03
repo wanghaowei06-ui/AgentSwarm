@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "source": {
+    "repository": "AgentTeams",
+    "purpose": "TestWeaver native domain skills",
+    "source_commit": "19a929ea084c32e0e551881ec709b1d9b1792512"
+  },
+  "worker": {
+    "runtime": "qwenpaw"
+  }
+}

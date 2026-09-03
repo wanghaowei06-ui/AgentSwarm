@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/agentscope-ai/AgentTeams/testweaver/contracts/schemas/context-v1.json",
+  "title": "TestWeaver Native Context",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "testweaver.context/v1"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "content_hash": {
+      "$ref": "common-v1.json#/$defs/Hash"
+    },
+    "context_id": {
+      "$ref": "common-v1.json#/$defs/Identifier"
+    },
+    "native_refs": {
+      "$ref": "common-v1.json#/$defs/NativeRefs"
+    },
+    "producer": {
+      "$ref": "common-v1.json#/$defs/Producer"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "claim_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "common-v1.json#/$defs/ArtifactRef"
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "common-v1.json#/$defs/EvidenceRef"
+      }
+    },
+    "provenance_ref": {
+      "$ref": "common-v1.json#/$defs/ArtifactRef"
+    },
+    "unresolved_items": {
+      "$ref": "common-v1.json#/$defs/UnresolvedItems"
+    },
+    "artifact": {
+      "$ref": "common-v1.json#/$defs/TransportArtifact"
+    }
+  },
+  "required": [
+    "schema_version",
+    "version",
+    "revision",
+    "content_hash",
+    "context_id",
+    "native_refs",
+    "producer",
+    "summary",
+    "claim_refs",
+    "evidence_refs",
+    "provenance_ref",
+    "unresolved_items",
+    "artifact"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "name": "testweaver-openworker-pr161-outcome-oracle",
+  "version": "1.0.0",
+  "worker": {
+    "suggested_name": "native-m1-outcome-oracle",
+    "runtime": "qwenpaw"
+  },
+  "oracle": {
+    "kind": "outcome",
+    "entrypoint": "verify_outcome",
+    "visibility": "verifier_private_gold",
+    "private_gold_ref": "config/oracle-private/gold-boundary-v1.json",
+    "gold_may_be_read_only_for_assigned_outcome_task": true
+  },
+  "provenance": {
+    "source_commit": "4fb580c8da24b880f054246cb9273341940b92f7",
+    "verifier_sha256": "896ea473e5a7fddae905aee3e697c8b99a5cea94ed749918969437fe176db2aa",
+    "gold_sha256": "bf309d1227547ca12bf48d5f2d21c65409f39bc5c9940564e20d6f0854e70a57",
+    "artifacts": {
+      "config/SOUL.md": "f79e9cd518206915bb0aff77ed444c2a9a41c05cac236a9c8369bd3fe5eb84cc",
+      "config/oracle-private/gold-boundary-v1.json": "bf309d1227547ca12bf48d5f2d21c65409f39bc5c9940564e20d6f0854e70a57",
+      "config/oracle/manifest-v1.json": "99179f8e4483dd66906d30d1c1d8dff5c65ddb9ef2896952cc558673e3e184fa",
+      "config/oracle/mode.json": "eca0c8c2c7fe352c134d7fce80c52cc41cfbc2f204de1c705810430ca7dfc8f3",
+      "config/oracle/verifier.py": "896ea473e5a7fddae905aee3e697c8b99a5cea94ed749918969437fe176db2aa"
+    }
+  }
+}

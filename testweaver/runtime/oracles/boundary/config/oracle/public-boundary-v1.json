@@ -1,0 +1,18 @@
+{
+  "schema_version": "testweaver.m3.openworker-pr161.public-boundary/v1",
+  "dataset_id": "openworker-pr161-public-inputs",
+  "visibility": "public_policy_only",
+  "source_ref": "public-inputs-v1.json",
+  "gold_ref": null,
+  "cases": [
+    {"case_id": "disallow-explicit-denial", "policy_committed_side_effects": 0, "policy_required_ledger_entries": 1, "policy_response_known": true},
+    {"case_id": "note-question-boundary", "policy_committed_side_effects": 0, "policy_required_ledger_entries": 1, "policy_response_known": true},
+    {"case_id": "not-question-boundary", "policy_committed_side_effects": 0, "policy_required_ledger_entries": 1, "policy_response_known": true},
+    {"case_id": "approve-word", "policy_committed_side_effects": 1, "policy_required_ledger_entries": 1, "policy_response_known": true},
+    {"case_id": "approved-word", "policy_committed_side_effects": 1, "policy_required_ledger_entries": 1, "policy_response_known": true},
+    {"case_id": "allowed-word", "policy_committed_side_effects": 1, "policy_required_ledger_entries": 1, "policy_response_known": true},
+    {"case_id": "yes-word", "policy_committed_side_effects": 1, "policy_required_ledger_entries": 1, "policy_response_known": true},
+    {"case_id": "deny-word", "policy_committed_side_effects": 0, "policy_required_ledger_entries": 1, "policy_response_known": true},
+    {"case_id": "ambiguous-free-text", "policy_committed_side_effects": 0, "policy_required_ledger_entries": 1, "policy_response_known": true}
+  ]
+}

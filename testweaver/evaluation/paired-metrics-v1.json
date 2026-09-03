@@ -1,0 +1,315 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "testweaver.m3.paired-comparison/v1",
+  "title": "TestWeaver M3 offline paired comparison",
+  "description": "Descriptive comparison of completed native runs using frozen references; it performs no runtime work and makes no causal claim.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "comparison_mode",
+    "pairing_fields",
+    "metric_units",
+    "pairs",
+    "aggregate",
+    "causal_inference",
+    "content_hash"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "testweaver.m3.paired-comparison/v1"
+    },
+    "comparison_mode": {
+      "const": "offline_frozen_references"
+    },
+    "pairing_fields": {
+      "const": [
+        "case_id",
+        "input_hash",
+        "golden_revision",
+        "budget_hash",
+        "environment_hash",
+        "repetition"
+      ]
+    },
+    "metric_units": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "quality",
+        "duplicate_work_rate",
+        "hallucination_or_unsupported_claim_block_rate",
+        "coordination_overhead",
+        "input_tokens",
+        "output_tokens",
+        "total_tokens",
+        "cost",
+        "latency_ms",
+        "evidence_completeness",
+        "net_value"
+      ],
+      "properties": {
+        "quality": {
+          "const": "ratio_0_to_1"
+        },
+        "duplicate_work_rate": {
+          "const": "ratio_0_to_1"
+        },
+        "hallucination_or_unsupported_claim_block_rate": {
+          "const": "ratio_0_to_1"
+        },
+        "coordination_overhead": {
+          "const": "native_coordination_units"
+        },
+        "input_tokens": {
+          "const": "tokens"
+        },
+        "output_tokens": {
+          "const": "tokens"
+        },
+        "total_tokens": {
+          "const": "tokens"
+        },
+        "cost": {
+          "const": "cost_units"
+        },
+        "latency_ms": {
+          "const": "milliseconds"
+        },
+        "evidence_completeness": {
+          "const": "ratio_0_to_1"
+        },
+        "net_value": {
+          "const": "value_units"
+        }
+      }
+    },
+    "pairs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Pair"
+      }
+    },
+    "aggregate": {
+      "$ref": "#/$defs/MetricSet"
+    },
+    "causal_inference": {
+      "$ref": "#/$defs/CausalInference"
+    },
+    "content_hash": {
+      "$ref": "#/$defs/Hash"
+    }
+  },
+  "$defs": {
+    "Hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "Identifier": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^\\S+$"
+    },
+    "Reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "content_hash"],
+      "properties": {
+        "ref": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "content_hash": {
+          "$ref": "#/$defs/Hash"
+        }
+      }
+    },
+    "RunProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id",
+        "profile",
+        "frozen",
+        "receipt_ref",
+        "manifest_ref",
+        "oracle_result_refs"
+      ],
+      "properties": {
+        "run_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "profile": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "frozen": {
+          "const": true
+        },
+        "receipt_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "manifest_ref": {
+          "$ref": "#/$defs/Reference"
+        },
+        "oracle_result_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/Reference"
+          }
+        }
+      }
+    },
+    "PairingKey": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_id",
+        "input_hash",
+        "golden_revision",
+        "budget_hash",
+        "environment_hash",
+        "repetition"
+      ],
+      "properties": {
+        "case_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "input_hash": {
+          "$ref": "#/$defs/Hash"
+        },
+        "golden_revision": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "budget_hash": {
+          "$ref": "#/$defs/Hash"
+        },
+        "environment_hash": {
+          "$ref": "#/$defs/Hash"
+        },
+        "repetition": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "MetricValue": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "const": "NOT_AVAILABLE"
+        }
+      ]
+    },
+    "MetricCell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseline", "treatment", "delta"],
+      "properties": {
+        "baseline": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "treatment": {
+          "$ref": "#/$defs/MetricValue"
+        },
+        "delta": {
+          "$ref": "#/$defs/MetricValue"
+        }
+      }
+    },
+    "MetricSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "quality",
+        "duplicate_work_rate",
+        "hallucination_or_unsupported_claim_block_rate",
+        "coordination_overhead",
+        "input_tokens",
+        "output_tokens",
+        "total_tokens",
+        "cost",
+        "latency_ms",
+        "evidence_completeness",
+        "net_value"
+      ],
+      "properties": {
+        "quality": {
+          "$ref": "#/$defs/MetricCell"
+        },
+        "duplicate_work_rate": {
+          "$ref": "#/$defs/MetricCell"
+        },
+        "hallucination_or_unsupported_claim_block_rate": {
+          "$ref": "#/$defs/MetricCell"
+        },
+        "coordination_overhead": {
+          "$ref": "#/$defs/MetricCell"
+        },
+        "input_tokens": {
+          "$ref": "#/$defs/MetricCell"
+        },
+        "output_tokens": {
+          "$ref": "#/$defs/MetricCell"
+        },
+        "total_tokens": {
+          "$ref": "#/$defs/MetricCell"
+        },
+        "cost": {
+          "$ref": "#/$defs/MetricCell"
+        },
+        "latency_ms": {
+          "$ref": "#/$defs/MetricCell"
+        },
+        "evidence_completeness": {
+          "$ref": "#/$defs/MetricCell"
+        },
+        "net_value": {
+          "$ref": "#/$defs/MetricCell"
+        }
+      }
+    },
+    "CausalInference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reason"],
+      "properties": {
+        "status": {
+          "const": "NOT_AVAILABLE"
+        },
+        "reason": {
+          "const": "paired_observation_does_not_establish_causality"
+        }
+      }
+    },
+    "Pair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pairing_key",
+        "baseline",
+        "treatment",
+        "metrics",
+        "causal_inference"
+      ],
+      "properties": {
+        "pairing_key": {
+          "$ref": "#/$defs/PairingKey"
+        },
+        "baseline": {
+          "$ref": "#/$defs/RunProjection"
+        },
+        "treatment": {
+          "$ref": "#/$defs/RunProjection"
+        },
+        "metrics": {
+          "$ref": "#/$defs/MetricSet"
+        },
+        "causal_inference": {
+          "$ref": "#/$defs/CausalInference"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "testweaver-openworker-pr161-boundary-oracle",
+  "version": "1.0.0",
+  "worker": {
+    "suggested_name": "native-m0-boundary-oracle",
+    "runtime": "qwenpaw"
+  },
+  "oracle": {
+    "kind": "boundary",
+    "entrypoint": "verify_boundary",
+    "visibility": "public_only",
+    "candidate_visible": [
+      "config/oracle/manifest-v1.json",
+      "config/oracle/public-inputs-v1.json",
+      "config/oracle/public-boundary-v1.json"
+    ],
+    "gold_present": false
+  },
+  "provenance": {
+    "source_commit": "4fb580c8da24b880f054246cb9273341940b92f7",
+    "manifest_projection": "gold_boundary descriptor omitted from Boundary-visible copy",
+    "verifier_sha256": "896ea473e5a7fddae905aee3e697c8b99a5cea94ed749918969437fe176db2aa",
+    "artifacts": {
+      "config/SOUL.md": "eec51bbc4178fd107879f93949ae39d0f03c5b184e3b9a94ea354c03125e01f9",
+      "config/oracle/manifest-v1.json": "88631725ca62d88e30cbf9e9ca4d1c1094f5554c00489c19a7adef58157fe3e9",
+      "config/oracle/mode.json": "508199a6fd5e1d37f058de517ef58f7368ed330f72c9ff9ec9879dbb929a50f5",
+      "config/oracle/public-boundary-v1.json": "c9a0ba49cba3f8c350ad83db92812edd26343f1f1a9905fa019b742f7b1d2325",
+      "config/oracle/public-inputs-v1.json": "16b17b27561d9c863578b23d47acddd0c98f58f73e8e30c192b6625104686572",
+      "config/oracle/verifier.py": "896ea473e5a7fddae905aee3e697c8b99a5cea94ed749918969437fe176db2aa"
+    }
+  }
+}

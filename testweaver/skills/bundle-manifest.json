@@ -1,0 +1,202 @@
+{
+  "schema_version": "testweaver.agentteams-native-skill-bundle/v1",
+  "bundle_id": "testweaver-native-domain-skills",
+  "semver": "1.0.0",
+  "runtime_contract": {
+    "discovery": "AgentTeams native Skill inventory discovers directories containing SKILL.md",
+    "load": "AgentTeams native Skill loader reads SKILL.md frontmatter and body",
+    "invoke": "AgentTeams native role invokes the named Skill with task-scoped references",
+    "package_only": true
+  },
+  "selection_basis": {
+    "register_assets": [
+      "BASELINE-SKILL-CONTRACT-013",
+      "POLICY-HITL-BASELINE-003",
+      "PG-RECOVERY-FENCING-002",
+      "CONTEXT-EVIDENCE-HANDOFF-011",
+      "REAL-AGENTLOOP-OTEL-010",
+      "SECURITY-BOUNDARY-018",
+      "DUAL-ORACLE-005"
+    ],
+    "plan_ref": "docs/superpowers/plans/2026-09-01-semifinal-agentteams-native-restart.md",
+    "native_format_ref": "manager/agent/worker-skills/README.md",
+    "source_set_ref": "TestWeaver packages/skillops first-batch Skill set"
+  },
+  "skills": [
+    {
+      "name": "approval-intent-boundary-check",
+      "semver": "1.0.0",
+      "path": "testweaver/skills/approval-intent-boundary-check/SKILL.md",
+      "content_sha256": "9c4ca3e3015b2201217825b4d40dccd785a5eeb2c97ddfbdb3daa53a1c4d4b66",
+      "source": {
+        "repository": "TestWeaver",
+        "worktree": "/root/projects/muti-agent",
+        "commit": "45070b694ba1745fb374ac857369e6acb34e918a",
+        "path": "skills/approval-intent-boundary-check/SKILL.md",
+        "sha256": "bd119be3115c882d9de330063f0352c3ea17f875377f903859495988c1a30cb5"
+      },
+      "register_asset_refs": [
+        "POLICY-HITL-BASELINE-003",
+        "SECURITY-BOUNDARY-018",
+        "BASELINE-SKILL-CONTRACT-013"
+      ],
+      "applicable_roles": ["native-worker", "native-team-leader"],
+      "tool_allowlist": [
+        "native.room.read",
+        "native.task.read",
+        "native.approval.read",
+        "native.evidence.read"
+      ],
+      "permission_allowlist": [
+        "room.read",
+        "task.read",
+        "approval.read",
+        "evidence.read",
+        "proposal.write"
+      ],
+      "dependencies": []
+    },
+    {
+      "name": "reconcile-before-retry",
+      "semver": "1.0.0",
+      "path": "testweaver/skills/reconcile-before-retry/SKILL.md",
+      "content_sha256": "cd4f768e3c39c63701cec6e18fe5228cd6005425649af89aa406ebffea5b2d8e",
+      "source": {
+        "repository": "TestWeaver",
+        "worktree": "/root/projects/muti-agent",
+        "commit": "45070b694ba1745fb374ac857369e6acb34e918a",
+        "path": "skills/reconcile-before-retry/SKILL.md",
+        "sha256": "f6b283d8a69646b0edc165245daae89ae916031aa510a79fc0a19d9282eac46f"
+      },
+      "register_asset_refs": [
+        "PG-RECOVERY-FENCING-002",
+        "CONTEXT-EVIDENCE-HANDOFF-011",
+        "BASELINE-SKILL-CONTRACT-013"
+      ],
+      "applicable_roles": ["native-worker", "native-team-leader"],
+      "tool_allowlist": [
+        "native.task.read",
+        "native.room.read",
+        "native.action-status.read",
+        "native.evidence.read"
+      ],
+      "permission_allowlist": [
+        "task.read",
+        "room.read",
+        "action-status.read",
+        "evidence.read",
+        "proposal.write"
+      ],
+      "dependencies": []
+    },
+    {
+      "name": "preserve-critical-constraints",
+      "semver": "1.0.0",
+      "path": "testweaver/skills/preserve-critical-constraints/SKILL.md",
+      "content_sha256": "fa63646e6c8b8499d09bb349bcc5b8f71040cb47522e169ebdb287e05569082f",
+      "source": {
+        "repository": "TestWeaver",
+        "worktree": "/root/projects/muti-agent",
+        "commit": "45070b694ba1745fb374ac857369e6acb34e918a",
+        "path": "skills/preserve-critical-constraints/SKILL.md",
+        "sha256": "63195ae1f22a20d3a97fa60c03a5285e54285043d19c00c800090b0f09a10070"
+      },
+      "register_asset_refs": [
+        "CONTEXT-EVIDENCE-HANDOFF-011",
+        "REAL-AGENTLOOP-OTEL-010",
+        "BASELINE-SKILL-CONTRACT-013"
+      ],
+      "applicable_roles": ["native-worker", "native-team-leader"],
+      "tool_allowlist": [
+        "native.task.read",
+        "native.checkpoint.read",
+        "native.policy.read",
+        "native.evidence.read"
+      ],
+      "permission_allowlist": [
+        "task.read",
+        "checkpoint.read",
+        "policy.read",
+        "evidence.read",
+        "proposal.write"
+      ],
+      "dependencies": []
+    },
+    {
+      "name": "diagnose-by-competing-hypotheses",
+      "semver": "1.0.0",
+      "path": "testweaver/skills/diagnose-by-competing-hypotheses/SKILL.md",
+      "content_sha256": "3e4f49d6977976612d4539db7e6a05520387bd653cd3eb2a5f4a202647910954",
+      "source": {
+        "repository": "TestWeaver",
+        "worktree": "/root/projects/muti-agent",
+        "commit": "45070b694ba1745fb374ac857369e6acb34e918a",
+        "path": "skills/diagnose-by-competing-hypotheses/SKILL.md",
+        "sha256": "6ba29ffd814179d823f883e4d1d065681531d67ab41bb26134884ddcf002abd9"
+      },
+      "register_asset_refs": [
+        "REAL-AGENTLOOP-OTEL-010",
+        "CONTEXT-EVIDENCE-HANDOFF-011",
+        "BASELINE-SKILL-CONTRACT-013"
+      ],
+      "applicable_roles": ["native-team-leader", "native-worker"],
+      "tool_allowlist": [
+        "native.task.read",
+        "native.room.read",
+        "native.source.read",
+        "native.trace.read",
+        "native.evidence.read"
+      ],
+      "permission_allowlist": [
+        "task.read",
+        "room.read",
+        "source.read",
+        "trace.read",
+        "evidence.read",
+        "proposal.write"
+      ],
+      "dependencies": []
+    },
+    {
+      "name": "avoid-redundant-exploration",
+      "semver": "1.0.0",
+      "path": "testweaver/skills/avoid-redundant-exploration/SKILL.md",
+      "content_sha256": "eb685877c9ea2120003806ce5633360d3e2431c5537db50de1e0429344ffb4bd",
+      "source": {
+        "repository": "TestWeaver",
+        "worktree": "/root/projects/muti-agent",
+        "commit": "45070b694ba1745fb374ac857369e6acb34e918a",
+        "path": "skills/avoid-redundant-exploration/SKILL.md",
+        "sha256": "f240401a8b3d6cacc6a5f415fd0090da6aaf4b3775616cc6585d7f815a50ff44"
+      },
+      "register_asset_refs": [
+        "REAL-AGENTLOOP-OTEL-010",
+        "DUAL-ORACLE-005",
+        "BASELINE-SKILL-CONTRACT-013"
+      ],
+      "applicable_roles": ["native-team-leader", "native-worker"],
+      "tool_allowlist": [
+        "native.task.read",
+        "native.room.read",
+        "native.scenario.read",
+        "native.evidence.read"
+      ],
+      "permission_allowlist": [
+        "task.read",
+        "room.read",
+        "scenario.read",
+        "evidence.read",
+        "proposal.write"
+      ],
+      "dependencies": []
+    }
+  ],
+  "boundaries": {
+    "native_runtime_owned": true,
+    "package_is_declarative": true,
+    "side_effects": "none",
+    "credentials_included": false,
+    "fixtures_included": false,
+    "authority_write_included": false
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "schema_version": "testweaver.m3.openworker-pr161.public-inputs/v1",
+  "dataset_id": "openworker-pr161-public-inputs",
+  "version": "1.0.0",
+  "visibility": "public_input_only",
+  "target": "openworker-legacy-unattended-inbox-free-text-fallback",
+  "cases": [
+    {
+      "case_id": "disallow-explicit-denial",
+      "interaction_kind": "approval",
+      "reply": "disallow"
+    },
+    {
+      "case_id": "note-question-boundary",
+      "interaction_kind": "question",
+      "reply": "note"
+    },
+    {
+      "case_id": "not-question-boundary",
+      "interaction_kind": "question",
+      "reply": "not"
+    },
+    {
+      "case_id": "approve-word",
+      "interaction_kind": "approval",
+      "reply": "approve"
+    },
+    {
+      "case_id": "approved-word",
+      "interaction_kind": "approval",
+      "reply": "approved"
+    },
+    {
+      "case_id": "allowed-word",
+      "interaction_kind": "approval",
+      "reply": "allowed"
+    },
+    {
+      "case_id": "yes-word",
+      "interaction_kind": "approval",
+      "reply": "yes"
+    },
+    {
+      "case_id": "deny-word",
+      "interaction_kind": "approval",
+      "reply": "denied"
+    },
+    {
+      "case_id": "ambiguous-free-text",
+      "interaction_kind": "approval",
+      "reply": "perhaps later"
+    }
+  ]
+}

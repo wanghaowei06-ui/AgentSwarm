@@ -1,0 +1,103 @@
+TestWeaver native heterogeneous Worker packaging/build receipt
+===============================================================
+Status: PASS (package, build, and no-credential image smoke); NOT_DEPLOYED
+Receipt scope: this packaging/build only; no Worker, Team, Controller, Manager,
+               Matrix, provider, or model was changed or invoked.
+Recorded: 2026-09-02T02:34:20Z
+
+Fixed DSH input
+---------------
+Source: /root/projects/muti-agent/.testweaver/cache/g13-deepseek-runtime/dsh-package
+Upstream commit: 47f943859bef60e4160492346772ded9b24f765a
+Upstream tree: f904efab9ef435201d6ba4da88a34d6366568272
+Package: @deepseek-ai/dsh@0.1.0-rc.5
+package.json sha256: a83af30293a1af777416ad890576840fecbeed33a56218993910239e39f19786
+lib/bin.js sha256: c0226687bb20f45c603ec6fe50f3de16d1c3510c3a803304ec575ef9bc366c62
+Canonical lock sha256: 6177ec61bdb8194eb5a606813a62ffb0ab2cc7fdfe2cd6e0249dcbfe4bce58e0
+Materialized lock sha256: b6f01683dca822848360087255d7847b4961afd2ad6e08cf6ed36a4d38daa377
+Fixed materialized cache sha256: bf23d5e48eadc9468442f035afd90f1624b9c0ad6784a1809150512f7376c761
+External provenance: /root/projects/muti-agent/artifacts/verification/g13/deepseek-harness-provenance.json
+TW-R2-0077: /root/projects/muti-agent/artifacts/verification/semifinal/tw-r2-0077-dsh-runtime.json
+TW-R2-0077 status: DONE / LOCAL_DEVELOPER_PREVIEW_RUNTIME / RUNTIME_PASS
+TW-R2-0077 report sha256: 1d743dc4395f933110b6ed9b335f88e7f5c56d4b6d2bc2927334d1402015a30b
+Official npm @deepseek-ai/dsh@0.1.0-rc.5: unavailable (fixed registry metadata/pack
+query returned no matching version); no unpinned fallback was used.
+
+Deterministic package
+---------------------
+DSH tarball sha256: 1d21f3e9c74f2dbad004da5c3d054cc2b9e31c80721067b4319a34f89905e31f
+Closure: 516 pnpm instances, 25 root packages, 58 absent optional/peer entries
+Published paths: package.json, lib/, config/, selected dependency closure
+Whole source node_modules copied: false
+External/platform symlink pruning: PASS; unresolved symlinks: 0
+The launcher resolves @deepseek-ai/dsh/lib/bin.js to the packaged lib/bin.js;
+it does not implement or replace the DSH CLI.
+
+Image
+-----
+Base ref: agentteams/qwenpaw-worker:be10aaf
+Base image ID: sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb
+Output tag: agentteams/qwenpaw-worker:m1plus-ae2d696-dsh-v2
+Output image ID/digest: sha256:4e1270e70cf4f2fda0c73ca6323d3b6c019c458db77eed72894c188cb6aefcd8
+Created: 2026-09-02T10:30:21.499877166+08:00
+Platform/size: linux/amd64 / 920258753 bytes
+Build mode: local Docker build, --pull=false, exact base ID assertion
+Build context: temporary /tmp/testweaver-qwenpaw-build.FqkSnd (not a repository path)
+Build warning: Dockerfile ARG-before-FROM default warning only; supplied base is valid.
+
+Codex package
+-------------
+Spec: @openai/codex@0.152.0
+Registry integrity metadata: sha512-Vx0tg/J5SbxYYGJazTtL/XySK9Dlqc5KW1MZM71NMwVci/4F1ap+FfSKPFTlrICEtOTuq3KNcWSdv9oMGdPuRw==
+Declared license: Apache-2.0
+Command: lowercase codex-cc -> installed .bin/codex; no bare codex wrapper was added.
+DSH declared license: MIT (package metadata).
+
+Package/Skill identity
+----------------------
+dsh-build-provenance.json sha256: aa27ccd9e5de8c223b5007f7d7f500d8ee3dfd5e9ba7c074554f832512874ea5
+dsh-launcher.mjs sha256: ee07c87b61e8a304d6012802100a1dcffefec47825725ead0c66c686cf6496f0
+AgentSpec manifest sha256: 6726453ec7e000ff2112fe6cf3e6cd110616800f4793b627bd2f84d7ccfa857d
+Skill sha256: efde5c8e005cc259ad0be8ee2fa646c4ba6cb8db901e4348f8f4bd8cecf97478
+
+No-credential image smoke
+-------------------------
+Command shape: docker run --rm --network none --read-only with temporary tmpfs
+               only for /tmp, /root/.dsh, /root/.config, and /root/.cache.
+Python compile: PASS
+Node: v20.19.2
+DSH --version: 0.1.0-rc.5; headless --help: PASS
+Resolved DSH entrypoint: /opt/agentteams/testweaver-native-worker/dsh-runtime/lib/bin.js
+Codex --version: codex-cli 0.152.0; installed package: 0.152.0
+MCP initialize: PASS (protocol 2024-11-05)
+MCP tools/list: PASS (exactly one tool: native_worker_execute)
+Authority scan: PASS; no task/project/room/lease/scheduler/Matrix operation in
+               packaged adapter executable source or MCP metadata.
+Secret-value scan: PASS; no secret value copied or emitted. Image config was
+                   checked by variable name only and adds no credential variable.
+Network proof: --network none; no provider/model call.
+Read-only Codex warning: PATH alias creation warning only; --version exited 0.
+
+Focused validation
+-------------------
+PYTHONPATH=. python3 -m unittest \
+  testweaver.adapters.tests.test_adapters \
+  testweaver.adapters.tests.test_executor \
+  testweaver.adapters.tests.test_package
+Result: 28 tests, PASS
+node --check testweaver/adapters/dsh-launcher.mjs: PASS
+bash -n testweaver/adapters/build-qwenpaw-native-extension.sh: PASS
+git diff --check -- testweaver/adapters: PASS
+Minimum license/SBOM check: PASS; direct DSH/Codex identities and declared
+                             licenses recorded above; no whole cache/node_modules
+                             or old TestWeaver Runner/Scheduler was staged.
+
+Build invocation
+----------------
+TESTWEAVER_QWENPAW_BASE_IMAGE=agentteams/qwenpaw-worker:be10aaf \
+TESTWEAVER_QWENPAW_BASE_IMAGE_ID=sha256:1f04db957f7ba99046a1a3f27fead9a5d7aca75bc3ccbe49dca1e4bb3de021bb \
+TESTWEAVER_QWENPAW_IMAGE=agentteams/qwenpaw-worker:m1plus-ae2d696-dsh-v2 \
+TESTWEAVER_DSH_SOURCE_DIR=/root/projects/muti-agent/.testweaver/cache/g13-deepseek-runtime/dsh-package \
+TESTWEAVER_DSH_LOCKFILE=/root/projects/muti-agent/artifacts/verification/g13/deepseek-harness-official-cache/pnpm-lock.yaml \
+TESTWEAVER_DSH_PROVENANCE=/root/projects/muti-agent/artifacts/verification/g13/deepseek-harness-provenance.json \
+bash testweaver/adapters/build-qwenpaw-native-extension.sh

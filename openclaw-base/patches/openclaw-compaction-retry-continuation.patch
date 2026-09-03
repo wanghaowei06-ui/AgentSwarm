@@ -1,0 +1,154 @@
+diff --git a/src/agents/pi-embedded-runner/run/types.ts b/src/agents/pi-embedded-runner/run/types.ts
+--- a/src/agents/pi-embedded-runner/run/types.ts
++++ b/src/agents/pi-embedded-runner/run/types.ts
+@@ -37,4 +37,6 @@
+   modelRegistry: ModelRegistry;
+   thinkLevel: ThinkLevel;
+   legacyBeforeAgentStartResult?: PluginHookBeforeAgentStartResult;
++  /** Continue the compacted transcript without appending the original prompt as a new user turn. */
++  continueFromCompactionRetry?: boolean;
+ };
+diff --git a/src/agents/pi-embedded-runner/run.ts b/src/agents/pi-embedded-runner/run.ts
+--- a/src/agents/pi-embedded-runner/run.ts
++++ b/src/agents/pi-embedded-runner/run.ts
+@@ -607,5 +607,6 @@
+         let authRetryPending = false;
+         let accumulatedReplayState = createEmbeddedRunReplayState();
++        let resumeCompactedTranscript = false;
+         // Hoisted so the retry-limit error path can use the most recent API total.
+         let lastTurnTotal: number | undefined;
+         while (true) {
+@@ -646,4 +648,6 @@
+           const runtimeAuthRetry = authRetryPending;
+           authRetryPending = false;
++          const continueFromCompactionRetry = resumeCompactedTranscript;
++          resumeCompactedTranscript = false;
+           attemptedThinking.add(thinkLevel);
+           await fs.mkdir(resolvedWorkspace, { recursive: true });
+@@ -722,6 +726,7 @@
+             authStorage,
+             modelRegistry,
+             agentId: workspaceResolution.agentId,
+             legacyBeforeAgentStartResult,
++            continueFromCompactionRetry,
+             thinkLevel,
+             fastMode: params.fastMode,
+@@ -1113,4 +1113,5 @@
+                 }
+                 autoCompactionCount += 1;
++                resumeCompactedTranscript = true;
+                 log.info(`auto-compaction succeeded for ${provider}/${modelId}; retrying prompt`);
+                 continue;
+diff --git a/src/agents/pi-embedded-runner/run/attempt.ts b/src/agents/pi-embedded-runner/run/attempt.ts
+--- a/src/agents/pi-embedded-runner/run/attempt.ts
++++ b/src/agents/pi-embedded-runner/run/attempt.ts
+@@ -2007,9 +2007,13 @@
+-            // Only pass images option if there are actually images to pass
+-            // This avoids potential issues with models that don't expect the images parameter
+-            if (imageResult.images.length > 0) {
++            if (params.continueFromCompactionRetry) {
++              // The compaction summary already represents the Human turn. Resume the
++              // compacted transcript so retrying an overflow cannot append another intake.
++              await abortable(activeSession.agent.continue());
++            } else if (imageResult.images.length > 0) {
++              // Only pass images option if there are actually images to pass
++              // This avoids potential issues with models that don't expect the images parameter
+               await abortable(
+                 activeSession.prompt(effectivePrompt, { images: imageResult.images }),
+               );
+             } else {
+               await abortable(activeSession.prompt(effectivePrompt));
+             }
+diff --git a/src/agents/pi-embedded-runner/run.overflow-compaction.loop.test.ts b/src/agents/pi-embedded-runner/run.overflow-compaction.loop.test.ts
+--- a/src/agents/pi-embedded-runner/run.overflow-compaction.loop.test.ts
++++ b/src/agents/pi-embedded-runner/run.overflow-compaction.loop.test.ts
+@@ -101,1 +101,19 @@
++  it("resumes a compacted transcript without a second Human intake", async () => {
++    mockOverflowRetrySuccess({
++      runEmbeddedAttempt: mockedRunEmbeddedAttempt,
++      compactDirect: mockedCompactDirect,
++    });
++
++    const result = await runEmbeddedPiAgent(baseParams);
++
++    expect(mockedRunEmbeddedAttempt).toHaveBeenCalledTimes(2);
++    expect(mockedRunEmbeddedAttempt.mock.calls[0]?.[0]).toEqual(
++      expect.objectContaining({ continueFromCompactionRetry: false }),
++    );
++    expect(mockedRunEmbeddedAttempt.mock.calls[1]?.[0]).toEqual(
++      expect.objectContaining({ continueFromCompactionRetry: true }),
++    );
++    expect(result.meta.error).toBeUndefined();
++  });
++
+   it("retries after successful compaction on likely-overflow promptError variants", async () => {
+diff --git a/src/agents/pi-embedded-runner/run/compaction-retry-intake.test.ts b/src/agents/pi-embedded-runner/run/compaction-retry-intake.test.ts
+new file mode 100644
+--- /dev/null
++++ b/src/agents/pi-embedded-runner/run/compaction-retry-intake.test.ts
+@@ -0,0 +1,65 @@
++import { Agent } from "@mariozechner/pi-agent-core";
++import { convertToLlm } from "@mariozechner/pi-coding-agent";
++import { describe, expect, it } from "vitest";
++
++describe("compaction retry intake boundary", () => {
++  it("resumes the compacted transcript without appending a second Human user message", async () => {
++    const humanEventId = "$m1-human-event";
++    const seenUserMessages: string[] = [];
++    const llmContexts: Array<unknown[]> = [];
++    const assistantMessage = {
++      role: "assistant",
++      content: [{ type: "text", text: "ack" }],
++      api: "messages",
++      provider: "test",
++      model: "test-model",
++      usage: { input: 1, output: 1, cacheRead: 0, cacheWrite: 0, totalTokens: 2 },
++      stopReason: "stop",
++      timestamp: Date.now(),
++    } as const;
++
++    const agent = new Agent({
++      initialState: {
++        systemPrompt: "test",
++        model: { provider: "test", id: "test-model", api: "messages" } as never,
++        tools: [],
++      },
++      convertToLlm,
++      streamFn: async (_model, context) => {
++        llmContexts.push(context.messages);
++        return {
++          result: async () => assistantMessage,
++          async *[Symbol.asyncIterator]() {
++            yield { type: "done", reason: "stop", message: assistantMessage };
++          },
++        } as never;
++      },
++    });
++
++    agent.subscribe((event) => {
++      if (event.type === "message_end" && event.message.role === "user") {
++        const text = event.message.content
++          .filter((part) => part.type === "text")
++          .map((part) => part.text)
++          .join("\n");
++        seenUserMessages.push(text);
++      }
++    });
++
++    await agent.prompt(humanEventId);
++    agent.state.messages = [
++      {
++        role: "compactionSummary",
++        summary: `Completed intake for ${humanEventId}; resume the existing work.`,
++        tokensBefore: 100,
++        timestamp: Date.now(),
++      } as never,
++    ];
++    await agent.continue();
++
++    expect(seenUserMessages).toEqual([humanEventId]);
++    expect(llmContexts).toHaveLength(2);
++    expect(llmContexts[1]).toHaveLength(1);
++    expect((llmContexts[1]?.[0] as { role?: string }).role).toBe("user");
++  });
++});

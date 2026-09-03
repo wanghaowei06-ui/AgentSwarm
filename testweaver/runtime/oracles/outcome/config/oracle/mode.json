@@ -1,0 +1,9 @@
+{
+  "schema_version": "testweaver.oracle-runtime-mode/v1",
+  "oracle_kind": "outcome",
+  "python_module": "verifier.py",
+  "entrypoint": "verify_outcome",
+  "allowed_inputs": ["observation", "manifest", "oracle-private/gold-boundary-v1.json"],
+  "forbidden_inputs": ["boundary_oracle_artifacts"],
+  "emits": "outcome_result_ref_only"
+}

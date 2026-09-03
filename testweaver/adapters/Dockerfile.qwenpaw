@@ -1,0 +1,104 @@
+# Small immutable extension image for the official QwenPaw Worker image.
+# The build entrypoint supplies a deterministic, platform-specific DSH package
+# assembled from the fixed upstream materialization; no source cache is copied.
+
+ARG QWENPAW_BASE_IMAGE
+FROM ${QWENPAW_BASE_IMAGE}
+
+ARG CODEX_CLI_SPEC=@openai/codex@0.152.0
+ARG TESTWEAVER_DSH_PACKAGE=dsh-runtime.tar.gz
+ARG TESTWEAVER_DSH_PACKAGE_SHA256=dsh-runtime.tar.gz.sha256
+ARG TESTWEAVER_QWENPAW_WORKER_BLOB=214b2649c5be8184772e383dfc5c37d29a1cb5fc
+ARG TESTWEAVER_QWENPAW_WORKER_SHA256=f06e91c6b424e3e8ecc43248d6fd84ef2082077286241059f5d5bc4fd1533a7d
+
+USER root
+RUN test "${CODEX_CLI_SPEC}" = "@openai/codex@0.152.0" \
+    && mkdir -p /opt/agentteams/testweaver-native-worker/bin \
+        /opt/agentteams/testweaver-native-worker/testweaver/adapters \
+        /opt/agentteams/testweaver-native-worker/codex-cli \
+        /opt/agentteams/testweaver-native-worker/dsh-runtime
+
+COPY __init__.py artifact_store.py codex_cli.py config.py native_worker.py result.py executor.py mcp_server.py \
+    /opt/agentteams/testweaver-native-worker/testweaver/adapters/
+COPY qwenpaw-package/ /opt/agentteams/testweaver-native-worker/package/
+COPY dsh-launcher.mjs /opt/agentteams/testweaver-native-worker/bin/dsh-launcher.mjs
+COPY dsh-headless-max-tokens.patch.yml /opt/agentteams/testweaver-native-worker/dsh-headless-max-tokens.patch.yml
+COPY node-runtime /opt/agentteams/testweaver-native-worker/bin/node
+COPY qwenpaw-worker-source/worker.py /tmp/qwenpaw-worker-source/worker.py
+COPY qwenpaw-worker-source.provenance.json /tmp/qwenpaw-worker-source.provenance.json
+COPY ${TESTWEAVER_DSH_PACKAGE} /tmp/dsh-runtime.tar.gz
+COPY ${TESTWEAVER_DSH_PACKAGE_SHA256} /tmp/dsh-runtime.tar.gz.sha256
+
+ENV PATH="/opt/agentteams/testweaver-native-worker/bin:${PATH}"
+
+RUN test -d /opt/venv/qwenpaw/lib/python3.11/site-packages/qwenpaw_worker \
+    && test -f /tmp/qwenpaw-worker-source/worker.py \
+    && test ! -L /tmp/qwenpaw-worker-source/worker.py \
+    && test "$(sha256sum /tmp/qwenpaw-worker-source/worker.py | awk '{print $1}')" = "${TESTWEAVER_QWENPAW_WORKER_SHA256}" \
+    && test -f /tmp/qwenpaw-worker-source.provenance.json \
+    && grep -Fq "${TESTWEAVER_QWENPAW_WORKER_BLOB}" /tmp/qwenpaw-worker-source.provenance.json \
+    && grep -Fq "${TESTWEAVER_QWENPAW_WORKER_SHA256}" /tmp/qwenpaw-worker-source.provenance.json \
+    && cp -a /tmp/qwenpaw-worker-source/. \
+        /opt/venv/qwenpaw/lib/python3.11/site-packages/qwenpaw_worker/ \
+    && test -f /opt/venv/qwenpaw/lib/python3.11/site-packages/qwenpaw_worker/worker.py \
+    && install -m 0444 /tmp/qwenpaw-worker-source.provenance.json \
+        /opt/agentteams/testweaver-native-worker/qwenpaw-worker-source.provenance.json \
+    && test ! -L /opt/agentteams/testweaver-native-worker/qwenpaw-worker-source.provenance.json \
+    && grep -Fq "${TESTWEAVER_QWENPAW_WORKER_BLOB}" \
+        /opt/agentteams/testweaver-native-worker/qwenpaw-worker-source.provenance.json \
+    && grep -Fq "${TESTWEAVER_QWENPAW_WORKER_SHA256}" \
+        /opt/agentteams/testweaver-native-worker/qwenpaw-worker-source.provenance.json \
+    && grep -Fq '_retry_builtin_mcp_configuration' \
+        /opt/venv/qwenpaw/lib/python3.11/site-packages/qwenpaw_worker/worker.py \
+    && grep -Fq 'BUILTIN_MCP_READY_TIMEOUT_SECONDS' \
+        /opt/venv/qwenpaw/lib/python3.11/site-packages/qwenpaw_worker/worker.py \
+    && rm -rf /tmp/qwenpaw-worker-source
+
+RUN cd /tmp \
+    && chmod 0755 /opt/agentteams/testweaver-native-worker/bin/node \
+    && test "$(sha256sum /opt/agentteams/testweaver-native-worker/bin/node | awk '{print $1}')" \
+        = "93956de2e59480474a7b46571da1651180b1a050cdf32641ebec4ce6e478e068" \
+    && test "$(node --version)" = "v22.23.1" \
+    && test "$(command -v node)" = "/opt/agentteams/testweaver-native-worker/bin/node" \
+    && node -e 'const zlib = require("node:zlib"); if (typeof Promise.withResolvers !== "function" || typeof zlib.createZstdDecompress !== "function") process.exit(2)' \
+    && sha256sum -c dsh-runtime.tar.gz.sha256 \
+    && tar -xzf /tmp/dsh-runtime.tar.gz \
+        -C /opt/agentteams/testweaver-native-worker/dsh-runtime \
+    && test -f /opt/agentteams/testweaver-native-worker/dsh-runtime/lib/bin.js \
+    && test -e /opt/agentteams/testweaver-native-worker/dsh-runtime/node_modules/@deepseek-ai/dsh \
+    && test "$(node -e 'const {createRequire}=require("node:module"); const r=createRequire("/opt/agentteams/testweaver-native-worker/bin/dsh-launcher.mjs"); process.stdout.write(r.resolve("@deepseek-ai/dsh/lib/bin.js", {paths:["/opt/agentteams/testweaver-native-worker/dsh-runtime"]}));')" \
+        = "/opt/agentteams/testweaver-native-worker/dsh-runtime/lib/bin.js" \
+    && cp /opt/agentteams/testweaver-native-worker/bin/dsh-launcher.mjs \
+        /opt/agentteams/testweaver-native-worker/bin/dsh \
+    && chmod 0755 /opt/agentteams/testweaver-native-worker/bin/dsh \
+    && chmod 0444 /opt/agentteams/testweaver-native-worker/dsh-headless-max-tokens.patch.yml \
+    && test -f /opt/agentteams/testweaver-native-worker/dsh-headless-max-tokens.patch.yml \
+    && test ! -L /opt/agentteams/testweaver-native-worker/dsh-headless-max-tokens.patch.yml \
+    && npm install --prefix /opt/agentteams/testweaver-native-worker/codex-cli \
+        --ignore-scripts --no-save --no-package-lock --no-audit --no-fund \
+        "@openai/codex@0.152.0" \
+    && test -x /opt/agentteams/testweaver-native-worker/codex-cli/node_modules/.bin/codex \
+    && printf '%s\n' \
+        '#!/usr/bin/python3' \
+        'import os, sys' \
+        'target = "/opt/agentteams/testweaver-native-worker/codex-cli/node_modules/.bin/codex"' \
+        'os.execv(target, ["codex-cc", *sys.argv[1:]])' \
+        > /opt/agentteams/testweaver-native-worker/bin/codex-cc \
+    && chmod 0755 /opt/agentteams/testweaver-native-worker/bin/codex-cc \
+    && /opt/venv/qwenpaw/bin/python -m py_compile \
+        /opt/agentteams/testweaver-native-worker/testweaver/adapters/*.py \
+    && install -d -m 0700 /tmp/testweaver-dsh-home \
+    && HOME=/tmp/testweaver-dsh-home \
+        /opt/agentteams/testweaver-native-worker/bin/dsh --profile headless --version \
+    && HOME=/tmp/testweaver-dsh-home \
+        /opt/agentteams/testweaver-native-worker/bin/dsh --profile headless --help >/dev/null \
+    && HOME=/tmp/testweaver-dsh-home \
+        /opt/agentteams/testweaver-native-worker/bin/dsh --profile headless \
+        --patch /opt/agentteams/testweaver-native-worker/dsh-headless-max-tokens.patch.yml \
+        --dump-config \
+        | node -e 'let text=""; process.stdin.setEncoding("utf8"); process.stdin.on("data", chunk => text += chunk); process.stdin.on("end", () => { let active = false; let seen = 0; let maxTokens; for (const line of text.split(/\r?\n/)) { if (line.startsWith("- id: ")) { active = line === "- id: llm-deepseek"; if (active) { seen += 1; maxTokens = undefined; } } else if (active) { const match = line.match(/^\s+maxTokens:\s+(\d+)\s*$/); if (match) maxTokens = match[1]; } } if (seen !== 1 || maxTokens !== "131072") process.exit(1); });' \
+    && test "$(readlink -- /tmp/testweaver-dsh-home/.dsh/profiles/headless/node_modules)" \
+        = "/opt/agentteams/testweaver-native-worker/dsh-runtime/node_modules" \
+    && /opt/agentteams/testweaver-native-worker/bin/codex-cc --version >/dev/null
+
+WORKDIR /opt/agentteams/testweaver-native-worker
