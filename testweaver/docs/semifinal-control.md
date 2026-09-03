@@ -2,7 +2,7 @@
 
 更新时间：2026-09-03（Asia/Shanghai）
 
-状态：`M2-G_HERO4_PARTIAL_SEALED / HERO4_RECEIPTS_PACKAGED / DSH_RUNTIME_LOCKED / MANAGER_BILLING_BLOCKED / M0-M1_NATIVE_CHAIN_PASS`
+状态：`M2-G_HERO4_PARTIAL_SEALED / HERO4_RECEIPTS_PACKAGED / RUNTIME_PLUGIN_PREFLIGHT_PASS / SKILL_CONTRACT_PASS / AGENTLOOP_BRIDGE_PASS / DSH_RUNTIME_LOCKED / MANAGER_BILLING_BLOCKED / M0-M1_NATIVE_CHAIN_PASS`
 
 唯一当前里程碑：Hero4 已由只读 capture 覆盖运行前边界并封存主包与 supplemental role receipts；原生 Manager→双 Team/Leader→普通 Worker 及两条独立 Oracle 结果已出现，但 Manager 最终 aggregate 因 provider `402 Insufficient Balance` 未观察到，DSH 在真实 HITL 审批超时前未调用百炼，因此整体诚实为 `PARTIAL`，不能称 `LIVE_AGENTTEAMS_HERO`。当前不再启动新的 live run；先增量封存离线包，待 provider 额度恢复后再按同一安全边界运行下一唯一 Hero。
 
@@ -198,7 +198,7 @@ TestWeaver 只做产品差异：
   `31f42a35278d3573b2e4fcb9231b1e107b48162f348a2d0cc27a3f7dfa043df2`；它只绑定
   角色存储中的结果哈希，不替代 immutable capture，也不升级 `LIVE_AGENTTEAMS_HERO`。
   累积索引 `semifinal-offline-package-index-v1.zip` 的 SHA-256 为
-  `0d0ac1fca82bd8d2a6edd15ce56e95037bfc01c76e8dec241228c99ab1957397`，同时收录
+  `02bf7f30ab963f08cda8befb531d98b2d07481c7a5b9d4adce937129ff8c3e10`，同时收录
   Hero2、Hero3-pre 和 Hero4 的主包/补充包及回放哈希。
 - capture 观察到 Manager 向双 Team/Leader 的原生 dispatch 与普通 Worker 运行；
   P1 analysis、P2 independent review、Outcome Oracle 和 Boundary Oracle 的同 Run
@@ -224,6 +224,27 @@ TestWeaver 只做产品差异：
   8 项通过。observability 28 项在当前最小环境因未安装 `pytest`/OpenTelemetry
   依赖而未运行完成，记为 `ENV_NOT_INSTALLED`，不伪装成实现 PASS；AgentLoop 云端
   同 Run 源记录缺口仍按上列 `NOT_OBSERVED` 保留。
+
+### 2026-09-03 Skill / AgentLoop / 运行时异构预检增量
+
+- 新增只读预检包
+  `testweaver/evidence/bundles/semifinal-agentloop-skill-heterogeneity-preflight-v1.zip`，
+  SHA-256 `1638f94568ec1399237e63ad3c420c232f69884e67ece0c7605d79c931d49d7b`，源提交
+  `c7403b50c9f628798efdcccb535b20b766d6fbf6`，分类为 `PRE_FLIGHT_PARTIAL`，
+  `live_claimed=false`。该包不发送 Matrix、不变更 AgentTeams 资源、不调用模型或 provider。
+- DSH `adapter_kind=dsh`（allowlist `deepseek`、`aliyun-bailian`）与 Codex
+  `adapter_kind=codex-cli`（`codex-cc`、`gpt-5.6-luna`、`max`）的 79 项适配器/执行器/包
+  测试通过，证明“运行时/插件异构”接线就绪；这不是 Native Task 的 LIVE 运行，也不宣称
+  已切换模型供应商。只要后续由原生 Leader 委派、出现独立进程/身份和真实输入输出，
+  即可按运行时异构计分；百炼成功则再升级为供应商异构证据。
+- 五个 Skill 的 AgentSpec 包布局与选择/来源规则均通过，manifest SHA-256 为
+  `218729541cb04d119a18226a59003785c4d83ca8d2920dee5db5fa10f6421ea4`，源提交
+  `19a929ea084c32e0e551881ec709b1d9b1792512`；exact runtime discover/load/invoke 和
+  Skill evolution/canary 仍为 `NOT_OBSERVED`。
+- AgentLoop bridge 10 项 fail-closed 合同测试通过；真实 readiness 命令在当前环境因缺少
+  官方 OTLP protobuf 依赖返回 `OtlpContractError`，故 readiness 与同 Run OTel/SLS
+  source readback 仍为 `BLOCKED/NOT_OBSERVED`。不能用这次契约 PASS 或旧云端 200 回读
+  升级 Hero 分类。
 
 ## 6. 实施顺序与完成条件
 
