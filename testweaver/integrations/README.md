@@ -24,7 +24,11 @@ Tasks, retries, and lifecycle state.
   readback proving exact AgentSpace ownership, Campaign/Run/revision scope,
   terminal state, and a non-empty successful result becomes
   `API_QUERY_VERIFIED`. Dataset-backed evaluation is intentionally limited to
-  one `content` row and exposes no hidden Gold.
+  one `content` row and exposes no hidden Gold. `create_trace_evaluation_task_run`
+  uses the official trace-native `CreateEvaluationTask` shape (`dataType=trace`,
+  trace variable mapping, bounded trace filter, and optional backfill window)
+  for a real Hero Trace; it has the same non-empty-result/readback gate and can
+  never turn an accepted-but-empty task into a LIVE claim.
 - `tea_transport.py` loads an owner-only protected AccessKey CSV at runtime and
   signs AgentLoop requests through the installed Alibaba Cloud Tea SDK. Secret
   material is neither dataclass-expandable nor printable.
