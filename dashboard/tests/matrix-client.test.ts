@@ -139,4 +139,98 @@ describe("MatrixClient", () => {
       },
     ]);
   });
+
+  it("creates a real private Matrix room with the requested invite", async () => {
+    const requests: { method: string; url: string; body: string }[] = [];
+    const baseUrl = await startServer((request, response) => {
+      let body = "";
+      request.on("data", (chunk) => {
+        body += String(chunk);
+      });
+      request.on("end", () => {
+        requests.push({
+          method: request.method ?? "",
+          url: request.url ?? "",
+          body,
+        });
+        response.setHeader("content-type", "application/json");
+        response.end(JSON.stringify({ room_id: "!created:matrix.local" }));
+      });
+    });
+
+    const result = await new MatrixClient({
+      homeserverUrl: baseUrl,
+      accessToken: "fixed-token",
+    }).createRoom({
+      name: "主讨论",
+      invite: ["@manager:matrix.local"],
+    });
+
+    expect(result.roomId).toBe("!created:matrix.local");
+    expect(requests[0]).toMatchObject({
+      method: "POST",
+      url: "/_matrix/client/v3/createRoom",
+    });
+    expect(JSON.parse(requests[0].body)).toMatchObject({
+      name: "主讨论",
+      invite: ["@manager:matrix.local"],
+      preset: "trusted_private_chat",
+      is_direct: false,
+    });
+  });
+
+  it("reads and caches the real Matrix user id", async () => {
+    let requestCount = 0;
+    const baseUrl = await startServer((request, response) => {
+      expect(request.url).toBe("/_matrix/client/v3/account/whoami");
+      requestCount += 1;
+      response.setHeader("content-type", "application/json");
+      response.end(JSON.stringify({ user_id: "@admin:matrix.local" }));
+    });
+
+    const client = new MatrixClient({
+      homeserverUrl: baseUrl,
+      accessToken: "fixed-token",
+    });
+
+    await expect(client.whoAmI()).resolves.toBe("@admin:matrix.local");
+    await expect(client.whoAmI()).resolves.toBe("@admin:matrix.local");
+    expect(requestCount).toBe(1);
+  });
+
+  it("parses joined and invited members from Matrix room state", async () => {
+    const baseUrl = await startServer((request, response) => {
+      expect(request.url).toBe("/_matrix/client/v3/rooms/%21room%3Amatrix.local/state");
+      response.setHeader("content-type", "application/json");
+      response.end(JSON.stringify([
+        {
+          type: "m.room.member",
+          state_key: "@manager:matrix.local",
+          content: { membership: "join", displayname: "总控协调者" },
+        },
+        {
+          type: "m.room.member",
+          state_key: "@worker:matrix.local",
+          content: { membership: "invite" },
+        },
+      ]));
+    });
+
+    const members = await new MatrixClient({
+      homeserverUrl: baseUrl,
+      accessToken: "fixed-token",
+    }).roomMembers("!room:matrix.local");
+
+    expect(members).toEqual([
+      {
+        userId: "@manager:matrix.local",
+        membership: "join",
+        displayName: "总控协调者",
+      },
+      {
+        userId: "@worker:matrix.local",
+        membership: "invite",
+      },
+    ]);
+  });
 });
