@@ -203,7 +203,7 @@ describe("normalizeMatrixEvent", () => {
       type: "m.room.message",
       content: {
         msgtype: "m.text",
-        body: "No high-risk side effects are pending; nothing requires your approval yet. In the spec, if it hits a security-approval denial, pause honestly; actual执行时若 driver 需要审批被拒，记录 BLOCKED 后继续。",
+        body: "No high-risk side effects are pending; nothing requires your approval yet. In the spec (\"if it hits a security-approval denial, pause honestly\"); actual执行时若 driver 需要审批被拒，记录 BLOCKED 后继续。",
       },
     });
 

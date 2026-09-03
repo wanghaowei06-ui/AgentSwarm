@@ -207,8 +207,8 @@ const classifyApproval = (text: string, actor?: AgentTeamsEvent["actor"]): TextC
     || /\b(?:human|manual)\s+approval\s+(?:is\s+)?(?:pending|required|needed)\b/i.test(normalized)
     || /\bpending\s+(?:a\s+)?approval(?:\s+from\s+(?:a\s+)?human)?\b/i.test(normalized)
     || /(?:需要|等待|暂停(?:等待)?|待)\s*(?:人工|人类)?\s*(?:审批|批准|决定)/.test(normalized);
-  const conditional = /(?:^|\s)(?:if|when)\b/i.test(normalized)
-    || /(?:^|[\s，：:])(?:若|如果|如)/.test(normalized);
+  const conditional = /\b(?:if|when)\b/i.test(normalized)
+    || /(?:若|如果|假如|一旦)/.test(normalized);
   if (pending && !conditional) {
     return {
       evidenceCategory: "approval",
