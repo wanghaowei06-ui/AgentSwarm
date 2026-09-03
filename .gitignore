@@ -64,4 +64,8 @@ htmlcov/
 *.Z
 *.lz
 *.lzo
+
+# TestWeaver local runtime artifacts
+testweaver/evidence/
+testweaver/config/runtime.env
 ```
