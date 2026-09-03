@@ -27,6 +27,7 @@
 - 现有 API Key、AgentLoop、LoongSuite、OTel 和 Nacos 配置必须复用，不要求用户重新填写。只引用 `/etc` 下受保护文件或受控挂载，不读取到输出、不复制或提交密钥值。
 - 当前原生基线继续使用已验证的 `agentteams-gateway/deepseek-v4-flash`，直到 M1 原生稳定性收口；异构资产接入前不得为了提前展示而修改在途 Run 的模型、账号、推理强度或 service tier。
 - 异构阶段的 DSH 是 provider-agnostic Harness，不得只用 DeepSeek 形成“异构”结论；必须复用现有受保护配置，让至少一个真实 DSH Worker 调用阿里云百炼模型，并把 provider/model/usage/延迟和结果证据与 DeepSeek 路径分开记录。
+- 异构验收区分两个层次：`runtime/plugin heterogeneity`（不同 Worker runtime、adapter、进程和身份）是最低要求，`provider heterogeneity`（不同模型供应商）是更强的加分证据，不要求为了证明前者强行换模型。DSH 仍是本作品的目标差异层；若百炼在时间窗内不可用，可用已存在且 allowlisted 的 Codex CLI/其他 Adapter 做受控 fallback，但必须由原生 Leader 委派、具备独立 runtime/process/identity、真实模型或工具调用及输入输出/usage/hash 证据，并明确分类为“运行时异构、同供应商”，不能把换 Skill、换 Prompt 或同一 QwenPaw 内换模型冒充异构，也不能悄悄把 fallback 写成 DSH 成功。
 - 首个真实 Hero 的 DSH→百炼接线优先复用目标 Worker 已由 AgentTeams 注入的 `AGENTTEAMS_AI_GATEWAY_URL` 与 `AGENTTEAMS_WORKER_GATEWAY_KEY`，仅补非密钥模型引用并实测现有 `testweaver-bailian-route` 的 Worker consumer 权限；这比新增宿主密钥投影更符合原生边界。只有真实预检证明该网关路径不能安全提供百炼调用时，才允许把现有百炼凭据以只读容器 Secret 仅挂载给目标 DSH adapter。两种路径都不得让 Secret 进入镜像、仓库、Prompt、任务产物、日志或 receipt，并必须记录同一 Run 的 provider/model、usage、延迟、HTTP/退出状态、request/response hash 和 Worker/Task 身份。
 - 统一网关的完整限流、计费和轮换属于 P1；首个 Hero 只要求当前 Worker consumer 鉴权和一次真实百炼调用成立。不得为此重写上层任务链或增加第二路由层。
 - Codex CLI 外部 Worker 必须由 `codex-cc` 启动，不使用裸 `codex`；计划模型固定为 `gpt-5.6-luna`、推理强度 `max`。首跑复用当前已登录的受保护 `CODEX_HOME`，只挂载到目标 Codex Worker，不复制认证缓存；M4 稳定复跑可把同一 CLI adapter 改为 API Key 登录。完整 Responses API adapter 属于 P1，不阻塞首次闭环。
@@ -240,7 +241,9 @@ TestWeaver 只做产品差异：
   业务目标；Manager 动态选 Team/Leader；Leader 原生委派；锁定 DSH 只经 allowlisted
   MCP；若真实出现受保护审批，必须由 authenticated Human 对明确 prompt 做一次
   approve/deny，之后才继续 provider、Leader 收敛、双 Oracle 和 Manager 二次决策。任何
-  未发生项按 `NOT_OBSERVED/BLOCKED/PARTIAL` 记录，成功 DSH 才能提升异构证据。
+  未发生项按 `NOT_OBSERVED/BLOCKED/PARTIAL` 记录；成功 DSH 可证明本作品目标的
+  DSH/百炼路径，其他已 allowlist 的外部 Adapter 也可在 fallback 中证明“运行时异构”，
+  但须明确标注同供应商或供应商未切换，不能替代 DSH 目标的事实描述。
 - 新 Run 结束后，只用同一 `campaign_id/run_id/trace_id` 原始事实接入 AgentLoop/OTel
   回读、Skill exact invocation/evolution 和 Failure Capsule 检索/回写；不使用旧 Run、
   synthetic span 或静态 receipt 补齐。优先修复真实运行暴露的最小通用根因（包括 DSH
