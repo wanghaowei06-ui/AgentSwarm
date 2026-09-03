@@ -9,6 +9,11 @@ export const feedFilterLabels: Record<FeedFilter, string> = {
   all: "全部事件",
 };
 
+export const conversationSourceLabels = {
+  controller: "Manager inbox",
+  "dashboard-project": "Projects",
+} as const;
+
 export const workspaceNavigationItems = [
   { id: "workspace", label: "Workspace", active: true },
   { id: "observability", label: "Observability", active: false },

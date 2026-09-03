@@ -9,7 +9,7 @@ import type {
   JsonObject,
   RoomSummary,
 } from "../types";
-import { eventEvidenceCategory, isCentralConversationEvent, isPriorityEvidence } from "../events/evidence";
+import { eventEvidenceCategory, isPriorityEvidence } from "../events/evidence";
 import { compactInboxPreview } from "../inbox/preview";
 
 export type ConversationProjection = {
@@ -211,9 +211,6 @@ const conversationSummary = (
   const managerDisplayName = rooms.find((room) => room.role === "manager")?.agentName || managerPresentationName(managerName);
   const managerRoomId = roomIdOf(manager);
   const latest = [...events].sort((left, right) => right.occurredAt.localeCompare(left.occurredAt))[0];
-  const latestConversationEvent = [...events]
-    .filter(isCentralConversationEvent)
-    .sort((left, right) => right.occurredAt.localeCompare(left.occurredAt))[0];
   const collaborationCount = events.filter((event) => eventEvidenceCategory(event) === "collaboration").length;
   const skillCount = events.filter((event) => eventEvidenceCategory(event) === "skill").length;
   const toolCount = events.filter((event) => eventEvidenceCategory(event) === "tool").length;

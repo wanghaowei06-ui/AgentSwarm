@@ -177,7 +177,7 @@ export function ConversationThread({
     messages: chatEvents,
     isLoading: loading,
     isRunning: sending,
-    isSendDisabled: sending,
+    isSendDisabled: sending || (conversation.source === "dashboard-project" && conversation.projectStatus !== "active"),
     onNew: async (message: AppendMessage) => {
       const text = extractText(message);
       if (text) {
@@ -191,7 +191,7 @@ export function ConversationThread({
       }
       return converted;
     },
-  }), [chatEvents, loading, onSend, sending]);
+  }), [chatEvents, conversation.projectStatus, conversation.source, loading, onSend, sending]);
   const runtime = useExternalStoreRuntime(adapter);
   const hiddenProgressCount = observations.filter(isPhaseReport).length;
   const hiddenStructuralCount = observations.filter(isStructuralRoomEvent).length;
