@@ -41,6 +41,13 @@ RUN test -d /opt/venv/qwenpaw/lib/python3.11/site-packages/qwenpaw_worker \
     && cp -a /tmp/qwenpaw-worker-source/. \
         /opt/venv/qwenpaw/lib/python3.11/site-packages/qwenpaw_worker/ \
     && test -f /opt/venv/qwenpaw/lib/python3.11/site-packages/qwenpaw_worker/worker.py \
+    && install -m 0444 /tmp/qwenpaw-worker-source.provenance.json \
+        /opt/agentteams/testweaver-native-worker/qwenpaw-worker-source.provenance.json \
+    && test ! -L /opt/agentteams/testweaver-native-worker/qwenpaw-worker-source.provenance.json \
+    && grep -Fq "${TESTWEAVER_QWENPAW_WORKER_BLOB}" \
+        /opt/agentteams/testweaver-native-worker/qwenpaw-worker-source.provenance.json \
+    && grep -Fq "${TESTWEAVER_QWENPAW_WORKER_SHA256}" \
+        /opt/agentteams/testweaver-native-worker/qwenpaw-worker-source.provenance.json \
     && grep -Fq '_retry_builtin_mcp_configuration' \
         /opt/venv/qwenpaw/lib/python3.11/site-packages/qwenpaw_worker/worker.py \
     && grep -Fq 'BUILTIN_MCP_READY_TIMEOUT_SECONDS' \

@@ -107,6 +107,8 @@ class NodeRuntimeAssetTests(unittest.TestCase):
         for marker in (
             'COPY qwenpaw-worker-source/worker.py /tmp/qwenpaw-worker-source/worker.py',
             'COPY qwenpaw-worker-source.provenance.json /tmp/qwenpaw-worker-source.provenance.json',
+            'install -m 0444 /tmp/qwenpaw-worker-source.provenance.json',
+            '/opt/agentteams/testweaver-native-worker/qwenpaw-worker-source.provenance.json',
             'TESTWEAVER_QWENPAW_WORKER_BLOB',
             'TESTWEAVER_QWENPAW_WORKER_SHA256',
             'site-packages/qwenpaw_worker',
