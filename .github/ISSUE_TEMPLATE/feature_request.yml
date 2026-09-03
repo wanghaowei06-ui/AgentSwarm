@@ -1,0 +1,68 @@
+name: Feature request
+description: Suggest a verifiable improvement for the AgentSwarm distribution or its upstream runtime integration.
+title: "[Feature] "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请先确认该建议属于 AgentSwarm 发行整理层，还是 AgentTeams 运行时。
+        不要在 Issue 中粘贴 API Key、Token、密码、未脱敏 Matrix 事件或私有日志。
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      description: Which boundary does this request belong to?
+      options:
+        - AgentSwarm distribution/docs
+        - AgentTeams runtime integration
+        - Dashboard
+        - Test/Trace/Skill/Schema
+        - Unsure
+    validations:
+      required: true
+  - type: textarea
+    id: background
+    attributes:
+      label: Background
+      description: What problem or user scenario should be improved?
+      placeholder: Describe the context and who is affected.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What outcome would you like to see?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction or usage scenario
+      description: Give minimal steps, environment, or an example request.
+    validations:
+      required: false
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - Controller
+        - Manager
+        - Worker runtime
+        - Dashboard
+        - Install or Helm
+        - Documentation
+        - TestWeaver
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I can help implement or test this change.
+          required: false
