@@ -402,6 +402,89 @@ def test_evaluation_task_can_carry_every_exact_provider_turn_tag() -> None:
     }
 
 
+def test_trace_evaluation_task_uses_native_trace_source_and_exact_filter() -> None:
+    transport = RecordingAgentLoopTransport()
+    client = AgentLoopClient(
+        AgentLoopEndpoint("https://agentloop.cn-beijing.aliyuncs.com", "space-1"),
+        transport,
+        _lease,
+        lambda: "2026-09-03T02:00:00Z",
+    )
+    result = client.create_trace_evaluation_task_run(
+        AgentLoopScope("campaign-1", "run-1", 7),
+        task_name="trace-task-1",
+        trace_id=TRACE_ID,
+        client_token="client-token-1",
+        start_time_ms=1788390000000,
+        end_time_ms=1788393600000,
+        evidence_binding=_evidence_binding(),
+    )
+    assert result.receipt.operation == "CreateEvaluationTask"
+    assert result.resource_ref == "task-1"
+    body = json.loads(transport.calls[0]["body"])
+    assert body["dataType"] == "trace"
+    assert body["dataFilter"] == {
+        "query": "traceId='0123456789abcdef0123456789abcdef'",
+        "maxRecords": 1,
+        "samplingRate": 100,
+    }
+    assert body["config"] == {"dataScope": "trace"}
+    assert body["runStrategies"] == {
+        "backfill": {
+            "enabled": True,
+            "startTime": 1788390000000,
+            "endTime": 1788393600000,
+        }
+    }
+    assert body["evaluators"][0]["variableMapping"] == {
+        "input": "trace.input",
+        "output": "trace.output",
+        "agent_trajectory": "trace.agent_trajectory",
+    }
+    assert body["tags"] == {
+        "campaignId": "campaign-1",
+        "runId": "run-1",
+        "revision": "7",
+        "traceId": TRACE_ID,
+        "contentHash": HASH,
+        "providerTurnRecordHash": HASH_B,
+        "providerTurnSourceHash": HASH_C,
+    }
+
+
+def test_trace_evaluation_task_rejects_mismatched_or_unbounded_inputs() -> None:
+    client = AgentLoopClient(
+        AgentLoopEndpoint("https://agentloop.cn-beijing.aliyuncs.com", "space-1"),
+        RecordingAgentLoopTransport(),
+        _lease,
+        lambda: "2026-09-03T02:00:00Z",
+    )
+    scope = AgentLoopScope("campaign-1", "run-1", 7)
+    with pytest.raises(AuthorityError, match="trace_id"):
+        client.create_trace_evaluation_task_run(
+            scope,
+            task_name="trace-task-1",
+            trace_id="not-a-trace",
+            client_token="client-token-1",
+        )
+    with pytest.raises(AuthorityError, match="binding"):
+        client.create_trace_evaluation_task_run(
+            scope,
+            task_name="trace-task-1",
+            trace_id=TRACE_ID,
+            client_token="client-token-1",
+            evidence_binding=AgentLoopEvidenceBinding("a" * 32, HASH, HASH_B, HASH_C),
+        )
+    with pytest.raises(AuthorityError, match="both"):
+        client.create_trace_evaluation_task_run(
+            scope,
+            task_name="trace-task-1",
+            trace_id=TRACE_ID,
+            client_token="client-token-1",
+            start_time_ms=1788390000000,
+        )
+
+
 def test_evaluation_query_keeps_empty_or_wrong_scope_result_not_verified() -> None:
     scope = AgentLoopScope("campaign-1", "run-1", 7)
     task = {

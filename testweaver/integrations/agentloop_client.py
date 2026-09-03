@@ -451,6 +451,106 @@ class AgentLoopClient:
             response_resource_keys=("taskId", "id"),
         )
 
+    def create_trace_evaluation_task_run(
+        self,
+        scope: AgentLoopScope,
+        *,
+        task_name: str,
+        trace_id: str,
+        evaluator_ref: str = "Builtin.agent_task_completion",
+        client_token: str,
+        max_records: int = 1,
+        start_time_ms: int | None = None,
+        end_time_ms: int | None = None,
+        evidence_binding: AgentLoopEvidenceBinding | None = None,
+    ) -> AgentLoopCallResult:
+        """Create a trace-native evaluation task for one observed Hero.
+
+        AgentLoop's trace data source is distinct from a user Dataset.  The
+        earlier Dataset helper remains available for frozen benchmark rows, but
+        a live Hero must use ``dataType=trace`` so the service can resolve the
+        OTel/SLS record by trace ID.  The task still carries the TestWeaver
+        authority/evidence tags for the later readback verifier.
+        """
+
+        scope.validate()
+        trace_id = _validate_trace_id(trace_id)
+        validate_ref(task_name, "agentloop_task_name")
+        validate_ref(evaluator_ref, "agentloop_evaluator_ref")
+        if (
+            isinstance(max_records, bool)
+            or not isinstance(max_records, int)
+            or not 1 <= max_records <= 100
+        ):
+            raise AuthorityError("AgentLoop trace max_records must be between 1 and 100")
+        if evidence_binding is not None and evidence_binding.trace_id != trace_id:
+            raise AuthorityError(
+                "AgentLoop trace task and evidence binding have different trace IDs"
+            )
+        if (start_time_ms is None) != (end_time_ms is None):
+            raise AuthorityError("AgentLoop trace backfill requires both start and end times")
+        backfill: dict[str, Any] = {"enabled": True}
+        if start_time_ms is not None and end_time_ms is not None:
+            if (
+                isinstance(start_time_ms, bool)
+                or isinstance(end_time_ms, bool)
+                or not isinstance(start_time_ms, int)
+                or not isinstance(end_time_ms, int)
+                or start_time_ms < 0
+                or end_time_ms <= start_time_ms
+                or end_time_ms - start_time_ms > 7 * 24 * 60 * 60 * 1000
+            ):
+                raise AuthorityError("AgentLoop trace backfill time window is invalid")
+            backfill.update({"startTime": start_time_ms, "endTime": end_time_ms})
+
+        tags = {
+            "campaignId": scope.campaign_id,
+            "runId": scope.run_id,
+            "revision": str(scope.revision),
+            "traceId": trace_id,
+        }
+        if evidence_binding is not None:
+            tags.update(evidence_binding.tags())
+        return self._call(
+            scope,
+            # The service exposes one CreateEvaluationTask action; the trace
+            # distinction is carried by the request's dataType/config fields.
+            operation="CreateEvaluationTask",
+            method="POST",
+            path=f"/api/v1/evaluation-task/{_quoted(self.config.agent_space)}",
+            query={"clientToken": client_token},
+            body={
+                "taskName": task_name,
+                "taskMode": "batch",
+                "dataType": "trace",
+                "dataFilter": {
+                    "query": f"traceId='{trace_id}'",
+                    "maxRecords": max_records,
+                    "samplingRate": 100,
+                },
+                "evaluators": [
+                    {
+                        "evaluatorRef": evaluator_ref,
+                        "resultName": "agent_task_completion",
+                        "resultType": "score",
+                        "variableMapping": {
+                            "input": "trace.input",
+                            "output": "trace.output",
+                            "agent_trajectory": "trace.agent_trajectory",
+                        },
+                    }
+                ],
+                "config": {"dataScope": "trace"},
+                "channel": "default",
+                "runStrategies": {"backfill": backfill},
+                "tags": tags,
+                "description": "TestWeaver same-run AgentLoop trace evaluation.",
+            },
+            resource_ref=task_name,
+            response_resource_keys=("taskId", "id"),
+            evidence_binding=evidence_binding,
+        )
+
     def get_evaluation_task(
         self,
         scope: AgentLoopScope,
@@ -700,6 +800,14 @@ class AgentLoopClient:
 def _quoted(value: str) -> str:
     validate_ref(value, "agentloop_path_component")
     return quote(value, safe="")
+
+
+def _validate_trace_id(value: object) -> str:
+    if not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{32}", value) is None:
+        raise AuthorityError(
+            "AgentLoop trace_id must be 32 lowercase hexadecimal characters"
+        )
+    return value
 
 
 def _resource_ref_from_response(body: bytes, keys: tuple[str, ...]) -> str:
