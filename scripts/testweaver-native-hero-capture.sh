@@ -202,9 +202,46 @@ matrix_get() {
 
 uri_component() { jq -rn --arg value "$1" '$value|@uri'; }
 
+# Matrix identifiers are opaque.  Keep a readable prefix, but always include
+# the identifier digest so distinct IDs cannot alias after safe_name replaces
+# punctuation with underscores.
+matrix_key() {
+  local value=$1 digest readable
+  digest=$(printf '%s' "$value" | sha256sum | awk '{print $1}')
+  readable=$(safe_name "$value")
+  printf '%s-%s' "${readable:0:80}" "$digest"
+}
+
+# Read or fetch one immutable event pair without ever overwriting an existing
+# exact response or its checksum sidecar.  A partial/mismatched pair is
+# rejected so the caller records NOT_OBSERVED instead of repairing evidence.
+capture_exact_event() {
+  local container=$1 token_var=$2 path=$3 event_id=$4 exact=$5 hash_file=$6
+  local raw_hash existing_event
+  if [[ -e "$exact" || -e "$hash_file" ]]; then
+    [[ -f "$exact" && -f "$hash_file" ]] || return 1
+    raw_hash=$(cat "$hash_file")
+    [[ "$raw_hash" =~ ^[0-9a-f]{64}$ ]] || return 1
+    [[ "$(sha_file "$exact")" == "$raw_hash" ]] || return 1
+    existing_event=$(jq -r '.event_id // empty' "$exact" 2>/dev/null || true)
+    [[ "$existing_event" == "$event_id" ]] || return 1
+    printf '%s\n' "$raw_hash"
+    return 0
+  fi
+  matrix_get "$container" "$token_var" "$path" "$exact" "$hash_file" || return 1
+  raw_hash=$(cat "$hash_file")
+  [[ "$raw_hash" =~ ^[0-9a-f]{64}$ ]] || return 1
+  [[ "$(sha_file "$exact")" == "$raw_hash" ]] || return 1
+  existing_event=$(jq -r '.event_id // empty' "$exact" 2>/dev/null || true)
+  [[ "$existing_event" == "$event_id" ]] || return 1
+  printf '%s\n' "$raw_hash"
+}
+
 capture_matrix_actor() {
   local actor=$1 kind=$2 container=$3 matrix_id=$4 out=$5
   local token_var=AGENTTEAMS_WORKER_MATRIX_TOKEN
+  local raw_hash exact_sender exact_room binding human_uri human_key root_id root_key root_exact root_hash_file root_hash root_sender root_room root_ts root_binding
+  declare -A seen_events=()
   [[ "$kind" == manager ]] && token_var=AGENTTEAMS_MANAGER_MATRIX_TOKEN
   mkdir -p "$out/events"
   if matrix_get "$container" "$token_var" '/_matrix/client/v3/account/whoami' "$out/whoami.json" "$out/whoami.raw.sha256"; then
@@ -219,20 +256,20 @@ capture_matrix_actor() {
   : >"$out/event-index.jsonl"
   while IFS= read -r room; do
     room_uri=$(uri_component "$room")
-    room_key=$(safe_name "$room")
+    room_key=$(matrix_key "$room")
     if ! matrix_get "$container" "$token_var" "/_matrix/client/v3/rooms/$room_uri/messages?dir=b&limit=100" "$out/messages-$room_key.json" "$out/messages-$room_key.raw.sha256"; then
       note_missing "matrix.messages.$actor.$room"; continue
     fi
     while IFS=$'\t' read -r event_id _sender origin_ts; do
       [[ -n "$event_id" ]] || continue
       event_uri=$(uri_component "$event_id")
-      event_key=$(safe_name "$event_id")
+      event_key=$(matrix_key "$event_id")
+      [[ -z "${seen_events[$event_key]+x}" ]] || continue
       exact="$out/events/$event_key.json"
       raw_hash_file="$out/events/$event_key.raw.sha256"
-      if ! matrix_get "$container" "$token_var" "/_matrix/client/v3/rooms/$room_uri/event/$event_uri" "$exact" "$raw_hash_file"; then
+      if ! raw_hash=$(capture_exact_event "$container" "$token_var" "/_matrix/client/v3/rooms/$room_uri/event/$event_uri" "$event_id" "$exact" "$raw_hash_file"); then
         note_missing "matrix.exact_event.$actor.$event_id"; continue
       fi
-      raw_hash=$(cat "$raw_hash_file")
       exact_sender=$(jq -r '.sender // "NOT_OBSERVED"' "$exact")
       exact_room=$(jq -r --arg fallback "$room" '.room_id // $fallback' "$exact")
       binding=UNBOUND
@@ -254,19 +291,20 @@ capture_matrix_actor() {
           sender:$sender,identity_binding:$binding,origin_server_ts:$origin_server_ts,
           authority_scope:{campaign_id:$campaign_id,run_id:$run_id,trace_id:$trace_id},
           immutable_source:{ref:$source_ref,raw_bytes_sha256:$raw_sha256}}' >>"$out/event-index.jsonl"
+      seen_events["$event_key"]=1
       # A thread root can be older than the bounded /messages page (and older
       # than the capture boundary). Fetch that exact root once so the native
       # relation remains verifiable without fabricating a task event.
       root_id=$(jq -r '.content."m.relates_to".event_id? // empty' "$exact" 2>/dev/null || true)
-      if [[ "$root_id" =~ ^\$[A-Za-z0-9_-]{8,}$ ]] && ! grep -Fq -- "\"event_id\":\"$root_id\"" "$out/event-index.jsonl"; then
-        root_key=$(safe_name "$root_id")
+      root_key=$(matrix_key "$root_id")
+      if [[ "$root_id" =~ ^\$[A-Za-z0-9_-]{8,}$ ]] && [[ -z "${seen_events[$root_key]+x}" ]]; then
         root_exact="$out/events/$root_key.json"
         root_hash_file="$out/events/$root_key.raw.sha256"
-        if [[ ! -f "$root_exact" ]] && ! matrix_get "$container" "$token_var" "/_matrix/client/v3/rooms/$room_uri/event/$(uri_component "$root_id")" "$root_exact" "$root_hash_file"; then
+        root_hash=''
+        if ! root_hash=$(capture_exact_event "$container" "$token_var" "/_matrix/client/v3/rooms/$room_uri/event/$(uri_component "$root_id")" "$root_id" "$root_exact" "$root_hash_file"); then
           note_missing "matrix.thread_root.$actor.$root_id"
         fi
-        if [[ -f "$root_exact" && -f "$root_hash_file" ]]; then
-          root_hash=$(cat "$root_hash_file")
+        if [[ -n "$root_hash" ]]; then
           root_sender=$(jq -r '.sender // "NOT_OBSERVED"' "$root_exact")
           root_room=$(jq -r --arg fallback "$room" '.room_id // $fallback' "$root_exact")
           root_ts=$(jq -r '.origin_server_ts // 0' "$root_exact")
@@ -281,6 +319,7 @@ capture_matrix_actor() {
               sender:$sender,identity_binding:$binding,origin_server_ts:$origin_server_ts,
               authority_scope:{campaign_id:$campaign_id,run_id:$run_id,trace_id:$trace_id},
               immutable_source:{ref:$source_ref,raw_bytes_sha256:$raw_sha256}}' >>"$out/event-index.jsonl"
+          seen_events["$root_key"]=1
         fi
       fi
     # Preserve exact thread roots for post-boundary events. Native AgentTeams

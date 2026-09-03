@@ -70,11 +70,18 @@ esac
 if [[ "$all" == *'account/whoami'* ]]; then
   printf '{"user_id":"%s"}\n' "$matrix_user"
 elif [[ "$all" == *'joined_rooms'* ]]; then
-  printf '%s\n' '{"joined_rooms":["!hero:hs"]}'
+  # The same actor can observe an event through overlapping room snapshots.
+  # Keep the duplicate to prove event-index records are emitted once per
+  # actor/event, while the two opaque IDs below prove path names cannot alias.
+  printf '%s\n' '{"joined_rooms":["!hero:hs","!hero:hs"]}'
 elif [[ "$all" == *'/messages?dir=b'* ]]; then
-  printf '%s\n' '{"chunk":[{"event_id":"$human-event","sender":"@human:hs","origin_server_ts":9999999999999},{"event_id":"$task-root","sender":"@explore-leader:hs","origin_server_ts":9999999999000},{"event_id":"$skill-event","sender":"@explore-worker:hs","origin_server_ts":9999999999100}]}'
+  printf '%s\n' '{"chunk":[{"event_id":"$human-event","sender":"@human:hs","origin_server_ts":9999999999999},{"event_id":"$task-root","sender":"@explore-leader:hs","origin_server_ts":9999999999000},{"event_id":"$skill-event","sender":"@explore-worker:hs","origin_server_ts":9999999999100},{"event_id":"$collision+one","sender":"@explore-worker:hs","origin_server_ts":9999999999200},{"event_id":"$collision/one","sender":"@explore-worker:hs","origin_server_ts":9999999999300}]}'
 elif [[ "$all" == *'/event/'* ]]; then
-  if [[ "$all" == *'%24task-root'* ]]; then
+  if [[ "$all" == *'%24collision%2Bone'* ]]; then
+    printf '%s\n' '{"event_id":"$collision+one","room_id":"!hero:hs","sender":"@explore-worker:hs","origin_server_ts":9999999999200,"type":"m.room.message","content":{"msgtype":"m.text","body":"collision plus"}}'
+  elif [[ "$all" == *'%24collision%2Fone'* ]]; then
+    printf '%s\n' '{"event_id":"$collision/one","room_id":"!hero:hs","sender":"@explore-worker:hs","origin_server_ts":9999999999300,"type":"m.room.message","content":{"msgtype":"m.text","body":"collision slash"}}'
+  elif [[ "$all" == *'%24task-root'* ]]; then
     printf '%s\n' '{"event_id":"$task-root","room_id":"!hero:hs","sender":"@explore-leader:hs","origin_server_ts":9999999999000,"type":"m.room.message","content":{"msgtype":"m.text","body":"@explore-worker:hs TASK_ASSIGNED task-1"}}'
   elif [[ "$all" == *'%24skill-event'* ]]; then
     printf '%s\n' '{"event_id":"$skill-event","room_id":"!hero:hs","sender":"@explore-worker:hs","origin_server_ts":9999999999100,"type":"m.room.message","content":{"msgtype":"m.text","body":"🔧 **read_file**\n```\n{\"file_path\":\"/root/agentteams-fs/agents/explore-worker/skills/evidence/SKILL.md\"}\n```","m.relates_to":{"event_id":"$task-root","rel_type":"m.thread","is_falling_back":false}}}'
@@ -160,6 +167,22 @@ jq -e 'select(.identity_binding=="HUMAN_ALLOWLIST_EXACT" and .immutable_source.r
 exact_ref=$(jq -r '.immutable_source.ref' "$index" | head -1)
 test -f "$evidence/$exact_ref"
 test -f "${evidence}/${exact_ref%.json}.raw.sha256"
+collision_index="$evidence/latest/matrix/explore-worker/event-index.jsonl"
+collision_count=$(jq -s --arg first '$collision+one' --arg second '$collision/one' \
+  '[.[] | select(.event_id==$first or .event_id==$second)] | length' "$collision_index")
+test "$collision_count" -eq 2
+collision_ref_count=$(jq -s --arg first '$collision+one' --arg second '$collision/one' \
+  '[.[] | select(.event_id==$first or .event_id==$second) | .immutable_source.ref] | unique | length' "$collision_index")
+test "$collision_ref_count" -eq 2
+while IFS= read -r collision_ref; do
+  test -f "$evidence/$collision_ref"
+  collision_sidecar="${collision_ref%.json}.raw.sha256"
+  test -f "$evidence/$collision_sidecar"
+  test "$(cat "$evidence/$collision_sidecar")" = "$(sha256sum "$evidence/$collision_ref" | awk '{print $1}')"
+done < <(jq -r --arg first '$collision+one' --arg second '$collision/one' \
+  'select(.event_id==$first or .event_id==$second) | .immutable_source.ref' "$collision_index" | sort -u)
+human_event_count=$(jq -s --arg event '$human-event' '[.[] | select(.event_id==$event)] | length' "$collision_index")
+test "$human_event_count" -eq 1
 whoami=$(find "$evidence/latest/matrix" -name whoami.json -print -quit)
 test -n "$whoami"
 test -f "${whoami%.json}.raw.sha256"
