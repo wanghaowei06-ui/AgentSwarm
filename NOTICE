@@ -1,0 +1,23 @@
+AgentSwarm NOTICE
+
+AgentSwarm is a public competition distribution based on the upstream AgentTeams
+open-source project:
+
+  https://github.com/agentscope-ai/AgentTeams
+
+The source tree retains AgentTeams runtime names, interfaces, image names, and
+installation contracts so that the system remains reproducible. The root
+LICENSE file contains the Apache License 2.0 terms applicable to this
+distribution unless a file or directory includes a more specific source or
+license notice.
+
+This notice does not relicense third-party software. Go modules, npm packages,
+Python packages, base images, Helm dependencies, Matrix components, model
+providers, and other external services remain subject to their own licenses and
+terms. See docs/dependencies.md and the relevant package manifests for the
+dependency sources.
+
+Competition-specific README files, reproduction guidance, provenance notes,
+and governance documents identify the AgentSwarm distribution separately from
+the upstream AgentTeams project. This repository does not claim unverified
+upstream contributions, third-party adoption, or co-maintenance records.
