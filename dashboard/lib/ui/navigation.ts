@@ -1,4 +1,4 @@
-export type FeedFilter = "key" | "messages" | "collaboration" | "skill" | "exceptions" | "all";
+export type FeedFilter = "key" | "messages" | "collaboration" | "skill" | "exceptions" | "approval" | "all";
 
 export const feedFilterLabels: Record<FeedFilter, string> = {
   key: "关键链路",
@@ -6,6 +6,7 @@ export const feedFilterLabels: Record<FeedFilter, string> = {
   collaboration: "Agent 协作",
   skill: "Skill 调用",
   exceptions: "异常证据",
+  approval: "人工审批",
   all: "全部事件",
 };
 

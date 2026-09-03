@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { normalizeMatrixEvent } from "../lib/events/normalizer";
+import { normalizeMatrixEvent, reclassifyStoredEvent } from "../lib/events/normalizer";
 
 describe("normalizeMatrixEvent", () => {
   it("uses the real Matrix member display name when one is available", () => {
@@ -118,6 +118,193 @@ describe("normalizeMatrixEvent", () => {
       detail: { name: "task-management", skillName: "task-management", status: "completed" },
     });
     expect(JSON.stringify(event.detail)).not.toContain("secret-value");
+  });
+
+  it("normalizes the real Matrix Markdown Skill invocation format", () => {
+    const event = normalizeMatrixEvent({
+      event_id: "$markdown-skill-1",
+      room_id: "!room:matrix.local",
+      sender: "@leader-a:matrix.local",
+      origin_server_ts: 1760000001600,
+      type: "m.room.message",
+      content: {
+        msgtype: "m.text",
+        body: "🔧 **Skill**\n```\n{\"skill\":\"teamharness-task-delegation\"}\n```",
+      },
+    });
+
+    expect(event).toMatchObject({
+      kind: "skill",
+      summary: "teamharness-task-delegation · observed",
+      detail: {
+        name: "teamharness-task-delegation",
+        skillName: "teamharness-task-delegation",
+        status: "observed",
+        invocationFormat: "matrix-markdown",
+      },
+    });
+  });
+
+  it("normalizes a real Matrix Markdown TeamHarness call as collaboration evidence", () => {
+    const event = normalizeMatrixEvent({
+      event_id: "$markdown-tool-1",
+      room_id: "!room:matrix.local",
+      sender: "@leader-a:matrix.local",
+      origin_server_ts: 1760000001700,
+      type: "m.room.message",
+      content: {
+        msgtype: "m.text",
+        body: "🔧 **teamharness__taskflow** ``` {\"action\":\"delegate_task\",\"project_id\":\"run-42\"} ```",
+      },
+    });
+
+    expect(event).toMatchObject({
+      kind: "tool",
+      summary: "teamharness__taskflow · observed",
+      detail: {
+        name: "teamharness__taskflow",
+        evidenceCategory: "collaboration",
+        invocationFormat: "matrix-markdown",
+        projectId: "run-42",
+      },
+    });
+  });
+
+  it("classifies explicit Matrix human approval evidence without treating ACCEPTED as approval", () => {
+    const event = normalizeMatrixEvent({
+      event_id: "$approval-1",
+      room_id: "!room:matrix.local",
+      sender: "@nativeadmin:matrix.local",
+      origin_server_ts: 1760000001800,
+      type: "m.room.message",
+      content: {
+        msgtype: "m.text",
+        body: "M2-E 一次性 Human 审批：我仅授权外部 operator 对上述同一 Worker 执行一次 docker rm -f。",
+      },
+    });
+
+    expect(event).toMatchObject({
+      kind: "message",
+      detail: {
+        evidenceCategory: "approval",
+        approvalState: "approved",
+        approvalActor: "human",
+      },
+    });
+    expect(event.summary).toContain("Human 审批");
+  });
+
+  it("does not classify approval policy text as a human approval decision", () => {
+    const event = normalizeMatrixEvent({
+      event_id: "$approval-policy-1",
+      room_id: "!room:matrix.local",
+      sender: "@manager:matrix.local",
+      origin_server_ts: 1760000001850,
+      type: "m.room.message",
+      content: {
+        msgtype: "m.text",
+        body: "No high-risk side effects are pending; nothing requires your approval yet. In the spec (\"if it hits a security-approval denial, pause honestly\"); actual执行时若 driver 需要审批被拒，记录 BLOCKED 后继续。",
+      },
+    });
+
+    expect(event.detail).not.toHaveProperty("evidenceCategory", "approval");
+    expect(event.detail).not.toHaveProperty("evidenceCategory", "exception");
+  });
+
+  it("does not classify a conditional BLOCKED branch in a progress note as an exception", () => {
+    const event = normalizeMatrixEvent({
+      event_id: "$exception-policy-1",
+      room_id: "!room:matrix.local",
+      sender: "@leader-a:matrix.local",
+      origin_server_ts: 1760000001925,
+      type: "m.room.message",
+      content: {
+        msgtype: "m.text",
+        body: "The worker will continue; if the provider fails, record BLOCKED/NOT_AVAILABLE and do not retry.",
+      },
+    });
+
+    expect(event.detail).not.toHaveProperty("evidenceCategory", "exception");
+  });
+
+  it("classifies an Agent waiting on a human decision as pending approval", () => {
+    const event = normalizeMatrixEvent({
+      event_id: "$approval-pending-1",
+      room_id: "!room:matrix.local",
+      sender: "@worker-a:matrix.local",
+      origin_server_ts: 1760000001875,
+      type: "m.room.message",
+      content: {
+        msgtype: "m.text",
+        body: "Worker is paused awaiting human approval before the protected operation.",
+      },
+    });
+
+    expect(event).toMatchObject({
+      detail: {
+        evidenceCategory: "approval",
+        approvalState: "pending",
+        status: "waiting",
+        approvalActor: "agent",
+      },
+    });
+  });
+
+  it("classifies explicit failure text as exception evidence", () => {
+    const event = normalizeMatrixEvent({
+      event_id: "$exception-1",
+      room_id: "!room:matrix.local",
+      sender: "@manager:matrix.local",
+      origin_server_ts: 1760000001900,
+      type: "m.room.message",
+      content: {
+        msgtype: "m.notice",
+        body: "⚠️ API provider returned a billing error; the branch is blocked.",
+      },
+    });
+
+    expect(event).toMatchObject({
+      kind: "message",
+      detail: { evidenceCategory: "exception", status: "blocked" },
+    });
+  });
+
+  it("reclassifies historical Matrix messages already stored before Markdown parsing", () => {
+    const event = reclassifyStoredEvent({
+      id: "matrix:$stored-tool",
+      source: "matrix",
+      kind: "message",
+      occurredAt: "2026-09-02T10:00:00.000Z",
+      roomId: "!room:matrix.local",
+      actor: { id: "@leader-a:matrix.local", label: "leader-a", role: "worker" },
+      summary: "🔧 **Skill**\n```\n{\"skill\":\"teamharness-roomflow\"}\n```",
+      detail: { msgtype: "m.text" },
+      sourceRef: { eventId: "$stored-tool" },
+    });
+
+    expect(event).toMatchObject({
+      kind: "skill",
+      summary: "teamharness-roomflow · observed",
+      detail: { name: "teamharness-roomflow", invocationFormat: "matrix-markdown" },
+    });
+  });
+
+  it("removes stale derived approval labels from a historical policy message", () => {
+    const event = reclassifyStoredEvent({
+      id: "matrix:$stale-approval",
+      source: "matrix",
+      kind: "message",
+      occurredAt: "2026-09-02T10:00:00.000Z",
+      roomId: "!room:matrix.local",
+      actor: { id: "@manager:matrix.local", label: "manager", role: "manager" },
+      summary: "Nothing requires your approval yet; the task remains pending while policy is recorded.",
+      detail: { msgtype: "m.text", evidenceCategory: "approval", approvalState: "pending", status: "waiting" },
+      sourceRef: { eventId: "$stale-approval" },
+    });
+
+    expect(event.detail).not.toHaveProperty("evidenceCategory");
+    expect(event.detail).not.toHaveProperty("approvalState");
+    expect(event.detail).not.toHaveProperty("status");
   });
 
   it("keeps an ordinary Matrix message as a user-visible message", () => {

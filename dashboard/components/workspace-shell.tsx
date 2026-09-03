@@ -106,6 +106,7 @@ function ConversationEntry({
             <span>{item.roomCount} rooms</span>
             {isProject && item.projectStatus && <span>· {projectStatusLabels[item.projectStatus]}</span>}
             {item.exceptionCount > 0 && <span className="run-badge attention">· {item.exceptionCount} alert</span>}
+            {item.approvalCount > 0 && <span className="run-badge approval">· {item.approvalCount} approval</span>}
           </span>
           <span className="run-item-summary">{item.summary}</span>
         </span>
@@ -144,7 +145,7 @@ function ConversationList({
   creationError?: string;
 }) {
   return (
-    <aside className="sidebar" aria-label="项目与 Manager 对话">
+    <aside className="sidebar" aria-label="项目与 Manager 对话" tabIndex={0}>
       <div className="sidebar-heading">
         <div className="sidebar-heading-top">
           <div>

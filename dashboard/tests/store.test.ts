@@ -119,4 +119,32 @@ describe("EventStore", () => {
       events: [{ actor: { displayName: "总控协调者" } }],
     });
   });
+
+  it("migrates stored Matrix Markdown observations when the event classifier is upgraded", async () => {
+    const dataDir = await mkdtemp(join(tmpdir(), "agentteams-dashboard-store-"));
+    const statePath = join(dataDir, "state.json");
+    await writeFile(statePath, JSON.stringify({
+      version: 1,
+      events: [{
+        id: "matrix:$old-skill",
+        source: "matrix",
+        kind: "message",
+        occurredAt: "2026-09-02T10:00:00.000Z",
+        roomId: "!room:matrix.local",
+        summary: '🔧 **Skill**\n```\n{"skill":"teamharness-file-sharing"}\n```',
+        detail: { msgtype: "m.text" },
+        sourceRef: { eventId: "$old-skill" },
+      }],
+      sync: { state: "stopped" },
+    }));
+
+    const store = new EventStore({ dataDir });
+
+    await expect(store.snapshot()).resolves.toMatchObject({
+      events: [{
+        kind: "skill",
+        summary: "teamharness-file-sharing · observed",
+      }],
+    });
+  });
 });

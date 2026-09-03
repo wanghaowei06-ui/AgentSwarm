@@ -2,7 +2,7 @@ import type { ThreadMessageLike } from "@assistant-ui/react";
 import type { AgentTeamsEvent } from "../types";
 import { actorDisplayName } from "./actor";
 
-const assistantRoles = new Set(["manager", "worker", "system", "unknown"]);
+const assistantRoles = new Set(["manager", "leader", "worker", "system", "unknown"]);
 
 export const toThreadMessageLike = (
   event: AgentTeamsEvent,

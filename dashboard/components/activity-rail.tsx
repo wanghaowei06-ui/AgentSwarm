@@ -7,11 +7,13 @@ import {
   CircleDot,
   RefreshCw,
   Server,
+  ShieldCheck,
   Sparkles,
   Terminal,
   Users,
 } from "lucide-react";
 import type {
+  AgentTeamsEvent,
   AttentionItem,
   ConversationDetail,
   ConversationRoom,
@@ -21,7 +23,9 @@ import type {
   WorkspaceSnapshot,
 } from "../lib/types";
 import {
+  approvalState,
   eventEvidenceCategory,
+  isPhaseReport,
   latestPhaseReports,
   phaseReportInfo,
   isPriorityEvidence,
@@ -54,6 +58,7 @@ const evidenceLabels: Record<EvidenceCategory, string> = {
   skill: "Skill 调用",
   tool: "工具调用",
   exception: "异常证据",
+  approval: "人工审批",
   artifact: "产物",
   message: "消息",
   system: "系统",
@@ -92,6 +97,9 @@ const evidenceIcon = (category: EvidenceCategory) => {
   }
   if (category === "tool") {
     return <Terminal size={11} />;
+  }
+  if (category === "approval") {
+    return <ShieldCheck size={11} />;
   }
   return <CircleDot size={11} />;
 };
@@ -132,19 +140,38 @@ export function ActivityRail({ snapshot, conversation, detail, refreshing, onRef
   const summary = detail?.conversation || conversation;
   const evidence = detail?.evidence || events.filter(isPriorityEvidence);
   const progressReports = latestPhaseReports(events);
-  const priorityEvidence = [...evidence].sort((left, right) => right.occurredAt.localeCompare(left.occurredAt)).slice(0, 6);
+  const approvalEvidence = events
+    .filter((event) => eventEvidenceCategory(event) === "approval")
+    .sort((left, right) => right.occurredAt.localeCompare(left.occurredAt));
+  const approvalSourceIds = new Set(approvalEvidence.flatMap((event) => [event.id, event.sourceRef.eventId].filter((value): value is string => Boolean(value))));
+  const exceptionEvidenceIds = new Set(events
+    .filter((event) => eventEvidenceCategory(event) === "exception" && !isPhaseReport(event))
+    .flatMap((event) => [event.id, event.sourceRef.eventId].filter((value): value is string => Boolean(value))));
+  const exceptionAttention = attention.filter((item) =>
+    !item.sourceEventId || (!approvalSourceIds.has(item.sourceEventId) && exceptionEvidenceIds.has(item.sourceEventId)));
+  const recentEvidence = (category: EvidenceCategory): AgentTeamsEvent[] => evidence
+    .filter((event) => eventEvidenceCategory(event) === category && !isPhaseReport(event))
+    .sort((left, right) => right.occurredAt.localeCompare(left.occurredAt))
+    .slice(0, 2);
+  const priorityEvidence = [
+    ...recentEvidence("collaboration"),
+    ...recentEvidence("skill"),
+    ...recentEvidence("exception"),
+    ...recentEvidence("tool"),
+  ].sort((left, right) => right.occurredAt.localeCompare(left.occurredAt));
   const messages = summary?.messageCount ?? events.filter((event) => event.kind === "message").length;
   const tools = summary?.toolCount ?? events.filter((event) => event.kind === "tool").length;
   const skills = summary?.skillCount ?? events.filter((event) => event.kind === "skill").length;
-  const collaboration = summary?.collaborationCount ?? events.filter((event) => event.kind === "workflow").length;
-  const exceptions = summary?.exceptionCount ?? attention.length;
+  const collaboration = summary?.collaborationCount ?? events.filter((event) => eventEvidenceCategory(event) === "collaboration").length;
+  const exceptions = summary?.exceptionCount ?? events.filter((event) => eventEvidenceCategory(event) === "exception").length;
+  const approvals = summary?.approvalCount ?? approvalEvidence.length;
   const artifacts = detail?.artifacts.length || events.filter((event) => event.kind === "artifact").length;
   const controllerKeys = controllerSources(snapshot.controller.data);
   const agentCount = summary?.agentCount ?? collectionCount(snapshot.controller.data?.["/api/v1/workers"]);
   const eventCount = summary?.eventCount ?? events.length;
 
   return (
-    <aside className="inspector" aria-label="Conversation evidence and observability">
+    <aside className="inspector" aria-label="Conversation evidence and observability" tabIndex={0}>
       <section className="inspector-section">
         <div className="inspector-title-row">
           <div>
@@ -181,10 +208,15 @@ export function ActivityRail({ snapshot, conversation, detail, refreshing, onRef
             <span className="stat-label"><AlertTriangle size={11} /> exceptions</span>
             <strong className="stat-value red">{exceptions}</strong>
           </div>
+          <div className="stat-card approval-stat">
+            <span className="stat-label"><ShieldCheck size={11} /> approvals</span>
+            <strong className="stat-value approval-value">{approvals}</strong>
+          </div>
         </div>
         <div className="evidence-count-line">
           <span><CircleDot size={11} /> {collaboration} collaboration</span>
           <span><Terminal size={11} /> {tools} tools</span>
+          <span><ShieldCheck size={11} /> {approvals} approvals</span>
           <span>{artifacts} artifacts</span>
         </div>
       </section>
@@ -233,11 +265,11 @@ export function ActivityRail({ snapshot, conversation, detail, refreshing, onRef
             <p className="eyebrow">Exception handling</p>
             <h2 className="section-title">异常处理证据</h2>
           </div>
-          <span className="mono-label">{attention.length} items</span>
+          <span className="mono-label">{exceptionAttention.length} items</span>
         </div>
-        {attention.length > 0 ? (
+        {exceptionAttention.length > 0 ? (
           <div className="attention-list">
-            {attention.slice(0, 5).map((item) => (
+            {exceptionAttention.slice(0, 5).map((item) => (
               <div className={`attention-item ${item.severity}`} key={item.id}>
                 <span className="attention-icon">
                   {item.severity === "error" ? <AlertTriangle size={14} /> : <Activity size={14} />}
@@ -252,6 +284,41 @@ export function ActivityRail({ snapshot, conversation, detail, refreshing, onRef
         ) : (
           <div className="muted-copy">当前会话没有失败或等待中的观测。</div>
           )}
+      </section>
+
+      <section className="inspector-section">
+        <div className="inspector-title-row">
+          <div>
+            <p className="eyebrow">Human in the loop</p>
+            <h2 className="section-title">人工审批证据</h2>
+          </div>
+          <span className="mono-label">{approvals} records</span>
+        </div>
+        {approvalEvidence.length > 0 ? (
+          <div className="approval-list">
+            {approvalEvidence.slice(0, 5).map((event) => {
+              const state = approvalState(event) || "unknown";
+              const stateLabel = state === "pending" ? "待审批" : state === "approved" ? "已批准" : state === "rejected" ? "已拒绝" : "已记录";
+              const sourceId = event.sourceRef.eventId || event.id;
+              return (
+                <article className={`approval-item ${statusClass(state)}`} key={event.id}>
+                  <div className="rail-evidence-head">
+                    <span className="evidence-category approval"><ShieldCheck size={11} /> {stateLabel}</span>
+                    <time>{formatDate(event.occurredAt)}</time>
+                  </div>
+                  <strong title={event.summary}>{event.summary}</strong>
+                  <div className="rail-evidence-meta">
+                    <span title={actorDisplayName(event)}>{actorDisplayName(event)}</span>
+                    <span title={event.roomId}>{rooms.find((room) => room.roomId === event.roomId)?.label || "unassigned room"}</span>
+                    <span title={sourceId}>{sourceId}</span>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="muted-copy">当前会话没有检测到明确的人工审批记录。</div>
+        )}
       </section>
 
       <section className="inspector-section">

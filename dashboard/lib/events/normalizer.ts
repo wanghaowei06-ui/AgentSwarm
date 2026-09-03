@@ -1,4 +1,4 @@
-import type { AgentTeamsEvent, ActorRole, JsonObject } from "../types";
+import type { AgentTeamsEvent, ActorRole, EvidenceCategory, JsonObject } from "../types";
 import type { MatrixEvent } from "../matrix/types";
 
 const MAX_TEXT_LENGTH = 4_000;
@@ -67,7 +67,10 @@ const actorRole = (sender: string): ActorRole => {
   if (localpart === "manager" || localpart.includes("manager")) {
     return "manager";
   }
-  if (localpart.includes("worker") || localpart.includes("team-lead")) {
+  if (localpart.includes("leader") || localpart.includes("team-lead")) {
+    return "leader";
+  }
+  if (localpart.includes("worker")) {
     return "worker";
   }
   if (localpart === "system" || localpart.includes("controller")) {
@@ -104,6 +107,202 @@ const textFromContent = (content: JsonObject): string => {
 
   const formattedBody = stringValue(content.formatted_body);
   return boundedText(formattedBody.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim());
+};
+
+type MarkdownInvocation = {
+  name: string;
+  payload?: JsonObject;
+};
+
+type TextClassification = {
+  evidenceCategory: Extract<EvidenceCategory, "collaboration" | "exception" | "approval">;
+  status?: string;
+  approvalState?: "pending" | "approved" | "rejected";
+  approvalActor?: "human" | "agent";
+};
+
+const markdownInvocationHeader = /^\s*🔧\s*\*\*(?<name>[^*]+)\*\*/u;
+const markdownCodeBlock = /```(?:json)?\s*([\s\S]*?)```/i;
+const collaborationToolNames = new Set([
+  "teamharness__message",
+  "teamharness__communication",
+  "teamharness__projectflow",
+  "teamharness__roomflow",
+  "teamharness__taskflow",
+]);
+
+const jsonPayload = (text: string): JsonObject | undefined => {
+  const block = markdownCodeBlock.exec(text)?.[1]?.trim();
+  if (!block) {
+    return undefined;
+  }
+  try {
+    const parsed: unknown = JSON.parse(block);
+    return isObject(parsed) ? parsed : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+const markdownInvocation = (text: string): MarkdownInvocation | undefined => {
+  const header = markdownInvocationHeader.exec(text);
+  const name = header?.groups?.name?.trim();
+  return name ? { name, payload: jsonPayload(text) } : undefined;
+};
+
+const statusFromPayload = (payload?: JsonObject): string => {
+  const status = stringValue(payload?.status) || stringValue(payload?.state);
+  if (status) {
+    return status;
+  }
+  if (payload && (payload.error !== undefined || payload.errors !== undefined)) {
+    return "failed";
+  }
+  return "observed";
+};
+
+const firstString = (value: JsonObject | undefined, keys: string[]): string => {
+  for (const key of keys) {
+    const result = stringValue(value?.[key]);
+    if (result) {
+      return result;
+    }
+  }
+  return "";
+};
+
+const textStatus = (text: string): string | undefined => {
+  if (/(?:waiting|pending|awaiting|等待)/i.test(text)) {
+    return "waiting";
+  }
+  if (/(?:blocked|not[_ -]?available|unavailable|timeout|timed out|阻断|不可用|超时)/i.test(text)) {
+    return "blocked";
+  }
+  if (/(?:failed|failure|error|exception|失败|错误|异常)/i.test(text)) {
+    return "failed";
+  }
+  return undefined;
+};
+
+const hasExplicitApprovalDecision = (text: string, actor?: AgentTeamsEvent["actor"]): boolean =>
+  (actor?.role === "human" && /(?:我\s*(?:仅)?授权|我\s*(?:批准|同意)|一次性\s*Human\s*审批|\/approve\b)/i.test(text))
+  || /(?:human|人工)\s*(?:approval\s*)?(?:was\s*)?(?:approved|granted|批准|同意|denied|rejected|拒绝)/i.test(text)
+  || /(?:approval|审批)\s*(?:was\s*)?(?:approved|granted|批准|同意|denied|rejected|拒绝)/i.test(text)
+  || /approved by human/i.test(text);
+
+const classifyApproval = (text: string, actor?: AgentTeamsEvent["actor"]): TextClassification | undefined => {
+  const normalized = text.replace(/\s+/g, " ").trim();
+  const rejected = /(?:human|人工)\s*(?:approval\s*)?(?:was\s*)?(?:denied|rejected|拒绝)/i.test(normalized)
+    || /(?:approval|审批)\s*(?:was\s*)?(?:denied|rejected|拒绝)/i.test(normalized)
+    || (actor?.role === "human" && /\/deny\b/i.test(normalized));
+  if (hasExplicitApprovalDecision(normalized, actor)) {
+    return {
+      evidenceCategory: "approval",
+      approvalState: rejected ? "rejected" : "approved",
+      approvalActor: actor?.role === "human" ? "human" : "agent",
+    };
+  }
+
+  const pending = /\b(?:awaiting|waiting for|requires?|needs?)\s+(?:a\s+)?(?:human|manual)\s+approval\b/i.test(normalized)
+    || /\b(?:human|manual)\s+approval\s+(?:is\s+)?(?:pending|required|needed)\b/i.test(normalized)
+    || /\bpending\s+(?:a\s+)?approval(?:\s+from\s+(?:a\s+)?human)?\b/i.test(normalized)
+    || /(?:需要|等待|暂停(?:等待)?|待)\s*(?:人工|人类)?\s*(?:审批|批准|决定)/.test(normalized);
+  const conditional = /\b(?:if|when)\b/i.test(normalized)
+    || /(?:若|如果|假如|一旦)/.test(normalized);
+  if (pending && !conditional) {
+    return {
+      evidenceCategory: "approval",
+      approvalState: "pending",
+      approvalActor: "agent",
+      status: "waiting",
+    };
+  }
+  return undefined;
+};
+
+const classifyException = (text: string): TextClassification | undefined => {
+  const strong = /⚠️|❌|billing error|command failed|provider returned .*error|\b(?:access|permission) denied\b|permission denied|exception occurred|error\s*[:：]/i.test(text);
+  const direct = strong
+    || /\b(?:status|state|result|branch|node|operation|request|command|task|call)\b.{0,18}\b(?:failed|blocked|not[_ -]?available|unavailable|timed out|timeout|error)\b/i.test(text)
+    || /(?:record(?:ed)?|mark(?:ed)?|记为|标记为).{0,20}(?:BLOCKED|NOT[_ -]?AVAILABLE|失败|阻断|不可用)/i.test(text)
+    || /(?:执行|调用|请求|命令|操作|任务|分支|节点|安全).{0,12}(?:失败|错误|异常|阻断|不可用|超时)/i.test(text)
+    || /(?:没有访问.*权限|权限不足|无权访问)/i.test(text);
+  const conditional = /\b(?:if|when|unless)\b[^.!?\n]{0,120}(?:fail(?:s|ed)?|blocked|denial|denied|error|unavailable|not[_ -]?available)/i.test(text)
+    || /(?:若|如果|假如|一旦)[^。！？\n]{0,120}(?:失败|错误|阻断|不可用|被拒|审批)/i.test(text);
+  if (!direct || (conditional && !strong)) {
+    return undefined;
+  }
+  return {
+    evidenceCategory: "exception",
+    status: textStatus(text) || "failed",
+  };
+};
+
+const classifyCollaboration = (text: string, actor?: AgentTeamsEvent["actor"]): TextClassification | undefined => {
+  const explicit = /teamharness__(?:message|communication|projectflow|roomflow|taskflow)|delegate_task|ack_task|submit_task|handoff|task assigned|assigned to|delegat(?:e|ed|ion)|phase[- ]?report|leader.{0,36}worker|worker.{0,36}leader|已委派|委派完成|已派发|已验收|验收报告|交付物|跨房间|协作/i.test(text);
+  const agentMention = (actor?.role === "leader" || actor?.role === "worker") && /@[\w.-]+(?::[^\s]+)?/.test(text);
+  if (!explicit && !agentMention) {
+    return undefined;
+  }
+  return { evidenceCategory: "collaboration" };
+};
+
+export const classifyMatrixMessage = (
+  text: string,
+  actor?: AgentTeamsEvent["actor"],
+): TextClassification | undefined =>
+  classifyApproval(text, actor) || classifyException(text) || classifyCollaboration(text, actor);
+
+const classificationDetail = (classification: TextClassification): JsonObject => ({
+  evidenceCategory: classification.evidenceCategory,
+  ...(classification.status ? { status: classification.status } : {}),
+  ...(classification.approvalState ? { approvalState: classification.approvalState } : {}),
+  ...(classification.approvalActor ? { approvalActor: classification.approvalActor } : {}),
+});
+
+const invocationDetails = (
+  content: JsonObject,
+  invocation: MarkdownInvocation,
+  kind: "tool" | "skill",
+): { detail: JsonObject; summary: string; runId?: string } => {
+  const payload = invocation.payload;
+  const status = statusFromPayload(payload);
+  const rawName = invocation.name.trim();
+  const skillName = kind === "skill"
+    ? firstString(payload, ["skill", "skillName", "name"]) || "skill"
+    : rawName;
+  const detail: JsonObject = {
+    ...relationDetails(content),
+    name: skillName,
+    ...(kind === "skill" ? { skillName } : {}),
+    status,
+    invocationFormat: "matrix-markdown",
+    ...(payload ? { arguments: sanitizeValue(payload) } : {}),
+  };
+  const callId = firstString(payload, ["callId", "call_id"]);
+  const runId = firstString(payload, ["runId", "run_id", "projectId", "project_id"]);
+  const projectId = firstString(payload, ["projectId", "project_id"]);
+  const taskId = firstString(payload, ["taskId", "task_id"]);
+  if (callId) {
+    detail.callId = callId;
+  }
+  if (runId) {
+    detail.runId = runId;
+  }
+  if (projectId) {
+    detail.projectId = projectId;
+  }
+  if (taskId) {
+    detail.taskId = taskId;
+  }
+  if (kind === "tool" && collaborationToolNames.has(rawName.toLowerCase())) {
+    detail.evidenceCategory = "collaboration";
+  }
+  return {
+    detail,
+    summary: `${skillName} · ${status}`,
+    ...(runId ? { runId } : {}),
+  };
 };
 
 const relationDetails = (content: JsonObject): JsonObject => {
@@ -154,6 +353,43 @@ const baseEvent = (
   };
 };
 
+const normalizeMarkdownInvocation = (
+  event: MatrixEvent,
+  content: JsonObject,
+  invocation: MarkdownInvocation,
+  displayNames?: ReadonlyMap<string, string>,
+): AgentTeamsEvent => {
+  const kind = invocation.name.trim().toLowerCase() === "skill" ? "skill" : "tool";
+  const details = invocationDetails(content, invocation, kind);
+  const normalized = baseEvent(event, kind, details.summary, displayNames);
+  normalized.detail = details.detail;
+  if (details.runId) {
+    normalized.runId = details.runId;
+  }
+  return normalized;
+};
+
+const normalizeMessage = (
+  event: MatrixEvent,
+  content: JsonObject,
+  displayNames?: ReadonlyMap<string, string>,
+): AgentTeamsEvent => {
+  const normalized = baseEvent(event, "message", textFromContent(content) || "Message", displayNames);
+  normalized.detail = {
+    ...relationDetails(event.content),
+    msgtype: stringValue(content.msgtype) || "m.text",
+    formatted: typeof content.formatted_body === "string",
+  };
+  const classification = classifyMatrixMessage(normalized.summary, normalized.actor);
+  if (classification) {
+    normalized.detail = {
+      ...normalized.detail,
+      ...classificationDetail(classification),
+    };
+  }
+  return normalized;
+};
+
 const normalizeWorkflow = (
   event: MatrixEvent,
   content: JsonObject,
@@ -200,6 +436,7 @@ const normalizeTool = (
     ...relationDetails(event.content),
     name,
     status,
+    ...(collaborationToolNames.has(name.toLowerCase()) ? { evidenceCategory: "collaboration" } : {}),
   };
   for (const key of ["callId", "runId", "phase", "args", "arguments", "result", "output", "error"]) {
     if (tool[key] !== undefined) {
@@ -292,19 +529,18 @@ export const normalizeMatrixEvent = (
     return normalizeSkill(event, skill, displayNames);
   }
 
+  const invocation = markdownInvocation(textFromContent(content));
+  if (invocation) {
+    return normalizeMarkdownInvocation(event, content, invocation, displayNames);
+  }
+
   const msgtype = stringValue(content.msgtype);
   if (["m.image", "m.file", "m.audio", "m.video"].includes(msgtype)) {
     return normalizeArtifact(event, content, displayNames);
   }
 
   if (event.type === "m.room.message") {
-    const normalized = baseEvent(event, "message", textFromContent(content) || "Message", displayNames);
-    normalized.detail = {
-      ...relationDetails(event.content),
-      msgtype: msgtype || "m.text",
-      formatted: typeof content.formatted_body === "string",
-    };
-    return normalized;
+    return normalizeMessage(event, content, displayNames);
   }
 
   const normalized = baseEvent(event, "system", `${event.type} event`, displayNames);
@@ -313,3 +549,41 @@ export const normalizeMatrixEvent = (
 };
 
 export const sanitizeObservationValue = sanitizeValue;
+
+export const reclassifyStoredEvent = (event: AgentTeamsEvent): AgentTeamsEvent => {
+  if (event.source !== "matrix" || event.kind !== "message") {
+    return event;
+  }
+
+  const actor = event.actor
+    ? { ...event.actor, role: actorRole(event.actor.id) }
+    : event.actor;
+  const invocation = markdownInvocation(event.summary);
+  if (invocation) {
+    const kind = invocation.name.trim().toLowerCase() === "skill" ? "skill" : "tool";
+    const details = invocationDetails(event.detail || {}, invocation, kind);
+    return {
+      ...event,
+      kind,
+      actor,
+      summary: details.summary,
+      detail: { ...(event.detail || {}), ...details.detail },
+      ...(details.runId ? { runId: details.runId } : {}),
+    };
+  }
+
+  const classification = classifyMatrixMessage(event.summary, actor);
+  const detail = { ...(event.detail || {}) };
+  for (const key of ["evidenceCategory", "status", "approvalState", "approvalActor"]) {
+    delete detail[key];
+  }
+  const detailChanged = JSON.stringify(detail) !== JSON.stringify(event.detail || {});
+  if (!classification && actor?.role === event.actor?.role && !detailChanged) {
+    return event;
+  }
+  return {
+    ...event,
+    actor,
+    detail: classification ? { ...detail, ...classificationDetail(classification) } : detail,
+  };
+};

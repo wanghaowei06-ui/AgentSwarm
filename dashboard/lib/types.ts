@@ -16,6 +16,7 @@ export type EvidenceCategory =
   | "skill"
   | "tool"
   | "exception"
+  | "approval"
   | "artifact"
   | "message"
   | "system";
@@ -23,6 +24,7 @@ export type EvidenceCategory =
 export type ActorRole =
   | "human"
   | "manager"
+  | "leader"
   | "worker"
   | "system"
   | "unknown";
@@ -135,6 +137,7 @@ export type ConversationSummary = {
   skillCount: number;
   toolCount: number;
   exceptionCount: number;
+  approvalCount: number;
   rooms: ConversationRoom[];
 };
 

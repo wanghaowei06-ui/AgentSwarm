@@ -9,7 +9,7 @@ import type {
   JsonObject,
   RoomSummary,
 } from "../types";
-import { eventEvidenceCategory, isPriorityEvidence } from "../events/evidence";
+import { approvalState, eventEvidenceCategory, isPriorityEvidence } from "../events/evidence";
 import { compactInboxPreview } from "../inbox/preview";
 
 export type ConversationProjection = {
@@ -87,7 +87,8 @@ const activeEvents = (events: AgentTeamsEvent[]): AgentTeamsEvent[] => {
 
 const attentionFor = (event: AgentTeamsEvent): AttentionItem[] => {
   const status = stringValue(event.detail?.status).toLowerCase();
-  if (event.kind === "workflow" && ["failed", "error", "waiting", "blocked"].includes(status)) {
+  const category = eventEvidenceCategory(event);
+  if (category === "exception") {
     return [{
       id: `attention:${event.id}`,
       severity: status === "waiting" || status === "blocked" ? "warning" : "error",
@@ -96,20 +97,11 @@ const attentionFor = (event: AgentTeamsEvent): AttentionItem[] => {
       sourceEventId: event.sourceRef.eventId,
     }];
   }
-  if ((event.kind === "tool" || event.kind === "skill") && ["failed", "error"].includes(status)) {
+  if (category === "approval" && ["pending", "rejected"].includes(approvalState(event))) {
     return [{
       id: `attention:${event.id}`,
-      severity: "error",
-      summary: `${event.summary} · requires review`,
-      runId: event.runId,
-      sourceEventId: event.sourceRef.eventId,
-    }];
-  }
-  if (event.kind === "system" && /degraded|unavailable|error|failed/i.test(event.summary)) {
-    return [{
-      id: `attention:${event.id}`,
-      severity: "warning",
-      summary: event.summary,
+      severity: approvalState(event) === "pending" ? "warning" : "error",
+      summary: approvalState(event) === "pending" ? `待人工审批：${event.summary}` : `人工审批已拒绝：${event.summary}`,
       runId: event.runId,
       sourceEventId: event.sourceRef.eventId,
     }];
@@ -215,7 +207,13 @@ const conversationSummary = (
   const skillCount = events.filter((event) => eventEvidenceCategory(event) === "skill").length;
   const toolCount = events.filter((event) => eventEvidenceCategory(event) === "tool").length;
   const exceptionCount = events.filter((event) => eventEvidenceCategory(event) === "exception").length;
-  const status: ConversationStatus = exceptionCount > 0 ? "attention" : events.length > 0 ? "active" : "quiet";
+  const approvalCount = events.filter((event) => eventEvidenceCategory(event) === "approval").length;
+  const pendingApprovalCount = events.filter((event) => eventEvidenceCategory(event) === "approval" && approvalState(event) === "pending").length;
+  const status: ConversationStatus = exceptionCount > 0 || pendingApprovalCount > 0
+    ? "attention"
+    : events.length > 0
+      ? "active"
+      : "quiet";
   const agents = new Set(
     [managerDisplayName, ...rooms.map((room) => room.agentName || "")].filter(Boolean),
   );
@@ -240,6 +238,7 @@ const conversationSummary = (
     skillCount,
     toolCount,
     exceptionCount,
+    approvalCount,
     rooms,
   };
 };

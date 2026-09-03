@@ -74,6 +74,14 @@ describe("conversation projection", () => {
         sourceRef: { eventId: "$failed-tool" },
       }),
       event({
+        id: "matrix:$approval",
+        roomId: "!manager:matrix.local",
+        actor: { id: "@nativeadmin:matrix.local", label: "nativeadmin", role: "human" },
+        summary: "Human approval granted for one bounded action",
+        detail: { evidenceCategory: "approval", approvalState: "approved" },
+        sourceRef: { eventId: "$approval" },
+      }),
+      event({
         id: "matrix:$orphan",
         roomId: "!unlinked:matrix.local",
         actor: { id: "@someone:matrix.local", label: "someone", role: "human" },
@@ -91,6 +99,7 @@ describe("conversation projection", () => {
       collaborationCount: 1,
       skillCount: 1,
       exceptionCount: 1,
+      approvalCount: 1,
       status: "attention",
     });
     expect(projection.conversations[0].rooms.map((room) => room.role)).toEqual([
@@ -188,5 +197,25 @@ describe("conversation projection", () => {
     }))).toBe("exception");
     expect(eventEvidenceCategory(event({ kind: "skill" }))).toBe("skill");
     expect(eventEvidenceCategory(event({ kind: "workflow" }))).toBe("collaboration");
+  });
+
+  it("surfaces a pending human approval as actionable attention", () => {
+    const detail = projectConversation("manager:default", [
+      event({
+        summary: "Worker is paused awaiting human approval",
+        detail: { evidenceCategory: "approval", approvalState: "pending", status: "waiting" },
+        sourceRef: { eventId: "$pending-approval" },
+      }),
+    ], controllerData);
+
+    expect(detail.conversation).toMatchObject({
+      approvalCount: 1,
+      status: "attention",
+    });
+    expect(detail.attention).toMatchObject([{
+      severity: "warning",
+      summary: "待人工审批：Worker is paused awaiting human approval",
+      sourceEventId: "$pending-approval",
+    }]);
   });
 });

@@ -3,7 +3,7 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import type { AgentTeamsEvent, DashboardProject, JsonObject } from "../types";
-import { matrixMemberKey } from "./normalizer";
+import { matrixMemberKey, reclassifyStoredEvent } from "./normalizer";
 
 export type SyncState = "connecting" | "live" | "degraded" | "stopped";
 
@@ -62,13 +62,21 @@ export class EventStore {
     try {
       const raw = await readFile(this.statePath, "utf8");
       const loaded = JSON.parse(raw) as Partial<EventStoreSnapshot>;
+      const loadedEvents = Array.isArray(loaded.events) ? loaded.events as AgentTeamsEvent[] : [];
+      const migratedEvents = loadedEvents.map(reclassifyStoredEvent);
+      const migrated = migratedEvents.some((event, index) => JSON.stringify(event) !== JSON.stringify(loadedEvents[index]));
       this.state = {
         ...emptySnapshot(),
         ...loaded,
-        events: Array.isArray(loaded.events) ? loaded.events : [],
+        events: migratedEvents,
         projects: Array.isArray(loaded.projects) ? loaded.projects : [],
         sync: { ...emptySnapshot().sync, ...(loaded.sync || {}) },
       };
+      this.initialized = true;
+      if (migrated) {
+        await this.persist();
+      }
+      return;
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
         throw new Error("Dashboard event store is not readable");
