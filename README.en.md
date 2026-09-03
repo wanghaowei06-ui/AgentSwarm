@@ -1,491 +1,134 @@
-<h1 align="center">
-    <img src="https://img.alicdn.com/imgextra/i3/O1CN01hRhtys1Y3svmSnfhX_!!6000000003004-2-tps-478-472.png" alt="AgentTeams"  width="290" height="290">
-  <br>
-</h1>
+# AgentSwarm
 
-[English](./README.en.md) | [中文](./README.md) | [日本語](./README.ja-JP.md)
+[English](./README.en.md) | [中文](./README.md)
 
-<p align="center">
-  <a href="https://deepwiki.com/agentscope-ai/AgentTeams"><img src="https://img.shields.io/badge/DeepWiki-Ask_AI-navy.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAyCAYAAAAnWDnqAAAAAXNSR0IArs4c6QAAA05JREFUaEPtmUtyEzEQhtWTQyQLHNak2AB7ZnyXZMEjXMGeK/AIi+QuHrMnbChYY7MIh8g01fJoopFb0uhhEqqcbWTp06/uv1saEDv4O3n3dV60RfP947Mm9/SQc0ICFQgzfc4CYZoTPAswgSJCCUJUnAAoRHOAUOcATwbmVLWdGoH//PB8mnKqScAhsD0kYP3j/Yt5LPQe2KvcXmGvRHcDnpxfL2zOYJ1mFwrryWTz0advv1Ut4CJgf5uhDuDj5eUcAUoahrdY/56ebRWeraTjMt/00Sh3UDtjgHtQNHwcRGOC98BJEAEymycmYcWwOprTgcB6VZ5JK5TAJ+fXGLBm3FDAmn6oPPjR4rKCAoJCal2eAiQp2x0vxTPB3ALO2CRkwmDy5WohzBDwSEFKRwPbknEggCPB/imwrycgxX2NzoMCHhPkDwqYMr9tRcP5qNrMZHkVnOjRMWwLCcr8ohBVb1OMjxLwGCvjTikrsBOiA6fNyCrm8V1rP93iVPpwaE+gO0SsWmPiXB+jikdf6SizrT5qKasx5j8ABbHpFTx+vFXp9EnYQmLx02h1QTTrl6eDqxLnGjporxl3NL3agEvXdT0WmEost648sQOYAeJS9Q7bfUVoMGnjo4AZdUMQku50McDcMWcBPvr0SzbTAFDfvJqwLzgxwATnCgnp4wDl6Aa+Ax283gghmj+vj7feE2KBBRMW3FzOpLOADl0Isb5587h/U4gGvkt5v60Z1VLG8BhYjbzRwyQZemwAd6cCR5/XFWLYZRIMpX39AR0tjaGGiGzLVyhse5C9RKC6ai42ppWPKiBagOvaYk8lO7DajerabOZP46Lby5wKjw1HCRx7p9sVMOWGzb/vA1hwiWc6jm3MvQDTogQkiqIhJV0nBQBTU+3okKCFDy9WwferkHjtxib7t3xIUQtHxnIwtx4mpg26/HfwVNVDb4oI9RHmx5WGelRVlrtiw43zboCLaxv46AZeB3IlTkwouebTr1y2NjSpHz68WNFjHvupy3q8TFn3Hos2IAk4Ju5dCo8B3wP7VPr/FGaKiG+T+v+TQqIrOqMTL1VdWV1DdmcbO8KXBz6esmYWYKPwDL5b5FA1a0hwapHiom0r/cKaoqr+27/XcrS5UwSMbQAAAABJRU5ErkJggg==" alt="DeepWiki"></a>
-  <a href="https://discord.com/invite/NVjNA4BAVw"><img src="https://img.shields.io/badge/Discord-Join_Us-blueviolet.svg?logo=discord" alt="Discord"></a>
-</p>
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](./LICENSE)
+[![Competition snapshot](https://img.shields.io/badge/competition-v1.1-6f42c1.svg)](./docs/competition-reproduction.md)
 
-**AgentTeams is an open-source collaborative multi-agent runtime platform. It enables multiple Agents to collaborate in a controlled and auditable room, with full human visibility and intervention capabilities throughout the process.**
+> AgentSwarm is the public competition distribution based on the upstream open-source [AgentTeams](https://github.com/agentscope-ai/AgentTeams) project. It keeps AgentTeams' real runtime source, image names, environment variables, APIs, and installation contracts, while adding a competition reproduction entry point, public-boundary documentation, test/trace specifications, and repository governance.
 
-Built on a **Manager-Workers architecture**, AgentTeams features a Manager that centrally orchestrates multiple Workers, focusing on collaboration scenarios between humans and Agents, as well as among Agents within enterprise environments.
+This repository does not re-claim upstream code as independent AgentSwarm work. The `AgentTeams` names in source files are runtime interfaces; AgentSwarm names this competition distribution and its curated public deliverables.
 
-AgentTeams does not compete with other Agent runtimes. Instead of implementing Agent logic itself, it orchestrates and manages multiple Agent containers (including the Manager and numerous Workers).
+## Start here
 
-## Key Features
+- [Competition reproduction guide](./docs/competition-reproduction.md)
+- [Open-source boundary and provenance](./docs/open-source-boundary.md)
+- [Third-party dependency inventory](./docs/dependencies.md)
+- [Contributing guide](./CONTRIBUTING.md)
+- [Security response](./SECURITY.md)
+- [Release history](./CHANGELOG.md)
+- [Runnable example](./examples/README.md)
 
-- 🧬 **Manager-Workers Architecture**: Eliminates the need for human oversight of individual Worker Claws by enabling Agents to manage other Agents.
+## AgentSwarm and AgentTeams
 
-- 🤝 **Multi-Runtime Collaboration**: OpenClaw, QwenPaw, and Hermes Workers coexist in the same IM room. Use deterministic agents (OpenClaw/QwenPaw) as Leaders to orchestrate tasks, and Hermes Workers for autonomous code execution — each runtime does what it's best at.
+| Area | Scope |
+| --- | --- |
+| AgentTeams Controller, Manager, Workers, Matrix, Helm, and installer contracts | Real open-source system content from upstream AgentTeams; source paths and interfaces remain unchanged |
+| AgentSwarm competition entry point | This repository's bilingual README, fixed-tag reproduction guide, dependency and public-boundary documents |
+| Dashboard and public TestWeaver material | Runnable source, interface/trace specifications, and repeatable test helpers included in this snapshot |
+| Local evidence, logs, secrets, and personal environment material | Explicitly excluded; never presented as source capability or evaluation proof |
+| Upstream contribution, adoption, and co-maintenance | Claimed only when backed by a public URL; this release makes no unverified claim |
 
-- 📦 **MinIO Shared File System**: Introduces a shared file system for inter-Agent information exchange, significantly reducing token consumption in multi-Agent collaboration scenarios.
+For upstream history and community activity, visit the [AgentTeams upstream repository](https://github.com/agentscope-ai/AgentTeams). For this competition submission, use a fixed tag and the [competition reproduction guide](./docs/competition-reproduction.md).
 
-- 🔐 **Higress AI Gateway**: Centralizes traffic management and mitigates credential-related risks, alleviating user concerns about security vulnerabilities in the native Lobster framework.
+## Open source surface
 
-- ☎️ **Element IM Client + Tuwunel IM Server (both Matrix protocol-based)**: Eliminating DingTalk/Lark integration overhead and enterprise approval workflows. Enables rapid user onboarding to experience the "delight" of model services within an IM environment, while maintaining compatibility with native OpenClaw IM integration.
-- 🧬 **Integrate** [AgentLoop](https://www.aliyun.com/product/agentloop?spm=at.readme.0.0.0) ：Provides capabilities such as full-stack Agent observability and auditing, Agent evaluation and experimentation, and Agent asset management and continuous optimization.
+The public tree contains the parts that can be rebuilt and checked from a clean checkout:
 
-## News
+| Path | Contents |
+| --- | --- |
+| `agentteams-controller/` | Go Controller, CRDs, REST API, `agt` CLI, and controller tests |
+| `manager/` | Manager image, startup scripts, templates, prompts, and Manager Skills |
+| `worker/`, `qwenpaw/`, `copaw/`, `hermes/`, `openhuman/` | Worker runtimes and image entrypoints |
+| `openclaw-base/` | OpenClaw Manager/Worker base image |
+| `plugins/` | TeamHarness, WorkerFlow, and runtime extensions |
+| `helm/`, `install/`, `shared/` | Kubernetes chart, embedded installer, and shared scripts |
+| `dashboard/` | Optional interface over real Matrix/Controller data |
+| `tests/`, `testweaver/` | Integration tests, adapters, evaluation/trace contracts, and reproduction helpers |
+| `docs/`, `design/` | Architecture, deployment, interface, runtime, and competition documentation |
 
-- **2026-07-30**: [Release Notes](https://github.com/agentscope-ai/AgentTeams/releases/tag/v1.2.0) — AgentTeams v1.2.0 (stable): establishes AgentTeams naming and the final Team/Worker resource contracts end to end; adds the optional AgentTeams Dashboard; and improves Worker storage sync, Team routing and lifecycle convergence, installer support for deploying v1.1.2 with its legacy environment and storage contract (earlier releases still require the matching `hiclaw-install.sh`), Dashboard reliability, and tooling and diagnostic safety.
-- **2026-07-17**: [Release Notes](https://github.com/agentscope-ai/AgentTeams/releases/tag/v1.2.0-beta.1) — AgentTeams v1.2.0-beta.1 (prerelease): completes the public rename from the retired predecessor across images, Kubernetes APIs, Helm, Matrix, storage, and runtime contracts; adds the plugin platform, TeamHarness and WorkerFlow integrations, Matrix AppService and Human SSO, model-provider routing and LLM preflight, plus richer controller observability. Beta installation requires explicit opt-in, while the stable default remains v1.1.2.
-- **2026-05-27**: [Release Notes](https://github.com/agentscope-ai/AgentTeams/releases/tag/v1.1.2) — AgentTeams v1.1.2: QwenPaw-first installer with keep-all upgrade flow, Team human coordinators and refreshed Team Leader coordination tools, Nacos remote skills with `sts-agentteams` / `ai-registry` STS scope, Worker CR-name decoupled from runtime name, controller reconcile metrics and graceful shutdown.
-- **2026-05-07**: [Release Notes](https://github.com/agentscope-ai/AgentTeams/releases/tag/v1.1.1) | [Changelog](changelog/v1.1.1.md) — AgentTeams v1.1.1: declarative MCP on Worker/Manager/Team CRDs (breaking) and on Team Leader, custom `spec.env` for CRs, Token Plan + Qwen Cloud international + `qwen3.6-plus`, namespace-scoped controller RBAC, optional `SOUL.md` in Worker packages.
-- **2026-04-24**: [English](blog/agentteams-1.1.0-release.md) | [中文](blog/zh-cn/agentteams-1.1.0-release.md) — AgentTeams v1.1.0: Kubernetes-native control plane, Hermes autonomous coding agent runtime, 1.7 GB image shrink, agt CLI replaces shell scripts.
-- **2026-04-14**: [English](blog/agentteams-k8s-native-multi-agent-collaboration.md) | [中文](blog/zh-cn/agentteams-k8s-native-multi-agent-collaboration.zh-CN.md) — Deep dive: AgentTeams as a Kubernetes-native multi-agent collaboration orchestration system.
-- **2026-04-03**: [English](docs/declarative-resource-management.md) | [中文](docs/zh-cn/declarative-resource-management.md) — AgentTeams 1.0.9: Kubernetes-style declarative resource management (YAML for Worker, Team, Human); Worker Template Marketplace; Manager QwenPaw runtime; Nacos Skills Registry and more.
-- **2026-03-14**: [English](blog/agentteams-1.0.6-release.md) | [中文](blog/zh-cn/agentteams-1.0.6-release.md) — AgentTeams 1.0.6: enterprise-grade MCP Server management, zero credential exposure.
-- **2026-03-10**: [English](blog/agentteams-1.0.4-release.md) | [中文](blog/zh-cn/agentteams-1.0.4-release.md) — AgentTeams 1.0.4: QwenPaw (formerly CoPaw) Worker support, 80% less memory.
-- **2026-03-04**: [English](blog/agentteams-announcement.md) | [中文](blog/zh-cn/agentteams-announcement.md) — AgentTeams open sourced under its former name.
+## Competition reproduction
 
-## Why AgentTeams
+The currently published snapshot is `competition-v1.1`. After this governance update is verified, the next immutable public version will be `competition-v1.2`; evaluators should use a fixed tag rather than the moving `main` branch.
 
-- **Enterprise-Grade Security**: Worker Agents operate with consumer tokens only. Real credentials (API keys, GitHub PATs) stay in the gateway — Workers can't see them, and neither can attackers.
+The following path builds real images from this repository and installs the embedded system. It does not use mocks, offline replay, or pre-recorded evidence:
 
-- **Fully Private**: Matrix is a decentralized, open protocol. Host it yourself, federate with others if you want. No vendor lock-in, no data harvesting.
+~~~bash
+git clone https://github.com/wanghaowei06-ui/AgentSwarm.git
+cd AgentSwarm
+git checkout competition-v1.1
 
-- **Human-in-the-Loop by Default**: Every Matrix room includes you, the Manager, and the relevant Workers. Watch everything. Jump in anytime. No black boxes.
+export VERSION=competition-v1.1
+export OPENCLAW_BASE_IMAGE=agentteams/openclaw-base
+export OPENCLAW_BASE_VERSION=competition-v1.1
+export AGENTTEAMS_DASHBOARD=0
 
-- **Zero Configuration IM**: Built-in Matrix server means no bot applications, no API approvals, no waiting. Just open Element Web and start chatting.
+make build-openclaw-base
+make install-embedded
+make wait-ready-embedded
+make verify
+~~~
 
-- **One Command Setup**: `curl | bash` and you're done — AI gateway, Matrix server, file storage, web client, and Manager Agent.
+See the [competition reproduction guide](./docs/competition-reproduction.md) for model API setup, credentials, ports, resource requirements, live task execution, and output retention. Pass API keys through environment variables only.
 
-- **Skills Ecosystem**: Workers pull from [skills.sh](https://skills.sh) (80,000+ community skills) on demand. Safe because Workers can't access real credentials.
+## Installation and deployment
 
-## Competition Reproduction
+The repository provides two real installation deliverables:
 
-The current source-based competition snapshot is `competition-v1.1`. Judges should follow the [competition reproduction guide](docs/competition-reproduction.md), which builds the real AgentTeams images from the checked-out tag, configures a live LLM provider, starts the embedded deployment, and runs verification tests.
+- **Docker embedded** for evaluators and local use, using the root `Makefile`, `install/`, and embedded image.
+- **Kubernetes Helm** for team or production-style deployments, using `helm/agentteams/` for the Controller, gateway, Matrix, storage, and Manager configuration.
 
-The generic one-line installer below is intended for release installation and is not the reproduction path for the competition snapshot; it may pull release images instead of building this checkout.
+See the [Chinese quickstart](./docs/zh-cn/quickstart.md), [architecture](./docs/zh-cn/architecture.md), [Windows deployment](./docs/zh-cn/windows-deploy.md), [development guide](./docs/zh-cn/development.md), [Helm chart](./helm/agentteams/), and [installer documentation](./install/README.md).
 
-## Quick Start
-
-**Prerequisites**: Docker Desktop (Windows/macOS) or Docker Engine (Linux).
-
-**Resources**: 2 CPU cores + 4 GB RAM minimum. For multiple Workers, 4 cores + 8 GB recommended.
-
-### Install
-
-**macOS / Linux:**
-```bash
-bash <(curl -sSL https://raw.githubusercontent.com/agentscope-ai/AgentTeams/main/install/agentteams-install.sh)
-```
-
-**Windows (PowerShell 7+ recommended):**
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; $wc=New-Object Net.WebClient; $wc.Encoding=[Text.Encoding]::UTF8; iex $wc.DownloadString('https://raw.githubusercontent.com/agentscope-ai/AgentTeams/main/install/agentteams-install.ps1')
-```
-
-The installer walks you through:
-1. Choose your LLM provider (OpenAI-compatible APIs supported)
-2. Enter your API key
-3. Select network mode (local-only or external access)
-4. Wait for setup to complete
-
-### Access
-
-Open http://127.0.0.1:18088 in your browser and log in to Element Web. The Manager will greet you and explain how to create your first Worker.
-
-**Mobile**: Use any Matrix client (Element, FluffyChat) and connect to your server address.
-
-**That's it.** No bot applications. No external services. Your AI team runs entirely on your machine.
-
-## Upgrade
-
-```bash
-# Upgrade to latest (preserves all data)
-bash <(curl -sSL https://raw.githubusercontent.com/agentscope-ai/AgentTeams/main/install/agentteams-install.sh)
-
-# Upgrade to specific version
-AGENTTEAMS_VERSION=v1.0.5 bash <(curl -sSL https://raw.githubusercontent.com/agentscope-ai/AgentTeams/main/install/agentteams-install.sh)
-```
-
-## Uninstall
-
-**macOS / Linux:**
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/agentscope-ai/AgentTeams/main/install/agentteams-install.sh) uninstall
-```
-
-**Windows (PowerShell):**
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; $wc=New-Object Net.WebClient; $wc.Encoding=[Text.Encoding]::UTF8; $s=$wc.DownloadString('https://raw.githubusercontent.com/agentscope-ai/AgentTeams/main/install/agentteams-install.ps1'); & ([scriptblock]::Create($s)) uninstall
-```
-
-This removes all AgentTeams containers (Manager, Workers, docker-proxy), Docker volume, network, env file, workspace directory, and install log.
-
-## Install on Kubernetes (Helm)
-
-For shared / production deployments you can install AgentTeams on any Kubernetes cluster via the official Helm chart. The default profile bundles the Higress AI gateway, Tuwunel (Matrix), MinIO and the AgentTeams controller — no external dependencies required.
-
-**Prerequisites**
-
-- Kubernetes 1.24+ (kind / minikube / k3s / managed K8s — all work)
-- Helm 3.7+
-- A default StorageClass (for the Tuwunel + MinIO PVCs)
-
-**Install (OpenAI / OpenAI-compatible)**
-
-```bash
-helm repo add higress.io https://higress.io/helm-charts
-helm repo update
-
-helm install agentteams higress.io/agentteams \
-  -n agentteams-system --create-namespace \
-  --render-subchart-notes \
-  --set credentials.llmApiKey=<your-api-key> \
-  --set credentials.adminPassword=<your-admin-password> \
-  --set gateway.publicURL=http://localhost:18080
-```
-
-For non-OpenAI providers that expose an OpenAI-compatible API, also set `llmBaseUrl`:
-
-```bash
-helm install agentteams higress.io/agentteams \
-  -n agentteams-system --create-namespace \
-  --render-subchart-notes \
-  --set credentials.llmApiKey=<your-api-key> \
-  --set credentials.llmBaseUrl=https://your-provider.example.com/v1 \
-  --set credentials.defaultModel=your-model-name \
-  --set credentials.adminPassword=<your-admin-password> \
-  --set gateway.publicURL=http://localhost:18080
-```
-
-<details>
-<summary>Using Qwen (通义千问) instead</summary>
-
-```bash
-helm install agentteams higress.io/agentteams \
-  -n agentteams-system --create-namespace \
-  --render-subchart-notes \
-  --set credentials.llmApiKey=<your-qwen-api-key> \
-  --set credentials.llmProvider=qwen \
-  --set credentials.defaultModel=qwen3.5-plus \
-  --set credentials.adminPassword=<your-admin-password> \
-  --set gateway.publicURL=http://localhost:18080
-```
-
-</details>
-
-| Value | Required | Description |
-|---|---|---|
-| `credentials.llmApiKey` | yes | API key for your LLM provider |
-| `gateway.publicURL` | yes | Public URL where users will reach Element Web (e.g. `http://localhost:18080` for port-forward, or `https://agentteams.example.com` for an Ingress) |
-| `credentials.adminPassword` | recommended | Matrix admin password; auto-generated if left empty (you'll have to read it back from the Secret) |
-| `credentials.llmProvider` | no | LLM provider name, defaults to `openai-compat` |
-| `credentials.defaultModel` | no | Default model, defaults to `gpt-5.4` |
-| `credentials.llmBaseUrl` | no | OpenAI-compatible base URL (e.g. `https://api.deepseek.com/v1`). Leave empty for official OpenAI API |
-| `preflight.llm.enabled` | no | Run an install/upgrade hook that validates the LLM API key, base URL, and model before the controller starts. Defaults to `true` |
-| `preflight.llm.strict` | no | Fail the Helm install/upgrade when the LLM preflight fails. Defaults to `true`; set to `false` to emit a warning and continue |
-| `preflight.llm.timeoutSeconds` | no | Per-request timeout for the LLM preflight HTTP probe. Defaults to `30` |
-| `preflight.llm.retries` | no | Retry count for transient LLM preflight failures such as rate limits and provider 5xx responses. Defaults to `2` |
-| `preflight.llm.activeDeadlineSeconds` | no | Kubernetes Job active deadline for the preflight hook. Defaults to `120` |
-| `preflight.llm.resources` | no | Optional Kubernetes resource requests/limits for the preflight hook container |
-| `manager.runtime` | no | Manager agent runtime: `openclaw` (default), `copaw`, or `hermes` |
-| `worker.defaultRuntime` | no | Default Worker runtime: `openclaw` (default), `copaw`, or `hermes` |
-
-Helm installs run an LLM preflight hook by default. The hook sends a minimal OpenAI-compatible `/chat/completions` request using `credentials.llmApiKey`, `credentials.llmBaseUrl`, and `credentials.defaultModel`; invalid keys, unreachable base URLs, unsupported models, quota errors, and provider outages fail the install before the controller starts. To bypass this check for restricted or offline clusters:
-
-```bash
-helm install agentteams higress.io/agentteams \
-  -n agentteams-system --create-namespace \
-  --set credentials.llmApiKey=<your-api-key> \
-  --set credentials.adminPassword=<your-admin-password> \
-  --set gateway.publicURL=http://localhost:18080 \
-  --set preflight.llm.enabled=false
-```
-
-<details>
-<summary>Using alternative runtimes (QwenPaw Manager + Hermes Workers)</summary>
-
-```bash
-helm install agentteams higress.io/agentteams \
-  -n agentteams-system --create-namespace --devel \
-  --set manager.runtime=copaw \
-  --set worker.defaultRuntime=hermes \
-  --set credentials.llmApiKey=<your-api-key> \
-  --set credentials.llmBaseUrl=https://your-provider.example.com/v1 \
-  --set credentials.defaultModel=your-model-name \
-  --set credentials.adminPassword=<your-admin-password> \
-  --set gateway.publicURL=http://localhost:18080
-```
-
-The image for each component is automatically selected based on the runtime (`agentteams-manager` / `agentteams-manager-copaw` for Manager; `agentteams-worker` / `agentteams-copaw-worker` / `agentteams-hermes-worker` for Workers).
-
-</details>
-
-**Multi-Region Image Registry**
-
-The default `global.imageRegistry` points to the China region (`higress-registry.cn-hangzhou.cr.aliyuncs.com/higress`). If you are deploying outside China, override it for faster image pulls:
-
-| Region | Registry |
-|---|---|
-| China (default) | `higress-registry.cn-hangzhou.cr.aliyuncs.com/higress` |
-| North America | `higress-registry.us-west-1.cr.aliyuncs.com/higress` |
-| Southeast Asia | `higress-registry.ap-southeast-7.cr.aliyuncs.com/higress` |
-
-```bash
-# Example: deploy from the North America registry
-helm install agentteams higress.io/agentteams \
-  -n agentteams-system --create-namespace \
-  --render-subchart-notes \
-  --set global.imageRegistry=higress-registry.us-west-1.cr.aliyuncs.com/higress \
-  --set credentials.llmApiKey=<your-api-key> \
-  --set credentials.adminPassword=<your-admin-password> \
-  --set gateway.publicURL=http://localhost:18080
-```
-
-For all configurable values (gateway/storage providers, image tags, resources, persistence, etc.) see [`helm/agentteams/values.yaml`](helm/agentteams/values.yaml).
-
-**Access**
-
-For a temporary local admin session, forward the Higress Gateway:
-
-```bash
-kubectl port-forward -n agentteams-system svc/higress-gateway 18080:80
-```
-
-Then open http://localhost:18080 and log in to Element Web. The port-forward
-ends when the command exits and is not suitable for shared access.
-
-For company or Internet access, expose only `svc/higress-gateway` through an
-HTTPS Ingress or LoadBalancer. `gateway.publicURL` is written into the Element
-Web configuration as its Matrix homeserver URL, so it must exactly match the
-public origin that users open (for example, `https://agentteams.example.com`).
-
-1. Point the public DNS name at your Ingress controller or load balancer.
-2. Provision a TLS certificate Secret in `agentteams-system`.
-3. Set the same origin on the Helm release:
-
-```bash
-helm upgrade agentteams higress.io/agentteams \
-  -n agentteams-system --reuse-values \
-  --set gateway.publicURL=https://agentteams.example.com
-```
-
-4. Route that host to the Higress Gateway. This generic example assumes an
-   NGINX IngressClass and an existing `agentteams-tls` Secret; replace both to
-   match your cluster:
-
-```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: agentteams
-  namespace: agentteams-system
-spec:
-  ingressClassName: nginx
-  tls:
-    - hosts:
-        - agentteams.example.com
-      secretName: agentteams-tls
-  rules:
-    - host: agentteams.example.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: higress-gateway
-                port:
-                  number: 80
-```
-
-Verify both the web entry point and Matrix routing after DNS and TLS are ready:
-
-```bash
-curl -fsSI https://agentteams.example.com/
-curl -fsS https://agentteams.example.com/_matrix/client/versions
-```
-
-Keep the controller API, Tuwunel, MinIO, and the Higress Console private unless
-you apply separate authentication and network policy. Use HTTPS for shared
-access because Matrix login credentials and access tokens pass through this
-endpoint. A `LoadBalancer` Service can replace the Ingress, but the DNS, TLS,
-and `gateway.publicURL` requirements remain the same.
-
-**Upgrade**
-
-```bash
-helm repo update
-helm upgrade agentteams higress.io/agentteams -n agentteams-system --reuse-values
-```
-
-**Uninstall**
-
-```bash
-helm uninstall agentteams -n agentteams-system
-kubectl delete namespace agentteams-system
-```
-
-For the Kubernetes-native architecture (CRDs, controller, declarative `Worker` / `Team` / `Human` resources), see [docs/k8s-native-agent-orch.md](docs/k8s-native-agent-orch.md).
-
-## How It Works
-
-### Manager as Your AI Chief of Staff
-
-```
-You: Create a Worker named alice for frontend development
-
-Manager: Done. Worker alice is ready.
-         Room: Worker: Alice
-         Tell alice what to build.
-
-You: @alice implement a login page with React
-
-Alice: On it... [a few minutes later]
-       Done. PR submitted: https://github.com/xxx/pull/1
-```
-
-<p align="center">
-  <img src="https://img.alicdn.com/imgextra/i4/O1CN01wHWaJQ29KV3j5vryD_!!6000000008049-0-tps-589-1280.jpg" width="240" />
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://img.alicdn.com/imgextra/i2/O1CN01q9L67J245mFT0fPXH_!!6000000007340-0-tps-589-1280.jpg" width="240" />
-</p>
-<p align="center">
-  <sub>① Manager creates a Worker and assigns tasks</sub>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <sub>② You can also direct Workers directly in the room</sub>
-</p>
-
-### Security Model
-
-```
-Worker (consumer token only)
-    → Higress AI Gateway (holds real API keys, GitHub PAT)
-        → LLM API / GitHub API / MCP Servers
-```
-
-Workers see only their consumer token. The gateway handles all real credentials. The Manager knows what Workers are doing but never touches the actual keys.
-
-### Human in the Loop
-
-Every Matrix Room includes you, the Manager, and relevant Workers:
-
-```
-You: @bob wait, change the password rule to minimum 8 chars
-Bob: Got it, updated.
-Alice: Frontend validation updated too.
-```
-
-No hidden agent-to-agent calls. Everything is visible and intervenable.
-
-## Multi-Runtime Collaboration
-
-AgentTeams supports three Worker runtimes that can **coexist in the same IM room**, collaborating on tasks together:
-
-- **OpenClaw** (Node.js) — General-purpose agent with rich skills ecosystem, ideal for task orchestration and tool calling
-- **QwenPaw** (Python) — Lightweight runtime, suited for browser automation and quick tasks
-- **Hermes** ([hermes-agent](https://github.com/NousResearch/hermes-agent)) — Autonomous coding agent with terminal sandbox, self-improving skills, and persistent memory
-
-Each runtime excels at different tasks. A common pattern: use deterministic agents (OpenClaw/QwenPaw) as Leaders to decompose and assign work, and Hermes Workers for autonomous code execution. All runtimes communicate via Matrix `m.mentions` in the same room — fully visible, fully intervenable.
-
-```bash
-# Switch any worker's runtime in place
-agt update worker --runtime hermes
-```
+The public repository provides source installation and deployment files. It does not claim to be a separately published PyPI/npm package, and external registries, model providers, and SaaS services remain external dependencies.
 
 ## Architecture
 
-```
-┌───────────────────────────────────────────────┐
-│            agentteams-controller                  │
-│  Higress │ Tuwunel │ MinIO │ Element Web      │
-└──────────────────┬────────────────────────────┘
-                   │ Matrix + HTTP Files
-┌──────────────────┴──────────┐
-│     agentteams-manager-agent     │
-│     Manager (OpenClaw/       │
-│       QwenPaw)               │
-└──────────────────┬──────────┘
-                   │
-┌──────────────────┼────────────────────────────┐
-│                  │                            │
-▼                  ▼                            ▼
-Worker Alice    Worker Bob              Worker Charlie
-(OpenClaw)      (QwenPaw)               (Hermes)
-```
+AgentTeams coordinates Manager, Workers, and humans in Matrix rooms:
 
-| Component | Role |
-|-----------|------|
-| agentteams-controller | Kubernetes-native control plane, reconciles Worker/Team/Manager CRs |
-| Higress AI Gateway | LLM proxy, MCP Server hosting, credential management |
-| Tuwunel (Matrix) | Self-hosted IM server for all Agent + Human communication |
-| Element Web | Browser client, zero setup |
-| MinIO | Centralized file storage, Workers are stateless |
+~~~text
+Human
+  │ Element Web / Matrix Client
+  ▼
+Matrix Homeserver (Tuwunel) ─── shared files (MinIO / OSS)
+  │
+  ▼
+Manager Agent ─── AI Gateway (Higress) ─── online LLM provider
+  │
+  ├── OpenClaw Worker
+  ├── QwenPaw / CoPaw Worker
+  ├── Hermes Worker
+  └── OpenHuman Worker
+~~~
 
-## AgentTeams vs OpenClaw Native
+The Manager decomposes and coordinates work; Workers execute it; the Matrix room keeps the collaboration context visible so a human can observe and intervene. See the [architecture documentation](./docs/zh-cn/architecture.md) for runtime boundaries.
 
-| | OpenClaw Native | AgentTeams |
-|---|---|---|
-| Deployment | Single process | Distributed containers |
-| Agent creation | Manual config + restart | Conversational |
-| Credentials | Each agent holds real keys | Workers only hold consumer tokens |
-| Human visibility | Optional | Built-in (Matrix Rooms) |
-| Mobile access | Depends on channel setup | Any Matrix client, zero config |
-| Monitoring | None | Manager heartbeat, visible in Room |
+## Dashboard, tests, and trace
 
-## Documentation
+The Dashboard is an optional real-data interface. It does not generate demo projects, seed data, or fabricated messages; it reads data returned by the Controller and Matrix. See [Dashboard README](./dashboard/README.md) for local build, configuration, and checks.
 
-| | |
-|---|---|
-| [docs/quickstart.md](docs/quickstart.md) | Step-by-step guide |
-| [docs/architecture.md](docs/architecture.md) | System architecture deep dive |
-| [docs/manager-guide.md](docs/manager-guide.md) | Manager configuration |
-| [docs/worker-guide.md](docs/worker-guide.md) | Worker deployment |
-| [docs/development.md](docs/development.md) | Contributing and local dev |
+Repeatable checks include:
 
-## Troubleshooting
+~~~bash
+make verify
+make test-installed TEST_FILTER="01"
+python3 -m unittest discover -s testweaver/adapters/tests -p 'test_*.py'
+~~~
 
-```bash
-docker exec -it agentteams-manager cat /var/log/agentteams/manager-agent.log
-```
+The public TestWeaver tree contains adapters, contracts, Skill/Schema material, and trace specifications. Historical evidence directories, container logs, and local run state are not public deliverables.
 
-See [docs/zh-cn/faq.md](docs/zh-cn/faq.md) for common issues.
+## Version and maintenance
 
-### Reporting Bugs
+- `competition-v1.1` is the previously published immutable competition snapshot.
+- Future public changes are verified on `main` before a new immutable tag is created.
+- See [CHANGELOG.md](./CHANGELOG.md), [NOTICE](./NOTICE), and the [open-source boundary](./docs/open-source-boundary.md).
+- See [MAINTAINERS.md](./MAINTAINERS.md) for the current maintainer and support scope.
+- Use [GitHub Issues](https://github.com/wanghaowei06-ui/AgentSwarm/issues) and the [contributing guide](./CONTRIBUTING.md) for bugs, feature requests, and pull requests.
 
-Export your Matrix message logs and let an AI tool analyze them against the codebase before filing an issue — this helps us fix bugs much faster.
+## Upstream contribution and adoption statement
 
-```bash
-# Export debug logs (Matrix messages + agent sessions, PII auto-redacted)
-python scripts/export-debug-log.py --range 1h
-```
-
-Then open the AgentTeams repo in Cursor, Claude Code, or similar AI tool and ask:
-
-> "Read the JSONL files in debug-log/. Analyze the Matrix message logs and agent session logs together. Cross-reference with the AgentTeams codebase to identify the root cause of [describe your bug]."
-
-Include the AI's analysis in your [bug report](https://github.com/agentscope-ai/AgentTeams/issues/new?template=bug_report.yml).
-
-You can also let the AI tool submit the issue or PR directly. Install [GitHub CLI](https://cli.github.com/), run `gh auth login` to authenticate in your browser, then add the [OpenClaw GitHub skill](https://github.com/openclaw/openclaw/blob/main/skills/github/SKILL.md) to your AI coding tool (Cursor, Claude Code, etc.). After that, just ask it to file the issue or open a PR based on its analysis.
-
-## Build & Test
-
-```bash
-make build          # Build all images
-make test           # Build + run all integration tests
-make test-quick     # Smoke test only
-```
-
-## Other Commands
-
-```bash
-make replay TASK="Create a Worker named alice for frontend development"
-make uninstall
-make help
-```
-
-## Community
-
-- [Discord](https://discord.gg/NVjNA4BAVw)
-- [GitHub Issues](https://github.com/agentscope-ai/AgentTeams/issues)
+This repository does not present its own commit history, competition evaluation logs, or static screenshots as upstream AgentTeams contributions, third-party adoption, or co-maintenance evidence. If a merged upstream PR, public issue, external deployment report, or co-maintainer record becomes available, it will be linked directly in the release notes.
 
 ## License
 
-Apache License 2.0
+This repository follows Apache License 2.0; see [LICENSE](./LICENSE) and [NOTICE](./NOTICE). Files with their own source or license notice take precedence, and third-party dependencies remain under their respective licenses.

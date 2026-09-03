@@ -1,6 +1,8 @@
-# AgentTeams Dashboard
+# AgentSwarm Dashboard（AgentTeams 运行时组件）
 
-AgentTeams 的产品化 workspace 前端：把现有 Matrix room 中的消息、workflow、tool call、artifact 和 system observation 聚合到一个当前会话界面，并通过 Controller API 补充运行状态。
+这是 AgentSwarm 比赛发行版中的可选 workspace 前端。它基于 AgentTeams 的真实运行时接口，把现有 Matrix room 中的消息、workflow、tool call、artifact 和 system observation 聚合到一个当前会话界面，并通过 Controller API 补充运行状态。
+
+本目录中的 `AgentTeams` 名称是运行时和 API 契约的一部分，不代表本仓库把上游 AgentTeams 代码重新声明为独立原创。仓库整体身份、许可证、公开范围和比赛版本见根目录 [`README.md`](../README.md)、[`NOTICE`](../NOTICE) 和[`开放范围文档`](../docs/open-source-boundary.md)。
 
 这个目录只负责前端与 server-side adapter。它不修改 AgentTeams 核心运行时，也不生成演示数据：页面展示的内容必须来自 Matrix 或 Controller 的真实接口。
 

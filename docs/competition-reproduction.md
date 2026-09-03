@@ -1,6 +1,8 @@
 # AgentSwarm 比赛版复现指南
 
-本文是比赛提交版本的唯一复现入口。评委应从指定 tag 克隆源码，并在联网的 Docker 环境中从本仓库构建镜像、安装真实系统、使用真实的大模型 API 完成验证。
+本文是 AgentSwarm 比赛提交版本的唯一复现入口。评委应从指定 tag 克隆源码，并在联网的 Docker 环境中从本仓库构建镜像、安装真实系统、使用真实的大模型 API 完成验证。
+
+本指南解释如何复现系统；仓库来源、许可证、依赖和公开/排除范围分别见 [`NOTICE`](../NOTICE)、[`docs/dependencies.md`](dependencies.md) 和 [`docs/open-source-boundary.md`](open-source-boundary.md)。AgentSwarm 基于上游 [AgentTeams](https://github.com/agentscope-ai/AgentTeams)，但评委应以本仓库固定 tag 的源码和本次实时输出为准。
 
 本流程不使用 mock、离线回放或预录证据。大模型 API Key 只通过环境变量传入，不要写入仓库文件。
 
@@ -25,6 +27,8 @@
 - 可选管理界面：从本仓库 `dashboard/` 源码构建的 AgentTeams Dashboard
 - 外部依赖：一个可访问的 Qwen 或 OpenAI-compatible LLM API
 - 可选测试依赖：GitHub PAT，仅在运行 GitHub 集成测试时需要
+- 许可证：根目录 Apache License 2.0；第三方依赖按各自许可证使用
+- 发行版身份：AgentSwarm 比赛发行版；运行时代码保留 AgentTeams 的真实命名契约
 
 仓库中的 `testweaver/evidence/` 是本地运行产物，`testweaver/config/runtime.env` 是受保护的部署配置；两者都不属于干净评委环境的启动输入，也不会提交到公开快照。评委应以本次启动和测试产生的实时结果为准。
 
