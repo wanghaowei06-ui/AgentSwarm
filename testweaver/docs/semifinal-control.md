@@ -218,6 +218,11 @@ TestWeaver 只做产品差异：
   为缺失/ghost artifact，作为 P1 一致性差异保留；P2 清理审批 timeout-cleared，未批准
   破坏性删除。capture stop 曾等待无 timeout 的 Matrix `docker exec` 子进程，最终快照
   仍通过全量校验，作为采集工具 P1 记录。
+- 封存后的本地回归检查：Hero bundle `verify`/`replay` 三包均为 `PARTIAL` 且
+  `replay_equal=true`；adapter 79 项、contract 9 项、evaluation 50 项和 bundle
+  8 项通过。observability 28 项在当前最小环境因未安装 `pytest`/OpenTelemetry
+  依赖而未运行完成，记为 `ENV_NOT_INSTALLED`，不伪装成实现 PASS；AgentLoop 云端
+  同 Run 源记录缺口仍按上列 `NOT_OBSERVED` 保留。
 
 ## 6. 实施顺序与完成条件
 
