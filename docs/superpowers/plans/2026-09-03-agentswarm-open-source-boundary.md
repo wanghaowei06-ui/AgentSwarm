@@ -373,4 +373,3 @@ git -C /root/projects/agentteams-competition-worktree status --short
 - [ ] **Step 8: 交付结果**
 
 最终回复提供：仓库 URL、`competition-v1.2` tag URL、最终 commit、默认中文 README、治理/依赖/复现文档入口、验证命令结果，以及主工作区未提交内容仍被保留的说明。
-
