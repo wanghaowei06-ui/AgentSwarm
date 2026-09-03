@@ -2,9 +2,9 @@
 
 更新时间：2026-09-03（Asia/Shanghai）
 
-状态：`M2-G_HERO2_NATIVE_PARTIAL_SEALED / HERO2_RECEIPTS_V14_PACKAGED / QWENPAW_DSH_DEPLOYED / M0-M1_NATIVE_CHAIN_PASS`
+状态：`M2-G_HERO3_PRE_NATIVE_PARTIAL_SEALED / HERO3_PRE_RECEIPTS_PACKAGED / DSH_RUNTIME_LOCKED / M0-M1_NATIVE_CHAIN_PASS`
 
-唯一当前里程碑：Hero2 已在同一真实 campaign 中完成原生 Manager→双 Team/Leader→Worker→Manager 收口，四个下游任务均由 Manager 接受，Outcome/Boundary 结果已分离并封存；整体仍诚实为 `PARTIAL`。DSH→百炼因真实审批超时在 provider 前被阻断，且同一 capture 未观察到有效 Human resume、恢复/迟到拒绝、Skill invoke/evolution、PG exact authority 或 AgentLoop/OTel 回读。v14 捕获包及补充收据已生成；下一步只做针对这些核心缺口的最小真实复跑，不新增 Gate、协调器或案例特例。
+唯一当前里程碑：Hero3-pre 已在同一真实 campaign 中完成原生 Manager→双 Team/Leader→Worker→Manager 收口，P1/P2、Outcome/Boundary 两个独立 Oracle 收据均已封存；整体仍诚实为 `PARTIAL`。DSH 真实异构尝试触发越权路径后被 authenticated Human 安全停止，provider 调用未发生，不能算异构成功。主捕获包与 supplemental receipt 已生成；下一步只用已锁定的 DSH 运行态做一轮新的自然真实复跑，不新增 Gate、协调器或案例特例。
 
 ## 0. 今晚批量收口策略（最高优先级，覆盖后文的逐小步运行措辞）
 
@@ -86,7 +86,7 @@ TestWeaver 只做产品差异：
 
 ## 5. 当前事实
 
-- 新仓库基线提交：`f2b57d4`，此前工作树干净。
+- 新仓库功能基线曾为 `f2b57d4`；当前总控与 Hero3-pre 证据源提交为 `751b3d0774d9b2516b22abfa139a87ad735bcb71`，工作树在本次文档/收据提交后必须保持干净。
 - 原生隔离运行栈 `agentteams-native-m0-20260901-*` 已恢复真实 provider 路由；官方 M0 实际完成 Manager 两次 provider 调用、Leader 原生 TeamHarness 委派、Worker 真实模型/Skill、submit/check/accept 和 Manager 中转收口。功能闭环已通。
 - M0 功能闭环已通，但早期 replay 缺少可独立关联的跨 Actor wire payload；补采已冻结 24 条脱敏原始事件，仍诚实分类为 `PARTIAL`。不再打磨旧 Run，下一次 M1+ 直接按完整采集合同生成 canonical evidence。
 - 第一次原生双 Team M1 已结束并冻结 `testweaver/evidence/m1/m1-receipt.txt`：两 Team、两 Leader、两真实 QwenPaw Worker、结构化 Handoff、真实 DeepSeek provider run 与 Manager 最终回读均已出现；核心链路成立，整体仍为 `PARTIAL`。阻断升级的运行事实是 Manager 在 OpenClaw compaction 后重复消费同一 Human prompt，以及一次裸 Worker 名称 `m.mentions` 未唤醒第二 Worker。
@@ -135,13 +135,56 @@ TestWeaver 只做产品差异：
 - 首轮完整 Hero `openworker-pr161-hero-20260902T221938Z` 已停止采集并通过全量 `SHA256SUMS` 校验，独立评估固定为 `PARTIAL`，不得补写为 PASS。真实观察到 Manager 首次选探索 Team、探索 Leader 原生 DAG/双 Worker 委派、QwenPaw 模型/工具执行、证据根冻结、Manager 基于新证据二次选路、收敛 Team 复核以及两个独立 Oracle 任务/进程。未闭合项为：DSH→百炼因审批超时未到 provider；旧 ACL 拦截第一次 Human 决定；DSH 正文 `BLOCKED` 与 Taskflow metadata `SUCCESS` 冲突；重叠 QwenPaw channel 对同一 Matrix event 重复入队；探索 Leader closeout `CONTEXT_UNFIT`；Outcome 被错误下发 Gold-free 约束而未用隔离私有 Gold；恢复、Skill invoke、PG tuple 与 AgentLoop 同 Run 回读未观察。封存根位于 `testweaver/evidence/hero/openworker-pr161-hero-20260902T221938Z/`，外部评估位于 `testweaver/evidence/hero/assessments/openworker-pr161-hero-20260902T221938Z.json`。
 - 唯一外部 Human `@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080` 已通过 QwenPaw ACL API 精确加入当前七个 Hero Worker/Leader 并逐个回读为 true；随后一次自然触发的高风险清理请求已由该身份在 Matrix 中实时 `DENY`，pending 数回到 0，证明身份通路已修复。该动作发生在首轮 capture STOP 边界之后，只是下一轮预检证据，不能回填首轮 HITL。
 
+### Hero3-pre 最新真实收口（2026-09-03）
+
+- 新 Run `openworker-pr161-hero3-pre-20260903T0625Z` / campaign
+  `testweaver-pr161-hero3-pre-20260903T0625Z` / trace
+  `hero3-pending-20260903T0625Z` 已由只读 capture 覆盖运行前边界；capture
+  `STOPPED`、checksum `FINAL`，最终快照为
+  `snapshots/20260903T065552909216873Z`。主包
+  `testweaver/evidence/bundles/openworker-pr161-hero3-pre-20260903T0625Z-v1.zip`
+  SHA-256 为
+  `9af133d3b68eb9b992a4ef046be0d176e098c5bb2325fb1aa6e992bc8461cddf`，源提交
+  `751b3d0774d9b2516b22abfa139a87ad735bcb71`，独立 replay hash 为
+  `sha256:97078a26e2ab722063b7a06101af83475487a92e347c50e15f1026452f1aa783`。
+  supplemental overlay 为
+  `openworker-pr161-hero3-pre-20260903T0625Z-receipts-v1.zip`，SHA-256
+  `81963f217c23ae59fa9ca8eb811eaa7e2786510f43efa02538951d617415bd3a`。
+- Manager aggregate 事件为
+  `$L4vbLCjM6r7chi577PxXDEDiE8uU1UHRNP4PWOarJp8`。P1 primary 冻结根
+  `49b8fafebda5ea00db14b1dcbc3d4d26c71636b4c0359687a1dad09bc5c3ed4b`，P1
+  analysis `b3ee589d48ccb7239cee6e088854b9cdb4793bc5c73dcdbb77dbcd43aa9bd1fb`，
+  P2 `CONVERGE` `5bfb5a83531ad6aa9f6a478656f5eb8b77b4f26478de9a02a7b126b9031c92cf`，
+  Outcome `SUCCESS_WITH_NOTES` `646ee723a83b4801bf1121085c6bfc9372eba926ce837dd0409f346823aa0461`，
+  Boundary `COMPLIANT` task/project 分别为
+  `9fe3de791811ec2142f76bf05b74649cf50ea146d888db9cc1e5a9806eeeee35` /
+  `bd414d9a0581ef673ab58afb3cbe7ebce50158b74156710fa6117cf75f19fd05`。
+- 原生 Manager→双 Team/Leader→Worker→Manager 二次决策、两 Oracle 独立身份/进程及
+  Gold 隔离均有真实收据。P2/Outcome 重现 vulnerable 4/9，最小修复与 public
+  FIXED 9/9 且 5/5 零回归；private Gold 修复为 7/9，结论为 `PARTIAL`，不夸大为
+  release-ready Gold PASS。
+- DSH `native-m0-clean-dsh-worker` 曾尝试读取/解密受保护配置并直连，违反 Worker
+  边界；authenticated Human 在约 `06:34Z` 真实停止，Manager/Boundary 将节点记为
+  `CANCELLED`、`BLOCKED/NOT_AVAILABLE`，provider 未调用，usage/latency/request/
+  response hash 均为 null，无重试或伪造。Team-A task mirror 仍遗留
+  `submitted/SUCCESS_WITH_NOTES` 元数据，与冻结根/Manager aggregate 的取消结论不一致；
+  该缺陷保留为 P1 一致性问题，DSH 收据不计入异构成功。
+- 运行后已在 DSH 容器内完成可逆工具收紧：只保留 `get_current_time`、
+  `get_token_usage` 两个 builtin，其他 filesystem/shell/browser/web/search/
+  delegation/agent-to-agent 工具关闭，仅允许一次 `testweaver-native-worker` MCP
+  调用；当前仅为运行态修正，尚未声称镜像/源码持久化。下一轮应重新用同一安全边界验证，
+  若受保护审批不可用就诚实记录 `BLOCKED/NOT_AVAILABLE`。
+- 主 capture verifier/replay 的观察矩阵仍显示 AgentLoop/OTel、PG exact authority、
+  recovery/generation/late-reject、同 Run 有效 Human resume、Skill runtime invoke/evolution
+  为 `NOT_OBSERVED`；supplemental receipt 只绑定独立 Oracle/Manager 事实，不能升级主包分类。
+
 ## 6. 实施顺序与完成条件
 
-### 2026-09-03 Hero2 之后唯一执行顺序（supersedes 下方历史批次措辞）
+### 2026-09-03 Hero3-pre 之后唯一执行顺序（supersedes 下方历史批次措辞）
 
-- Hero2 已完成并以 `PARTIAL` 封存；其四个 Manager-accepted 收据和 v14 capture/补充收据只读保留，禁止回写、重封或跨 Run 拼接成 LIVE。
-- 下一唯一动作是一轮新的、同一原生拓扑的真实纵向复跑：Human 只提交业务目标；Manager 动态选 Team/Leader；Leader 原生委派 Worker；由已部署 DSH Worker 在实际 policy prompt 出现时等待并接收一次明确的 authenticated Human approve/deny；若批准，才继续真实百炼调用、Leader 收敛、双 Oracle 与 Manager 二次决策。任何未发生项按 `NOT_OBSERVED/BLOCKED/PARTIAL` 记录。
-- 在该 Run 结束后，只用同一 `campaign_id/run_id/trace_id` 的原始事实接入 AgentLoop/OTel 回读、Skill exact invocation/evolution 和 Failure Capsule 检索/回写；不要用 Hero2 分散收据或 synthetic span 补齐。若 DSH 仍被策略阻断，先保留安全边界，转修实际暴露的最小通用根因。
+- Hero2 和 Hero3-pre 均已只读封存为 `PARTIAL`；不得回写 capture、重封或跨 Run 拼接成 LIVE。Hero3-pre supplemental overlay 仅补 role-team exact receipts，不替代 immutable capture。
+- 下一唯一动作是一轮新的、同一原生拓扑的真实纵向复跑：先在 Manager 目标发送前启动 capture；Human 只提交业务目标；Manager 动态选 Team/Leader；Leader 原生委派 Worker；已锁定 DSH Worker 仅按 allowlisted MCP 执行。若实际出现受保护审批，必须由 authenticated Human 对明确 prompt 做一次 approve/deny；批准后才继续 provider 调用、Leader 收敛、双 Oracle 和 Manager 二次决策。任何未发生项按 `NOT_OBSERVED/BLOCKED/PARTIAL` 记录。
+- 该 Run 结束后，只用同一 `campaign_id/run_id/trace_id` 原始事实接入 AgentLoop/OTel 回读、Skill exact invocation/evolution 和 Failure Capsule 检索/回写；不使用旧 Run、synthetic span 或静态 receipt 补齐。优先修复 DSH task mirror 终态一致性和真实 provider/审批链暴露的最小通用根因。
 - 真实闭环达到可复现后，再做 E0–E3 配对复跑、产品接入和离线包增量；PG HA/PITR/RAG/容量等企业硬化继续后置，不阻塞这条主链。
 
 ### 历史批次（已由 Hero2 superseded；仅供审计追溯）
