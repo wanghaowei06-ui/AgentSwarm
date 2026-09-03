@@ -213,6 +213,25 @@ class FileSync:
             return False
         raise RuntimeError(f"pull runtime config failed: {_mc_error_message(result)}")
 
+    def push_file(self, local_path: Path) -> bool:
+        """Upload one worker-owned file and return whether it changed remotely."""
+
+        local_path = Path(local_path)
+        try:
+            relative = local_path.resolve().relative_to(self.local_dir.resolve())
+        except ValueError as exc:
+            raise ValueError(f"file is outside worker storage: {local_path}") from exc
+        if not local_path.is_file():
+            return False
+
+        self.ensure_alias()
+        key = f"{self.remote_prefix}/{relative.as_posix()}"
+        if local_path.stat().st_size <= COMPARE_CONTENT_MAX_BYTES:
+            if self._cat_bytes(key) == local_path.read_bytes():
+                return False
+        self._mc("cp", str(local_path), self._object_path(key), check=True)
+        return True
+
 
 def _skip_background_push(rel: Path) -> bool:
     rel_path = rel.as_posix()

@@ -20,6 +20,7 @@ from typing import Optional
 from qwenpaw_worker.api import QwenPawApiClient, QwenPawApiError
 from qwenpaw_worker.config import WorkerConfig, _relative_storage_prefix
 from qwenpaw_worker.heartbeat import WorkerHeartbeat, run_worker_heartbeat_loop
+from qwenpaw_worker.hitl import HITL_STATE_FILE_NAME, hitl_state_path
 from qwenpaw_worker.sync import FileSync, push_loop
 from qwenpaw_worker.update import MemberRuntimeConfig, RuntimeUpdater
 
@@ -278,8 +279,36 @@ class Worker:
                 self._process.kill()
                 await self._process.wait()
                 logger.warning("qwenpaw app killed after stop timeout component=worker worker=%s", self.config.worker_name)
+        await asyncio.to_thread(self._flush_hitl_state)
         self._process = None
         logger.info("qwenpaw worker stopped component=worker worker=%s", self.config.worker_name)
+
+    def _flush_hitl_state(self) -> None:
+        """Upload the durable HITL state before a graceful worker stop."""
+
+        if self.sync is None:
+            return
+        state_path = hitl_state_path()
+        default_path = self.config.qwenpaw_working_dir / HITL_STATE_FILE_NAME
+        if state_path != default_path:
+            logger.warning(
+                "skipping HITL state flush outside worker storage component=worker path=%s",
+                state_path,
+            )
+            return
+        try:
+            if self.sync.push_file(state_path):
+                logger.info(
+                    "flushed HITL state component=worker worker=%s path=%s",
+                    self.config.worker_name,
+                    state_path,
+                )
+        except Exception as exc:
+            logger.warning(
+                "HITL state flush failed component=worker worker=%s error_type=%s",
+                self.config.worker_name,
+                type(exc).__name__,
+            )
 
     def _log_worker_stage_begin(self, stage: str, **fields: object) -> float:
         started_at = time.monotonic()

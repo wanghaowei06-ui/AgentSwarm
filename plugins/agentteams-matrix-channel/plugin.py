@@ -3,6 +3,10 @@
 
 class AgentTeamsMatrixPlugin:
     def register(self, api):
+        from qwenpaw_worker.hitl import install_qwenpaw_approval_persistence
+
+        install_qwenpaw_approval_persistence()
+
         from .agentteams_matrix.channel import AgentTeamsMatrixChannel
 
         api.register_channel(
