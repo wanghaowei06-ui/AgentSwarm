@@ -4,9 +4,22 @@
 
 本流程不使用 mock、离线回放或预录证据。大模型 API Key 只通过环境变量传入，不要写入仓库文件。
 
+## 0. 评委执行顺序
+
+评委可以按下面的顺序完成一次端到端复现：
+
+1. 克隆仓库并切换到 `competition-v1.1`，确保评测使用固定源码，而不是会继续变化的 `main`；
+2. 配置一个可联网调用的 Qwen 或 OpenAI-compatible LLM；
+3. 构建本仓库的基础镜像和 embedded 真实系统；
+4. 启动 Dashboard，并从 Element Web 登录；
+5. 执行 `make verify` 和 `make test-installed TEST_FILTER="01"`；
+6. 若要验证更高层能力，再运行完整集成测试并保存本次运行输出。
+
+源码构建、服务启动和实时模型调用是同一条复现路径。只阅读静态文档或检查历史文件，不能替代实际运行。
+
 ## 1. 版本与复现边界
 
-- 比赛快照：`competition-v1.0`
+- 比赛快照：`competition-v1.1`
 - 运行方式：源码构建 + embedded 部署
 - 核心服务：AgentTeams Controller、Higress、Tuwunel、MinIO、Element Web、Manager
 - 可选管理界面：从本仓库 `dashboard/` 源码构建的 AgentTeams Dashboard
@@ -14,6 +27,8 @@
 - 可选测试依赖：GitHub PAT，仅在运行 GitHub 集成测试时需要
 
 仓库中的 `testweaver/evidence/` 是本地运行产物，`testweaver/config/runtime.env` 是受保护的部署配置；两者都不属于干净评委环境的启动输入，也不会提交到公开快照。评委应以本次启动和测试产生的实时结果为准。
+
+公开快照保留真实 AgentTeams 源码、Dockerfile、Helm chart、安装脚本、Dashboard 源码和测试；不保留依赖目录、容器日志、运行时密钥、历史证据包或本地工作区。这样评委可以从一个干净克隆重新生成运行数据，并能明确区分源码能力与某次历史运行结果。
 
 ## 2. 环境要求
 
@@ -45,7 +60,7 @@
 ```bash
 git clone https://github.com/wanghaowei06-ui/AgentSwarm.git
 cd AgentSwarm
-git checkout competition-v1.0
+git checkout competition-v1.1
 ```
 
 请不要使用仓库上游 README 中面向正式发布版的 `curl | bash` 安装命令来复现比赛快照；该命令会获取发布镜像，而不是构建当前提交中的源码。
@@ -83,9 +98,9 @@ API Key、管理员密码和第三方服务地址都属于本地运行配置，�
 比赛版本使用统一的本地 tag，避免 Manager/Worker 误使用远程 `latest` 基础镜像：
 
 ```bash
-export VERSION=competition-v1.0
+export VERSION=competition-v1.1
 export OPENCLAW_BASE_IMAGE=agentteams/openclaw-base
-export OPENCLAW_BASE_VERSION=competition-v1.0
+export OPENCLAW_BASE_VERSION=competition-v1.1
 
 # 先构建本仓库中的 OpenClaw 基础镜像
 make build-openclaw-base
@@ -105,8 +120,8 @@ Dashboard 与主系统分开构建，但使用同一份源码快照：
 
 ```bash
 export DASHBOARD_CONTEXT=dashboard
-export DASHBOARD_VERSION=competition-v1.0
-export DASHBOARD_IMAGE=agentteams/agentteams-dashboard:competition-v1.0
+export DASHBOARD_VERSION=competition-v1.1
+export DASHBOARD_IMAGE=agentteams/agentteams-dashboard:competition-v1.1
 
 make build-dashboard
 make install-dashboard
@@ -163,6 +178,20 @@ npm run build
 cd ..
 ```
 
+### 7.1 评委应保存的验证结果
+
+为了让结果可复核，建议至少保存以下命令的完整终端输出，并记录执行时间、源码 commit、LLM provider/model 和 Docker 版本：
+
+```bash
+git rev-parse HEAD
+docker version
+docker compose version
+make verify
+make test-installed TEST_FILTER="01"
+```
+
+如果运行了 Worker 创建、任务分派、人工干预或 GitHub 集成测试，还应同时保存对应 Matrix 房间结果、容器状态和测试命令输出；不要只保存截图或手工描述。
+
 ## 8. 清理环境
 
 评委完成验证后，可以删除本次安装的容器、网络、卷和工作区：
@@ -206,7 +235,7 @@ make wait-ready-embedded
 先确认 `agentteams-controller` 已运行，再确认 Dashboard 使用了本地构建的 `DASHBOARD_IMAGE`：
 
 ```bash
-docker image inspect agentteams/agentteams-dashboard:competition-v1.0
+docker image inspect agentteams/agentteams-dashboard:competition-v1.1
 docker logs agentteams-dashboard
 ```
 
