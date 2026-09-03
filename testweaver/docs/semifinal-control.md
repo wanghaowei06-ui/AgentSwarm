@@ -194,10 +194,10 @@ TestWeaver 只做产品差异：
   verifier/replay 均通过，主包分类仍为 `PARTIAL`。
 - supplemental role-receipt overlay 为
   `openworker-pr161-hero4-20260903T071124Z-receipts-v1.zip`，SHA-256
-  `a60ed8b0f196183df546512b52f70d72ea317a3f828206c1812b4a1a5000c654`；它只绑定
+  `31f42a35278d3573b2e4fcb9231b1e107b48162f348a2d0cc27a3f7dfa043df2`；它只绑定
   角色存储中的结果哈希，不替代 immutable capture，也不升级 `LIVE_AGENTTEAMS_HERO`。
   累积索引 `semifinal-offline-package-index-v1.zip` 的 SHA-256 为
-  `11ba665efff1fb09bf00b9546ba50ae303e93b995fb703f1c89091ea1f4d0d81`，同时收录
+  `0d0ac1fca82bd8d2a6edd15ce56e95037bfc01c76e8dec241228c99ab1957397`，同时收录
   Hero2、Hero3-pre 和 Hero4 的主包/补充包及回放哈希。
 - capture 观察到 Manager 向双 Team/Leader 的原生 dispatch 与普通 Worker 运行；
   P1 analysis、P2 independent review、Outcome Oracle 和 Boundary Oracle 的同 Run
