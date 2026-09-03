@@ -1,0 +1,55 @@
+{
+  "schema_version": "testweaver.hero-assessment/v1",
+  "assessed_at": "2026-09-03T07:20:00+08:00",
+  "authority_scope": {
+    "campaign_id": "testweaver-semifinal-hero-20260902T221938Z",
+    "run_id": "openworker-pr161-hero-20260902T221938Z",
+    "trace_id": "368ccf9f8c4c40f916eb3c14a6a01940"
+  },
+  "classification": "PARTIAL",
+  "live_agentteams_hero": false,
+  "sealed_capture": {
+    "path": "../openworker-pr161-hero-20260902T221938Z",
+    "manifest_sha256": "def55dd438223e337883645f0648f939408a57b59631d0567f4b9079dff69541",
+    "sha256sums_sha256": "9758582d7d347fd4db956df078673860f1bee1d5d91425a2045292063f001092",
+    "latest_snapshot": "snapshots/20260902T231209554519532Z",
+    "latest_tasks_sha256": "0086e013ee13986acccf4004cf14d253afcff40d1fa2db99811f983db73f8869"
+  },
+  "observed": [
+    "Manager made a real provider-backed first choice and selected the exploration Team/Leader",
+    "the exploration Leader created a native Project/DAG and delegated a QwenPaw Worker plus a DSH Worker",
+    "the QwenPaw Worker used real model and tool calls, reproduced four public defects, and validated a minimal general fix",
+    "the exploration Leader accepted and froze a content-addressed evidence root",
+    "Manager read the new evidence and made a second dynamic decision that selected the convergence Team and two independent Oracle tasks",
+    "the convergence Worker, Outcome Oracle, and Boundary Oracle were registered to distinct Matrix identities and containers, and task facts record worker-role submissions",
+    "the Boundary Oracle independently checked the Gold-free boundary",
+    "high-risk cleanup attempts naturally triggered QwenPaw approval pauses"
+  ],
+  "failed_or_incomplete": [
+    "the DSH Worker was dispatched but both protected Bailian executions timed out awaiting Human approval, so no provider result, usage, or latency was produced",
+    "stale QwenPaw channel ACL state prevented an effective authenticated Human decision; the sealed capture contains no exact authenticated decision",
+    "the DSH result body truthfully reported BLOCKED while taskflow metadata recorded SUCCESS because submit_task did not preserve the structured result status",
+    "overlapping QwenPaw workspace/channel instances processed one Matrix event twice, causing duplicate model turns and last-writer-wins task updates",
+    "the exploration Leader exceeded its 131072-token context during closeout",
+    "the Outcome Oracle was incorrectly delegated a Gold-free task and therefore did not consume its isolated private Gold or call the required private outcome verifier",
+    "no approved recoverable Worker generation takeover or late-result rejection occurred",
+    "no Manager final aggregate after all Phase 2/3 results was present in the sealed capture"
+  ],
+  "not_observed": [
+    "effective same-capture HITL decision",
+    "runtime-verifiable domain Skill invocation",
+    "PostgreSQL exact same-run authority tuple",
+    "AgentLoop or authoritative SLS same-run trace readback",
+    "Nacos Skill proposal, Human decision, canary, and same-dataset reevaluation",
+    "same-run Failure Capsule retrieval before a rerun"
+  ],
+  "minimal_next_fixes": [
+    "make taskflow.submit_task require and preserve an explicit structured result status",
+    "deduplicate Matrix ingestion atomically by room_id and event_id across overlapping channel instances",
+    "keep nativeadmin as the exact allowlisted external Human identity for every existing Hero actor",
+    "separate candidate and Boundary Gold prohibition from the Outcome Oracle private-Gold mandate",
+    "start the next Hero in fresh task rooms with bounded evidence reads and no inherited closeout context",
+    "approve or deny each next-run tool request explicitly while it is pending"
+  ],
+  "redline_statement": "This run is not a LIVE_AGENTTEAMS_HERO. Static receipts, old runs, and post-capture actions must not be used to fill its missing gates."
+}
