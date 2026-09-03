@@ -237,6 +237,11 @@ def _select_files(root: Path, latest: str) -> dict[str, list[str]]:
     # proving that a skill was installed.
     invocation = f"{latest}/skill-invocations.jsonl"
     if _source_path(root, invocation).is_file():
+        # ``default`` is a capture sentinel for an actor with no runtime
+        # session. It must not downgrade a real actor invocation to
+        # NOT_OBSERVED when the invoked actor's inventory is present.
+        default_prefix = f"{latest}/skills/default/"
+        skill = [path for path in skill if not path.startswith(default_prefix)]
         skill.append(invocation)
     selected = {
         "matrix_exact": matrix,
