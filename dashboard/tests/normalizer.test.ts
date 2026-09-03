@@ -203,11 +203,34 @@ describe("normalizeMatrixEvent", () => {
       type: "m.room.message",
       content: {
         msgtype: "m.text",
-        body: "No high-risk side effects are pending; nothing requires your approval yet. If a security-approval denial occurs, record BLOCKED honestly.",
+        body: "No high-risk side effects are pending; nothing requires your approval yet. In the spec, if it hits a security-approval denial, pause honestly; actual执行时若 driver 需要审批被拒，记录 BLOCKED 后继续。",
       },
     });
 
     expect(event.detail).not.toHaveProperty("evidenceCategory", "approval");
+  });
+
+  it("classifies an Agent waiting on a human decision as pending approval", () => {
+    const event = normalizeMatrixEvent({
+      event_id: "$approval-pending-1",
+      room_id: "!room:matrix.local",
+      sender: "@worker-a:matrix.local",
+      origin_server_ts: 1760000001875,
+      type: "m.room.message",
+      content: {
+        msgtype: "m.text",
+        body: "Worker is paused awaiting human approval before the protected operation.",
+      },
+    });
+
+    expect(event).toMatchObject({
+      detail: {
+        evidenceCategory: "approval",
+        approvalState: "pending",
+        status: "waiting",
+        approvalActor: "agent",
+      },
+    });
   });
 
   it("classifies explicit failure text as exception evidence", () => {
@@ -247,6 +270,24 @@ describe("normalizeMatrixEvent", () => {
       summary: "teamharness-roomflow · observed",
       detail: { name: "teamharness-roomflow", invocationFormat: "matrix-markdown" },
     });
+  });
+
+  it("removes stale derived approval labels from a historical policy message", () => {
+    const event = reclassifyStoredEvent({
+      id: "matrix:$stale-approval",
+      source: "matrix",
+      kind: "message",
+      occurredAt: "2026-09-02T10:00:00.000Z",
+      roomId: "!room:matrix.local",
+      actor: { id: "@manager:matrix.local", label: "manager", role: "manager" },
+      summary: "Nothing requires your approval yet; the task remains pending while policy is recorded.",
+      detail: { msgtype: "m.text", evidenceCategory: "approval", approvalState: "pending", status: "waiting" },
+      sourceRef: { eventId: "$stale-approval" },
+    });
+
+    expect(event.detail).not.toHaveProperty("evidenceCategory");
+    expect(event.detail).not.toHaveProperty("approvalState");
+    expect(event.detail).not.toHaveProperty("status");
   });
 
   it("keeps an ordinary Matrix message as a user-visible message", () => {

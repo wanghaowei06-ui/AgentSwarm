@@ -184,14 +184,18 @@ const textStatus = (text: string): string | undefined => {
   return undefined;
 };
 
-const hasExplicitApprovalDecision = (text: string): boolean =>
-  /(?:human.?approved|approved by human|human approval\s+(?:granted|approved)|人工(?:已)?批准|我仅授权|一次性\s*Human\s*审批|\/approve\b|\bapprove(?:d)?\s+(?:this|the|one|a)\b)/i.test(text)
-  || /(?:human|人工).{0,24}(?:deny|denied|拒绝)/i.test(text);
+const hasExplicitApprovalDecision = (text: string, actor?: AgentTeamsEvent["actor"]): boolean =>
+  (actor?.role === "human" && /(?:我\s*(?:仅)?授权|我\s*(?:批准|同意)|一次性\s*Human\s*审批|\/approve\b)/i.test(text))
+  || /(?:human|人工)\s*(?:approval\s*)?(?:was\s*)?(?:approved|granted|批准|同意|denied|rejected|拒绝)/i.test(text)
+  || /(?:approval|审批)\s*(?:was\s*)?(?:approved|granted|批准|同意|denied|rejected|拒绝)/i.test(text)
+  || /approved by human/i.test(text);
 
 const classifyApproval = (text: string, actor?: AgentTeamsEvent["actor"]): TextClassification | undefined => {
   const normalized = text.replace(/\s+/g, " ").trim();
-  const rejected = /(?:human.?denied|denied by human|human approval\s+(?:denied|rejected)|人工(?:已)?拒绝|\/deny\b|\bdeny\b)/i.test(normalized);
-  if (hasExplicitApprovalDecision(normalized)) {
+  const rejected = /(?:human|人工)\s*(?:approval\s*)?(?:was\s*)?(?:denied|rejected|拒绝)/i.test(normalized)
+    || /(?:approval|审批)\s*(?:was\s*)?(?:denied|rejected|拒绝)/i.test(normalized)
+    || (actor?.role === "human" && /\/deny\b/i.test(normalized));
+  if (hasExplicitApprovalDecision(normalized, actor)) {
     return {
       evidenceCategory: "approval",
       approvalState: rejected ? "rejected" : "approved",
@@ -199,10 +203,12 @@ const classifyApproval = (text: string, actor?: AgentTeamsEvent["actor"]): TextC
     };
   }
 
+  const pending = /\b(?:awaiting|waiting for|requires?|needs?)\s+(?:a\s+)?(?:human|manual)\s+approval\b/i.test(normalized)
+    || /\b(?:human|manual)\s+approval\s+(?:is\s+)?(?:pending|required|needed)\b/i.test(normalized)
+    || /\bpending\s+(?:a\s+)?approval(?:\s+from\s+(?:a\s+)?human)?\b/i.test(normalized)
+    || /(?:需要|等待|暂停(?:等待)?|待)\s*(?:人工|人类)?\s*(?:审批|批准|决定)/.test(normalized);
   const conditional = /(?:^|\s)(?:if|when)\b/i.test(normalized)
     || /(?:^|[\s，：:])(?:若|如果|如)/.test(normalized);
-  const pending = /(?:waiting|awaiting|pending|需要|等待|暂停).{0,48}(?:human|人工)?\s*(?:approval|approve|deny|审批|批准|决定)/i.test(normalized)
-    || /(?:approval|审批).{0,48}(?:pending|waiting|等待)/i.test(normalized);
   if (pending && !conditional) {
     return {
       evidenceCategory: "approval",
@@ -560,14 +566,17 @@ export const reclassifyStoredEvent = (event: AgentTeamsEvent): AgentTeamsEvent =
   }
 
   const classification = classifyMatrixMessage(event.summary, actor);
-  if (!classification && actor?.role === event.actor?.role) {
+  const detail = { ...(event.detail || {}) };
+  for (const key of ["evidenceCategory", "status", "approvalState", "approvalActor"]) {
+    delete detail[key];
+  }
+  const detailChanged = JSON.stringify(detail) !== JSON.stringify(event.detail || {});
+  if (!classification && actor?.role === event.actor?.role && !detailChanged) {
     return event;
   }
   return {
     ...event,
     actor,
-    ...(classification
-      ? { detail: { ...(event.detail || {}), ...classificationDetail(classification) } }
-      : {}),
+    detail: classification ? { ...detail, ...classificationDetail(classification) } : detail,
   };
 };
