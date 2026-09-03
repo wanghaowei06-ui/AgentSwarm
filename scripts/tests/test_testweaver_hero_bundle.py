@@ -185,6 +185,27 @@ class HeroBundleTests(unittest.TestCase):
             self.assertEqual(manifest["observations"]["oracle_boundary"]["status"], "NOT_OBSERVED")
             self.assertEqual(manifest["observations"]["agentloop"]["status"], "NOT_OBSERVED")
 
+    def test_runtime_skill_invocation_is_packaged_with_skill_inventory(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            evidence = _fixture(root)
+            snapshot = evidence / "snapshots" / "20260903T010203Z"
+            _write(
+                snapshot / "skill-invocations.jsonl",
+                json.dumps({"authority_scope": SCOPE, "record_hash": HASH_A, "skill": {"name": "evidence"}})
+                + "\n",
+            )
+            _seal(evidence)
+            output = root / "skill.zip"
+            bundle.build_hero_bundle(evidence, output, source_commit="abc123")
+            with zipfile.ZipFile(output) as archive:
+                manifest = json.loads(archive.read("manifest.json"))
+            self.assertEqual(manifest["observations"]["skill"]["status"], "OBSERVED")
+            self.assertIn(
+                "source/snapshots/20260903T010203Z/skill-invocations.jsonl",
+                manifest["observations"]["skill"]["refs"],
+            )
+
     def test_unfinished_or_hash_changed_source_is_blocked_without_output(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

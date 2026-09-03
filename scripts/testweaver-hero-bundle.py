@@ -230,6 +230,14 @@ def _select_files(root: Path, latest: str) -> dict[str, list[str]]:
     )
     provider = [f"{latest}/manager-choice-readback.json"]
     provider.extend(_files_below(root, f"{latest}/sessions"))
+    skill = _files_below(root, f"{latest}/skills")
+    # The capture stores the exact, body-free invocation ledger beside the
+    # snapshot's skill inventory. Include it in the allowlist so a sealed
+    # offline bundle can prove an actual runtime invocation rather than only
+    # proving that a skill was installed.
+    invocation = f"{latest}/skill-invocations.jsonl"
+    if _source_path(root, invocation).is_file():
+        skill.append(invocation)
     selected = {
         "matrix_exact": matrix,
         "agentteams_task": [item for item in task_candidates if _source_path(root, item).is_file()],
@@ -239,7 +247,7 @@ def _select_files(root: Path, latest: str) -> dict[str, list[str]]:
             for item in (f"{latest}/pg-tw-row-hashes.jsonl",)
             if _source_path(root, item).is_file()
         ],
-        "skill": _files_below(root, f"{latest}/skills"),
+        "skill": skill,
     }
     for category, relative in _FACT_DIRECTORIES.items():
         selected[category] = _files_below(root, relative)
