@@ -35,11 +35,21 @@ docker run --rm -p 3000:3000 \
   agentteams-dashboard:local
 ```
 
-`/app/db/state.json` 保存事件游标、有限长度事件投影和最近 Controller snapshot。生产环境应挂载持久卷，避免重启后重新 hydration 全部 room history。
+`/app/db/state.json` 保存事件游标、有限长度事件投影、Dashboard 项目房间记录和最近 Controller snapshot。生产环境应挂载持久卷，避免重启后重新 hydration 全部 room history。项目记录只在真实 Matrix `createRoom` 返回 room ID 后逐步写入；多房间创建失败会保留已创建的真实 room，并标记为 `failed`。
 
 ## 数据路径
 
-- `GET /api/workspace`：返回 Manager conversations、关联 rooms、runs、attention、sync 和 Controller 状态。
+- `GET /api/workspace`：返回原生 Manager conversations、Dashboard projects、可邀请的真实 Manager/Leader/Worker participants、关联 rooms、runs、attention、sync 和 Controller 状态。
+- `POST /api/projects`：创建 Dashboard 项目空间或复用 Manager 私聊。请求体只能是以下两种真实操作：
+
+  ```json
+  { "kind": "manager-dm" }
+  { "kind": "project", "name": "材料核验", "roomNames": ["主讨论", "交付"], "inviteUserIds": ["@worker:example.test"] }
+  ```
+
+  Manager 和邀请对象由服务端从当前 Controller 快照校验；服务端随后调用 Matrix `createRoom`，浏览器不会接触任何 Matrix 或 Controller 凭证。
+- `GET /api/projects/:projectId`：返回项目已持久化真实 room 的聊天、Agent 协作、Skill/工具调用、异常证据、产物和 sync 状态。
+- `POST /api/projects/:projectId/messages`：将消息发送到该项目真实 Manager room；只有 `active` 项目可以发送。
 - `GET /api/conversations/:conversationId`：返回一次 Manager 对话的消息、Agent 协作、Skill/工具调用、异常证据、产物和关联 rooms。
 - `POST /api/conversations/:conversationId/messages`：将用户消息写入该对话的 Manager primary Matrix room。
 - `GET /api/runs/:runId`：返回单个 run 的聊天消息、完整 observation timeline、workflow、artifact 和 attention。
