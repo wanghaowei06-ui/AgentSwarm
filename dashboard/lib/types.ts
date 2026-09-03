@@ -95,6 +95,13 @@ export type DashboardProject = {
   error?: string;
 };
 
+export type WorkspaceParticipant = {
+  userId: string;
+  name: string;
+  role: "manager" | "leader" | "worker";
+  displayName?: string;
+};
+
 export type ConversationSource = "controller" | "dashboard-project";
 
 export type ConversationRoomRole = "manager" | "team" | "leader" | "worker" | "project";
@@ -177,6 +184,7 @@ export type WorkspaceProjection = {
 
 export type WorkspaceSnapshot = WorkspaceProjection & {
   projects: ConversationSummary[];
+  participants: WorkspaceParticipant[];
   generatedAt: string;
   controller: {
     state: "live" | "unavailable";
