@@ -2,7 +2,7 @@
 
 更新时间：2026-09-03（Asia/Shanghai）
 
-状态：`M2-G_CURRENT_HERO_PARTIAL_SEALED / GOLDEN_HERO_MINIMAL_FIX_BATCH / QWENPAW_IMAGE_BUILT_NOT_DEPLOYED / M0-M1_NATIVE_CHAIN_PASS`
+状态：`M2-G_CURRENT_HERO_PARTIAL_SEALED / GOLDEN_HERO_MINIMAL_FIX_BATCH / QWENPAW_DSH_DEPLOYED_PREHERO / M0-M1_NATIVE_CHAIN_PASS`
 
 唯一当前里程碑：首轮完整 Hero 已封存为诚实 `PARTIAL`，证明了真实 Manager 两次动态决策、原生双 Team/Leader/Worker、证据根和两个独立 Oracle，但未闭合 DSH→百炼、有效 Human 决定、私有 Gold、恢复、Skill、PG 与 AgentLoop。当前只完成本轮暴露的最小通用修复批次（Taskflow 结构化终态、Matrix event_id 幂等、唯一 Human ACL、Outcome 私有 Gold 角色边界和 fresh-room 上下文约束），构建/部署一次后立即运行新的 Golden Hero；不新增 Gate、协调器或案例特例。
 
@@ -129,6 +129,7 @@ TestWeaver 只做产品差异：
 - 当前 Manager/Leader/Worker 容器未注入 `OTEL_*`/LoongSuite 自动探针环境。首个 Hero 允许把真实 provider/session/Task 原始事实转换为标准 OTel GenAI span并经现有 Collector 写入云端，但只能称 `PROJECTED_LIVE_TRACE`；只有自动探针原始 span 与同 Run 云端回读同时成立才称 `NATIVE_LIVE_TRACE`。这不阻塞 AgentTeams 纵向闭环，但材料必须如实区分。
 - 独立运行期复核确认 TeamHarness MCP 当前信任调用者自报 `role`，普通 Worker/Oracle 在能力上可冒充 Leader 调用部分管理动作。首个 Hero 可继续，但必须登记 `P1_SECURITY_GAP / LEAST_PRIVILEGE_NOT_ENFORCED`，保存 Oracle 未调用管理工具及 Leader 实际验收的原始证据，且不得宣称强 RBAC；闭环后在 AgentTeams TeamHarness 单点以运行时身份和 action allowlist 修复，禁止另造 TestWeaver 权限层。
 - 产品展示线 `6f6af80` 已加入只读 workspace dashboard 与真实 Matrix/Controller adapter；它不生成 mock 运行数据，也不修改 AgentTeams 核心。前端 `npm test`（45 项）、`typecheck`、`lint` 和生产 `build` 均通过；尚未绑定线上部署，不能把页面可用性写成 Hero 运行证据。
+- 2026-09-03 已按官方 `agt update worker --name native-m0-clean-dsh-worker --image agentteams/qwenpaw-worker:m1plus-6c24fb1-dsh-v4` 完成可回滚的 DSH Worker 预部署：旧镜像 digest `sha256:530ad2d39e2b5ca005fca63c59e31b676f04fa7a72eb6b9b7d058ca3725df9fb`，新镜像 digest `sha256:70e893617c0f4c0d5aa8571b80ac548522b8b1bb88a8ad09f84592071e02c7c3`，容器 `785c02c9c6b0` 运行中；`/api/version` 返回 `2.0.1`，worker provenance 以 `root:root 0444` 回读且 SHA-256 与锁定值一致。此次没有发送任务或调用模型，不能回填旧 Hero；必要时可用旧 digest 做单 Worker 回滚。下一步是拓扑/身份复核后启动新的真实 Hero。
 - 首轮完整 Hero `openworker-pr161-hero-20260902T221938Z` 已停止采集并通过全量 `SHA256SUMS` 校验，独立评估固定为 `PARTIAL`，不得补写为 PASS。真实观察到 Manager 首次选探索 Team、探索 Leader 原生 DAG/双 Worker 委派、QwenPaw 模型/工具执行、证据根冻结、Manager 基于新证据二次选路、收敛 Team 复核以及两个独立 Oracle 任务/进程。未闭合项为：DSH→百炼因审批超时未到 provider；旧 ACL 拦截第一次 Human 决定；DSH 正文 `BLOCKED` 与 Taskflow metadata `SUCCESS` 冲突；重叠 QwenPaw channel 对同一 Matrix event 重复入队；探索 Leader closeout `CONTEXT_UNFIT`；Outcome 被错误下发 Gold-free 约束而未用隔离私有 Gold；恢复、Skill invoke、PG tuple 与 AgentLoop 同 Run 回读未观察。封存根位于 `testweaver/evidence/hero/openworker-pr161-hero-20260902T221938Z/`，外部评估位于 `testweaver/evidence/hero/assessments/openworker-pr161-hero-20260902T221938Z.json`。
 - 唯一外部 Human `@nativeadmin:matrix-native-m0-20260901.agentteams.local:28080` 已通过 QwenPaw ACL API 精确加入当前七个 Hero Worker/Leader 并逐个回读为 true；随后一次自然触发的高风险清理请求已由该身份在 Matrix 中实时 `DENY`，pending 数回到 0，证明身份通路已修复。该动作发生在首轮 capture STOP 边界之后，只是下一轮预检证据，不能回填首轮 HITL。
 
