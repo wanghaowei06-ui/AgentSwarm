@@ -208,6 +208,23 @@ describe("normalizeMatrixEvent", () => {
     });
 
     expect(event.detail).not.toHaveProperty("evidenceCategory", "approval");
+    expect(event.detail).not.toHaveProperty("evidenceCategory", "exception");
+  });
+
+  it("does not classify a conditional BLOCKED branch in a progress note as an exception", () => {
+    const event = normalizeMatrixEvent({
+      event_id: "$exception-policy-1",
+      room_id: "!room:matrix.local",
+      sender: "@leader-a:matrix.local",
+      origin_server_ts: 1760000001925,
+      type: "m.room.message",
+      content: {
+        msgtype: "m.text",
+        body: "The worker will continue; if the provider fails, record BLOCKED/NOT_AVAILABLE and do not retry.",
+      },
+    });
+
+    expect(event.detail).not.toHaveProperty("evidenceCategory", "exception");
   });
 
   it("classifies an Agent waiting on a human decision as pending approval", () => {

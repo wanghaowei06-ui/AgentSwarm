@@ -498,6 +498,7 @@ textarea:focus-visible {
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--line);
+  background: linear-gradient(90deg, rgba(112, 211, 198, 0.1), var(--canvas-raised) 72%);
   clip-path: inset(0 calc(100% - 48px) 0 0);
 }
 
@@ -619,6 +620,7 @@ textarea:focus-visible {
   overflow: auto;
   overscroll-behavior: contain;
   border-left: 1px solid var(--line);
+  background: linear-gradient(270deg, rgba(244, 120, 88, 0.08), var(--canvas-raised) 72%);
   clip-path: inset(0 0 0 calc(100% - 48px));
 }
 
@@ -2054,9 +2056,13 @@ textarea:focus-visible {
 }
 
 .attention-copy strong {
+  display: -webkit-box;
+  overflow: hidden;
   color: var(--ink);
   font-size: 11px;
   line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .attention-copy span {
@@ -2087,6 +2093,17 @@ textarea:focus-visible {
   border-color: rgba(238, 124, 124, 0.32);
   border-left-color: var(--red);
   background: rgba(43, 28, 32, 0.72);
+}
+
+.approval-item > strong {
+  display: -webkit-box;
+  overflow: hidden;
+  margin-top: 8px;
+  color: var(--ink);
+  font-size: 11px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .flow-shell {

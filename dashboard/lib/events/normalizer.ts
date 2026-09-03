@@ -221,8 +221,15 @@ const classifyApproval = (text: string, actor?: AgentTeamsEvent["actor"]): TextC
 };
 
 const classifyException = (text: string): TextClassification | undefined => {
-  const explicit = /⚠️|❌|billing error|command failed|provider returned .*error|not[_ -]?available|unavailable|timed out|timeout|exception|\bblocked\b|\bfailed\b|失败|错误|异常|阻断|不可用|超时/i.test(text);
-  if (!explicit) {
+  const strong = /⚠️|❌|billing error|command failed|provider returned .*error|\b(?:access|permission) denied\b|permission denied|exception occurred|error\s*[:：]/i.test(text);
+  const direct = strong
+    || /\b(?:status|state|result|branch|node|operation|request|command|task|call)\b.{0,18}\b(?:failed|blocked|not[_ -]?available|unavailable|timed out|timeout|error)\b/i.test(text)
+    || /(?:record(?:ed)?|mark(?:ed)?|记为|标记为).{0,20}(?:BLOCKED|NOT[_ -]?AVAILABLE|失败|阻断|不可用)/i.test(text)
+    || /(?:执行|调用|请求|命令|操作|任务|分支|节点|安全).{0,12}(?:失败|错误|异常|阻断|不可用|超时)/i.test(text)
+    || /(?:没有访问.*权限|权限不足|无权访问)/i.test(text);
+  const conditional = /\b(?:if|when|unless)\b[^.!?\n]{0,120}(?:fail(?:s|ed)?|blocked|denial|denied|error|unavailable|not[_ -]?available)/i.test(text)
+    || /(?:若|如果|假如|一旦)[^。！？\n]{0,120}(?:失败|错误|阻断|不可用|被拒|审批)/i.test(text);
+  if (!direct || (conditional && !strong)) {
     return undefined;
   }
   return {

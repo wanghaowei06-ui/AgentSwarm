@@ -13,6 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import type {
+  AgentTeamsEvent,
   AttentionItem,
   ConversationDetail,
   ConversationRoom,
@@ -24,6 +25,7 @@ import type {
 import {
   approvalState,
   eventEvidenceCategory,
+  isPhaseReport,
   latestPhaseReports,
   phaseReportInfo,
   isPriorityEvidence,
@@ -142,11 +144,21 @@ export function ActivityRail({ snapshot, conversation, detail, refreshing, onRef
     .filter((event) => eventEvidenceCategory(event) === "approval")
     .sort((left, right) => right.occurredAt.localeCompare(left.occurredAt));
   const approvalSourceIds = new Set(approvalEvidence.flatMap((event) => [event.id, event.sourceRef.eventId].filter((value): value is string => Boolean(value))));
-  const exceptionAttention = attention.filter((item) => !item.sourceEventId || !approvalSourceIds.has(item.sourceEventId));
-  const priorityEvidence = [...evidence]
-    .filter((event) => eventEvidenceCategory(event) !== "approval")
+  const exceptionEvidenceIds = new Set(events
+    .filter((event) => eventEvidenceCategory(event) === "exception" && !isPhaseReport(event))
+    .flatMap((event) => [event.id, event.sourceRef.eventId].filter((value): value is string => Boolean(value))));
+  const exceptionAttention = attention.filter((item) =>
+    !item.sourceEventId || (!approvalSourceIds.has(item.sourceEventId) && exceptionEvidenceIds.has(item.sourceEventId)));
+  const recentEvidence = (category: EvidenceCategory): AgentTeamsEvent[] => evidence
+    .filter((event) => eventEvidenceCategory(event) === category && !isPhaseReport(event))
     .sort((left, right) => right.occurredAt.localeCompare(left.occurredAt))
-    .slice(0, 6);
+    .slice(0, 2);
+  const priorityEvidence = [
+    ...recentEvidence("collaboration"),
+    ...recentEvidence("skill"),
+    ...recentEvidence("exception"),
+    ...recentEvidence("tool"),
+  ].sort((left, right) => right.occurredAt.localeCompare(left.occurredAt));
   const messages = summary?.messageCount ?? events.filter((event) => event.kind === "message").length;
   const tools = summary?.toolCount ?? events.filter((event) => event.kind === "tool").length;
   const skills = summary?.skillCount ?? events.filter((event) => event.kind === "skill").length;
