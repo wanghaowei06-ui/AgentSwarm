@@ -3,6 +3,8 @@ set -euo pipefail
 
 readonly TESTWEAVER_NODE_RUNTIME_VERSION="v22.23.1"
 readonly TESTWEAVER_NODE_RUNTIME_SHA256="93956de2e59480474a7b46571da1651180b1a050cdf32641ebec4ce6e478e068"
+readonly TESTWEAVER_QWENPAW_WORKER_BLOB="214b2649c5be8184772e383dfc5c37d29a1cb5fc"
+readonly TESTWEAVER_QWENPAW_WORKER_SHA256="f06e91c6b424e3e8ecc43248d6fd84ef2082077286241059f5d5bc4fd1533a7d"
 
 preflight_node_runtime() {
   local executable="$1"
@@ -52,6 +54,9 @@ main() {
   local build_context
   local dsh_stage
   local dsh_hash
+  local qwenpaw_worker_source
+  local qwenpaw_worker_blob
+  local qwenpaw_worker_sha256
 
   adapter_root="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
   repo_root="$(CDPATH= cd -- "${adapter_root}/../.." && pwd)"
@@ -69,7 +74,18 @@ main() {
   test -d "${TESTWEAVER_DSH_SOURCE_DIR}"
   test -f "${TESTWEAVER_DSH_LOCKFILE}"
   test -f "${TESTWEAVER_DSH_PROVENANCE}"
-  test -d "${repo_root}/qwenpaw/src/qwenpaw_worker"
+  qwenpaw_worker_source="${repo_root}/qwenpaw/src/qwenpaw_worker/worker.py"
+  if [ ! -f "${qwenpaw_worker_source}" ] || [ -L "${qwenpaw_worker_source}" ]; then
+    echo "QwenPaw worker source must be a tracked regular non-symlink file" >&2
+    exit 2
+  fi
+  qwenpaw_worker_blob="$(git -C "${repo_root}" hash-object -- "${qwenpaw_worker_source}")"
+  qwenpaw_worker_sha256="$(sha256sum -- "${qwenpaw_worker_source}" | awk '{print $1}')"
+  if [ "${qwenpaw_worker_blob}" != "${TESTWEAVER_QWENPAW_WORKER_BLOB}" ] || \
+     [ "${qwenpaw_worker_sha256}" != "${TESTWEAVER_QWENPAW_WORKER_SHA256}" ]; then
+    echo "QwenPaw worker source does not match the locked blob/SHA256" >&2
+    exit 2
+  fi
   if [ "${CODEX_CLI_SPEC:-@openai/codex@0.152.0}" != "@openai/codex@0.152.0" ]; then
     echo "CODEX_CLI_SPEC is fixed to @openai/codex@0.152.0" >&2
     exit 2
@@ -104,12 +120,18 @@ main() {
   cp "${adapter_root}/dsh-launcher.mjs" "${build_context}/dsh-launcher.mjs"
   cp "${adapter_root}/dsh-headless-max-tokens.patch.yml" "${build_context}/dsh-headless-max-tokens.patch.yml"
   cp -a "${adapter_root}/qwenpaw-package" "${build_context}/qwenpaw-package"
-  cp -a "${repo_root}/qwenpaw/src/qwenpaw_worker" "${build_context}/qwenpaw-worker-source"
+  install -d -m 0755 "${build_context}/qwenpaw-worker-source"
+  install -m 0644 -- "${qwenpaw_worker_source}" "${build_context}/qwenpaw-worker-source/worker.py"
+  printf '%s\n' \
+    "{\"path\":\"qwenpaw/src/qwenpaw_worker/worker.py\",\"git_blob\":\"${qwenpaw_worker_blob}\",\"sha256\":\"${qwenpaw_worker_sha256}\"}" \
+    > "${build_context}/qwenpaw-worker-source.provenance.json"
 
   docker build --pull=false \
     --build-arg "QWENPAW_BASE_IMAGE=${TESTWEAVER_QWENPAW_BASE_IMAGE}" \
     --build-arg "TESTWEAVER_DSH_PACKAGE=dsh-runtime.tar.gz" \
     --build-arg "TESTWEAVER_DSH_PACKAGE_SHA256=dsh-runtime.tar.gz.sha256" \
+    --build-arg "TESTWEAVER_QWENPAW_WORKER_BLOB=${TESTWEAVER_QWENPAW_WORKER_BLOB}" \
+    --build-arg "TESTWEAVER_QWENPAW_WORKER_SHA256=${TESTWEAVER_QWENPAW_WORKER_SHA256}" \
     -f "${build_context}/Dockerfile.qwenpaw" \
     -t "${TESTWEAVER_QWENPAW_IMAGE}" \
     "${build_context}"

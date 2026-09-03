@@ -97,16 +97,24 @@ class NodeRuntimeAssetTests(unittest.TestCase):
         script = BUILD_SCRIPT.read_text(encoding="utf-8")
         dockerfile = DOCKERFILE.read_text(encoding="utf-8")
         normalized_dockerfile = " ".join(dockerfile.replace(chr(92) + "\n", " ").split())
-        self.assertIn('qwenpaw/src/qwenpaw_worker', script)
+        self.assertIn('qwenpaw/src/qwenpaw_worker/worker.py', script)
+        self.assertIn('TESTWEAVER_QWENPAW_WORKER_BLOB', script)
+        self.assertIn('TESTWEAVER_QWENPAW_WORKER_SHA256', script)
+        self.assertIn('git -C "${repo_root}" hash-object', script)
+        self.assertIn('qwenpaw-worker-source.provenance.json', script)
         self.assertIn('qwenpaw-worker-source', script)
         self.assertIn('qwenpaw-worker-source', normalized_dockerfile)
         for marker in (
-            'COPY qwenpaw-worker-source/ /tmp/qwenpaw-worker-source/',
+            'COPY qwenpaw-worker-source/worker.py /tmp/qwenpaw-worker-source/worker.py',
+            'COPY qwenpaw-worker-source.provenance.json /tmp/qwenpaw-worker-source.provenance.json',
+            'TESTWEAVER_QWENPAW_WORKER_BLOB',
+            'TESTWEAVER_QWENPAW_WORKER_SHA256',
             'site-packages/qwenpaw_worker',
             '_retry_builtin_mcp_configuration',
             'BUILTIN_MCP_READY_TIMEOUT_SECONDS',
         ):
             self.assertIn(marker, normalized_dockerfile)
+        self.assertNotIn('cp -a "${repo_root}/qwenpaw/src/qwenpaw_worker"', script)
 
 
 if __name__ == "__main__":

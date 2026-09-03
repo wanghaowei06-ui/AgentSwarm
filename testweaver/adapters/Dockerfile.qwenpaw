@@ -8,6 +8,8 @@ FROM ${QWENPAW_BASE_IMAGE}
 ARG CODEX_CLI_SPEC=@openai/codex@0.152.0
 ARG TESTWEAVER_DSH_PACKAGE=dsh-runtime.tar.gz
 ARG TESTWEAVER_DSH_PACKAGE_SHA256=dsh-runtime.tar.gz.sha256
+ARG TESTWEAVER_QWENPAW_WORKER_BLOB=214b2649c5be8184772e383dfc5c37d29a1cb5fc
+ARG TESTWEAVER_QWENPAW_WORKER_SHA256=f06e91c6b424e3e8ecc43248d6fd84ef2082077286241059f5d5bc4fd1533a7d
 
 USER root
 RUN test "${CODEX_CLI_SPEC}" = "@openai/codex@0.152.0" \
@@ -22,13 +24,20 @@ COPY qwenpaw-package/ /opt/agentteams/testweaver-native-worker/package/
 COPY dsh-launcher.mjs /opt/agentteams/testweaver-native-worker/bin/dsh-launcher.mjs
 COPY dsh-headless-max-tokens.patch.yml /opt/agentteams/testweaver-native-worker/dsh-headless-max-tokens.patch.yml
 COPY node-runtime /opt/agentteams/testweaver-native-worker/bin/node
-COPY qwenpaw-worker-source/ /tmp/qwenpaw-worker-source/
+COPY qwenpaw-worker-source/worker.py /tmp/qwenpaw-worker-source/worker.py
+COPY qwenpaw-worker-source.provenance.json /tmp/qwenpaw-worker-source.provenance.json
 COPY ${TESTWEAVER_DSH_PACKAGE} /tmp/dsh-runtime.tar.gz
 COPY ${TESTWEAVER_DSH_PACKAGE_SHA256} /tmp/dsh-runtime.tar.gz.sha256
 
 ENV PATH="/opt/agentteams/testweaver-native-worker/bin:${PATH}"
 
 RUN test -d /opt/venv/qwenpaw/lib/python3.11/site-packages/qwenpaw_worker \
+    && test -f /tmp/qwenpaw-worker-source/worker.py \
+    && test ! -L /tmp/qwenpaw-worker-source/worker.py \
+    && test "$(sha256sum /tmp/qwenpaw-worker-source/worker.py | awk '{print $1}')" = "${TESTWEAVER_QWENPAW_WORKER_SHA256}" \
+    && test -f /tmp/qwenpaw-worker-source.provenance.json \
+    && grep -Fq "${TESTWEAVER_QWENPAW_WORKER_BLOB}" /tmp/qwenpaw-worker-source.provenance.json \
+    && grep -Fq "${TESTWEAVER_QWENPAW_WORKER_SHA256}" /tmp/qwenpaw-worker-source.provenance.json \
     && cp -a /tmp/qwenpaw-worker-source/. \
         /opt/venv/qwenpaw/lib/python3.11/site-packages/qwenpaw_worker/ \
     && test -f /opt/venv/qwenpaw/lib/python3.11/site-packages/qwenpaw_worker/worker.py \
