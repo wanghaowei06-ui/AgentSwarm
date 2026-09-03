@@ -2,9 +2,9 @@
 
 更新时间：2026-09-03（Asia/Shanghai）
 
-状态：`M2-G_HERO3_PRE_NATIVE_PARTIAL_SEALED / HERO3_PRE_RECEIPTS_PACKAGED / DSH_RUNTIME_LOCKED / M0-M1_NATIVE_CHAIN_PASS`
+状态：`M2-G_HERO4_PARTIAL_SEALED / HERO4_RECEIPTS_PACKAGED / DSH_RUNTIME_LOCKED / MANAGER_BILLING_BLOCKED / M0-M1_NATIVE_CHAIN_PASS`
 
-唯一当前里程碑：Hero3-pre 已在同一真实 campaign 中完成原生 Manager→双 Team/Leader→Worker→Manager 收口，P1/P2、Outcome/Boundary 两个独立 Oracle 收据均已封存；整体仍诚实为 `PARTIAL`。DSH 真实异构尝试触发越权路径后被 authenticated Human 安全停止，provider 调用未发生，不能算异构成功。主捕获包与 supplemental receipt 已生成；下一步只用已锁定的 DSH 运行态做一轮新的自然真实复跑，不新增 Gate、协调器或案例特例。
+唯一当前里程碑：Hero4 已由只读 capture 覆盖运行前边界并封存主包与 supplemental role receipts；原生 Manager→双 Team/Leader→普通 Worker 及两条独立 Oracle 结果已出现，但 Manager 最终 aggregate 因 provider `402 Insufficient Balance` 未观察到，DSH 在真实 HITL 审批超时前未调用百炼，因此整体诚实为 `PARTIAL`，不能称 `LIVE_AGENTTEAMS_HERO`。当前不再启动新的 live run；先增量封存离线包，待 provider 额度恢复后再按同一安全边界运行下一唯一 Hero。
 
 ## 0. 今晚批量收口策略（最高优先级，覆盖后文的逐小步运行措辞）
 
@@ -86,7 +86,9 @@ TestWeaver 只做产品差异：
 
 ## 5. 当前事实
 
-- 新仓库功能基线曾为 `f2b57d4`；当前总控与 Hero3-pre 证据源提交为 `751b3d0774d9b2516b22abfa139a87ad735bcb71`，工作树在本次文档/收据提交后必须保持干净。
+- 新仓库功能基线曾为 `f2b57d4`；Hero3-pre 证据源提交为
+  `751b3d0774d9b2516b22abfa139a87ad735bcb71`，Hero4 证据源提交为
+  `9bfc7d42318b4da8f0731aa41f1596fa21f36c4a`。工作树在本次文档/收据提交后必须保持干净。
 - 原生隔离运行栈 `agentteams-native-m0-20260901-*` 已恢复真实 provider 路由；官方 M0 实际完成 Manager 两次 provider 调用、Leader 原生 TeamHarness 委派、Worker 真实模型/Skill、submit/check/accept 和 Manager 中转收口。功能闭环已通。
 - M0 功能闭环已通，但早期 replay 缺少可独立关联的跨 Actor wire payload；补采已冻结 24 条脱敏原始事件，仍诚实分类为 `PARTIAL`。不再打磨旧 Run，下一次 M1+ 直接按完整采集合同生成 canonical evidence。
 - 第一次原生双 Team M1 已结束并冻结 `testweaver/evidence/m1/m1-receipt.txt`：两 Team、两 Leader、两真实 QwenPaw Worker、结构化 Handoff、真实 DeepSeek provider run 与 Manager 最终回读均已出现；核心链路成立，整体仍为 `PARTIAL`。阻断升级的运行事实是 Manager 在 OpenClaw compaction 后重复消费同一 Human prompt，以及一次裸 Worker 名称 `m.mentions` 未唤醒第二 Worker。
@@ -178,14 +180,68 @@ TestWeaver 只做产品差异：
   recovery/generation/late-reject、同 Run 有效 Human resume、Skill runtime invoke/evolution
   为 `NOT_OBSERVED`；supplemental receipt 只绑定独立 Oracle/Manager 事实，不能升级主包分类。
 
+### Hero4 最新真实收口（2026-09-03）
+
+- 新 Run `openworker-pr161-hero4-20260903T071124Z` / campaign
+  `testweaver-pr161-hero4-20260903T071124Z` / trace
+  `hero4-pending-20260903T071124Z` 已由只读 capture 覆盖运行前边界；capture
+  `STOPPED`、checksum `FINAL`，最终快照为
+  `snapshots/20260903T075030836474524Z`。主包
+  `testweaver/evidence/bundles/openworker-pr161-hero4-20260903T071124Z-v1.zip`
+  SHA-256 为 `9b5e987b8af872ee5edd9eae3626dd650311894a704751cf425d4fb6dc439c5f`，源提交
+  `9bfc7d42318b4da8f0731aa41f1596fa21f36c4a`，独立 replay hash 为
+  `sha256:1ad0d9d6bfb242408b58e1386c3e9dddbee39c698dafea33aabce17ce36b1099`。
+  verifier/replay 均通过，主包分类仍为 `PARTIAL`。
+- supplemental role-receipt overlay 为
+  `openworker-pr161-hero4-20260903T071124Z-receipts-v1.zip`，SHA-256
+  `a60ed8b0f196183df546512b52f70d72ea317a3f828206c1812b4a1a5000c654`；它只绑定
+  角色存储中的结果哈希，不替代 immutable capture，也不升级 `LIVE_AGENTTEAMS_HERO`。
+  累积索引 `semifinal-offline-package-index-v1.zip` 的 SHA-256 为
+  `11ba665efff1fb09bf00b9546ba50ae303e93b995fb703f1c89091ea1f4d0d81`，同时收录
+  Hero2、Hero3-pre 和 Hero4 的主包/补充包及回放哈希。
+- capture 观察到 Manager 向双 Team/Leader 的原生 dispatch 与普通 Worker 运行；
+  P1 analysis、P2 independent review、Outcome Oracle 和 Boundary Oracle 的同 Run
+  role-team 结果已由 supplemental overlay 逐一绑定。P1 analysis/P2 重现 PR#161
+  vulnerable `4/9`，public fixed parity `9/9`、zero regression `5/5`；private Gold
+  修复为 `7/9`，保持 `PARTIAL`。Outcome 与 Boundary 的 Gold 隔离和独立身份配置保留，
+  但主 capture 缺少精确 task attachment，故不能把补充结果写成主包 LIVE。
+- DSH `native-m0-clean-dsh-worker` 真实到达受保护调用边界，但 HITL 审批超时，provider
+  未调用，usage/latency/request/response hash 均为 null，无重试或伪造。精确的
+  authenticated Human `PAUSE→decision→resume` 未被本 Run 观察；task 记录只报告
+  timeout，不能当作人工决定收据。DSH 不计入异构成功。
+- Manager 在 closeout 后的 provider turns 返回 `402 Insufficient Balance`，因此
+  semantic choice contract、最终 aggregate 和 Manager 二次决策保持
+  `NOT_OBSERVED`。不得用两条 closeout 请求事件或角色存储结果拼接成 Manager aggregate。
+- 本 Run 的 recovery/generation/late-result rejection、runtime Skill invoke/evolution、
+  AgentLoop/OTel/SLS 同 Run source readback 和 PostgreSQL exact authority tuple 均为
+  `NOT_OBSERVED`。Team-A P3 spec 为零字节而 global spec 非空、P1 corroboration result
+  为缺失/ghost artifact，作为 P1 一致性差异保留；P2 清理审批 timeout-cleared，未批准
+  破坏性删除。capture stop 曾等待无 timeout 的 Matrix `docker exec` 子进程，最终快照
+  仍通过全量校验，作为采集工具 P1 记录。
+
 ## 6. 实施顺序与完成条件
 
-### 2026-09-03 Hero3-pre 之后唯一执行顺序（supersedes 下方历史批次措辞）
+### 2026-09-03 Hero4 之后唯一执行顺序（supersedes 下方历史批次措辞）
 
-- Hero2 和 Hero3-pre 均已只读封存为 `PARTIAL`；不得回写 capture、重封或跨 Run 拼接成 LIVE。Hero3-pre supplemental overlay 仅补 role-team exact receipts，不替代 immutable capture。
-- 下一唯一动作是一轮新的、同一原生拓扑的真实纵向复跑：先在 Manager 目标发送前启动 capture；Human 只提交业务目标；Manager 动态选 Team/Leader；Leader 原生委派 Worker；已锁定 DSH Worker 仅按 allowlisted MCP 执行。若实际出现受保护审批，必须由 authenticated Human 对明确 prompt 做一次 approve/deny；批准后才继续 provider 调用、Leader 收敛、双 Oracle 和 Manager 二次决策。任何未发生项按 `NOT_OBSERVED/BLOCKED/PARTIAL` 记录。
-- 该 Run 结束后，只用同一 `campaign_id/run_id/trace_id` 原始事实接入 AgentLoop/OTel 回读、Skill exact invocation/evolution 和 Failure Capsule 检索/回写；不使用旧 Run、synthetic span 或静态 receipt 补齐。优先修复 DSH task mirror 终态一致性和真实 provider/审批链暴露的最小通用根因。
-- 真实闭环达到可复现后，再做 E0–E3 配对复跑、产品接入和离线包增量；PG HA/PITR/RAG/容量等企业硬化继续后置，不阻塞这条主链。
+- Hero2、Hero3-pre 和 Hero4 均已只读封存为 `PARTIAL`；不得回写 capture、重封或跨
+  Run 拼接成 LIVE。Hero4 supplemental overlay 只补 role-team exact receipts，累积索引
+  只提供传输清单，不替代任何 immutable capture。
+- 当前唯一可执行动作是离线收口：保留 Hero4 主包、补充包和
+  `semifinal-offline-package-index-v1.zip`，对每个主包执行 `verify`/`replay`，并把
+  缺失项按原始状态登记。Manager provider 当前返回 `402 Insufficient Balance`，在
+  额度恢复前不得启动新的真实 Run，也不得通过静态事件、旧收据或脚本补齐 DSH、HITL、
+  AgentLoop、Skill、PG 或恢复证据。
+- 额度恢复后，下一唯一 live Step 是从运行前启动 capture 的新自然 Hero：Human 只提交
+  业务目标；Manager 动态选 Team/Leader；Leader 原生委派；锁定 DSH 只经 allowlisted
+  MCP；若真实出现受保护审批，必须由 authenticated Human 对明确 prompt 做一次
+  approve/deny，之后才继续 provider、Leader 收敛、双 Oracle 和 Manager 二次决策。任何
+  未发生项按 `NOT_OBSERVED/BLOCKED/PARTIAL` 记录，成功 DSH 才能提升异构证据。
+- 新 Run 结束后，只用同一 `campaign_id/run_id/trace_id` 原始事实接入 AgentLoop/OTel
+  回读、Skill exact invocation/evolution 和 Failure Capsule 检索/回写；不使用旧 Run、
+  synthetic span 或静态 receipt 补齐。优先修复真实运行暴露的最小通用根因（包括 DSH
+  task mirror 终态一致性），不扩展第二编排器或新的 Gate。
+- 真实闭环达到可复现后，再做 E0–E3 配对复跑、产品接入和离线包增量；PG
+  HA/PITR/RAG/容量等企业硬化继续后置，不阻塞这条主链。
 
 ### 历史批次（已由 Hero2 superseded；仅供审计追溯）
 
