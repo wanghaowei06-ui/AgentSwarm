@@ -70,7 +70,34 @@ export type RoomSummary = {
   messageCount: number;
 };
 
-export type ConversationRoomRole = "manager" | "team" | "leader" | "worker";
+export type DashboardProjectStatus = "provisioning" | "active" | "failed";
+
+export type DashboardProjectKind = "project" | "manager-dm";
+
+export type DashboardProjectRoom = {
+  roomId: string;
+  name: string;
+  kind: "manager" | "project";
+  inviteUserIds: string[];
+  createdAt: string;
+};
+
+export type DashboardProject = {
+  id: string;
+  kind: DashboardProjectKind;
+  name: string;
+  status: DashboardProjectStatus;
+  managerUserId: string;
+  managerRoomId?: string;
+  rooms: DashboardProjectRoom[];
+  createdAt: string;
+  updatedAt: string;
+  error?: string;
+};
+
+export type ConversationSource = "controller" | "dashboard-project";
+
+export type ConversationRoomRole = "manager" | "team" | "leader" | "worker" | "project";
 
 export type ConversationRoom = RoomSummary & {
   role: ConversationRoomRole;
@@ -82,6 +109,10 @@ export type ConversationStatus = "active" | "attention" | "quiet";
 
 export type ConversationSummary = {
   id: string;
+  source: ConversationSource;
+  projectId?: string;
+  projectKind?: DashboardProjectKind;
+  projectStatus?: DashboardProjectStatus;
   title: string;
   managerName: string;
   managerUserId?: string;
@@ -145,6 +176,7 @@ export type WorkspaceProjection = {
 };
 
 export type WorkspaceSnapshot = WorkspaceProjection & {
+  projects: ConversationSummary[];
   generatedAt: string;
   controller: {
     state: "live" | "unavailable";

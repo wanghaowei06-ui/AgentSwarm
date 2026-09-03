@@ -64,6 +64,7 @@ const roomRoleLabels: Record<ConversationRoom["role"], string> = {
   team: "Team",
   leader: "Leader DM",
   worker: "Worker",
+  project: "项目房间",
 };
 
 const formatDate = (value: string): string => {

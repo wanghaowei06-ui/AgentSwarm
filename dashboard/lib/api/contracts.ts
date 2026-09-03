@@ -8,6 +8,7 @@ export const buildWorkspaceSnapshot = (snapshot: EventStoreSnapshot): WorkspaceS
   const projection = projectWorkspace(snapshot.events, snapshot.controller?.data);
   return {
     ...projection,
+    projects: [],
     generatedAt: new Date().toISOString(),
     controller: snapshot.controller
       ? {

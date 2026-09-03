@@ -99,6 +99,7 @@ const roomRoleLabels: Record<ConversationDetail["rooms"][number]["role"], string
   team: "Team",
   leader: "Leader DM",
   worker: "Worker",
+  project: "项目房间",
 };
 
 const roomLabel = (

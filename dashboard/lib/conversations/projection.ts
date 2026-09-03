@@ -10,6 +10,7 @@ import type {
   RoomSummary,
 } from "../types";
 import { eventEvidenceCategory, isCentralConversationEvent, isPriorityEvidence } from "../events/evidence";
+import { compactInboxPreview } from "../inbox/preview";
 
 export type ConversationProjection = {
   conversations: ConversationSummary[];
@@ -223,12 +224,15 @@ const conversationSummary = (
   );
   return {
     id: `manager:${managerName}`,
+    source: "controller",
     title: "Manager 对话",
     managerName: managerDisplayName,
     managerUserId: stringValue(manager.matrixUserID) || stringValue(manager.matrixUserId) || undefined,
     managerRoomId,
-    summary: latestConversationEvent?.summary
-      || (latest ? "最新执行进度已移到右侧证据栏" : "等待新的 Manager 会话事件"),
+    summary: compactInboxPreview(
+      events,
+      latest ? "最新执行进度已移到右侧证据栏" : "等待新的 Manager 会话事件",
+    ),
     status,
     latestAt: latest?.occurredAt || "",
     eventCount: events.length,
