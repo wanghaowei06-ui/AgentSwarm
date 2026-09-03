@@ -3,6 +3,9 @@
 本文件只记录 AgentSwarm 比赛发行版和公开整理层的变化，不复制
 [AgentTeams 上游项目](https://github.com/agentscope-ai/AgentTeams)的完整历史。
 
+当前公开发行版：`competition-v1.2`。对应的复现入口见
+[`docs/releases/competition-v1.2.md`](docs/releases/competition-v1.2.md)。
+
 ## competition-v1.2
 
 - 将根 README 调整为 AgentSwarm 默认中文入口，并保留英文对应入口。

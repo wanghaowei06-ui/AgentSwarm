@@ -4,13 +4,15 @@
 
 本指南解释如何复现系统；仓库来源、许可证、依赖和公开/排除范围分别见 [`NOTICE`](../NOTICE)、[`docs/dependencies.md`](dependencies.md) 和 [`docs/open-source-boundary.md`](open-source-boundary.md)。AgentSwarm 基于上游 [AgentTeams](https://github.com/agentscope-ai/AgentTeams)，但评委应以本仓库固定 tag 的源码和本次实时输出为准。
 
+本版本的发行范围和已知限制见[competition-v1.2 发布说明](releases/competition-v1.2.md)。
+
 本流程不使用 mock、离线回放或预录证据。大模型 API Key 只通过环境变量传入，不要写入仓库文件。
 
 ## 0. 评委执行顺序
 
 评委可以按下面的顺序完成一次端到端复现：
 
-1. 克隆仓库并切换到 `competition-v1.1`，确保评测使用固定源码，而不是会继续变化的 `main`；
+1. 克隆仓库并切换到 `competition-v1.2`，确保评测使用固定源码，而不是会继续变化的 `main`；
 2. 配置一个可联网调用的 Qwen 或 OpenAI-compatible LLM；
 3. 构建本仓库的基础镜像和 embedded 真实系统；
 4. 启动 Dashboard，并从 Element Web 登录；
@@ -21,7 +23,7 @@
 
 ## 1. 版本与复现边界
 
-- 比赛快照：`competition-v1.1`
+- 比赛快照：`competition-v1.2`
 - 运行方式：源码构建 + embedded 部署
 - 核心服务：AgentTeams Controller、Higress、Tuwunel、MinIO、Element Web、Manager
 - 可选管理界面：从本仓库 `dashboard/` 源码构建的 AgentTeams Dashboard
@@ -29,6 +31,7 @@
 - 可选测试依赖：GitHub PAT，仅在运行 GitHub 集成测试时需要
 - 许可证：根目录 Apache License 2.0；第三方依赖按各自许可证使用
 - 发行版身份：AgentSwarm 比赛发行版；运行时代码保留 AgentTeams 的真实命名契约
+- 历史版本：`competition-v1.1` 仍保留为不可移动的旧比赛快照
 
 仓库中的 `testweaver/evidence/` 是本地运行产物，`testweaver/config/runtime.env` 是受保护的部署配置；两者都不属于干净评委环境的启动输入，也不会提交到公开快照。评委应以本次启动和测试产生的实时结果为准。
 
@@ -64,7 +67,7 @@
 ```bash
 git clone https://github.com/wanghaowei06-ui/AgentSwarm.git
 cd AgentSwarm
-git checkout competition-v1.1
+git checkout competition-v1.2
 ```
 
 请不要使用仓库上游 README 中面向正式发布版的 `curl | bash` 安装命令来复现比赛快照；该命令会获取发布镜像，而不是构建当前提交中的源码。
@@ -102,9 +105,9 @@ API Key、管理员密码和第三方服务地址都属于本地运行配置，�
 比赛版本使用统一的本地 tag，避免 Manager/Worker 误使用远程 `latest` 基础镜像：
 
 ```bash
-export VERSION=competition-v1.1
+export VERSION=competition-v1.2
 export OPENCLAW_BASE_IMAGE=agentteams/openclaw-base
-export OPENCLAW_BASE_VERSION=competition-v1.1
+export OPENCLAW_BASE_VERSION=competition-v1.2
 
 # 先构建本仓库中的 OpenClaw 基础镜像
 make build-openclaw-base
@@ -124,8 +127,8 @@ Dashboard 与主系统分开构建，但使用同一份源码快照：
 
 ```bash
 export DASHBOARD_CONTEXT=dashboard
-export DASHBOARD_VERSION=competition-v1.1
-export DASHBOARD_IMAGE=agentteams/agentteams-dashboard:competition-v1.1
+export DASHBOARD_VERSION=competition-v1.2
+export DASHBOARD_IMAGE=agentteams/agentteams-dashboard:competition-v1.2
 
 make build-dashboard
 make install-dashboard
@@ -239,7 +242,7 @@ make wait-ready-embedded
 先确认 `agentteams-controller` 已运行，再确认 Dashboard 使用了本地构建的 `DASHBOARD_IMAGE`：
 
 ```bash
-docker image inspect agentteams/agentteams-dashboard:competition-v1.1
+docker image inspect agentteams/agentteams-dashboard:competition-v1.2
 docker logs agentteams-dashboard
 ```
 
