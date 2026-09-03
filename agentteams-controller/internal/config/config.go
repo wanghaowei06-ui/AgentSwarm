@@ -809,6 +809,7 @@ func (c *Config) ManagerAgentEnv() map[string]string {
 	setIfNonEmpty("AGENTTEAMS_EMBEDDING_MODEL", c.EmbeddingModel)
 	setIfNonEmpty("AGENTTEAMS_LLM_PROVIDER", c.LLMProvider)
 	setIfNonEmpty("AGENTTEAMS_LLM_API_KEY", c.LLMAPIKey)
+	setIfNonEmpty("AGENTTEAMS_OPENAI_BASE_URL", c.OpenAIBaseURL)
 	if c.AIStreamIdleTimeoutSeconds > 0 {
 		env["AGENTTEAMS_AI_STREAM_IDLE_TIMEOUT_SECONDS"] = strconv.Itoa(c.AIStreamIdleTimeoutSeconds)
 	}

@@ -255,6 +255,7 @@ func TestManagerAgentEnvForwardsAbstractInfraEnv(t *testing.T) {
 	t.Setenv("AGENTTEAMS_STORAGE_PREFIX", "teams/demo")
 	t.Setenv("AGENTTEAMS_AI_GATEWAY_URL", "http://aigw.example.com:8080")
 	t.Setenv("AGENTTEAMS_MATRIX_URL", "http://matrix.example.com:8080")
+	t.Setenv("AGENTTEAMS_OPENAI_BASE_URL", "https://api.deepseek.com/v1")
 
 	cfg := LoadConfig()
 	env := cfg.ManagerAgentEnv()
@@ -266,6 +267,7 @@ func TestManagerAgentEnvForwardsAbstractInfraEnv(t *testing.T) {
 		"AGENTTEAMS_FS_ENDPOINT":          "http://fs.example.com:9000",
 		"AGENTTEAMS_FS_BUCKET":            "agentteams-fs",
 		"AGENTTEAMS_STORAGE_PREFIX":       "teams/demo",
+		"AGENTTEAMS_OPENAI_BASE_URL":      "https://api.deepseek.com/v1",
 		"AGENTTEAMS_FS_ACCESS_KEY":        "root",
 		"AGENTTEAMS_FS_SECRET_KEY":        "secret",
 	} {
