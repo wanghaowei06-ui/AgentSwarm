@@ -230,6 +230,7 @@ class AgentLoopResponseSummary:
     completed: bool
     result_count: int
     successful_result_count: int
+    source_verified: bool = True
 
 
 @dataclass(frozen=True, slots=True)
@@ -557,7 +558,10 @@ class AgentLoopClient:
         *,
         task_id: str,
         evidence_binding: AgentLoopEvidenceBinding | None = None,
+        expected_trace_id: str | None = None,
     ) -> AgentLoopCallResult:
+        if expected_trace_id is not None:
+            expected_trace_id = _validate_trace_id(expected_trace_id)
         return self._call(
             scope,
             operation="GetEvaluationTask",
@@ -567,6 +571,7 @@ class AgentLoopClient:
             body=None,
             resource_ref=task_id,
             evidence_binding=evidence_binding,
+            expected_trace_id=expected_trace_id,
         )
 
     def get_evaluation_runs(
@@ -594,6 +599,7 @@ class AgentLoopClient:
         task_id: str,
         max_results: int = 10,
         evidence_binding: AgentLoopEvidenceBinding | None = None,
+        expected_trace_id: str | None = None,
     ) -> AgentLoopQueryVerification:
         """Read back task ownership/scope and a completed non-empty run.
 
@@ -603,7 +609,10 @@ class AgentLoopClient:
         """
 
         task = self.get_evaluation_task(
-            scope, task_id=task_id, evidence_binding=evidence_binding
+            scope,
+            task_id=task_id,
+            evidence_binding=evidence_binding,
+            expected_trace_id=expected_trace_id,
         )
         runs = self.get_evaluation_runs(scope, task_id=task_id, max_results=max_results)
         task_summary = task.response_summary or _EMPTY_SUMMARY
@@ -625,6 +634,7 @@ class AgentLoopClient:
             and scoped
             and evidence_verified
             and terminal
+            and task_summary.source_verified
             and result_count > 0
             and successful > 0
         )
@@ -649,6 +659,31 @@ class AgentLoopClient:
         }
         return AgentLoopQueryVerification(**values, content_hash=canonical_hash(values))
 
+    def verify_trace_evaluation_task_run(
+        self,
+        scope: AgentLoopScope,
+        *,
+        task_id: str,
+        trace_id: str,
+        max_results: int = 10,
+        evidence_binding: AgentLoopEvidenceBinding | None = None,
+    ) -> AgentLoopQueryVerification:
+        """Verify that an evaluation task is actually scoped to one Trace.
+
+        Dataset tasks may carry the same business tags as a Hero. A trace
+        readback therefore needs an additional source-shape check instead of
+        relying on tags alone.
+        """
+
+        trace_id = _validate_trace_id(trace_id)
+        return self.verify_evaluation_task_run(
+            scope,
+            task_id=task_id,
+            max_results=max_results,
+            evidence_binding=evidence_binding,
+            expected_trace_id=trace_id,
+        )
+
     def _call(
         self,
         scope: AgentLoopScope,
@@ -661,6 +696,7 @@ class AgentLoopClient:
         resource_ref: str,
         response_resource_keys: tuple[str, ...] = (),
         evidence_binding: AgentLoopEvidenceBinding | None = None,
+        expected_trace_id: str | None = None,
     ) -> AgentLoopCallResult:
         scope.validate()
         validate_ref(self.config.endpoint, "agentloop_endpoint")
@@ -770,6 +806,7 @@ class AgentLoopClient:
                 resource_ref=resource_ref,
                 scope=scope,
                 evidence_binding=evidence_binding,
+                expected_trace_id=expected_trace_id,
             )
         receipt = AgentLoopReceipt.create(
             operation=operation,
@@ -829,6 +866,36 @@ def _resource_ref_from_response(body: bytes, keys: tuple[str, ...]) -> str:
 _EMPTY_SUMMARY = AgentLoopResponseSummary(False, False, False, False, False, 0, 0)
 
 
+def _trace_task_source_matches(task: Mapping[str, Any], trace_id: str) -> bool:
+    """Check the official trace source shape and an exact trace filter."""
+
+    if task.get("dataType") != "trace":
+        return False
+    config = task.get("config")
+    if not isinstance(config, Mapping) or config.get("dataScope") != "trace":
+        return False
+    data_filter = task.get("dataFilter")
+    if isinstance(data_filter, str):
+        try:
+            data_filter = json.loads(data_filter)
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            return False
+    if not isinstance(data_filter, Mapping):
+        return False
+    query = data_filter.get("query")
+    if not isinstance(query, str):
+        return False
+    match = re.fullmatch(r"\s*traceId\s*=\s*(['\"])([0-9a-f]{32})\1\s*", query)
+    if match is None or match.group(2) != trace_id:
+        return False
+    max_records = data_filter.get("maxRecords")
+    return (
+        isinstance(max_records, int)
+        and not isinstance(max_records, bool)
+        and 1 <= max_records <= 100
+    )
+
+
 def _response_summary(
     *,
     operation: str,
@@ -837,6 +904,7 @@ def _response_summary(
     resource_ref: str,
     scope: AgentLoopScope,
     evidence_binding: AgentLoopEvidenceBinding | None,
+    expected_trace_id: str | None = None,
 ) -> AgentLoopResponseSummary:
     if len(body) > 4 * 1024 * 1024:
         return _EMPTY_SUMMARY
@@ -863,6 +931,11 @@ def _response_summary(
                 tags.get(key) == expected
                 for key, expected in evidence_binding.tags().items()
             )
+        source_verified = (
+            True
+            if expected_trace_id is None
+            else _trace_task_source_matches(task, expected_trace_id)
+        )
         return AgentLoopResponseSummary(
             ownership_verified=(
                 task.get("agentSpace") == agent_space
@@ -877,6 +950,7 @@ def _response_summary(
             completed=status == "Completed",
             result_count=0,
             successful_result_count=0,
+            source_verified=source_verified,
         )
     if operation == "ListEvaluationRuns":
         rows = value.get("evaluationRuns")

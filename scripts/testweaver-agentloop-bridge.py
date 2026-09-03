@@ -639,9 +639,10 @@ def _agentloop_query_callback(args: argparse.Namespace) -> Callable[[ProviderTur
     )
 
     def query(turn: ProviderTurn) -> AgentLoopQueryVerification:
-        return client.verify_evaluation_task_run(
+        return client.verify_trace_evaluation_task_run(
             AgentLoopScope(turn.campaign_id, turn.run_id, turn.pg_revision),
             task_id=args.agentloop_task_id,
+            trace_id=turn.trace_id,
             evidence_binding=AgentLoopEvidenceBinding(
                 trace_id=turn.trace_id,
                 content_hash=turn.content_hash,

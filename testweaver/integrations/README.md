@@ -28,7 +28,10 @@ Tasks, retries, and lifecycle state.
   uses the official trace-native `CreateEvaluationTask` shape (`dataType=trace`,
   trace variable mapping, bounded trace filter, and optional backfill window)
   for a real Hero Trace; it has the same non-empty-result/readback gate and can
-  never turn an accepted-but-empty task into a LIVE claim.
+  never turn an accepted-but-empty task into a LIVE claim. Use
+  `verify_trace_evaluation_task_run` for the corresponding readback: it also
+  requires `dataType=trace`, `config.dataScope=trace`, and an exact TraceID
+  filter, so a same-tag Dataset task cannot satisfy the Hero gate.
 - `tea_transport.py` loads an owner-only protected AccessKey CSV at runtime and
   signs AgentLoop requests through the installed Alibaba Cloud Tea SDK. Secret
   material is neither dataclass-expandable nor printable.

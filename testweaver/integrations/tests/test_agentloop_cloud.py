@@ -452,6 +452,105 @@ def test_trace_evaluation_task_uses_native_trace_source_and_exact_filter() -> No
     }
 
 
+def test_trace_evaluation_readback_requires_trace_source_shape() -> None:
+    task = {
+        "taskId": "task-1",
+        "agentSpace": "space-1",
+        "status": "Completed",
+        "dataType": "trace",
+        "dataFilter": json.dumps(
+            {"query": f"traceId='{TRACE_ID}'", "maxRecords": 1}
+        ),
+        "config": {"dataScope": "trace"},
+        "tags": {
+            "campaignId": "campaign-1",
+            "runId": "run-1",
+            "revision": "7",
+            **_evidence_binding().tags(),
+        },
+    }
+    runs = {
+        "evaluationRuns": [
+            {
+                "taskId": "task-1",
+                "runId": "evaluation-run-1",
+                "status": "Completed",
+                "totalCount": 1,
+                "successCount": 1,
+            }
+        ]
+    }
+    client = AgentLoopClient(
+        AgentLoopEndpoint("https://agentloop.cn-beijing.aliyuncs.com", "space-1"),
+        QueueTransport(
+            [
+                AgentLoopHTTPResponse(200, json.dumps(task).encode()),
+                AgentLoopHTTPResponse(200, json.dumps(runs).encode()),
+            ]
+        ),
+        _lease,
+        lambda: "2026-09-03T02:00:00Z",
+    )
+    result = client.verify_trace_evaluation_task_run(
+        AgentLoopScope("campaign-1", "run-1", 7),
+        task_id="task-1",
+        trace_id=TRACE_ID,
+        evidence_binding=_evidence_binding(),
+    )
+    assert result.status == "API_QUERY_VERIFIED"
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"dataType": "dataset"},
+        {"config": {"dataScope": "dataset"}},
+        {"dataFilter": {"query": "traceId='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'", "maxRecords": 1}},
+    ],
+)
+def test_trace_evaluation_readback_rejects_non_trace_source_shape(
+    overrides: dict[str, Any],
+) -> None:
+    task = {
+        "taskId": "task-1",
+        "agentSpace": "space-1",
+        "status": "Completed",
+        "dataType": "trace",
+        "dataFilter": {"query": f"traceId='{TRACE_ID}'", "maxRecords": 1},
+        "config": {"dataScope": "trace"},
+        "tags": {
+            "campaignId": "campaign-1",
+            "runId": "run-1",
+            "revision": "7",
+            **_evidence_binding().tags(),
+        },
+    }
+    task.update(overrides)
+    runs = {
+        "evaluationRuns": [
+            {"taskId": "task-1", "status": "Completed", "totalCount": 1, "successCount": 1}
+        ]
+    }
+    client = AgentLoopClient(
+        AgentLoopEndpoint("https://agentloop.cn-beijing.aliyuncs.com", "space-1"),
+        QueueTransport(
+            [
+                AgentLoopHTTPResponse(200, json.dumps(task).encode()),
+                AgentLoopHTTPResponse(200, json.dumps(runs).encode()),
+            ]
+        ),
+        _lease,
+        lambda: "2026-09-03T02:00:00Z",
+    )
+    result = client.verify_trace_evaluation_task_run(
+        AgentLoopScope("campaign-1", "run-1", 7),
+        task_id="task-1",
+        trace_id=TRACE_ID,
+        evidence_binding=_evidence_binding(),
+    )
+    assert result.status == "NOT_VERIFIED"
+
+
 def test_trace_evaluation_task_rejects_mismatched_or_unbounded_inputs() -> None:
     client = AgentLoopClient(
         AgentLoopEndpoint("https://agentloop.cn-beijing.aliyuncs.com", "space-1"),
