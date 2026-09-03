@@ -4,7 +4,7 @@
   "deployMode": "plugin-probe",
   "detection": {
     "paths": ["~/.qwenpaw"],
-    "commands": ["qwenpaw"]
+    "commands": ["qwenpaw", "claude"]
   },
   "pluginProbe": {
     "source": {

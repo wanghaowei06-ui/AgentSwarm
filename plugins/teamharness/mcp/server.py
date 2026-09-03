@@ -768,6 +768,11 @@ def _md_to_html(text: str) -> str:
             blocks.append(_render_fallback_table(table_lines))
             continue
 
+        if re.fullmatch(r"\s{0,3}([-*_])(?:\s*\1){2,}\s*", line):
+            blocks.append("<hr>")
+            index += 1
+            continue
+
         heading = re.match(r"^(#{1,6})\s+(.+?)\s*$", line)
         if heading:
             level = len(heading.group(1))
@@ -786,6 +791,17 @@ def _md_to_html(text: str) -> str:
             blocks.append("<ul>" + "".join(f"<li>{_render_inline_matrix_html(item)}</li>" for item in items) + "</ul>")
             continue
 
+        if re.match(r"^\s*\d+[.)]\s+\S", line):
+            items = []
+            while index < len(lines):
+                item = re.match(r"^\s*\d+[.)]\s+(.+?)\s*$", lines[index])
+                if not item:
+                    break
+                items.append(item.group(1))
+                index += 1
+            blocks.append("<ol>" + "".join(f"<li>{_render_inline_matrix_html(item)}</li>" for item in items) + "</ol>")
+            continue
+
         if line.strip():
             blocks.append(_render_inline_matrix_html(line))
         else:
@@ -796,7 +812,8 @@ def _md_to_html(text: str) -> str:
         code = html.escape("\n".join(code_lines))
         blocks.append(f"<pre><code>{code}</code></pre>")
 
-    return "<br>\n".join(blocks)
+    rendered = "<br>\n".join(blocks)
+    return re.sub(r"(</(?:h[1-6]|table|pre|ul|ol)>|<hr>)<br>\n", r"\1\n", rendered)
 
 
 def _formatted_body(text: str, mentions: list[str]) -> str:

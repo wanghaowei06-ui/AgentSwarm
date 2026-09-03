@@ -14,6 +14,7 @@ REQUIRED_NAMES_FILE="${TESTWEAVER_REQUIRED_NAMES_FILE:-${SCRIPT_DIR}/../testweav
 MANAGER_CONTAINER=""
 NACOS_SOURCE_CONTAINER=""
 OTEL_CONTAINER=""
+MANAGER_CONTAINER_EXPLICIT=0
 NETWORK_CHECK=1
 BLOCKING_GAPS=0
 
@@ -31,7 +32,7 @@ while (($#)); do
       case "$1" in
         --reference|--config) REFERENCE_FILE="$2" ;;
         --required-names) REQUIRED_NAMES_FILE="$2" ;;
-        --manager-container) MANAGER_CONTAINER="$2" ;;
+        --manager-container) MANAGER_CONTAINER="$2"; MANAGER_CONTAINER_EXPLICIT=1 ;;
         --nacos-source-container) NACOS_SOURCE_CONTAINER="$2" ;;
         --otel-container) OTEL_CONTAINER="$2" ;;
       esac
@@ -89,6 +90,21 @@ container_keys() {
 
 has_name() { grep -Fqx -- "$1" <<<"$2"; }
 is_running() { command -v docker >/dev/null 2>&1 && [[ "$(docker inspect --format '{{.State.Status}}' "$1" 2>/dev/null || true)" == running ]]; }
+
+discover_manager_container() {
+  command -v docker >/dev/null 2>&1 || return 0
+  local candidate keys
+  while IFS= read -r candidate; do
+    [[ -n "$candidate" ]] || continue
+    keys="$(container_keys "$candidate")"
+    if has_name AGENTTEAMS_MANAGER_NAME "$keys" \
+      && has_name AGENTTEAMS_MANAGER_MATRIX_TOKEN "$keys" \
+      && has_name AGENTTEAMS_MATRIX_URL "$keys"; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done < <(docker ps --format '{{.Names}}' 2>/dev/null)
+}
 
 check_parent() {
   local path="$1" owner mode
@@ -192,6 +208,14 @@ NACOS_SOURCE_CONTAINER="${NACOS_SOURCE_CONTAINER:-$(ref_value TESTWEAVER_NACOS_S
 AGENTLOOP_CONFIG_FILE="$(ref_value TESTWEAVER_AGENTLOOP_CONFIG_FILE)"
 OTEL_CONFIG_FILE="$(ref_value TESTWEAVER_OTEL_CONFIG_FILE)"
 OTEL_CONTAINER="${OTEL_CONTAINER:-$(ref_value TESTWEAVER_OTEL_CONTAINER)}"
+
+if ((MANAGER_CONTAINER_EXPLICIT == 0)) && ! is_running "$MANAGER_CONTAINER"; then
+  discovered_manager="$(discover_manager_container || true)"
+  if [[ -n "$discovered_manager" ]]; then
+    MANAGER_CONTAINER="$discovered_manager"
+    say "REUSED container=manager source=docker-runtime-discovery name=$MANAGER_CONTAINER"
+  fi
+fi
 
 check_file agentteams-env "$AGENTTEAMS_ENV_FILE" 1 || true
 check_file provider-env "$PROVIDER_ENV_FILE" 1 || true

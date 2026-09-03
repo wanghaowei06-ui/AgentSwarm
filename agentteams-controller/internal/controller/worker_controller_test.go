@@ -320,7 +320,7 @@ func TestWorkerReconcileDeleteBlocksReferencedTeamMember(t *testing.T) {
 	}
 }
 
-func TestReconcileManagerAccessRemovesManagerFromTeamWorkerRoom(t *testing.T) {
+func TestReconcileManagerAccessLeavesTeamRoomCleanupToTeamReconciler(t *testing.T) {
 	ctx := context.Background()
 	worker := &v1beta1.Worker{
 		ObjectMeta: metav1.ObjectMeta{Name: "dev", Namespace: "default"},
@@ -342,10 +342,8 @@ func TestReconcileManagerAccessRemovesManagerFromTeamWorkerRoom(t *testing.T) {
 
 	rig.r.reconcileManagerAccess(ctx, worker, MemberContext{RuntimeName: "dev"}, &MemberState{})
 
-	if got := rig.provisioner.Calls.ForceLeaveRoom; len(got) != 1 {
-		t.Fatalf("ForceLeaveRoom calls=%+v, want Manager removed from Team worker room", got)
-	} else if got[0].UserID != "@manager:matrix.local" || got[0].RoomID != "!room-dev:matrix.local" {
-		t.Fatalf("ForceLeaveRoom call=%+v, want Manager removed from !room-dev:matrix.local", got[0])
+	if got := rig.provisioner.Calls.ForceLeaveRoom; len(got) != 0 {
+		t.Fatalf("ForceLeaveRoom calls=%+v, want TeamReconciler to own Team worker room cleanup", got)
 	}
 }
 

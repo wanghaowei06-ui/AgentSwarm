@@ -54,8 +54,9 @@ type WorkerProvisioner interface {
 	// KickFromRoom removes userID from roomID using the admin token.
 	// Idempotent: returns nil when the user is not a member.
 	KickFromRoom(ctx context.Context, roomID, userID, reason string) error
-	// ForceLeaveRoom removes a user whose room power level prevents a normal
-	// admin kick.
+	// ForceLeaveRoom removes a currently joined user whose room power level
+	// prevents a normal admin kick. Idempotent: returns nil when the user is
+	// already absent or not joined.
 	ForceLeaveRoom(ctx context.Context, userID, roomID string) error
 	MatrixAppServiceEnabled() bool
 }
@@ -231,9 +232,9 @@ type HumanProvisioner interface {
 	// Idempotent: returns nil when the user is not a member.
 	KickFromRoom(ctx context.Context, roomID, userID, reason string) error
 
-	// ForceLeaveRoom asks the Tuwunel admin bot to force-leave userID out
-	// of roomID via "!admin users force-leave-room". Fire-and-forget at
-	// the bot layer, but the admin message delivery itself is confirmed.
+	// ForceLeaveRoom asks the Tuwunel admin bot to force-leave a currently
+	// joined userID out of roomID via "!admin users force-leave-room".
+	// Idempotent: returns nil when the user is already absent or not joined.
 	ForceLeaveRoom(ctx context.Context, userID, roomID string) error
 
 	// DeactivateHumanUser disables a Human Matrix account after membership
