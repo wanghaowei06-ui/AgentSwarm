@@ -12,6 +12,7 @@ describe("Dashboard API contracts", () => {
     const response = buildWorkspaceSnapshot({
       version: 1,
       events: [],
+      projects: [],
       sync: { state: "connecting" },
     });
 

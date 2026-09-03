@@ -10,6 +10,7 @@ import type {
   WorkspaceProjection,
 } from "../types";
 import { projectConversations } from "../conversations/projection";
+import { approvalState, eventEvidenceCategory } from "../events/evidence";
 
 const isObject = (value: unknown): value is JsonObject =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -106,45 +107,27 @@ const workflowSteps = (event: AgentTeamsEvent): JsonObject[] => {
 
 const attentionFor = (event: AgentTeamsEvent, runId?: string): AttentionItem[] => {
   const detail = event.detail || {};
-  const status = normalizedStatus(detail.status);
-  const items: AttentionItem[] = [];
-  if (event.kind === "workflow" && status === "failed") {
-    items.push({
+  const category = eventEvidenceCategory(event);
+  const rawStatus = stringValue(detail.status).toLowerCase();
+  if (category === "exception") {
+    return [{
       id: `attention:${event.id}`,
-      severity: "error",
+      severity: ["waiting", "blocked", "unavailable"].includes(rawStatus) ? "warning" : "error",
       summary: event.summary,
       runId,
       sourceEventId: event.sourceRef.eventId,
-    });
+    }];
   }
-  if (event.kind === "workflow" && status === "waiting") {
-    items.push({
+  if (category === "approval" && ["pending", "rejected"].includes(approvalState(event))) {
+    return [{
       id: `attention:${event.id}`,
-      severity: "warning",
-      summary: event.summary,
+      severity: approvalState(event) === "pending" ? "warning" : "error",
+      summary: approvalState(event) === "pending" ? `待人工审批：${event.summary}` : `人工审批已拒绝：${event.summary}`,
       runId,
       sourceEventId: event.sourceRef.eventId,
-    });
+    }];
   }
-  if ((event.kind === "tool" || event.kind === "skill") && ["failed", "error"].includes(stringValue(detail.status).toLowerCase())) {
-    items.push({
-      id: `attention:${event.id}`,
-      severity: "error",
-      summary: `${event.summary} · requires review`,
-      runId,
-      sourceEventId: event.sourceRef.eventId,
-    });
-  }
-  if (event.kind === "system" && /degraded|unavailable|error|failed/i.test(event.summary)) {
-    items.push({
-      id: `attention:${event.id}`,
-      severity: "warning",
-      summary: event.summary,
-      runId,
-      sourceEventId: event.sourceRef.eventId,
-    });
-  }
-  return items;
+  return [];
 };
 
 const latestByRun = (runEvents: AgentTeamsEvent[]): AgentTeamsEvent | undefined =>

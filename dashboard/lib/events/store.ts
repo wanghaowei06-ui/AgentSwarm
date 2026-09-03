@@ -2,8 +2,8 @@ import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
-import type { AgentTeamsEvent, JsonObject } from "../types";
-import { matrixMemberKey } from "./normalizer";
+import type { AgentTeamsEvent, DashboardProject, JsonObject } from "../types";
+import { matrixMemberKey, reclassifyStoredEvent } from "./normalizer";
 
 export type SyncState = "connecting" | "live" | "degraded" | "stopped";
 
@@ -11,6 +11,7 @@ export type EventStoreSnapshot = {
   version: 1;
   cursor?: string;
   events: AgentTeamsEvent[];
+  projects: DashboardProject[];
   controller?: {
     data: JsonObject;
     receivedAt: string;
@@ -32,6 +33,7 @@ type EventStoreOptions = {
 const emptySnapshot = (): EventStoreSnapshot => ({
   version: 1,
   events: [],
+  projects: [],
   sync: { state: "stopped" },
 });
 
@@ -60,12 +62,21 @@ export class EventStore {
     try {
       const raw = await readFile(this.statePath, "utf8");
       const loaded = JSON.parse(raw) as Partial<EventStoreSnapshot>;
+      const loadedEvents = Array.isArray(loaded.events) ? loaded.events as AgentTeamsEvent[] : [];
+      const migratedEvents = loadedEvents.map(reclassifyStoredEvent);
+      const migrated = migratedEvents.some((event, index) => JSON.stringify(event) !== JSON.stringify(loadedEvents[index]));
       this.state = {
         ...emptySnapshot(),
         ...loaded,
-        events: Array.isArray(loaded.events) ? loaded.events : [],
+        events: migratedEvents,
+        projects: Array.isArray(loaded.projects) ? loaded.projects : [],
         sync: { ...emptySnapshot().sync, ...(loaded.sync || {}) },
       };
+      this.initialized = true;
+      if (migrated) {
+        await this.persist();
+      }
+      return;
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
         throw new Error("Dashboard event store is not readable");
@@ -78,6 +89,41 @@ export class EventStore {
   async snapshot(): Promise<EventStoreSnapshot> {
     await this.init();
     return cloneSnapshot(this.state);
+  }
+
+  async getProject(projectId: string): Promise<DashboardProject | undefined> {
+    await this.init();
+    return this.state.projects.find((project) => project.id === projectId);
+  }
+
+  async createProject(project: DashboardProject): Promise<void> {
+    await this.init();
+    if (this.state.projects.some((existing) => existing.id === project.id)) {
+      throw new Error(`project ${project.id} already exists`);
+    }
+    this.state.projects = [...this.state.projects, project];
+    await this.persist();
+  }
+
+  async updateProject(
+    projectId: string,
+    patch: Partial<Omit<DashboardProject, "id" | "createdAt">>,
+  ): Promise<DashboardProject> {
+    await this.init();
+    const existing = this.state.projects.find((project) => project.id === projectId);
+    if (!existing) {
+      throw new Error(`project ${projectId} was not found`);
+    }
+    const updated: DashboardProject = {
+      ...existing,
+      ...patch,
+      id: existing.id,
+      createdAt: existing.createdAt,
+      updatedAt: new Date().toISOString(),
+    };
+    this.state.projects = this.state.projects.map((project) => project.id === projectId ? updated : project);
+    await this.persist();
+    return updated;
   }
 
   async append(events: AgentTeamsEvent[]): Promise<AgentTeamsEvent[]> {

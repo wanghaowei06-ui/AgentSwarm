@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 
 import type { JsonObject } from "../types";
-import type { MatrixEvent, MatrixStateEvent } from "./types";
+import type { MatrixEvent, MatrixRoomMember, MatrixStateEvent } from "./types";
 
 export type MatrixSyncResponse = JsonObject & {
   next_batch: string;
@@ -45,6 +45,13 @@ type MatrixSendOptions = {
   txnId?: string;
 };
 
+export type MatrixCreateRoomOptions = {
+  name: string;
+  invite: string[];
+  preset?: string;
+  isDirect?: boolean;
+};
+
 const trimTrailingSlash = (value: string): string => value.replace(/\/+$/, "");
 
 const boundedErrorBody = (value: string): string => value.replace(/\s+/g, " ").trim().slice(0, 240);
@@ -74,6 +81,8 @@ export class MatrixClient {
   private readonly timeoutMs: number;
   private accessToken?: string;
   private loginPromise?: Promise<string>;
+  private currentUserId?: string;
+  private whoAmIPromise?: Promise<string>;
 
   constructor(options: MatrixClientOptions) {
     if (!options.homeserverUrl.trim()) {
@@ -93,6 +102,33 @@ export class MatrixClient {
     return Array.isArray(data.joined_rooms)
       ? data.joined_rooms.filter((room): room is string => typeof room === "string")
       : [];
+  }
+
+  async whoAmI(): Promise<string> {
+    if (this.currentUserId) {
+      return this.currentUserId;
+    }
+    if (this.whoAmIPromise) {
+      return this.whoAmIPromise;
+    }
+    const path = "/_matrix/client/v3/account/whoami";
+    this.whoAmIPromise = this.requestJson(path).then((data) => {
+      const userId = typeof data.user_id === "string" ? data.user_id.trim() : "";
+      if (!userId) {
+        throw new MatrixUpstreamError("Matrix whoami response has no user_id", {
+          status: 502,
+          path,
+          retryable: false,
+        });
+      }
+      this.currentUserId = userId;
+      return userId;
+    });
+    try {
+      return await this.whoAmIPromise;
+    } finally {
+      this.whoAmIPromise = undefined;
+    }
   }
 
   async roomState(roomId: string): Promise<MatrixStateEvent[]> {
@@ -132,6 +168,29 @@ export class MatrixClient {
       ...(typeof event.state_key === "string" ? { state_key: event.state_key } : {}),
       content: event.content,
     }));
+  }
+
+  async roomMembers(roomId: string): Promise<MatrixRoomMember[]> {
+    const state = await this.roomState(roomId);
+    return state.flatMap((event) => {
+      if (event.type !== "m.room.member" || !event.state_key?.trim()) {
+        return [];
+      }
+      const membership = typeof event.content.membership === "string"
+        ? event.content.membership.trim()
+        : "";
+      if (!membership) {
+        return [];
+      }
+      const displayName = typeof event.content.displayname === "string"
+        ? event.content.displayname.trim()
+        : "";
+      return [{
+        userId: event.state_key.trim(),
+        membership,
+        ...(displayName ? { displayName } : {}),
+      }];
+    });
   }
 
   async sync(options: { since?: string; timeoutMs?: number; filter?: string } = {}): Promise<MatrixSyncResponse> {
@@ -210,6 +269,32 @@ export class MatrixClient {
       });
     }
     return { eventId: data.event_id, txnId };
+  }
+
+  async createRoom(options: MatrixCreateRoomOptions): Promise<{ roomId: string }> {
+    const name = options.name.trim();
+    if (!name) {
+      throw new Error("Matrix room name is required");
+    }
+    const path = "/_matrix/client/v3/createRoom";
+    const data = await this.requestJson(path, {
+      method: "POST",
+      body: JSON.stringify({
+        name,
+        invite: options.invite,
+        preset: options.preset?.trim() || "trusted_private_chat",
+        is_direct: options.isDirect === true,
+      }),
+    });
+    const roomId = typeof data.room_id === "string" ? data.room_id.trim() : "";
+    if (!roomId) {
+      throw new MatrixUpstreamError("Matrix createRoom response has no room_id", {
+        status: 502,
+        path,
+        retryable: false,
+      });
+    }
+    return { roomId };
   }
 
   async downloadMedia(mxcUri: string): Promise<Response> {

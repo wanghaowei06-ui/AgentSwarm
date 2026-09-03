@@ -8,6 +8,7 @@ import {
   MessageSquare,
   Search,
   Send,
+  ShieldCheck,
   Sparkles,
 } from "lucide-react";
 import {
@@ -53,6 +54,7 @@ const categoryLabels: Record<EvidenceCategory, string> = {
   skill: "Skill",
   tool: "工具",
   exception: "异常",
+  approval: "人工审批",
   artifact: "产物",
   message: "消息",
   system: "系统",
@@ -91,6 +93,9 @@ const matchesFilter = (event: AgentTeamsEvent, filter: FeedFilter): boolean => {
   if (filter === "skill") {
     return category === "skill";
   }
+  if (filter === "approval") {
+    return category === "approval";
+  }
   return category === "exception";
 };
 
@@ -99,6 +104,7 @@ const roomRoleLabels: Record<ConversationDetail["rooms"][number]["role"], string
   team: "Team",
   leader: "Leader DM",
   worker: "Worker",
+  project: "项目房间",
 };
 
 const roomLabel = (
@@ -118,7 +124,13 @@ function ConversationEvidence({
     <article className={`conversation-evidence ${isPriorityEvidence(event) ? "priority" : "context"}`}>
       <div className="evidence-context">
         <span className={`evidence-category ${statusClass(category)}`}>
-          {category === "exception" ? <AlertTriangle size={11} /> : category === "skill" ? <Sparkles size={11} /> : <CircleDot size={11} />}
+          {category === "exception"
+            ? <AlertTriangle size={11} />
+            : category === "approval"
+              ? <ShieldCheck size={11} />
+              : category === "skill"
+                ? <Sparkles size={11} />
+                : <CircleDot size={11} />}
           {categoryLabels[category]}
         </span>
         <span className="evidence-room">{roomLabel(event.roomId, rooms)}</span>
@@ -176,7 +188,7 @@ export function ConversationThread({
     messages: chatEvents,
     isLoading: loading,
     isRunning: sending,
-    isSendDisabled: sending,
+    isSendDisabled: sending || (conversation.source === "dashboard-project" && conversation.projectStatus !== "active"),
     onNew: async (message: AppendMessage) => {
       const text = extractText(message);
       if (text) {
@@ -190,7 +202,7 @@ export function ConversationThread({
       }
       return converted;
     },
-  }), [chatEvents, loading, onSend, sending]);
+  }), [chatEvents, conversation.projectStatus, conversation.source, loading, onSend, sending]);
   const runtime = useExternalStoreRuntime(adapter);
   const hiddenProgressCount = observations.filter(isPhaseReport).length;
   const hiddenStructuralCount = observations.filter(isStructuralRoomEvent).length;

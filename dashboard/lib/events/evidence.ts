@@ -14,6 +14,22 @@ const hasFailureStatus = (value: unknown): boolean =>
   ["failed", "failure", "error", "errored", "unavailable", "degraded", "cancelled", "canceled", "waiting", "blocked"]
     .includes(textValue(value));
 
+const evidenceCategories = new Set<EvidenceCategory>([
+  "collaboration",
+  "skill",
+  "tool",
+  "exception",
+  "approval",
+  "artifact",
+  "message",
+  "system",
+]);
+
+const explicitEvidenceCategory = (event: AgentTeamsEvent): EvidenceCategory | undefined => {
+  const value = textValue(event.detail?.evidenceCategory) as EvidenceCategory;
+  return evidenceCategories.has(value) ? value : undefined;
+};
+
 const phaseReportHeader = /^\s*\[\s*PHASE[-\s]?REPORT\s+([^\]]+)\]\s*(.*)$/i;
 
 const cleanReportLine = (value: string): string =>
@@ -80,11 +96,18 @@ export const latestPhaseReports = (events: AgentTeamsEvent[]): AgentTeamsEvent[]
 
 export const eventEvidenceCategory = (event: AgentTeamsEvent): EvidenceCategory => {
   const status = event.detail?.status;
+  const explicit = explicitEvidenceCategory(event);
+  if (explicit === "exception") {
+    return "exception";
+  }
   if ((event.kind === "workflow" || event.kind === "tool" || event.kind === "skill" || event.kind === "system") && hasFailureStatus(status)) {
     return "exception";
   }
   if (event.kind === "system" && /degraded|unavailable|error|failed/i.test(event.summary)) {
     return "exception";
+  }
+  if (explicit) {
+    return explicit;
   }
   if (event.kind === "workflow") {
     return "collaboration";
@@ -93,6 +116,9 @@ export const eventEvidenceCategory = (event: AgentTeamsEvent): EvidenceCategory 
     return "skill";
   }
   if (event.kind === "tool") {
+    if (textValue(event.detail?.name).startsWith("teamharness__")) {
+      return "collaboration";
+    }
     return "tool";
   }
   if (event.kind === "artifact") {
@@ -105,4 +131,10 @@ export const eventEvidenceCategory = (event: AgentTeamsEvent): EvidenceCategory 
 };
 
 export const isPriorityEvidence = (event: AgentTeamsEvent): boolean =>
-  ["collaboration", "skill", "tool", "exception"].includes(eventEvidenceCategory(event));
+  ["collaboration", "skill", "tool", "exception", "approval"].includes(eventEvidenceCategory(event));
+
+export const approvalState = (event: AgentTeamsEvent): string =>
+  textValue(event.detail?.approvalState);
+
+export const isPendingApproval = (event: AgentTeamsEvent): boolean =>
+  eventEvidenceCategory(event) === "approval" && approvalState(event) === "pending";

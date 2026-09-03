@@ -16,6 +16,7 @@ export type EvidenceCategory =
   | "skill"
   | "tool"
   | "exception"
+  | "approval"
   | "artifact"
   | "message"
   | "system";
@@ -23,6 +24,7 @@ export type EvidenceCategory =
 export type ActorRole =
   | "human"
   | "manager"
+  | "leader"
   | "worker"
   | "system"
   | "unknown";
@@ -70,7 +72,41 @@ export type RoomSummary = {
   messageCount: number;
 };
 
-export type ConversationRoomRole = "manager" | "team" | "leader" | "worker";
+export type DashboardProjectStatus = "provisioning" | "active" | "failed";
+
+export type DashboardProjectKind = "project" | "manager-dm";
+
+export type DashboardProjectRoom = {
+  roomId: string;
+  name: string;
+  kind: "manager" | "project";
+  inviteUserIds: string[];
+  createdAt: string;
+};
+
+export type DashboardProject = {
+  id: string;
+  kind: DashboardProjectKind;
+  name: string;
+  status: DashboardProjectStatus;
+  managerUserId: string;
+  managerRoomId?: string;
+  rooms: DashboardProjectRoom[];
+  createdAt: string;
+  updatedAt: string;
+  error?: string;
+};
+
+export type WorkspaceParticipant = {
+  userId: string;
+  name: string;
+  role: "manager" | "leader" | "worker";
+  displayName?: string;
+};
+
+export type ConversationSource = "controller" | "dashboard-project";
+
+export type ConversationRoomRole = "manager" | "team" | "leader" | "worker" | "project";
 
 export type ConversationRoom = RoomSummary & {
   role: ConversationRoomRole;
@@ -82,6 +118,10 @@ export type ConversationStatus = "active" | "attention" | "quiet";
 
 export type ConversationSummary = {
   id: string;
+  source: ConversationSource;
+  projectId?: string;
+  projectKind?: DashboardProjectKind;
+  projectStatus?: DashboardProjectStatus;
   title: string;
   managerName: string;
   managerUserId?: string;
@@ -97,6 +137,7 @@ export type ConversationSummary = {
   skillCount: number;
   toolCount: number;
   exceptionCount: number;
+  approvalCount: number;
   rooms: ConversationRoom[];
 };
 
@@ -145,6 +186,8 @@ export type WorkspaceProjection = {
 };
 
 export type WorkspaceSnapshot = WorkspaceProjection & {
+  projects: ConversationSummary[];
+  participants: WorkspaceParticipant[];
   generatedAt: string;
   controller: {
     state: "live" | "unavailable";

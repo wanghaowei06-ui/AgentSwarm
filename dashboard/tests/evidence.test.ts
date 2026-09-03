@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  eventEvidenceCategory,
   isCentralConversationEvent,
   isPhaseReport,
   latestPhaseReports,
@@ -78,5 +79,14 @@ Phase 1 (primary, Team A): IN PROGRESS — delegation chain complete.
     });
 
     expect(isCentralConversationEvent(event)).toBe(false);
+  });
+
+  it("uses explicit evidence categories for real text-derived observations", () => {
+    expect(eventEvidenceCategory(phaseReport({
+      detail: { evidenceCategory: "approval", approvalState: "approved" },
+    }))).toBe("approval");
+    expect(eventEvidenceCategory(phaseReport({
+      detail: { evidenceCategory: "collaboration" },
+    }))).toBe("collaboration");
   });
 });

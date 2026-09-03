@@ -15,3 +15,9 @@ export type MatrixStateEvent = {
   state_key?: string;
   content: JsonObject;
 };
+
+export type MatrixRoomMember = {
+  userId: string;
+  membership: string;
+  displayName?: string;
+};

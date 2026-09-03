@@ -14,13 +14,14 @@ import {
   Settings2,
   Sparkles,
 } from "lucide-react";
-import type { ConversationDetail, ConversationSummary, WorkspaceSnapshot } from "../lib/types";
-import { feedFilterLabels, workspaceNavigationItems, type FeedFilter } from "../lib/ui/navigation";
+import type { ConversationDetail, ConversationSummary, DashboardProject, WorkspaceSnapshot } from "../lib/types";
+import { conversationSourceLabels, feedFilterLabels, workspaceNavigationItems, type FeedFilter } from "../lib/ui/navigation";
 import { ActivityRail } from "./activity-rail";
 import { ConversationThread } from "./conversation-thread";
+import { ProjectCreateDialog, type ProjectCreateValues } from "./project-create-dialog";
 
 type Selection = {
-  type: "conversation";
+  type: "conversation" | "project";
   id: string;
 };
 
@@ -68,69 +69,127 @@ const syncLabel: Record<WorkspaceSnapshot["sync"]["state"], string> = {
 const conversationCountLabel = (conversations: ConversationSummary[]): string =>
   `${conversations.length} ${conversations.length === 1 ? "active conversation" : "active conversations"}`;
 
+const projectStatusLabels: Record<NonNullable<ConversationSummary["projectStatus"]>, string> = {
+  provisioning: "创建中",
+  active: "运行中",
+  failed: "创建失败",
+};
+
+function ConversationEntry({
+  item,
+  selection,
+  onSelect,
+}: {
+  item: ConversationSummary;
+  selection?: Selection;
+  onSelect: (selection: Selection) => void;
+}) {
+  const type = item.source === "dashboard-project" ? "project" : "conversation";
+  const active = selection?.type === type && item.id === selection.id;
+  const isProject = type === "project";
+  return (
+    <div className={`conversation-entry ${active ? "active" : ""}`}>
+      <button
+        className="conversation-item"
+        type="button"
+        onClick={() => onSelect({ type, id: item.id })}
+      >
+        <span className={`run-item-indicator ${item.status}`} aria-hidden="true" />
+        <span className="run-item-body">
+          <span className="run-item-title">
+            <span>{isProject ? <Sparkles size={13} /> : <Bot size={13} />}{item.title}</span>
+            <span className="run-item-time">{formatRunTime(item.latestAt)}</span>
+          </span>
+          <span className="run-item-meta">
+            <span>{item.agentCount} agents</span>
+            <span>·</span>
+            <span>{item.roomCount} rooms</span>
+            {isProject && item.projectStatus && <span>· {projectStatusLabels[item.projectStatus]}</span>}
+            {item.exceptionCount > 0 && <span className="run-badge attention">· {item.exceptionCount} alert</span>}
+            {item.approvalCount > 0 && <span className="run-badge approval">· {item.approvalCount} approval</span>}
+          </span>
+          <span className="run-item-summary">{item.summary}</span>
+        </span>
+      </button>
+      {active && item.rooms.length > 0 && (
+        <div className="conversation-room-scope">
+          <span className="scope-label">关联房间</span>
+          {item.rooms.slice(0, 4).map((room) => (
+            <span className="scope-room" key={room.roomId} title={room.roomId}>
+              <CircleDot size={10} />
+              <span>{room.label}</span>
+            </span>
+          ))}
+          {item.rooms.length > 4 && <span className="scope-more">+{item.rooms.length - 4} 个房间</span>}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ConversationList({
   snapshot,
   selection,
   onSelect,
+  onCreateProject,
+  onCreateManagerDm,
+  creatingProject,
+  creationError,
 }: {
   snapshot: WorkspaceSnapshot;
   selection?: Selection;
   onSelect: (selection: Selection) => void;
+  onCreateProject: () => void;
+  onCreateManagerDm: () => void;
+  creatingProject: boolean;
+  creationError?: string;
 }) {
   return (
-    <aside className="sidebar" aria-label="Manager conversations">
+    <aside className="sidebar" aria-label="项目与 Manager 对话" tabIndex={0}>
       <div className="sidebar-heading">
-        <p className="eyebrow">Manager inbox</p>
-        <h2 className="page-title">与 Manager 的对话</h2>
-        <p className="sidebar-copy">一次对话承载主任务，关联的 Team、Leader 和 Worker room 作为协作证据。</p>
+        <div className="sidebar-heading-top">
+          <div>
+            <p className="eyebrow">Workspace inbox</p>
+            <h2 className="page-title">项目与私聊</h2>
+          </div>
+          <span className="inbox-count">{snapshot.projects.length + snapshot.conversations.length}</span>
+        </div>
+        <p className="sidebar-copy">按项目查看 Manager 与协作房间。</p>
+        <div className="inbox-actions">
+          <button className="inbox-action primary" type="button" onClick={onCreateProject} disabled={creatingProject}>
+            <Sparkles size={12} /> 新建项目
+          </button>
+          <button className="inbox-action" type="button" onClick={onCreateManagerDm} disabled={creatingProject}>
+            <Bot size={12} /> Manager 私聊
+          </button>
+        </div>
+        {creationError && <p className="sidebar-action-error">{creationError}</p>}
       </div>
       <div className="conversation-list">
-        <p className="run-list-label">Conversations · {conversationCountLabel(snapshot.conversations)}</p>
-        {snapshot.conversations.length > 0 ? snapshot.conversations.map((conversation) => {
-          const active = selection?.type === "conversation" && conversation.id === selection.id;
-          return (
-            <div className={`conversation-entry ${active ? "active" : ""}`} key={conversation.id}>
-              <button
-                className="conversation-item"
-                type="button"
-                onClick={() => onSelect({ type: "conversation", id: conversation.id })}
-              >
-                <span className={`run-item-indicator ${conversation.status}`} aria-hidden="true" />
-                <span className="run-item-body">
-                  <span className="run-item-title">
-                    <span><Bot size={13} />{conversation.title}</span>
-                    <span className="run-item-time">{formatRunTime(conversation.latestAt)}</span>
-                  </span>
-                  <span className="run-item-meta">
-                    <span>{conversation.agentCount} agents</span>
-                    <span>·</span>
-                    <span>{conversation.roomCount} rooms</span>
-                    {conversation.exceptionCount > 0 && <span className="run-badge attention">· {conversation.exceptionCount} alert</span>}
-                  </span>
-                  <span className="run-item-summary">{conversation.summary}</span>
-                </span>
-              </button>
-              {active && conversation.rooms.length > 0 && (
-                <div className="conversation-room-scope">
-                  <span className="scope-label">linked evidence</span>
-                  {conversation.rooms.slice(0, 4).map((room) => (
-                    <span className="scope-room" key={room.roomId} title={room.roomId}>
-                      <CircleDot size={10} />
-                      <span>{room.label}</span>
-                    </span>
-                  ))}
-                  {conversation.rooms.length > 4 && <span className="scope-more">+{conversation.rooms.length - 4} rooms</span>}
-                </div>
-              )}
+        {snapshot.projects.length > 0 && (
+          <section className="inbox-section">
+            <div className="inbox-section-heading">
+              <p className="run-list-label">{conversationSourceLabels["dashboard-project"]}</p>
+              <span>{snapshot.projects.length}</span>
             </div>
-          );
-        }) : (
-          <div className="empty-state compact-empty">
-            <Inbox size={20} />
-            <p className="empty-state-title">等待 Manager 会话</p>
-            <p className="empty-state-copy">Controller 暴露 Manager room 后，真实对话会出现在这里。</p>
-          </div>
+            {snapshot.projects.map((item) => <ConversationEntry item={item} selection={selection} onSelect={onSelect} key={item.id} />)}
+          </section>
         )}
+        <section className="inbox-section">
+          <div className="inbox-section-heading">
+            <p className="run-list-label">{conversationSourceLabels.controller}</p>
+            <span>{conversationCountLabel(snapshot.conversations)}</span>
+          </div>
+          {snapshot.conversations.length > 0 ? snapshot.conversations.map((item) => (
+            <ConversationEntry item={item} selection={selection} onSelect={onSelect} key={item.id} />
+          )) : (
+            <div className="empty-state compact-empty">
+              <Inbox size={20} />
+              <p className="empty-state-title">等待 Manager 会话</p>
+              <p className="empty-state-copy">Controller 暴露 Manager room 后，真实对话会出现在这里。</p>
+            </div>
+          )}
+        </section>
         <div className="unassigned-summary">
           <span><CircleDot size={11} /> 未归类证据 room</span>
           <strong>{snapshot.unassignedRooms.length}</strong>
@@ -289,9 +348,12 @@ export function WorkspaceShell() {
   const [feedFilter, setFeedFilter] = useState<FeedFilter>("key");
   const [eventQuery, setEventQuery] = useState("");
   const [streamState, setStreamState] = useState<"connecting" | "live" | "degraded">("connecting");
+  const [projectDialogOpen, setProjectDialogOpen] = useState(false);
+  const [creatingProject, setCreatingProject] = useState(false);
+  const [creationError, setCreationError] = useState<string>();
   const hasSnapshot = snapshot !== null;
 
-  const refreshWorkspace = useCallback(async () => {
+  const refreshWorkspace = useCallback(async (preferredSelection?: Selection) => {
     setRefreshing(true);
     try {
       const next = await fetchJson<WorkspaceSnapshot>("/api/workspace");
@@ -299,10 +361,24 @@ export function WorkspaceShell() {
       setError(undefined);
       setStreamState(next.sync.state === "degraded" ? "degraded" : "live");
       setSelection((current) => {
+        if (preferredSelection && (
+          preferredSelection.type === "project"
+            ? next.projects.some((project) => project.id === preferredSelection.id)
+            : next.conversations.some((conversation) => conversation.id === preferredSelection.id)
+        )) {
+          return preferredSelection;
+        }
         if (current?.type === "conversation" && next.conversations.some((conversation) => conversation.id === current.id)) {
           return current;
         }
-        return next.conversations[0] ? { type: "conversation", id: next.conversations[0].id } : undefined;
+        if (current?.type === "project" && next.projects.some((project) => project.id === current.id)) {
+          return current;
+        }
+        return next.conversations[0]
+          ? { type: "conversation", id: next.conversations[0].id }
+          : next.projects[0]
+            ? { type: "project", id: next.projects[0].id }
+            : undefined;
       });
       setRevision((value) => value + 1);
     } catch (caught) {
@@ -313,7 +389,7 @@ export function WorkspaceShell() {
   }, []);
 
   useEffect(() => {
-    void Promise.resolve().then(refreshWorkspace);
+    void Promise.resolve().then(() => refreshWorkspace());
   }, [refreshWorkspace]);
 
   useEffect(() => {
@@ -321,7 +397,8 @@ export function WorkspaceShell() {
       return;
     }
     let cancelled = false;
-    const endpoint = `/api/conversations/${encodeURIComponent(selection.id)}`;
+    const resource = selection.type === "project" ? "projects" : "conversations";
+    const endpoint = `/api/${resource}/${encodeURIComponent(selection.id)}`;
     void fetchJson<ConversationDetail>(endpoint)
       .then((next) => {
         if (cancelled) {
@@ -359,11 +436,14 @@ export function WorkspaceShell() {
     eventSource.addEventListener("run.updated", refreshFromEvent);
     eventSource.addEventListener("controller.updated", refreshFromEvent);
     eventSource.addEventListener("sync.status", refreshFromEvent);
+    eventSource.addEventListener("project.updated", refreshFromEvent);
     return () => eventSource.close();
   }, [refreshWorkspace, hasSnapshot]);
 
   const activeConversation = useMemo(
-    () => selection?.type === "conversation" ? snapshot?.conversations.find((conversation) => conversation.id === selection.id) || null : null,
+    () => selection?.type === "project"
+      ? snapshot?.projects.find((project) => project.id === selection.id) || null
+      : snapshot?.conversations.find((conversation) => conversation.id === selection?.id) || null,
     [selection, snapshot],
   );
 
@@ -374,7 +454,8 @@ export function WorkspaceShell() {
     setSending(true);
     setSendError(undefined);
     try {
-      const endpoint = `/api/conversations/${encodeURIComponent(selection.id)}/messages`;
+      const resource = selection.type === "project" ? "projects" : "conversations";
+      const endpoint = `/api/${resource}/${encodeURIComponent(selection.id)}/messages`;
       await fetchJson(endpoint, {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -387,6 +468,47 @@ export function WorkspaceShell() {
       setSending(false);
     }
   }, [refreshWorkspace, selection]);
+
+  const createManagerDm = useCallback(async () => {
+    if (creatingProject) {
+      return;
+    }
+    setCreatingProject(true);
+    setCreationError(undefined);
+    try {
+      const result = await fetchJson<{ project: DashboardProject }>("/api/projects", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ kind: "manager-dm" }),
+      });
+      await refreshWorkspace({ type: "project", id: result.project.id });
+    } catch (caught) {
+      setCreationError(caught instanceof Error ? caught.message : "无法创建 Manager 私聊");
+    } finally {
+      setCreatingProject(false);
+    }
+  }, [creatingProject, refreshWorkspace]);
+
+  const createProject = useCallback(async (values: ProjectCreateValues) => {
+    if (creatingProject) {
+      return;
+    }
+    setCreatingProject(true);
+    setCreationError(undefined);
+    try {
+      const result = await fetchJson<{ project: DashboardProject }>("/api/projects", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ kind: "project", ...values }),
+      });
+      setProjectDialogOpen(false);
+      await refreshWorkspace({ type: "project", id: result.project.id });
+    } catch (caught) {
+      setCreationError(caught instanceof Error ? caught.message : "无法创建项目");
+    } finally {
+      setCreatingProject(false);
+    }
+  }, [creatingProject, refreshWorkspace]);
 
   if (!snapshot && error) {
     return <ErrorPane message={error} onRetry={() => void refreshWorkspace()} retrying={refreshing} />;
@@ -401,7 +523,10 @@ export function WorkspaceShell() {
     );
   }
 
-  const activeDetail = selection?.type === "conversation" && conversationDetail?.conversation.id === selection.id
+  const activeDetail = conversationDetail
+    && conversationDetail.conversation.id === selection?.id
+    && ((selection.type === "project" && conversationDetail.conversation.source === "dashboard-project")
+      || (selection.type === "conversation" && conversationDetail.conversation.source === "controller"))
     ? conversationDetail
     : null;
   const activeError = conversationError && conversationError.type === selection?.type && conversationError.id === selection?.id
@@ -429,9 +554,13 @@ export function WorkspaceShell() {
         <ConversationList snapshot={snapshot} selection={selection} onSelect={(next) => {
           setSelection(next);
           setSendError(undefined);
+          setCreationError(undefined);
           setFeedFilter("key");
           setEventQuery("");
-        }} />
+        }} onCreateProject={() => {
+          setCreationError(undefined);
+          setProjectDialogOpen(true);
+        }} onCreateManagerDm={() => void createManagerDm()} creatingProject={creatingProject} creationError={creationError} />
         {activeConversation ? (
           <ConversationThread
             key={`conversation:${selection?.id || activeConversation.id}`}
@@ -458,6 +587,20 @@ export function WorkspaceShell() {
           onRefresh={() => void refreshWorkspace()}
         />
       </div>
+      {projectDialogOpen && (
+        <ProjectCreateDialog
+          participants={snapshot.participants}
+          submitting={creatingProject}
+          error={creationError}
+          onClose={() => {
+            if (!creatingProject) {
+              setProjectDialogOpen(false);
+              setCreationError(undefined);
+            }
+          }}
+          onSubmit={(values) => void createProject(values)}
+        />
+      )}
     </div>
   );
 }

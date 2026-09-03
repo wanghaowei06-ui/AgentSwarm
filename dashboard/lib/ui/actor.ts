@@ -6,7 +6,14 @@ export const actorDisplayName = (event: AgentTeamsEvent): string =>
 export const actorRoleLabel: Record<ActorRole, string> = {
   human: "用户",
   manager: "管理者",
+  leader: "组长",
   worker: "工作者",
   system: "系统",
   unknown: "未知",
 };
+
+export const participantRoleLabels = {
+  manager: "Manager",
+  leader: "Leader",
+  worker: "Worker",
+} as const;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { workspaceNavigationItems } from "../lib/ui/navigation";
+import { conversationSourceLabels, workspaceNavigationItems } from "../lib/ui/navigation";
 
 describe("Workspace navigation", () => {
   it("keeps the existing navigation choices in Workspace order", () => {
@@ -9,5 +9,12 @@ describe("Workspace navigation", () => {
       { id: "observability", label: "Observability", active: false },
       { id: "artifacts", label: "Artifacts", active: false },
     ]);
+  });
+
+  it("labels native and Dashboard-created Inbox sources", () => {
+    expect(conversationSourceLabels).toEqual({
+      controller: "Manager inbox",
+      "dashboard-project": "Projects",
+    });
   });
 });
