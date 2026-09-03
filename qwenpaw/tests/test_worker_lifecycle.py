@@ -1259,6 +1259,28 @@ async def test_stop_logs_failed_background_task_and_still_terminates_process(
 
 
 @pytest.mark.anyio
+async def test_stop_flushes_hitl_state_after_process_shutdown(tmp_path: Path) -> None:
+    config = _config(tmp_path)
+    worker = Worker(config)
+    worker._prepare_env()
+    state_path = config.qwenpaw_working_dir / "agentteams-hitl.json"
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    state_path.write_text('{"version":1,"records":{}}\n', encoding="utf-8")
+    flushed: list[Path] = []
+
+    class FakeSync:
+        def push_file(self, path: Path) -> bool:
+            flushed.append(path)
+            return True
+
+    worker.sync = FakeSync()
+
+    await worker.stop()
+
+    assert flushed == [state_path]
+
+
+@pytest.mark.anyio
 async def test_qwenpaw_process_start_failure_marks_runtime_not_ready(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

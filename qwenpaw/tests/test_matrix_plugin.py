@@ -30,6 +30,15 @@ def test_matrix_plugin_targets_qwenpaw_2_and_does_not_patch_builtin_matrix():
     assert "/opt/agentteams/plugins/agentteams-matrix-channel" in dockerfile
 
 
+def test_matrix_plugin_installs_persistent_hitl_before_channel_registration():
+    source = (PLUGIN / "plugin.py").read_text(encoding="utf-8")
+
+    assert "install_qwenpaw_approval_persistence" in source
+    assert source.index("install_qwenpaw_approval_persistence()") < source.index(
+        "api.register_channel(",
+    )
+
+
 def test_matrix_plugin_uses_qwenpaw_2_display_config_renderer_contract():
     source = (PLUGIN / "agentteams_matrix" / "channel.py").read_text(encoding="utf-8")
 

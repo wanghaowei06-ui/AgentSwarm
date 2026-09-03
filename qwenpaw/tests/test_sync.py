@@ -120,6 +120,35 @@ def test_storage_alias_derives_from_agentteams_storage_prefix(tmp_path: Path, mo
     assert sync._object_path("agents/worker-a/file.txt") == "agentteams/agentteams-storage/agents/worker-a/file.txt"
 
 
+def test_push_file_uploads_one_worker_owned_file(tmp_path: Path, monkeypatch) -> None:
+    sync = _sync(tmp_path)
+    state_path = sync.local_dir / ".qwenpaw" / "agentteams-hitl.json"
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    state_path.write_text('{"version":1}\n', encoding="utf-8")
+    commands = []
+
+    monkeypatch.setattr(sync, "ensure_alias", lambda: None)
+    monkeypatch.setattr(sync, "_cat_bytes", lambda _key: None)
+
+    def fake_mc(*args, **kwargs):
+        commands.append((args, kwargs))
+        return subprocess.CompletedProcess(args, 0, stdout="", stderr="")
+
+    monkeypatch.setattr(sync, "_mc", fake_mc)
+
+    assert sync.push_file(state_path) is True
+    assert commands == [
+        (
+            (
+                "cp",
+                str(state_path),
+                "agentteams/agentteams-storage/agents/worker-a/.qwenpaw/agentteams-hitl.json",
+            ),
+            {"check": True},
+        )
+    ]
+
+
 def test_push_local_uploads_worker_files_but_skips_controller_owned_state(tmp_path: Path, monkeypatch) -> None:
     sync = _sync(tmp_path)
     uploads = []

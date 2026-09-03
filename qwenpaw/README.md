@@ -32,7 +32,24 @@ QwenPaw localhost HTTP API.
 - Exclude credentials, shared projections, logs, tool results,
   media, file store, and other runtime cache paths from background push.
 
-### 1.3 Desired-State Apply
+### 1.3 HITL Approval Persistence
+
+- Install the AgentTeams HITL compatibility layer before QwenPaw agents start.
+- Store pending approval metadata and the first terminal decision in
+  `.qwenpaw/agentteams-hitl.json` using atomic writes.
+- Redact channel instances and credential-like fields before persistence.
+- Restore non-expired requests with the original request ID after a QwenPaw
+  process restart, and retry Matrix notifications until the channel is ready.
+- Use `AGENTTEAMS_HITL_APPROVAL_TIMEOUT_SECONDS` to set the bounded approval
+  window. The default is 24 hours; `0` disables expiry and should only be used
+  for a deliberately supervised environment.
+
+The persisted record is the approval control state, not a serialized Python
+coroutine. If the QwenPaw process dies while a tool call is paused, the
+original coroutine cannot be resurrected; the normal task/message replay path
+must re-enter the approved operation.
+
+### 1.4 Desired-State Apply
 
 - Pull and read `agents/{memberName}/runtime/runtime.yaml` from object
   storage.
@@ -66,7 +83,7 @@ QwenPaw localhost HTTP API.
   See `../docs/zh-cn/qwenpaw-mcp-json.md` for the user-facing package authoring
   guide.
 
-### 1.4 Heartbeat
+### 1.5 Heartbeat
 
 - Maintain local `heartbeat.json` for QwenPaw process/API reachability.
 - Use QwenPaw's native `/api/version` endpoint as the process health probe.
@@ -81,7 +98,7 @@ QwenPaw localhost HTTP API.
 - Keep controller reporting as a bypass path: report failures are logged but do
   not block storage sync, desired-state apply, or QwenPaw runtime loops.
 
-### 1.5 AgentTeams Matrix Channel
+### 1.6 AgentTeams Matrix Channel
 
 - The `agentteams-matrix-channel` plugin registers the independent
   `agentteams_matrix` key through `BaseChannel` and `register_channel()`.
@@ -96,7 +113,7 @@ The daemon does not implement TeamHarness collaboration semantics. It triggers
 runtime apply and storage persistence, then delegates TeamHarness-specific
 QwenPaw integration to the adapter.
 
-### 1.6 DingTalk Streaming Card Mode
+### 1.7 DingTalk Streaming Card Mode
 
 The worker consumes `desired.channels.dingtalk` from `runtime.yaml`. When
 `streaming_enabled: true`, the worker requires `client_id`, `client_secret`,
