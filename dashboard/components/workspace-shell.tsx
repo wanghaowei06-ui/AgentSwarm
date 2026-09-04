@@ -87,6 +87,7 @@ function ConversationEntry({
   const type = item.source === "dashboard-project" ? "project" : "conversation";
   const active = selection?.type === type && item.id === selection.id;
   const isProject = type === "project";
+  const isTask = type === "conversation" && Boolean(item.runId);
   return (
     <div className={`conversation-entry ${active ? "active" : ""}`}>
       <button
@@ -97,10 +98,12 @@ function ConversationEntry({
         <span className={`run-item-indicator ${item.status}`} aria-hidden="true" />
         <span className="run-item-body">
           <span className="run-item-title">
-            <span>{isProject ? <Sparkles size={13} /> : <Bot size={13} />}{item.title}</span>
+            <span>{isProject ? <Sparkles size={13} /> : isTask ? <CircleDot size={13} /> : <Bot size={13} />}{item.title}</span>
             <span className="run-item-time">{formatRunTime(item.latestAt)}</span>
           </span>
           <span className="run-item-meta">
+            <span>{isTask ? "task" : isProject ? "project" : "Manager"}</span>
+            <span>·</span>
             <span>{item.agentCount} agents</span>
             <span>·</span>
             <span>{item.roomCount} rooms</span>
@@ -145,16 +148,16 @@ function ConversationList({
   creationError?: string;
 }) {
   return (
-    <aside className="sidebar" aria-label="项目与 Manager 对话" tabIndex={0}>
+    <aside className="sidebar" aria-label="项目、任务与 Manager 对话" tabIndex={0}>
       <div className="sidebar-heading">
         <div className="sidebar-heading-top">
           <div>
             <p className="eyebrow">Workspace inbox</p>
-            <h2 className="page-title">项目与私聊</h2>
+            <h2 className="page-title">项目、任务与私聊</h2>
           </div>
           <span className="inbox-count">{snapshot.projects.length + snapshot.conversations.length}</span>
         </div>
-        <p className="sidebar-copy">按项目查看 Manager 与协作房间。</p>
+        <p className="sidebar-copy">按项目或任务查看 Manager 与协作房间。</p>
         <div className="inbox-actions">
           <button className="inbox-action primary" type="button" onClick={onCreateProject} disabled={creatingProject}>
             <Sparkles size={12} /> 新建项目
@@ -185,7 +188,7 @@ function ConversationList({
           )) : (
             <div className="empty-state compact-empty">
               <Inbox size={20} />
-              <p className="empty-state-title">等待 Manager 会话</p>
+              <p className="empty-state-title">等待 Manager 会话或任务</p>
               <p className="empty-state-copy">Controller 暴露 Manager room 后，真实对话会出现在这里。</p>
             </div>
           )}

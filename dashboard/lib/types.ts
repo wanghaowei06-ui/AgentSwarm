@@ -122,6 +122,8 @@ export type ConversationSummary = {
   projectId?: string;
   projectKind?: DashboardProjectKind;
   projectStatus?: DashboardProjectStatus;
+  runId?: string;
+  taskIds?: string[];
   title: string;
   managerName: string;
   managerUserId?: string;

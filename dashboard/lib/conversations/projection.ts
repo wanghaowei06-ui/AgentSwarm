@@ -9,8 +9,9 @@ import type {
   JsonObject,
   RoomSummary,
 } from "../types";
-import { approvalState, eventEvidenceCategory, isPriorityEvidence } from "../events/evidence";
+import { approvalState, eventEvidenceCategory, isPriorityEvidence, isStructuralRoomEvent } from "../events/evidence";
 import { compactInboxPreview } from "../inbox/preview";
+import { correlateTasks, taskRunIdFor } from "./task-correlation";
 
 export type ConversationProjection = {
   conversations: ConversationSummary[];
@@ -85,7 +86,7 @@ const activeEvents = (events: AgentTeamsEvent[]): AgentTeamsEvent[] => {
   });
 };
 
-const attentionFor = (event: AgentTeamsEvent): AttentionItem[] => {
+const attentionFor = (event: AgentTeamsEvent, runId = event.runId): AttentionItem[] => {
   const status = stringValue(event.detail?.status).toLowerCase();
   const category = eventEvidenceCategory(event);
   if (category === "exception") {
@@ -93,7 +94,7 @@ const attentionFor = (event: AgentTeamsEvent): AttentionItem[] => {
       id: `attention:${event.id}`,
       severity: status === "waiting" || status === "blocked" ? "warning" : "error",
       summary: event.summary,
-      runId: event.runId,
+      runId,
       sourceEventId: event.sourceRef.eventId,
     }];
   }
@@ -102,7 +103,7 @@ const attentionFor = (event: AgentTeamsEvent): AttentionItem[] => {
       id: `attention:${event.id}`,
       severity: approvalState(event) === "pending" ? "warning" : "error",
       summary: approvalState(event) === "pending" ? `待人工审批：${event.summary}` : `人工审批已拒绝：${event.summary}`,
-      runId: event.runId,
+      runId,
       sourceEventId: event.sourceRef.eventId,
     }];
   }
@@ -117,12 +118,13 @@ const addRoom = (
   role: ConversationRoomRole,
   agentName?: string,
   teamName?: string,
+  summaryEvents: AgentTeamsEvent[] = events,
 ): void => {
   if (!roomId) {
     return;
   }
   const existing = rooms.get(roomId);
-  const summary = roomSummary(roomId, events, label);
+  const summary = roomSummary(roomId, summaryEvents, label);
   rooms.set(roomId, {
     ...(existing || summary),
     ...summary,
@@ -194,10 +196,26 @@ const knownRoomsForManager = (
   return [...rooms.values()];
 };
 
+const roomsForEvents = (rooms: ConversationRoom[], events: AgentTeamsEvent[]): ConversationRoom[] => {
+  const roomIds = new Set(events.map((event) => event.roomId).filter((roomId): roomId is string => Boolean(roomId)));
+  return rooms
+    .filter((room) => room.role === "manager" || roomIds.has(room.roomId))
+    .map((room) => ({
+      ...room,
+      ...roomSummary(room.roomId, events, room.label),
+    }));
+};
+
+type ConversationScope = {
+  runId?: string;
+  taskIds?: string[];
+};
+
 const conversationSummary = (
   manager: ControllerRecord,
   rooms: ConversationRoom[],
   events: AgentTeamsEvent[],
+  scope: ConversationScope = {},
 ): ConversationSummary => {
   const managerName = stringValue(manager.name) || "default";
   const managerDisplayName = rooms.find((room) => room.role === "manager")?.agentName || managerPresentationName(managerName);
@@ -218,9 +236,11 @@ const conversationSummary = (
     [managerDisplayName, ...rooms.map((room) => room.agentName || "")].filter(Boolean),
   );
   return {
-    id: `manager:${managerName}`,
+    id: scope.runId ? `manager:${managerName}:run:${scope.runId}` : `manager:${managerName}`,
     source: "controller",
-    title: "Manager 对话",
+    runId: scope.runId,
+    taskIds: scope.taskIds?.length ? scope.taskIds : undefined,
+    title: scope.runId ? `任务 · ${scope.runId}` : "Manager 对话",
     managerName: managerDisplayName,
     managerUserId: stringValue(manager.matrixUserID) || stringValue(manager.matrixUserId) || undefined,
     managerRoomId,
@@ -248,21 +268,48 @@ export const projectConversations = (
   controllerData?: JsonObject,
   existingRooms?: RoomSummary[],
 ): ConversationProjection => {
-  const active = activeEvents(events);
+  const active = activeEvents(events).filter((event) => !isStructuralRoomEvent(event));
   const managers = recordsAt(controllerData, "/api/v1/managers", "managers");
   const teams = recordsAt(controllerData, "/api/v1/teams", "teams");
   const workers = recordsAt(controllerData, "/api/v1/workers", "workers");
   const sourceRooms = existingRooms || roomSummariesFromEvents(events);
-  const conversations = managers.map((manager) => {
+  const managerScopes = managers.map((manager) => {
     const rooms = knownRoomsForManager(manager, managers, teams, workers, events);
     const roomIds = new Set(rooms.map((room) => room.roomId));
     const scoped = active.filter((event) => event.roomId && roomIds.has(event.roomId));
-    return conversationSummary(manager, rooms, scoped);
-  }).sort((left, right) => right.latestAt.localeCompare(left.latestAt));
-  const assignedRoomIds = new Set(conversations.flatMap((conversation) => {
-    const manager = managers.find((item) => `manager:${stringValue(item.name) || "default"}` === conversation.id);
-    return manager ? knownRoomsForManager(manager, managers, teams, workers, events).map((room) => room.roomId) : [];
-  }));
+    const correlationEvents = events.filter((event) => event.roomId && roomIds.has(event.roomId));
+    return { manager, rooms, roomIds, scoped, correlationEvents };
+  });
+  const conversations = managerScopes.flatMap(({ manager, rooms, scoped, correlationEvents }) => {
+    const correlation = correlateTasks(correlationEvents);
+    const taskGroups = new Map<string, AgentTeamsEvent[]>();
+    const generalEvents: AgentTeamsEvent[] = [];
+    for (const event of scoped) {
+      const runId = taskRunIdFor(event, correlation);
+      if (!runId) {
+        generalEvents.push(event);
+        continue;
+      }
+      const group = taskGroups.get(runId) || [];
+      group.push(event);
+      taskGroups.set(runId, group);
+    }
+    return [
+      conversationSummary(manager, rooms, generalEvents),
+      ...[...taskGroups.entries()].map(([runId, taskEvents]) => conversationSummary(
+        manager,
+        roomsForEvents(rooms, taskEvents),
+        taskEvents,
+        { runId, taskIds: correlation.taskIdsByRun.get(runId) },
+      )),
+    ];
+  }).sort((left, right) => {
+    if (Boolean(left.runId) !== Boolean(right.runId)) {
+      return left.runId ? -1 : 1;
+    }
+    return right.latestAt.localeCompare(left.latestAt);
+  });
+  const assignedRoomIds = new Set(managerScopes.flatMap(({ roomIds }) => [...roomIds]));
   return {
     conversations,
     unassignedRooms: sourceRooms.filter((room) => !assignedRoomIds.has(room.roomId)),
@@ -283,20 +330,32 @@ export const projectConversation = (
   const managers = recordsAt(controllerData, "/api/v1/managers", "managers");
   const teams = recordsAt(controllerData, "/api/v1/teams", "teams");
   const workers = recordsAt(controllerData, "/api/v1/workers", "workers");
-  const manager = managers.find((item) => `manager:${stringValue(item.name) || "default"}` === conversationId);
+  const taskMarker = ":run:";
+  const taskMarkerIndex = conversationId.indexOf(taskMarker);
+  const managerConversationId = taskMarkerIndex === -1
+    ? conversationId
+    : conversationId.slice(0, taskMarkerIndex);
+  const manager = managers.find((item) => `manager:${stringValue(item.name) || "default"}` === managerConversationId);
   const rooms = manager ? knownRoomsForManager(manager, managers, teams, workers, events) : [];
   const roomIds = new Set(rooms.map((room) => room.roomId));
-  const observations = activeEvents(events)
-    .filter((event) => event.roomId && roomIds.has(event.roomId))
+  const scopedEvents = activeEvents(events)
+    .filter((event) => !isStructuralRoomEvent(event))
+    .filter((event) => event.roomId && roomIds.has(event.roomId));
+  const correlation = correlateTasks(events.filter((event) => event.roomId && roomIds.has(event.roomId)));
+  const runId = conversation.runId
+    || (taskMarkerIndex === -1 ? undefined : conversationId.slice(taskMarkerIndex + taskMarker.length));
+  const observations = scopedEvents
+    .filter((event) => (runId ? taskRunIdFor(event, correlation) === runId : !taskRunIdFor(event, correlation)))
     .sort((left, right) => left.occurredAt.localeCompare(right.occurredAt));
+  const detailRooms = runId ? roomsForEvents(rooms, observations) : rooms;
   return {
     conversation,
-    rooms,
+    rooms: detailRooms,
     messages: observations.filter((event) => event.kind === "message"),
     observations,
     evidence: observations.filter(isPriorityEvidence),
     artifacts: observations.filter((event) => event.kind === "artifact"),
-    attention: observations.flatMap(attentionFor),
+    attention: observations.flatMap((event) => attentionFor(event, taskRunIdFor(event, correlation))),
   };
 };
 

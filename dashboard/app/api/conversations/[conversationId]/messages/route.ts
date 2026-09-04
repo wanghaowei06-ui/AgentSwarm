@@ -22,7 +22,19 @@ export async function POST(
     const runtime = await ensureDashboardRuntime();
     const snapshot = await runtime.store.snapshot();
     const conversation = projectConversation(conversationId, snapshot.events, snapshot.controller?.data);
-    const sent = await runtime.matrix.sendMessage(conversation.conversation.managerRoomId, text, { threadRootEventId });
+    const taskThreadRoot = conversation.conversation.runId
+      ? conversation.observations.find((event) =>
+        event.roomId === conversation.conversation.managerRoomId
+        && !event.detail?.threadRootEventId
+        && event.sourceRef.eventId,
+      )?.sourceRef.eventId
+        || conversation.observations.find((event) =>
+          event.roomId === conversation.conversation.managerRoomId && event.sourceRef.eventId,
+        )?.sourceRef.eventId
+      : undefined;
+    const sent = await runtime.matrix.sendMessage(conversation.conversation.managerRoomId, text, {
+      threadRootEventId: threadRootEventId || taskThreadRoot,
+    });
     return jsonResponse({ accepted: true, eventId: sent.eventId, txnId: sent.txnId });
   } catch (error) {
     if (error instanceof Error && /was not found/.test(error.message)) {
